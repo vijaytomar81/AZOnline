@@ -4,6 +4,7 @@ $env:SCAN_BASE_URL="target page full url"
 npx ts-node .\src\scanner\cli.ts --pageKey common.auth-entry --url "/" --verbose
 npx ts-node .\src\scanner\cli.ts --pageKey common.insurance-product-type-selection --url "/insurance-product-selection" --verbose
 npx ts-node .\src\scanner\cli.ts --pageKey motor.car-details --url "/car-details" --verbose
+npx ts-node .\src\scanner\cli.ts --journey motorNB --pageKey motor.car-details --targetUrlPattern "/numberPlateScan/" --verbose
 npx ts-node .\src\scanner\cli.ts --pageKey motor.driving-licence --url "/driving-licence" --verbose
 npx ts-node .\src\scanner\cli.ts --pageKey motor.personal-details --url "/personal-details" --verbose
 npx ts-node .\src\scanner\cli.ts --pageKey motor.claims-and-convictions --url "/claims-and-convictions" --verbose
