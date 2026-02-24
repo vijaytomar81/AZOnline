@@ -1,0 +1,31 @@
+{
+  "name": "azonline",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "data:build": "ts-node src/data/data-builder/index.ts",
+    "test:e2e": "playwright test",
+    "e2e": "npm run data:build -- && npm run test:e2e"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vijaytomar81/AZOnline.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vijaytomar81/AZOnline/issues"
+  },
+  "homepage": "https://github.com/vijaytomar81/AZOnline#readme",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.3.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "exceljs": "^4.1.1"
+  }
+}
