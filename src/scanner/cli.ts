@@ -1,10 +1,12 @@
 // src/scanner/cli.ts
+
 import path from "node:path";
-import { scanPage } from "./scanPage";
 import { createLogger } from "./logger";
+import { scanPage } from "./scanPage";
 
 function getArg(name: string): string | null {
     const argv = process.argv.slice(2);
+
     const i = argv.indexOf(name);
     if (i >= 0) return argv[i + 1] ?? null;
 
@@ -19,31 +21,50 @@ function hasFlag(name: string): boolean {
 }
 
 async function main() {
+    const connectCdp = getArg("--connectCdp");
+    if (!connectCdp) {
+        throw new Error(
+            "Missing --connectCdp. Example: --connectCdp http://localhost:9222"
+        );
+    }
+
     const pageKey = getArg("--pageKey");
-    const url = getArg("--url");
+    if (!pageKey) {
+        throw new Error(
+            "Missing --pageKey. Example: --pageKey common.auth-entry"
+        );
+    }
 
-    const outDir = getArg("--outDir") ?? path.join("src", "page-maps");
-    const headless = (getArg("--headless") ?? "true").toLowerCase() !== "false";
+    const tabUrlRegex = getArg("--tabUrlRegex") ?? undefined;
+    const outDir =
+        getArg("--outDir") ?? path.join(process.cwd(), "src", "page-maps");
 
+    const merge = hasFlag("--merge");
     const verbose = hasFlag("--verbose");
-    const withTimestamp = (getArg("--withTimestamp") ?? "true").toLowerCase() !== "false";
 
     const log = createLogger({
         prefix: "[scanner]",
         verbose,
-        withTimestamp, // ✅ default TRUE, can disable via --withTimestamp=false
+        withTimestamp: true,
     });
 
-    if (!pageKey) throw new Error("Missing --pageKey. Example: --pageKey common.authEntry");
-    if (!url) throw new Error("Missing --url. Example: --url /");
-
-    await scanPage({ pageKey, url, outDir, headless, log });
+    log.info("Starting scanner...");
+    await scanPage({
+        connectCdp,
+        pageKey,
+        tabUrlRegex,
+        outDir,
+        merge,
+        verbose,
+    });
 }
 
 main().catch((e) => {
-    const msg = e?.message || String(e);
-    // keep this in the same style even on hard failure
-    const log = createLogger({ prefix: "[scanner]", verbose: true, withTimestamp: true });
-    log.error(msg);
+    const log = createLogger({
+        prefix: "[scanner]",
+        verbose: true,
+        withTimestamp: true,
+    });
+    log.error(e?.message || String(e));
     process.exit(1);
 });
