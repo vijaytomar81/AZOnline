@@ -3,37 +3,161 @@
 import fs from "node:fs";
 import path from "node:path";
 import { chromium } from "@playwright/test";
-import { createLogger } from "./logger";
 
-type ScanOptions = {
-    connectCdp: string;
-    pageKey: string;
-    tabUrlRegex?: string;
-    merge?: boolean;
-    outDir?: string;
-    verbose?: boolean;
+import type { Logger } from "./logger";
+import type { PageMap, ScannedElement } from "./types";
+import { buildCandidates } from "./selectorEngine";
+
+export type ScanPageOptions = {
+    connectCdp: string; // required (http or ws)
+    pageKey: string; // required e.g. "motor.car-details"
+    outDir?: string; // default: ./src/page-maps
+    merge?: boolean; // default false
+    tabIndex?: number; // default 0
+    verbose?: boolean; // debug logs
+    log: Logger; // required
 };
 
-type ElementMap = Record<string, string>;
-
-function mergeMaps(oldMap: ElementMap, newMap: ElementMap): ElementMap {
-    return { ...oldMap, ...newMap };
+function nowIso() {
+    return new Date().toISOString();
 }
 
-export async function scanPage(opts: ScanOptions) {
-    const log = createLogger({
-        prefix: "[scanner]",
-        verbose: opts.verbose,
-        withTimestamp: true,
-    });
+function ensureDir(dir: string) {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+}
 
-    const outDir =
-        opts.outDir ??
-        path.join(process.cwd(), "src", "page-maps");
+function toCamelFromText(s: string) {
+    const cleaned = s
+        .trim()
+        .toLowerCase()
+        .replace(/[\u200B-\u200D\uFEFF]/g, "")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
 
-    if (!fs.existsSync(outDir)) {
-        fs.mkdirSync(outDir, { recursive: true });
+    if (!cleaned) return "";
+
+    const parts = cleaned.split(/\s+/g);
+    return parts
+        .map((p, i) => (i === 0 ? p : p.charAt(0).toUpperCase() + p.slice(1)))
+        .join("");
+}
+
+function uniqueKey(base: string, used: Set<string>) {
+    let key = base;
+    let i = 2;
+    while (!key || used.has(key)) {
+        key = `${base}${i}`;
+        i++;
     }
+    used.add(key);
+    return key;
+}
+
+/**
+ * Label-first key strategy (your requirement):
+ * labelText -> ariaLabel -> visible text -> placeholder -> inputName -> name -> id -> tag+index
+ */
+function buildLabelFirstKey(el: ScannedElement, indexHint: number) {
+    const candidates = [
+        el.labelText,
+        el.ariaLabel,
+        el.text,
+        el.placeholder,
+        el.inputName,
+        el.name,
+        el.id,
+    ].filter(Boolean) as string[];
+
+    const best = candidates[0] ?? `${el.tag}-${indexHint}`;
+    return toCamelFromText(best);
+}
+
+function classifyType(el: ScannedElement) {
+    const tag = (el.tag || "").toLowerCase();
+    const role = (el.role || "").toLowerCase();
+    const type = (el.typeAttr || "").toLowerCase();
+
+    if (tag === "button" || role === "button") return "button";
+    if (tag === "a" || role === "link") return "link";
+    if (tag === "select" || role === "combobox") return "select";
+    if (tag === "textarea") return "textarea";
+    if (tag === "input") {
+        if (type === "checkbox") return "checkbox";
+        if (type === "radio") return "radio";
+        return "input";
+    }
+    return role || tag || "element";
+}
+
+function uniq(arr: string[]) {
+    return Array.from(new Set(arr.filter(Boolean)));
+}
+
+function safeReadJson<T>(filePath: string): T | null {
+    if (!fs.existsSync(filePath)) return null;
+    return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
+}
+
+/**
+ * Merge strategy:
+ * - Keep existing keys stable.
+ * - If preferred differs, keep old as fallback and promote new preferred.
+ * - Union fallbacks.
+ * - Merge meta (new wins where defined), and always keep meta.tag defined.
+ */
+function mergePageMaps(existing: PageMap, incoming: PageMap): PageMap {
+    const out: PageMap = {
+        ...existing,
+        pageKey: existing.pageKey || incoming.pageKey,
+        url: incoming.url || existing.url,
+        urlPath: incoming.urlPath ?? existing.urlPath,
+        scannedAt: incoming.scannedAt,
+        elements: { ...existing.elements },
+    };
+
+    for (const [key, next] of Object.entries(incoming.elements)) {
+        const cur = out.elements[key];
+
+        if (!cur) {
+            out.elements[key] = next;
+            continue;
+        }
+
+        let preferred = cur.preferred;
+        let fallbacks = uniq([...(cur.fallbacks ?? [])]);
+
+        if (preferred !== next.preferred) {
+            fallbacks = uniq(
+                [preferred, ...fallbacks, ...(next.fallbacks ?? [])].filter(
+                    (x) => x !== next.preferred
+                )
+            );
+            preferred = next.preferred;
+        } else {
+            fallbacks = uniq([...(cur.fallbacks ?? []), ...(next.fallbacks ?? [])]);
+        }
+
+        out.elements[key] = {
+            ...cur,
+            type: cur.type || next.type,
+            preferred,
+            fallbacks,
+            meta: {
+                ...(cur.meta ?? {}),
+                ...(next.meta ?? {}),
+                tag: next.meta?.tag ?? cur.meta?.tag ?? cur.type ?? next.type ?? "element",
+            },
+        };
+    }
+
+    return out;
+}
+
+export async function scanPage(opts: ScanPageOptions): Promise<void> {
+    const log = opts.log;
+
+    const outDir = opts.outDir ?? path.join(process.cwd(), "src", "page-maps");
+    ensureDir(outDir);
 
     const outFile = path.join(outDir, `${opts.pageKey}.json`);
 
@@ -43,120 +167,206 @@ export async function scanPage(opts: ScanOptions) {
 
     try {
         const contexts = browser.contexts();
-        if (!contexts.length) {
-            throw new Error("No browser contexts found.");
+        if (!contexts.length) throw new Error("No browser contexts found via CDP.");
+
+        const ctx = contexts[0];
+        const pages = ctx.pages();
+        if (!pages.length) throw new Error("No tabs/pages found in the connected browser.");
+
+        const tabIndex = opts.tabIndex ?? 0;
+        if (tabIndex < 0 || tabIndex >= pages.length) {
+            throw new Error(`tabIndex ${tabIndex} is out of range. Available tabs: ${pages.length}`);
         }
 
-        const pages = contexts[0].pages();
-        if (!pages.length) {
-            throw new Error("No open tabs found.");
-        }
+        const page = pages[tabIndex];
+        const url = page.url();
 
-        // -----------------------------
-        // Find target page
-        // -----------------------------
-        let page = pages[0];
+        log.info(`Scanning tab[${tabIndex}]: ${url}`);
 
-        if (opts.tabUrlRegex) {
-            const regex = new RegExp(
-                opts.tabUrlRegex.replace(/^\/|\/$/g, "")
-            );
-
-            const matched = pages.find((p) =>
-                regex.test(p.url())
-            );
-
-            if (!matched) {
-                throw new Error(
-                    `No tab matched regex: ${opts.tabUrlRegex}`
-                );
+        const scanned: ScannedElement[] = await page.evaluate(() => {
+            function getAttr(el: Element, name: string): string | null {
+                const v = el.getAttribute(name);
+                return v && v.trim() ? v.trim() : null;
             }
 
-            page = matched;
-        }
-
-        log.info(`Scanning tab: ${page.url()}`);
-
-        // -----------------------------
-        // Scan DOM elements
-        // -----------------------------
-        const elements: ElementMap = await page.evaluate(() => {
-            const result: Record<string, string> = {};
-
-            const nodes = Array.from(
-                document.querySelectorAll<
-                    HTMLInputElement |
-                    HTMLSelectElement |
-                    HTMLTextAreaElement |
-                    HTMLButtonElement
-                >("input, select, textarea, button")
-            );
-
-            for (const el of nodes) {
-                const label =
-                    el.getAttribute("aria-label") ||
-                    el.getAttribute("name") ||
-                    el.id ||
-                    el.textContent ||
-                    "element";
-
-                const key = label
-                    .trim()
-                    .toLowerCase()
-                    .replace(/\s+/g, "_")
-                    .replace(/[^a-z0-9_]/g, "");
-
-                if (!key) continue;
-
-                let locator = "";
-
-                if (el.id) {
-                    locator = `#${el.id}`;
-                } else if (el.getAttribute("name")) {
-                    locator = `[name="${el.getAttribute("name")}"]`;
-                } else {
-                    locator = el.tagName.toLowerCase();
-                }
-
-                if (!result[key]) {
-                    result[key] = locator;
-                }
+            function safeText(s: string | null | undefined): string | null {
+                const t = (s ?? "").trim();
+                return t ? t : null;
             }
 
-            return result;
+            function labelFromForId(id: string): string | null {
+                const lbl = document.querySelector(`label[for='${CSS.escape(id)}']`);
+                return safeText(lbl?.textContent ?? null);
+            }
+
+            function labelFromWrap(el: Element): string | null {
+                const lbl = el.closest("label");
+                return safeText(lbl?.textContent ?? null);
+            }
+
+            function labelFromAriaLabelledBy(el: Element): string | null {
+                const ids = getAttr(el, "aria-labelledby");
+                if (!ids) return null;
+                const parts = ids.split(/\s+/g).filter(Boolean);
+                const texts = parts
+                    .map((id) => document.getElementById(id)?.textContent ?? "")
+                    .map((t) => t.trim())
+                    .filter(Boolean);
+                return texts.length ? texts.join(" ") : null;
+            }
+
+            function inferLabelText(el: Element): string | null {
+                const id = getAttr(el, "id");
+                if (id) {
+                    const f = labelFromForId(id);
+                    if (f) return f;
+                }
+                const aria = labelFromAriaLabelledBy(el);
+                if (aria) return aria;
+
+                const wrap = labelFromWrap(el);
+                if (wrap) return wrap;
+
+                return null;
+            }
+
+            function elementText(el: Element): string | null {
+                const tag = el.tagName.toLowerCase();
+                if (tag === "button" || tag === "a") {
+                    return safeText(el.textContent ?? null);
+                }
+                return null;
+            }
+
+            const selector = [
+                "input",
+                "select",
+                "textarea",
+                "button",
+                "a[href]",
+                "[role='button']",
+                "[role='link']",
+                "[role='textbox']",
+                "[role='combobox']",
+                "[data-testid]",
+                "[data-test]",
+                "[data-qa]",
+            ].join(",");
+
+            const nodes = Array.from(document.querySelectorAll(selector));
+
+            return nodes.map((el) => {
+                const tag = el.tagName.toLowerCase();
+                const role = getAttr(el, "role");
+                const id = getAttr(el, "id");
+                const nameAttr = getAttr(el, "name");
+                const placeholder = getAttr(el, "placeholder");
+                const ariaLabel = getAttr(el, "aria-label");
+                const labelText = inferLabelText(el);
+                const text = elementText(el);
+
+                const href = tag === "a" ? getAttr(el, "href") : null;
+
+                const dataTestId = getAttr(el, "data-testid");
+                const dataTest = getAttr(el, "data-test");
+                const dataQa = getAttr(el, "data-qa");
+
+                const typeAttr = tag === "input" ? getAttr(el, "type") : null;
+
+                const derivedName =
+                    ariaLabel || labelText || text || placeholder || nameAttr || id || null;
+
+                return {
+                    tag,
+                    role,
+                    id,
+                    name: derivedName,
+                    text,
+                    href,
+                    dataTestId,
+                    dataTest,
+                    dataQa,
+                    labelText,
+                    ariaLabel,
+                    placeholder,
+                    inputName: nameAttr,
+                    typeAttr,
+                    valueAttr: null,
+                    candidates: [],
+                    key: "",
+                } as ScannedElement;
+            });
         });
 
-        log.info(`Elements found: ${Object.keys(elements).length}`);
+        const usedKeys = new Set<string>();
+        const perBaseCounter = new Map<string, number>();
 
-        let finalMap = elements;
+        const pageMap: PageMap = {
+            pageKey: opts.pageKey,
+            url,
+            urlPath: (() => {
+                try {
+                    return new URL(url).pathname;
+                } catch {
+                    return undefined;
+                }
+            })(),
+            scannedAt: nowIso(),
+            elements: {},
+        };
 
-        // -----------------------------
-        // Merge mode (amend existing)
-        // -----------------------------
-        if (opts.merge && fs.existsSync(outFile)) {
-            log.info("Merging with existing mapper...");
+        for (let idx = 0; idx < scanned.length; idx++) {
+            const el = scanned[idx];
 
-            const existing = JSON.parse(
-                fs.readFileSync(outFile, "utf8")
-            );
+            const baseKey = buildLabelFirstKey(el, idx + 1);
+            const bump = (perBaseCounter.get(baseKey) ?? 0) + 1;
+            perBaseCounter.set(baseKey, bump);
 
-            finalMap = mergeMaps(existing, elements);
+            const finalKey = uniqueKey(bump === 1 ? baseKey : `${baseKey}${bump}`, usedKeys);
+
+            const cands = buildCandidates(el);
+            const best = cands[0];
+            const fallbacks = uniq(cands.slice(1).map((c) => c.selector));
+
+            const type = classifyType(el);
+
+            pageMap.elements[finalKey] = {
+                type,
+                preferred: best.selector,
+                fallbacks,
+                meta: {
+                    tag: el.tag,
+                    role: el.role,
+                    id: el.id,
+                    name: el.name,
+                    text: el.text,
+                    labelText: el.labelText ?? null,
+                    ariaLabel: el.ariaLabel ?? null,
+                    placeholder: el.placeholder ?? null,
+                    inputName: el.inputName ?? null,
+                    typeAttr: el.typeAttr ?? null,
+                },
+            };
+
+            if (opts.verbose) {
+                log.debug(`KEY=${finalKey} type=${type} best=${best.selector} (${best.reason})`);
+            }
         }
 
-        fs.writeFileSync(
-            outFile,
-            JSON.stringify(finalMap, null, 2),
-            "utf8"
-        );
+        log.info(`Elements found: ${Object.keys(pageMap.elements).length}`);
 
-        log.info(`Mapper written: ${outFile}`);
-    } catch (err: any) {
-        log.error(err.message);
-        throw err;
+        if (opts.merge) {
+            log.info(`Merging into existing mapper (if any): ${outFile}`);
+            const existing = safeReadJson<PageMap>(outFile);
+            const merged = existing ? mergePageMaps(existing, pageMap) : pageMap;
+            fs.writeFileSync(outFile, JSON.stringify(merged, null, 2), "utf8");
+            log.info(`Mapper written (merged): ${outFile}`);
+        } else {
+            fs.writeFileSync(outFile, JSON.stringify(pageMap, null, 2), "utf8");
+            log.info(`Mapper written: ${outFile}`);
+        }
     } finally {
-        // ⭐ IMPORTANT
-        // connectOverCDP + close = SAFE DETACH
+        // CDP attach: close() detaches Playwright, browser stays open.
         await browser.close();
-        log.debug("Disconnected from browser (browser remains open).");
     }
 }

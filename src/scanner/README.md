@@ -1,4 +1,8 @@
 # 🧱 Page scanner command — from Powershell VS Code
+# to kille browser: taskkill /IM msedge.exe /F
+
+# to get tree outcome: tree -L 6 -I "node_modules|.git"
+
 1) Open Browser:
 
 $profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
