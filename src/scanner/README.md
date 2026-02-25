@@ -10,7 +10,6 @@
 npx ts-node .\src\scanner\cli.ts `
   --connectCdp "http://localhost:9222" `
   --pageKey "common.auth-entry" `
-  --tabUrlRegex "/auth|login|register/" `
   --verbose
 
 
@@ -27,7 +26,6 @@ npx ts-node .\src\scanner\cli.ts `
 npx ts-node src/scanner/cli.ts \
   --connectCdp http://localhost:9222 \
   --pageKey common.auth-entry \
-  --tabUrlRegex "/auth|login|register/" \
   --verbose
 
 #end
