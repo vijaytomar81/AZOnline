@@ -1,11 +1,24 @@
 # 🧱 Page scanner command — from Powershell VS Code
 1) Open Browser:
 
+$profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
+
 & "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" `
   --remote-debugging-port=9222 `
-  --user-data-dir="$env:TEMP\edge-scan-profile"
+  --user-data-dir="$profile"
 
-2) Scan current open page:
+2) Verify CDP (quick check):
+
+Invoke-RestMethod http://localhost:9222/json/version
+
+output be like below:
+
+{
+  "Browser": "Edg/...",
+  "webSocketDebuggerUrl": "ws://..."
+}
+
+3) Scan current open page:
 
 npx ts-node .\src\scanner\cli.ts `
   --connectCdp "http://localhost:9222" `
