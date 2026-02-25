@@ -21,7 +21,7 @@ output be like below:
 3) Scan current open page:
 
 npx ts-node .\src\scanner\cli.ts `
-  --connectCdp "http://localhost:9222" `
+  --connectCdp "ws://localhost:9222/devtools/browser/41fa169d-8934-45c1-9ce2-b47046a75ec9" `
   --pageKey "common.auth-entry" `
   --verbose
 
