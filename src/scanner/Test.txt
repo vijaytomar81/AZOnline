@@ -1,22 +1,12 @@
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npx ts-node .\src\scanner\cli.ts --connectCdp "http://localhost:9222" --pageKey "common.auth-entry" ` --verbose
-C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\node_modules\ts-node\src\index.ts:859
-    return new TSError(diagnosticText, diagnosticCodes, diagnostics);
-           ^
-TSError: ⨯ Unable to compile TypeScript:
-src/scanner/cli.ts:40:31 - error TS2353: Object literal may only specify known properties, and 'url' does not exist in type 'ScanOptions'.
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npx ts-node .\src\scanner\cli.ts `
+>>   --connectCdp "http://localhost:9222" `
+>>   --pageKey "common.auth-entry" `
+>>   --verbose
+2026-02-25T17:41:23.800Z [scanner] Starting scanner...
+2026-02-25T17:41:23.801Z [scanner] Connecting to browser: http://localhost:9222
+2026-02-25T17:41:23.947Z [scanner] ERROR: browserType.connectOverCDP: Unexpected status 503 when connecting to http://localhost:9222/json/version/.
+This does not look like a DevTools server, try connecting via ws://.
+Call log:
+  - <ws preparing> retrieving websocket url from http://localhost:9222
 
-40     await scanPage({ pageKey, url, outDir, headless, log });
-                                 ~~~
-
-    at createTSError (C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\node_modules\ts-node\src\index.ts:859:12)
-    at reportTSError (C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\node_modules\ts-node\src\index.ts:863:19)
-    at getOutput (C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\node_modules\ts-node\src\index.ts:1077:36)
-    at Object.compile (C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\node_modules\ts-node\src\index.ts:1433:41)
-    at Module.m._compile (C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\node_modules\ts-node\src\index.ts:1617:30)
-    at node:internal/modules/cjs/loader:1895:10
-    at Object.require.extensions.<computed> [as .ts] (C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\node_modules\ts-node\src\index.ts:1621:12)
-    at Module.load (node:internal/modules/cjs/loader:1465:32)
-    at Function._load (node:internal/modules/cjs/loader:1282:12)
-    at TracingChannel.traceSync (node:diagnostics_channel:322:14) {
-  diagnosticCodes: [ 2353 ]
-}
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
