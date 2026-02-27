@@ -49,9 +49,10 @@ export class InsuranceProductTypeSelectionPage extends BasePage {
             elements.carQuote
         );
 
-        await this.page.waitForURL(/\/journey\/show\/product\//i, {
-            timeout: Number(process.env.ACTION_TIMEOUT ?? 20_000),
-        });
+        await this.page.waitForURL(
+            /\/journey\/show\/product\/AnnualMotorInsurance\/process\/nb\/numberPlateScan\/[a-z0-9]+/i,
+            { timeout: Number(process.env.ACTION_TIMEOUT ?? 20_000) }
+        );
     }
 
     /**
