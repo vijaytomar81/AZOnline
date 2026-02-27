@@ -1,0 +1,10 @@
+In Common:
+account-registration
+direct-debit-setup
+email-verification
+pay-deposit
+
+In Motor:
+dashboard
+your-quote
+your-quote-summary
