@@ -1,7 +1,17 @@
-> azonline@1.0.0 gen:elements:changed:verbose
-> ts-node src/scanner/generateElements.ts -- --changedOnly --merge --verbose
+Get-ChildItem -Recurse -Filter *.json .\src\page-maps | ForEach-Object {
+  try {
+    $raw = Get-Content $_.FullName -Raw
+    $j = $raw | ConvertFrom-Json
 
-2026-02-27T18:20:19.784Z [scanner] Generating elements from page-maps...
-2026-02-27T18:20:19.786Z [scanner] Found 21 page-map(s).
-2026-02-27T18:20:19.787Z [scanner] ERROR: Cannot read properties of undefined (reading 'split')
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
+    if (-not $j.pageKey -or -not ($j.pageKey -is [string])) {
+      Write-Host "❌ Missing/invalid pageKey:" $_.FullName
+    }
+
+    if (-not $j.elements) {
+      Write-Host "❌ Missing elements:" $_.FullName
+    }
+  }
+  catch {
+    Write-Host "❌ Invalid JSON:" $_.FullName
+  }
+}
