@@ -1,1 +1,7 @@
-https://customer-portal-lv-test.athenapaas.com/journey/show/product/AnnualHomeInsurance/process/nb/propertyDetails/69a1dd30af510e20377314b9
+> azonline@1.0.0 gen:elements:changed:verbose
+> ts-node src/scanner/generateElements.ts -- --changedOnly --merge --verbose
+
+2026-02-27T18:20:19.784Z [scanner] Generating elements from page-maps...
+2026-02-27T18:20:19.786Z [scanner] Found 21 page-map(s).
+2026-02-27T18:20:19.787Z [scanner] ERROR: Cannot read properties of undefined (reading 'split')
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
