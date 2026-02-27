@@ -2,9 +2,9 @@
 import type { Page, Locator } from "@playwright/test";
 
 export type ElementDef = {
-    type: string;
-    preferred: string;
-    fallbacks: string[];
+  type: string;
+  preferred: string;
+  fallbacks: readonly string[]; // ✅ supports "as const"
 };
 
 export type LocatorEngineOptions = {
