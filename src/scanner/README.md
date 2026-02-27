@@ -17,7 +17,7 @@ $profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss
 
 Invoke-RestMethod http://localhost:9222/json/version
 webSocketDebuggerUrl
-$CDP = "ws://localhost:9222/devtools/browser/YOUR-ID"
+$CDP = "ws://localhost:9222/devtools/browser/9449de56-396e-4b57-b6e0-9d6e18c64c11"
 
 
 # Pages scanner command
@@ -103,7 +103,42 @@ npx ts-node .\src\scanner\cli.ts `
 
   npx ts-node .\src\scanner\cli.ts `
   --connectCdp $CDP `
-  --pageKey "motor.decline" `
+  --pageKey "motor.your-quote" `
   --merge `
   --verbose
 
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.your-quote-summary" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "common.account-registration" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "common.email-verification" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "common.direct-debit-setup" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "common.pay-deposit" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.dashboard" `
+  --merge `
+  --verbose
