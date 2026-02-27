@@ -7,3 +7,7 @@ npx ts-node .\src\scanner\generateElements.ts -- --merge --verbose
 
 Mac:
 npx ts-node ./src/scanner/generateElements.ts -- --merge --verbose
+
+
+
+npm run gen:elements:changed:verbose
