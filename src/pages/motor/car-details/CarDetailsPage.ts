@@ -19,18 +19,13 @@ export class CarDetailsPage extends BasePage {
 
     /**
      * Arrive here via navigation (from InsuranceProductTypeSelectionPage).
-     * This page is step-based:
-     *   Step 1: Yes/No question appears
-     *   Step 2: If Yes, registration input appears
-     *
-     * So enterprise anchor = YES/NO buttons (always visible on load).
+     * Step-1 anchor on first load is "Do you know the registration number?" Yes/No.
      */
     async waitForLoaded() {
         await this.page.waitForURL(CAR_DETAILS_URL_RE, {
             timeout: Number(process.env.ACTION_TIMEOUT ?? 20_000),
         });
 
-        // Step-1 anchors (match your screenshot)
         await expect(this.elPreferred("yes")).toBeVisible({
             timeout: Number(process.env.ACTION_TIMEOUT ?? 20_000),
         });
@@ -63,30 +58,67 @@ export class CarDetailsPage extends BasePage {
 
     // --- Business actions (enterprise names) ---
 
-    async selectKnowRegistrationYes() {
-        await this.click("yes");
+    /**
+     * Step-1: "Do you know the registration number of the car?"
+     */
+    async answerKnowRegistration(know: boolean) {
+        await this.click(know ? "yes" : "no");
 
-        // Registration field should now appear (Step-2)
-        await expect(this.elPreferred("whatSYourCarRegistrationNumber")).toBeVisible({
-            timeout: Number(process.env.ACTION_TIMEOUT ?? 20_000),
-        });
-    }
-
-    async selectKnowRegistrationNo() {
-        await this.click("no");
-        // If selecting No reveals different fields later, we’ll add those asserts then.
+        // If "Yes", the VRN input appears in the next step.
+        if (know) {
+            await expect(this.elPreferred("whatSYourCarRegistrationNumber")).toBeVisible({
+                timeout: Number(process.env.ACTION_TIMEOUT ?? 20_000),
+            });
+        }
     }
 
     async setRegistrationNumber(vrn: string) {
         await this.fill("whatSYourCarRegistrationNumber", vrn);
     }
 
-    async clickFindMyCar() {
+    /**
+     * Triggers lookup and transitions page into the "vehicle found" state
+     * where the two Yes/No question groups appear (details correct + modifications).
+     */
+    async findMyCarAndWaitForVehicleSummary() {
         await this.click("findMyCar");
+
+        // After lookup, these questions should appear (your screenshot).
+        // We wait for modifications question group anchor, because it indicates the new state is rendered.
+        await expect(this.elPreferred("yes2")).toBeVisible({
+            timeout: Number(process.env.ACTION_TIMEOUT ?? 30_000),
+        });
+        await expect(this.elPreferred("no2")).toBeVisible({
+            timeout: Number(process.env.ACTION_TIMEOUT ?? 30_000),
+        });
+    }
+
+    /**
+     * Post-VRN lookup question #1:
+     * "Are the above vehicle details correct?"
+     *
+     * NOTE: your generator named them "yes"/"no" too, which collides with Step-1 meaning.
+     * But for THIS question, the fallbacks include the real IDs:
+     * - #vehicleDetailsSetCorrectly-true
+     * - #vehicleDetailsSetCorrectly-false
+     *
+     * So we still call click("yes"/"no") BUT ONLY AFTER you are in the post-lookup state.
+     */
+    async confirmVehicleDetailsCorrect(isCorrect: boolean) {
+        await this.click(isCorrect ? "yes" : "no");
+    }
+
+    /**
+     * Post-VRN lookup question #2:
+     * "Does this car have any modifications...?"
+     */
+    async setHasModifications(hasMods: boolean) {
+        await this.click(hasMods ? "yes2" : "no2");
     }
 
     /**
      * Purchase date: month/year inputs (MM + YYYY)
+     * (Used when you are manually editing details; may not appear in the lookup state.)
      */
     async setPurchaseDate(monthMM: string, yearYYYY: string) {
         await this.fill("purchaseMonthInputField", monthMM);
@@ -94,13 +126,11 @@ export class CarDetailsPage extends BasePage {
     }
 
     async setTransmission(type: "manual" | "automatic") {
-        if (type === "manual") await this.click("manual");
-        else await this.click("automatic");
+        await this.click(type === "manual" ? "manual" : "automatic");
     }
 
     async setFuelType(type: "petrol" | "diesel") {
-        if (type === "petrol") await this.click("petrol");
-        else await this.click("diesel");
+        await this.click(type === "petrol" ? "petrol" : "diesel");
     }
 
     async setVehicleMake(make: string) {
@@ -128,6 +158,9 @@ export class CarDetailsPage extends BasePage {
         await this.click("theCarHasnTBeenBoughtYet");
     }
 
+    /**
+     * After answering post-lookup questions, Next becomes enabled.
+     */
     async goNext() {
         await this.click("next");
     }
