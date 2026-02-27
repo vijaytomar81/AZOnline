@@ -1,20 +1,2 @@
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> Get-ChildItem -Recurse -Filter *.json .\src\page-maps | ForEach-Object {
->>   try {
->>     $raw = Get-Content $_.FullName -Raw
->>     $j = $raw | ConvertFrom-Json
->>
->>     if (-not $j.pageKey -or -not ($j.pageKey -is [string])) {
->>       Write-Host "❌ Missing/invalid pageKey:" $_.FullName
->>     }
->>
->>     if (-not $j.elements) {
->>       Write-Host "❌ Missing elements:" $_.FullName
->>     }
->>   }
->>   catch {
->>     Write-Host "❌ Invalid JSON:" $_.FullName
->>   }
->> }
-❌ Missing/invalid pageKey: C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\page-maps\.page-maps-state.json
-❌ Missing elements: C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\page-maps\.page-maps-state.json
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline>
+New-Item -ItemType Directory -Force .\src\.scanner-state | Out-Null
+Move-Item .\src\page-maps\.page-maps-state.json .\src\.scanner-state\.page-maps-state.json -Force
