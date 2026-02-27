@@ -1,2 +1,31 @@
-New-Item -ItemType Directory -Force .\src\.scanner-state | Out-Null
-Move-Item .\src\page-maps\.page-maps-state.json .\src\.scanner-state\.page-maps-state.json -Force
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run gen:elements:changed:verbose
+
+> azonline@1.0.0 gen:elements:changed:verbose
+> ts-node src/scanner/generateElements.ts -- --changedOnly --merge --verbose
+   
+2026-02-27T18:27:00.662Z [scanner] Generating elements from page-maps...
+2026-02-27T18:27:00.664Z [scanner] Found 20 page-map(s).
+2026-02-27T18:27:00.665Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\common\account-registration\elements.ts
+2026-02-27T18:27:00.669Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\common\auth-entry\elements.ts
+2026-02-27T18:27:00.673Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\common\direct-debit-setup\elements.ts
+2026-02-27T18:27:00.676Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\common\email-verification\elements.ts
+2026-02-27T18:27:00.679Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\common\insurance-product-type-selection\elements.ts
+2026-02-27T18:27:00.683Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\common\pay-deposit\elements.ts
+2026-02-27T18:27:00.687Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\add-additional-driver\elements.ts
+2026-02-27T18:27:00.691Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\additional-driver-claims\elements.ts
+2026-02-27T18:27:00.694Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\additional-driver-personal-details\elements.ts
+2026-02-27T18:27:00.697Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\additional-driver\elements.ts
+2026-02-27T18:27:00.700Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\car-details\elements.ts
+2026-02-27T18:27:00.703Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\car-usage\elements.ts
+2026-02-27T18:27:00.708Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\claims-and-convictions\elements.ts
+2026-02-27T18:27:00.720Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\dashboard\elements.ts
+2026-02-27T18:27:00.724Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\driving-licence\elements.ts
+2026-02-27T18:27:00.728Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\no-claim-discount\elements.ts
+2026-02-27T18:27:00.731Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\personal-details\elements.ts
+2026-02-27T18:27:00.735Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\policy-start-date\elements.ts
+2026-02-27T18:27:00.739Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\your-quote-summary\elements.ts
+2026-02-27T18:27:00.748Z [scanner] Merging (overwrite-safe): C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\pages\motor\your-quote\elements.ts
+2026-02-27T18:27:00.753Z [scanner] State file updated: C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\page-maps\.page-maps-state.json
+2026-02-27T18:27:00.753Z [scanner] Processed pages: 20
+2026-02-27T18:27:00.754Z [scanner] Done ✅
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
