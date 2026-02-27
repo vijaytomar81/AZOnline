@@ -1,6 +1,4 @@
-New-Item -ItemType File -Force .\src\core\locatorEngine.ts, .\src\core\pageFx.ts
 
-New-Item -ItemType File -Force .\src\scanner\selfHealWriter.ts
 
 npm run gen:hashes
 npm run gen:elements
