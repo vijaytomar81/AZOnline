@@ -1,7 +1,7 @@
 // src/pages/common/BasePage.ts
 import type { Page } from "@playwright/test";
 import { PageFx } from "../../core/pageFx";
-import { CookieBanner } from "./CookieBanner";
+import { CookieBanner } from "../common/cookie-banner/CookieBanner";
 import { SelfHealWriter } from "../../scanner/selfHealWriter";
 import type { ElementDef } from "../../core/locatorEngine";
 

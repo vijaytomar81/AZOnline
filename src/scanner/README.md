@@ -1,6 +1,8 @@
 
 # to kille browser: taskkill /IM msedge.exe /F
 
+# tfor error checking: npx tsc -p tsconfig.json --noEmit
+
 # to get tree outcome: tree -L 6 -I "node_modules|.git"
 
 # 🧱 Page scanner command — from Powershell VS Code
