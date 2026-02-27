@@ -1,1 +1,1 @@
-https://customer-portal-lv-test.athenapaas.com/journey/show/product/AnnualMotorInsurance/process/nb/numberPlateScan/69a1dbb2af510e20377314b5
+https://customer-portal-lv-test.athenapaas.com/journey/show/product/AnnualHomeInsurance/process/nb/propertyDetails/69a1dd30af510e20377314b9
