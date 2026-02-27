@@ -67,9 +67,10 @@ export class InsuranceProductTypeSelectionPage extends BasePage {
         );
 
         // placeholder match: change to your stable home journey route once confirmed
-        await this.page.waitForURL(/home/i, {
-            timeout: Number(process.env.ACTION_TIMEOUT ?? 20_000),
-        });
+        await this.page.waitForURL(
+            /\/journey\/show\/product\/AnnualHomeInsurance\/process\/nb\/propertyDetails\/[a-z0-9]+/i,
+            { timeout: Number(process.env.ACTION_TIMEOUT ?? 20_000) }
+        );
     }
 
     /**
