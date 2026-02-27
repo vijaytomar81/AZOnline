@@ -1,2 +1,13 @@
-Get-ChildItem -Force .\src\page-maps | Where-Object Name -like "*.state*"
-Get-ChildItem -Force .\src\page-maps | Where-Object Name -like ".*state*"
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> Get-ChildItem -Force .\src\page-maps | Where-Object Name -like "*.state*"
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> Get-ChildItem -Force .\src\page-maps | Where-Object Name -like ".*state*"
+
+
+    Directory: C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\page-maps
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----         2/27/2026   7:27 PM           1577 .page-maps-state.json
+
+
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
