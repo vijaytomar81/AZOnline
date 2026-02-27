@@ -1,359 +1,200 @@
 // src/scanner/generateElements.ts
-//
-// Generates src/pages/**/elements.ts from src/page-maps/*.json
-// Enterprise features:
-// - --pageKey single generation
-// - --merge (default) merge-at-JSON level and regenerate TS
-// - --changedOnly (NO git) uses sha256 state file to regenerate only changed page-maps
-// - --stateFile optional override for state location (default: src/page-maps/.page-maps-state.json)
-// - --dryRun, --verbose
-//
-// Usage:
-//   npx ts-node src/scanner/generateElements.ts -- --merge --verbose
-//   npx ts-node src/scanner/generateElements.ts -- --pageKey "motor.car-details" --merge --verbose
-//   npx ts-node src/scanner/generateElements.ts -- --changedOnly --merge --verbose
-//
 
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 
 import { createLogger } from "./logger";
-import type { PageMap } from "./types";
+
+type PageMap = {
+    pageKey: string;
+    elements: Record<
+        string,
+        {
+            type: string;
+            preferred: string;
+            fallbacks: string[];
+        }
+    >;
+};
 
 type GenOptions = {
-    pageKey?: string;          // generate only one pageKey
-    mapsDir?: string;          // default: ./src/page-maps
-    pagesDir?: string;         // default: ./src/pages
-    outFileName?: string;      // default: elements.ts
-    merge?: boolean;           // default: true
-    dryRun?: boolean;          // default: false
-    verbose?: boolean;         // debug logs
-
-    // NO-GIT change detection
-    changedOnly?: boolean;     // default false
-    stateFile?: string;        // default: <mapsDir>/.page-maps-state.json
+    mapsDir: string;
+    pagesDir: string;
+    merge?: boolean;
+    verbose?: boolean;
+    changedOnly?: boolean;
+    stateOnly?: boolean;
+    log: ReturnType<typeof createLogger>;
 };
 
-type StateFile = {
-    version: number;
-    updatedAt: string;
-    files: Record<string, { hash: string; scannedAt?: string }>;
-};
+type StateFile = Record<string, string>; // mapFile -> hash
 
-function ensureDir(dir: string) {
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+// ---------------------------------------------------
+// helpers
+// ---------------------------------------------------
+
+function safeReadJson<T>(file: string): T | null {
+    if (!fs.existsSync(file)) return null;
+    return JSON.parse(fs.readFileSync(file, "utf8")) as T;
 }
 
-function safeReadJson<T>(filePath: string): T {
-    return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
+function safeWriteText(file: string, content: string) {
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, content, "utf8");
 }
 
-function safeWriteText(filePath: string, text: string) {
-    ensureDir(path.dirname(filePath));
-    fs.writeFileSync(filePath, text, "utf8");
+function hashContent(content: string): string {
+    return crypto.createHash("sha1").update(content).digest("hex");
 }
 
-function listMapFiles(mapsDirAbs: string): string[] {
-    if (!fs.existsSync(mapsDirAbs)) return [];
-    return fs
-        .readdirSync(mapsDirAbs)
-        .filter((f) => f.endsWith(".json"))
-        .map((f) => path.join(mapsDirAbs, f));
+function toPascal(s: string) {
+    return s
+        .replace(/[-_.]/g, " ")
+        .split(" ")
+        .filter(Boolean)
+        .map((p) => p[0].toUpperCase() + p.slice(1))
+        .join("");
 }
 
-/**
- * pageKey -> pages folder mapping rule:
- * pageKey uses dots: "motor.car-details"
- * maps to: "src/pages/motor/car-details/elements.ts"
- */
-function pageKeyToElementsPath(pageKey: string, pagesDirAbs: string, outFileName: string) {
-    const parts = pageKey.split(".").filter(Boolean);
-    return path.join(pagesDirAbs, ...parts, outFileName);
+function mapPageKeyToElementsPath(pagesDir: string, pageKey: string) {
+    // example: motor.car-details
+    const parts = pageKey.split(".");
+    const folder = path.join(pagesDir, ...parts);
+    return path.join(folder, "elements.ts");
 }
 
-function sha256File(filePath: string): string {
-    const buf = fs.readFileSync(filePath);
-    return crypto.createHash("sha256").update(buf).digest("hex");
-}
-
-function relFrom(dirAbs: string, fileAbs: string): string {
-    return path.relative(dirAbs, fileAbs).replace(/\\/g, "/");
-}
-
-function readState(statePath: string): StateFile {
-    if (!fs.existsSync(statePath)) {
-        return { version: 1, updatedAt: new Date().toISOString(), files: {} };
-    }
-    return JSON.parse(fs.readFileSync(statePath, "utf8")) as StateFile;
-}
-
-function writeState(statePath: string, state: StateFile) {
-    ensureDir(path.dirname(statePath));
-    fs.writeFileSync(statePath, JSON.stringify(state, null, 2), "utf8");
-}
-
-/**
- * Render elements.ts from PageMap
- */
-function buildElementsTs(pageKey: string, map: PageMap): string {
-    const keys = Object.keys(map.elements).sort((a, b) => a.localeCompare(b));
-
+function buildTs(pageMap: PageMap): string {
     const lines: string[] = [];
-    lines.push(`// AUTO-GENERATED by src/scanner/generateElements.ts`);
-    lines.push(`// pageKey: ${pageKey}`);
-    lines.push(`// scannedAt: ${map.scannedAt}`);
-    lines.push(``);
-    lines.push(`export type ElementDef = {`);
-    lines.push(`  type: string;`);
-    lines.push(`  preferred: string;`);
-    lines.push(`  fallbacks: string[];`);
-    lines.push(`};`);
+
+    lines.push(`// AUTO-GENERATED FILE — DO NOT EDIT`);
+    lines.push(`// pageKey: ${pageMap.pageKey}`);
     lines.push(``);
     lines.push(`export const elements = {`);
 
-    for (const k of keys) {
-        const el = map.elements[k];
-        const preferred = JSON.stringify(el.preferred ?? "");
-        const fallbacks = JSON.stringify(el.fallbacks ?? [], null, 0);
+    for (const [key, v] of Object.entries(pageMap.elements)) {
+        lines.push(`  ${key}: {`);
+        lines.push(`    type: "${v.type}",`);
+        lines.push(`    preferred: "${v.preferred}",`);
 
-        lines.push(`  ${JSON.stringify(k)}: {`);
-        lines.push(`    type: ${JSON.stringify(el.type ?? "element")},`);
-        lines.push(`    preferred: ${preferred},`);
-        lines.push(`    fallbacks: ${fallbacks},`);
+        if (v.fallbacks?.length) {
+            lines.push(`    fallbacks: [`);
+            for (const f of v.fallbacks) {
+                lines.push(`      "${f}",`);
+            }
+            lines.push(`    ],`);
+        } else {
+            lines.push(`    fallbacks: [],`);
+        }
+
         lines.push(`  },`);
     }
 
     lines.push(`} as const;`);
     lines.push(``);
-    lines.push(`export type ElementKey = keyof typeof elements;`);
-    lines.push(``);
+    lines.push(`export type ElementsMap = typeof elements;`);
+
     return lines.join("\n");
 }
 
-/**
- * Merge strategy (JSON level):
- * - keep existing keys stable
- * - add new keys
- * - if preferred changes, move old preferred into fallbacks and promote new preferred
- * - union fallbacks
- * - meta.tag MUST remain defined (string)
- */
-function mergeMaps(existing: PageMap, incoming: PageMap): PageMap {
-    const out: PageMap = {
-        ...existing,
-        pageKey: existing.pageKey || incoming.pageKey,
-        url: incoming.url || existing.url,
-        urlPath: incoming.urlPath ?? existing.urlPath,
-        scannedAt: incoming.scannedAt,
-        elements: { ...existing.elements },
-    };
+// ---------------------------------------------------
+// main
+// ---------------------------------------------------
 
-    for (const [key, next] of Object.entries(incoming.elements)) {
-        const cur = out.elements[key];
+async function generateElements(opts: GenOptions) {
+    const log = opts.log;
 
-        if (!cur) {
-            // Ensure meta.tag is always present
-            out.elements[key] = {
-                ...next,
-                meta: {
-                    ...(next.meta ?? {}),
-                    tag: (next.meta?.tag ?? next.type ?? "element") as string,
-                },
-            };
+    const stateFilePath = path.join(opts.mapsDir, ".page-maps-state.json");
+    const oldState: StateFile = safeReadJson<StateFile>(stateFilePath) ?? {};
+    const newState: StateFile = {};
+
+    const mapFiles = fs
+        .readdirSync(opts.mapsDir)
+        .filter((f) => f.endsWith(".json"));
+
+    log.info(`Found ${mapFiles.length} page-map(s).`);
+
+    let processed = 0;
+
+    for (const file of mapFiles) {
+        const abs = path.join(opts.mapsDir, file);
+        const raw = fs.readFileSync(abs, "utf8");
+
+        const hash = hashContent(raw);
+        newState[file] = hash;
+
+        const oldHash = oldState[file];
+        const changed = oldHash !== hash;
+
+        if (opts.changedOnly && !changed) {
+            if (opts.verbose) {
+                log.debug(`UNCHANGED → skipping ${file}`);
+            }
             continue;
         }
 
-        const curPreferred = cur.preferred;
-        const nextPreferred = next.preferred;
+        const pageMap = JSON.parse(raw) as PageMap;
 
-        const set = new Set<string>([
-            ...(cur.fallbacks ?? []),
-            ...(next.fallbacks ?? []),
-        ]);
+        const outPath = mapPageKeyToElementsPath(opts.pagesDir, pageMap.pageKey);
 
-        if (curPreferred && nextPreferred && curPreferred !== nextPreferred) {
-            set.add(curPreferred);
-            set.delete(nextPreferred);
+        if (opts.stateOnly) {
+            log.info(`STATE-ONLY → skipping write for ${pageMap.pageKey}`);
+            processed++;
+            continue;
+        }
 
-            out.elements[key] = {
-                ...cur,
-                ...next,
-                preferred: nextPreferred,
-                fallbacks: Array.from(set),
-                meta: {
-                    ...(cur.meta ?? {}),
-                    ...(next.meta ?? {}),
-                    tag: (next.meta?.tag ?? cur.meta?.tag ?? next.type ?? cur.type ?? "element") as string,
-                },
-            };
+        const ts = buildTs(pageMap);
+
+        if (opts.merge && fs.existsSync(outPath)) {
+            log.info(`Merging (overwrite-safe): ${outPath}`);
         } else {
-            out.elements[key] = {
-                ...cur,
-                ...next,
-                preferred: nextPreferred ?? curPreferred,
-                fallbacks: Array.from(set),
-                meta: {
-                    ...(cur.meta ?? {}),
-                    ...(next.meta ?? {}),
-                    tag: (next.meta?.tag ?? cur.meta?.tag ?? next.type ?? cur.type ?? "element") as string,
-                },
-            };
+            log.info(`Writing: ${outPath}`);
         }
+
+        safeWriteText(outPath, ts);
+        processed++;
     }
 
-    return out;
+    // always update state file
+    safeWriteText(stateFilePath, JSON.stringify(newState, null, 2));
+
+    log.info(`State file updated: ${stateFilePath}`);
+    log.info(`Processed pages: ${processed}`);
 }
 
-export async function generateElements(opts: GenOptions = {}) {
-    const log = createLogger({
-        prefix: "[scanner]",
-        verbose: !!opts.verbose,
-        withTimestamp: true,
-    });
+// ---------------------------------------------------
+// CLI
+// ---------------------------------------------------
 
-    const mapsDirAbs = path.resolve(opts.mapsDir ?? path.join(process.cwd(), "src", "page-maps"));
-    const pagesDirAbs = path.resolve(opts.pagesDir ?? path.join(process.cwd(), "src", "pages"));
-    const outFileName = opts.outFileName ?? "elements.ts";
-    const merge = opts.merge !== false; // default TRUE
-    const dryRun = !!opts.dryRun;
-
-    const changedOnly = !!opts.changedOnly;
-
-    const statePath = opts.stateFile
-        ? path.resolve(opts.stateFile)
-        : path.join(mapsDirAbs, ".page-maps-state.json");
-
-    log.info(`Generating elements.ts from page-maps...`);
-    log.info(`Maps dir: ${mapsDirAbs}`);
-    log.info(`Pages dir: ${pagesDirAbs}`);
-    log.info(`Mode: ${merge ? "merge" : "overwrite"}${dryRun ? " (dry-run)" : ""}`);
-    if (changedOnly && !opts.pageKey) {
-        log.info(`Change-detect: sha256 state file (no-git)`);
-        log.info(`State file: ${statePath}`);
-    }
-
-    const allFiles = listMapFiles(mapsDirAbs);
-    if (!allFiles.length) throw new Error(`No page-map JSON found in: ${mapsDirAbs}`);
-
-    // Select files to process
-    let filesToProcess = [...allFiles];
-
-    // 1) Explicit pageKey wins
-    if (opts.pageKey) {
-        filesToProcess = allFiles.filter((f) => path.basename(f, ".json") === opts.pageKey);
-        if (!filesToProcess.length) {
-            const available = allFiles.map((f) => path.basename(f, ".json")).sort().join(", ");
-            throw new Error(`pageKey '${opts.pageKey}' not found. Available: ${available}`);
-        }
-    }
-    // 2) changedOnly (hash) if no pageKey
-    else if (changedOnly) {
-        const state = readState(statePath);
-
-        const changed: string[] = [];
-        for (const f of allFiles) {
-            const rel = relFrom(mapsDirAbs, f);
-            const hash = sha256File(f);
-            const prev = state.files[rel]?.hash;
-            if (prev !== hash) changed.push(f);
-        }
-
-        if (!changed.length) {
-            log.info(`No page-map changes detected (hash). Nothing to generate ✅`);
-            return;
-        }
-
-        const changedKeys = changed.map((f) => path.basename(f, ".json")).sort();
-        log.info(`Changed page-maps (${changedKeys.length}): ${changedKeys.join(", ")}`);
-
-        filesToProcess = changed;
-    }
-
-    // If changedOnly is enabled, we’ll update state as we go
-    const state = (changedOnly && !opts.pageKey) ? readState(statePath) : null;
-
-    for (const file of filesToProcess) {
-        const incoming = safeReadJson<PageMap>(file);
-        const pageKey = incoming.pageKey || path.basename(file, ".json");
-
-        // Decide destination
-        const outPath = pageKeyToElementsPath(pageKey, pagesDirAbs, outFileName);
-
-        // Merge at JSON level (source-of-truth = page-map json)
-        let finalMap: PageMap = incoming;
-
-        if (merge) {
-            // Merge against the existing JSON map for this pageKey if present (usually same file)
-            const existingJsonPath = path.join(mapsDirAbs, `${pageKey}.json`);
-            if (fs.existsSync(existingJsonPath)) {
-                const existing = safeReadJson<PageMap>(existingJsonPath);
-                finalMap = mergeMaps(existing, incoming);
-            }
-        }
-
-        // Render TS
-        const ts = buildElementsTs(pageKey, finalMap);
-
-        log.info(`Writing: ${outPath}`);
-        if (!dryRun) {
-            safeWriteText(outPath, ts);
-        }
-
-        if (opts.verbose) {
-            log.debug(`Done pageKey=${pageKey} keys=${Object.keys(finalMap.elements).length}`);
-        }
-
-        // Update state (hash-based) so next run can skip unchanged files
-        if (state && !dryRun) {
-            const rel = relFrom(mapsDirAbs, file);
-            state.files[rel] = { hash: sha256File(file), scannedAt: finalMap.scannedAt };
-        }
-    }
-
-    if (state && !dryRun) {
-        state.updatedAt = new Date().toISOString();
-        writeState(statePath, state);
-        log.info(`State updated: ${statePath}`);
-    }
-
-    log.info(`Done ✅`);
-}
-
-/**
- * Minimal CLI parsing (keeps your project lightweight)
- *
- * Examples:
- *  npx ts-node src/scanner/generateElements.ts -- --merge --verbose
- *  npx ts-node src/scanner/generateElements.ts -- --pageKey motor.car-details --merge --verbose
- *  npx ts-node src/scanner/generateElements.ts -- --changedOnly --merge --verbose
- *  npx ts-node src/scanner/generateElements.ts -- --changedOnly --stateFile src/page-maps/.state.json --merge
- */
-function getArg(name: string): string | null {
-    const idx = process.argv.indexOf(name);
-    if (idx === -1) return null;
-    return process.argv[idx + 1] ?? null;
-}
-function hasFlag(name: string): boolean {
+function hasFlag(name: string) {
     return process.argv.includes(name);
 }
 
-if (require.main === module) {
-    const pageKey = getArg("--pageKey") ?? undefined;
-    const mapsDir = getArg("--mapsDir") ?? undefined;
-    const pagesDir = getArg("--pagesDir") ?? undefined;
-
-    const merge = hasFlag("--overwrite") ? false : true; // default merge
-    const dryRun = hasFlag("--dryRun");
-    const verbose = hasFlag("--verbose");
-
-    const changedOnly = hasFlag("--changedOnly");
-    const stateFile = getArg("--stateFile") ?? undefined;
-
-    generateElements({ pageKey, mapsDir, pagesDir, merge, dryRun, verbose, changedOnly, stateFile }).catch((e) => {
-        // keep raw console for fatal CLI error
-        // eslint-disable-next-line no-console
-        console.error(e);
-        process.exit(1);
+(async () => {
+    const log = createLogger({
+        prefix: "[scanner]",
+        verbose: hasFlag("--verbose"),
     });
-}
+
+    const mapsDir = path.join(process.cwd(), "src", "page-maps");
+    const pagesDir = path.join(process.cwd(), "src", "pages");
+
+    const opts: GenOptions = {
+        mapsDir,
+        pagesDir,
+        merge: hasFlag("--merge"),
+        verbose: hasFlag("--verbose"),
+        changedOnly: hasFlag("--changedOnly"),
+        stateOnly: hasFlag("--stateOnly"),
+        log,
+    };
+
+    try {
+        log.info("Generating elements from page-maps...");
+        await generateElements(opts);
+        log.info("Done ✅");
+    } catch (e: any) {
+        log.error(e?.message || String(e));
+        process.exit(1);
+    }
+})();

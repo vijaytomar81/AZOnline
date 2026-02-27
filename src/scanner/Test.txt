@@ -1,13 +1,6 @@
-New-Item -ItemType File -Force .\src\scanner\generateElements.ts | Out-Null
+New-Item -ItemType File -Force .\src\core\locatorEngine.ts, .\src\core\pageFx.ts
 
+New-Item -ItemType File -Force .\src\scanner\selfHealWriter.ts
 
-Generate elements.ts from all page-maps
-Powershell: 
-npx ts-node .\src\scanner\generateElements.ts -- --merge --verbose
-
-Mac:
-npx ts-node ./src/scanner/generateElements.ts -- --merge --verbose
-
-
-
-npm run gen:elements:changed:verbose
+npm run gen:hashes
+npm run gen:elements

@@ -1,61 +1,123 @@
 // src/pages/common/BasePage.ts
-import { expect } from "@playwright/test";
-import type { Locator, Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { PageFx } from "../../core/pageFx";
 import { CookieBanner } from "./CookieBanner";
+import { SelfHealWriter } from "../../scanner/selfHealWriter";
+import type { ElementDef } from "../../core/locatorEngine";
 
-/**
- * Enterprise BasePage
- * - Central place for navigation, waits, cookie handling
- * - Keeps individual pages clean + consistent
- */
+export type BasePageOptions = {
+    verboseEngine?: boolean;
+    selfHeal?: boolean;
+    actionTimeoutMs?: number;
+
+    // cookie behavior
+    autoAcceptCookies?: boolean; // default true
+    autoRejectCookies?: boolean; // default false
+};
+
 export abstract class BasePage {
     protected readonly page: Page;
+    protected readonly fx: PageFx;
+    protected readonly cookies: CookieBanner;
 
-    /** Turn cookie handling on/off globally via env var if needed */
-    private readonly autoHandleCookies: boolean;
+    // persistent self-heal (optional)
+    private readonly healWriter: SelfHealWriter;
+    private readonly healWriteEnabled: boolean;
 
-    constructor(page: Page) {
+    // cookie switches
+    private readonly _autoAccept: boolean;
+    private readonly _autoReject: boolean;
+
+    constructor(page: Page, opts: BasePageOptions = {}) {
         this.page = page;
 
-        // Default: true. You can disable via: $env:AUTO_COOKIES="false"
-        this.autoHandleCookies = process.env.AUTO_COOKIES === "false" ? false : true;
+        // persistent heal toggle (OFF by default for safety)
+        this.healWriteEnabled = process.env.SELF_HEAL_WRITE === "true";
+        this.healWriter = new SelfHealWriter({
+            enabled: this.healWriteEnabled,
+            prefix: "[self-heal]",
+        });
+
+        this.fx = new PageFx(page, {
+            verbose: opts.verboseEngine ?? process.env.VERBOSE_ENGINE === "true",
+            selfHeal: opts.selfHeal ?? process.env.SELF_HEAL === "true",
+            timeoutMs: opts.actionTimeoutMs ?? Number(process.env.ACTION_TIMEOUT ?? 10_000),
+            prefix: "[pw]",
+            onHealed: ({ preferredWas, preferredNow }) => {
+                // We can only persist if caller provides pageKey/elementKey.
+                // That happens when pages use resolveByKey/clickByKey/fillByKey.
+                // So this callback exists mainly for runtime logs.
+                // Persistent writing is done inside resolveByKey() below.
+                void preferredWas;
+                void preferredNow;
+            },
+        });
+
+        this.cookies = new CookieBanner(page);
+
+        // defaults
+        this._autoAccept = opts.autoAcceptCookies ?? process.env.AUTO_ACCEPT_COOKIES !== "false";
+        this._autoReject = opts.autoRejectCookies ?? process.env.AUTO_REJECT_COOKIES === "true";
     }
 
-    /**
-     * Navigate to absolute URL or relative path.
-     * If you pass "/path", it uses Playwright baseURL automatically.
-     */
-    async goto(urlOrPath: string, waitUntil: "domcontentloaded" | "load" | "networkidle" = "domcontentloaded") {
-        await this.page.goto(urlOrPath, { waitUntil });
+    async goto(url: string) {
+        await this.page.goto(url, { waitUntil: "domcontentloaded" });
 
-        if (this.autoHandleCookies) {
-            // Accept cookie banner if it appears
-            await new CookieBanner(this.page).acceptIfVisible();
+        // handle cookie banner safely
+        if (this._autoReject) {
+            await this.cookies.rejectIfVisible();
+        } else if (this._autoAccept) {
+            await this.cookies.acceptIfVisible();
         }
     }
 
-    /** Useful generic helpers */
-    async click(locator: Locator) {
-        await expect(locator).toBeVisible();
-        await locator.click();
+    async waitForNetworkIdle(timeoutMs = 10_000) {
+        await this.page.waitForLoadState("networkidle", { timeout: timeoutMs });
     }
 
-    async fill(locator: Locator, value: string) {
-        await expect(locator).toBeVisible();
-        await locator.fill(value);
+    /**
+     * Enterprise key-aware actions:
+     * These enable persistent self-heal because we know pageKey + elementKey.
+     *
+     * pageKey should match the page-map json file name.
+     * elementKey should match the key inside the generated elements.ts.
+     */
+
+    protected async resolveByKey(pageKey: string, elementKey: string, def: ElementDef) {
+        const beforePreferred = def.preferred;
+        const res = await this.fx.resolveKey(pageKey, elementKey, def);
+
+        // If runtime selfHeal promoted fallback -> preferred, def.preferred will change.
+        // Persist that change when enabled.
+        if (this.healWriteEnabled && def.preferred !== beforePreferred) {
+            this.healWriter.apply({
+                pageKey,
+                elementKey,
+                preferredWas: beforePreferred,
+                preferredNow: def.preferred,
+            });
+        }
+
+        return res;
     }
 
-    async expectVisible(locator: Locator) {
-        await expect(locator).toBeVisible();
+    protected async clickByKey(pageKey: string, elementKey: string, def: ElementDef) {
+        const { locator } = await this.resolveByKey(pageKey, elementKey, def);
+        await locator.click({ timeout: Number(process.env.ACTION_TIMEOUT ?? 10_000) });
     }
 
-    async expectHidden(locator: Locator) {
-        await expect(locator).toBeHidden();
+    protected async fillByKey(pageKey: string, elementKey: string, def: ElementDef, value: string) {
+        const { locator } = await this.resolveByKey(pageKey, elementKey, def);
+        await locator.fill(value, { timeout: Number(process.env.ACTION_TIMEOUT ?? 10_000) });
     }
 
-    /** Sometimes pages have spinners / overlays — you can standardize it here later */
-    async waitForStableUi(timeoutMs = 10_000) {
-        // minimal default: ensure DOM ready
-        await this.page.waitForLoadState("domcontentloaded", { timeout: timeoutMs });
+    protected async typeByKey(pageKey: string, elementKey: string, def: ElementDef, value: string) {
+        const { locator } = await this.resolveByKey(pageKey, elementKey, def);
+        await locator.type(value, { timeout: Number(process.env.ACTION_TIMEOUT ?? 10_000) });
+    }
+
+    protected async selectOptionByKey(pageKey: string, elementKey: string, def: ElementDef, value: string) {
+        const { locator } = await this.resolveByKey(pageKey, elementKey, def);
+        await locator.selectOption(value, { timeout: Number(process.env.ACTION_TIMEOUT ?? 10_000) });
     }
 }

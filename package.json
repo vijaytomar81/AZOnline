@@ -4,18 +4,23 @@
   "main": "index.js",
   "scripts": {
     "data:build": "ts-node src/data/data-builder/index.ts",
+    "data:build:verbose": "ts-node src/data/data-builder/index.ts -- --verbose",
+    "data:build:empty": "ts-node src/data/data-builder/index.ts -- --includeEmptyChildFields true",
+    "data:build:empty:verbose": "ts-node src/data/data-builder/index.ts -- --includeEmptyChildFields true --verbose",
+    "data:build:flowNB": "ts-node src/data/data-builder/index.ts -- --sheet FlowNB",
+    "data:build:debug": "ts-node src/data/data-builder/index.ts -- --includeEmptyChildFields true --verbose",
     "test:e2e": "playwright test",
     "e2e": "npm run data:build -- && npm run test:e2e",
-    
     "scan:page": "ts-node src/scanner/cli.ts",
     "scan:page:verbose": "ts-node src/scanner/cli.ts -- --verbose",
     "scan:page:merge": "ts-node src/scanner/cli.ts -- --merge",
     "scan:page:merge:verbose": "ts-node src/scanner/cli.ts -- --merge --verbose",
-    
     "gen:elements": "ts-node src/scanner/generateElements.ts -- --merge",
     "gen:elements:verbose": "ts-node src/scanner/generateElements.ts -- --merge --verbose",
     "gen:elements:changed": "ts-node src/scanner/generateElements.ts -- --changedOnly --merge",
-    "gen:elements:changed:verbose": "ts-node src/scanner/generateElements.ts -- --changedOnly --merge --verbose"
+    "gen:elements:changed:verbose": "ts-node src/scanner/generateElements.ts -- --changedOnly --merge --verbose",
+    "gen:hashes": "ts-node src/scanner/generateElements.ts -- --stateOnly --verbose",
+    "gen:hashes:changed": "ts-node src/scanner/generateElements.ts -- --changedOnly --stateOnly --verbose"
   },
   "repository": {
     "type": "git",
