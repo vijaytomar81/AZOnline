@@ -1,48 +1,102 @@
-# 🧱 Page scanner command — from Powershell VS Code
+
 # to kille browser: taskkill /IM msedge.exe /F
 
 # to get tree outcome: tree -L 6 -I "node_modules|.git"
 
-1) Open Browser:
+# 🧱 Page scanner command — from Powershell VS Code
 
-$profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
-
-& "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" `
-  --remote-debugging-port=9222 `
-  --user-data-dir="$profile"
-
-2) Verify CDP (quick check):
+STEP 1 — Save CDP URL once (VERY IMPORTANT)
 
 Invoke-RestMethod http://localhost:9222/json/version
+webSocketDebuggerUrl
+$CDP = "ws://localhost:9222/devtools/browser/YOUR-ID"
 
-output be like below:
 
-{
-  "Browser": "Edg/...",
-  "webSocketDebuggerUrl": "ws://..."
-}
-
-3) Scan current open page:
+STEP 2 — COMMON Pages
 
 npx ts-node .\src\scanner\cli.ts `
-  --connectCdp "ws://localhost:9222/devtools/browser/41fa169d-8934-45c1-9ce2-b47046a75ec9" `
+  --connectCdp $CDP `
   --pageKey "common.auth-entry" `
+  --merge `
   --verbose
 
 
-# 🧱 Page scanner command — from Mac VS Code
-
-1) Open Browser:
-
-/Applications/Microsoft\ Edge.app/Contents/MacOS/Microsoft\ Edge \
-  --remote-debugging-port=9222 \
-  --user-data-dir=/tmp/edge-scan-profile
-
-2) Scan current open page:
-
-npx ts-node src/scanner/cli.ts \
-  --connectCdp http://localhost:9222 \
-  --pageKey common.auth-entry \
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "common.insurance-product-type-selection" `
+  --merge `
   --verbose
 
-#end
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.car-details" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.driving-licence" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.personal-details" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.claims-and-convictions" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.no-claim-discount" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.add-additional-driver" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.additional-driver" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.additional-driver-personal-details" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.additional-driver-claims" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.car-usage" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.policy-start-date" `
+  --merge `
+  --verbose
+
+  npx ts-node .\src\scanner\cli.ts `
+  --connectCdp $CDP `
+  --pageKey "motor.decline" `
+  --merge `
+  --verbose
+
+  
