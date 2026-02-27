@@ -1,4 +1,20 @@
+for later on :
 
+ Enterprise-level next (you’ll love this)
 
-npm run gen:hashes
-npm run gen:elements
+Once imports are clean, next step is:
+
+Auto Import Safety Mode
+
+One command that instantly finds:
+	•	orphan pages
+	•	broken page factory imports
+	•	unused page objects
+
+Say:
+
+“Show Enterprise Import Health Check”
+
+and I’ll give you the Level-5 engineer workflow.
+
+===============================================================
