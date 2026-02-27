@@ -5,14 +5,22 @@
 
 # 🧱 Page scanner command — from Powershell VS Code
 
-STEP 1 — Save CDP URL once (VERY IMPORTANT)
+Launch Edge with remote debugging:
+
+$profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
+
+& "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" `
+  --remote-debugging-port=9222 `
+  --user-data-dir="$profile"
+
+# Save CDP URL once (VERY IMPORTANT)
 
 Invoke-RestMethod http://localhost:9222/json/version
 webSocketDebuggerUrl
 $CDP = "ws://localhost:9222/devtools/browser/YOUR-ID"
 
 
-STEP 2 — COMMON Pages
+# Pages scanner command
 
 npx ts-node .\src\scanner\cli.ts `
   --connectCdp $CDP `
@@ -99,4 +107,3 @@ npx ts-node .\src\scanner\cli.ts `
   --merge `
   --verbose
 
-  
