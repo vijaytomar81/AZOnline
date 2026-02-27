@@ -1,10 +1,1 @@
-In Common:
-account-registration
-direct-debit-setup
-email-verification
-pay-deposit
-
-In Motor:
-dashboard
-your-quote
-your-quote-summary
+https://customer-portal-lv-test.athenapaas.com/journey/show/product/AnnualMotorInsurance/process/nb/numberPlateScan/69a1dbb2af510e20377314b5
