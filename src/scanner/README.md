@@ -1,4 +1,3 @@
-File 'c:/Users/tp70707/OneDrive - Allianz/My Documents/Automation/AZOnline/src/pages/common/auth-entry/AuthEntryPage.ts' is not a module.
 
 # to kille browser: taskkill /IM msedge.exe /F
 

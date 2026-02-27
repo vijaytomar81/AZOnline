@@ -1,2 +1,9 @@
-document.querySelectorAll('input[placeholder="MM"]').length
-document.querySelectorAll('input[placeholder="YYYY"]').length
+New-Item -ItemType File -Force .\src\scanner\generateElements.ts | Out-Null
+
+
+Generate elements.ts from all page-maps
+Powershell: 
+npx ts-node .\src\scanner\generateElements.ts -- --merge --verbose
+
+Mac:
+npx ts-node ./src/scanner/generateElements.ts -- --merge --verbose
