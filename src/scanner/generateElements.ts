@@ -198,7 +198,7 @@ function buildAliasesHumanTs(pageMap: PageMap): string {
     lines.push(`// Start empty. You can map business names -> ElementKey.`);
     lines.push(`export const aliases = {`);
     lines.push(`  // example: continue: aliasesGenerated.next,`);
-    lines.push(`} as const satisfies Record<string, ElementKey>;`);
+    lines.push(`} as Record<string, ElementKey>;`);
     lines.push(``);
     lines.push(`export const allAliases = { ...aliasesGenerated, ...aliases } as const;`);
     lines.push(`export type AliasKey = keyof typeof allAliases;`);
@@ -217,7 +217,8 @@ function buildPageTsStub(pageMap: PageMap): string {
     lines.push(``);
     lines.push(`import type { Page } from "@playwright/test";`);
     lines.push(`import { BasePage } from "../../core/BasePage"; // adjust if needed`);
-    lines.push(`import { elements, type ElementKey } from "./elements";`);
+    lines.push(`import { elements } from "./elements";`);
+    lines.push(`import type { ElementKey } from "./elements";`);
     lines.push(``);
     lines.push(`const PAGE_KEY = ${JSON.stringify(pageKey)} as const;`);
     lines.push(``);
