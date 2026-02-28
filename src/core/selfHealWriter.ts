@@ -1,4 +1,4 @@
-// src/scanner/selfHealWriter.ts
+// src/core/selfHealWriter.ts
 import fs from "node:fs";
 import path from "node:path";
 
