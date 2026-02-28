@@ -1,8 +1,11 @@
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> $profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss")); Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "--remote-debugging-port=9222 --user-data-dir=$profile"; Start-Sleep -Seconds 2; $CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerUrl;
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run scan:page:merge -- --connectCdp $CDP --pageKey "motor.car-details"
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> $profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss")); `
+>> Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "--remote-debugging-port=9222 --user-data-dir=$profile"; `
+>> Start-Sleep -Seconds 2; `
+>> $CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerUrl;
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run scan:page:merge -- --connectCdp "$CDP" --pageKey "motor.car-details"
 
 > azonline@1.0.0 scan:page:merge
-> ts-node src/scanner/cli.ts -- --merge ws://localhost:9222/devtools/browser/2628e0a1-e302-4c09-b32b-a7a500dc3a53 motor.car-details
+> ts-node src/scanner/cli.ts -- --merge ws://localhost:9222/devtools/browser/e665379f-6595-4e94-85f4-c5ba00f916bb motor.car-details
 
-2026-02-28T19:35:44.485Z [scanner] ERROR: --connectCdp is required.
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
+2026-02-28T19:39:46.268Z [scanner] ERROR: --connectCdp is required.
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline>
