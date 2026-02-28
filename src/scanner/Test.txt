@@ -1,29 +1,8 @@
-Error 1) 
-Getting error in all business.ts files (beliw is from AuthEntryPage.ts)
-import { elements, type ElementKey } from "./elements";
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> $profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss")); Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "--remote-debugging-port=9222 --user-data-dir=$profile"; Start-Sleep -Seconds 2; $CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerUrl;
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run scan:page:merge -- --connectCdp $CDP --pageKey "motor.car-details"
 
-it should be like below:
+> azonline@1.0.0 scan:page:merge
+> ts-node src/scanner/cli.ts -- --merge ws://localhost:9222/devtools/browser/2628e0a1-e302-4c09-b32b-a7a500dc3a53 motor.car-details
 
-import { elements } from "./elements";
-import type { ElementKey } from "./elements";
-
-Error 2) 
-Getting error in below in alises files:
-
-// Start empty. You can map business names -> ElementKey.
-export const aliases = {
-  // example: continue: aliasesGenerated.next,
-} as const satisfies Record<string, ElementKey>;
-
-error details:
-
-const satisfies: any
-',' expected.
-
-const Record: any
-',' expected.
-
-'>' expected.
-
-any
-'ElementKey' only refers to a type, but is being used as a value here.
+2026-02-28T19:35:44.485Z [scanner] ERROR: --connectCdp is required.
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
