@@ -1,20 +1,29 @@
-for later on :
+Error 1) 
+Getting error in all business.ts files (beliw is from AuthEntryPage.ts)
+import { elements, type ElementKey } from "./elements";
 
- Enterprise-level next (you’ll love this)
+it should be like below:
 
-Once imports are clean, next step is:
+import { elements } from "./elements";
+import type { ElementKey } from "./elements";
 
-Auto Import Safety Mode
+Error 2) 
+Getting error in below in alises files:
 
-One command that instantly finds:
-	•	orphan pages
-	•	broken page factory imports
-	•	unused page objects
+// Start empty. You can map business names -> ElementKey.
+export const aliases = {
+  // example: continue: aliasesGenerated.next,
+} as const satisfies Record<string, ElementKey>;
 
-Say:
+error details:
 
-“Show Enterprise Import Health Check”
+const satisfies: any
+',' expected.
 
-and I’ll give you the Level-5 engineer workflow.
+const Record: any
+',' expected.
 
-===============================================================
+'>' expected.
+
+any
+'ElementKey' only refers to a type, but is being used as a value here.
