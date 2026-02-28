@@ -35,7 +35,8 @@ These commands use the scanner CLI:
 $profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss")); `
 Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "--remote-debugging-port=9222 --user-data-dir=$profile"; `
 Start-Sleep -Seconds 2; `
-$CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerUrl; `
+$CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerUrl;
+
 npm run scan:page:merge -- --connectCdp $CDP --pageKey "motor.car-details"
 
 
