@@ -2,7 +2,7 @@
 import type { Page } from "@playwright/test";
 import { PageFx } from "../../core/pageFx";
 import { CookieBanner } from "../common/cookie-banner/CookieBanner";
-import { SelfHealWriter } from "../../scanner/selfHealWriter";
+import { SelfHealWriter } from "../../core/selfHealWriter";
 import type { ElementDef } from "../../core/locatorEngine";
 
 export type BasePageOptions = {
