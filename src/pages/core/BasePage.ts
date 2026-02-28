@@ -15,6 +15,8 @@ export type BasePageOptions = {
     autoRejectCookies?: boolean; // default false
 };
 
+export type AliasMap = Record<string, string>;
+
 export abstract class BasePage {
     protected readonly page: Page;
     protected readonly fx: PageFx;
@@ -119,5 +121,87 @@ export abstract class BasePage {
     protected async selectOptionByKey(pageKey: string, elementKey: string, def: ElementDef, value: string) {
         const { locator } = await this.resolveByKey(pageKey, elementKey, def);
         await locator.selectOption(value, { timeout: Number(process.env.ACTION_TIMEOUT ?? 10_000) });
+    }
+
+    // ============================================================
+    // ✅ Alias Engine (enterprise)
+    // ============================================================
+
+    protected getElementKeyFromAlias<A extends AliasMap>(aliases: A, aliasKey: keyof A): string {
+        const elementKey = aliases[String(aliasKey)];
+        if (!elementKey) {
+            throw new Error(`Alias "${String(aliasKey)}" not found in aliases map.`);
+        }
+        return elementKey;
+    }
+
+    protected getElementDefFromKey<E extends Record<string, ElementDef>>(elements: E, elementKey: string): ElementDef {
+        const def = (elements as any)[elementKey] as ElementDef | undefined;
+        if (!def) {
+            throw new Error(`ElementKey "${elementKey}" not found in elements map.`);
+        }
+        return def;
+    }
+
+    /**
+     * Resolve Locator by alias (self-heal aware + optional write-back).
+     * Useful for expect() because it returns locator.
+     */
+    protected async resolveByAlias<A extends AliasMap, E extends Record<string, ElementDef>>(
+        pageKey: string,
+        aliases: A,
+        elements: E,
+        aliasKey: keyof A
+    ) {
+        const elementKey = this.getElementKeyFromAlias(aliases, aliasKey);
+        const def = this.getElementDefFromKey(elements, elementKey);
+        return await this.resolveByKey(pageKey, elementKey, def);
+    }
+
+    protected async clickByAlias<A extends AliasMap, E extends Record<string, ElementDef>>(
+        pageKey: string,
+        aliases: A,
+        elements: E,
+        aliasKey: keyof A
+    ) {
+        const elementKey = this.getElementKeyFromAlias(aliases, aliasKey);
+        const def = this.getElementDefFromKey(elements, elementKey);
+        await this.clickByKey(pageKey, elementKey, def);
+    }
+
+    protected async fillByAlias<A extends AliasMap, E extends Record<string, ElementDef>>(
+        pageKey: string,
+        aliases: A,
+        elements: E,
+        aliasKey: keyof A,
+        value: string
+    ) {
+        const elementKey = this.getElementKeyFromAlias(aliases, aliasKey);
+        const def = this.getElementDefFromKey(elements, elementKey);
+        await this.fillByKey(pageKey, elementKey, def, value);
+    }
+
+    protected async typeByAlias<A extends AliasMap, E extends Record<string, ElementDef>>(
+        pageKey: string,
+        aliases: A,
+        elements: E,
+        aliasKey: keyof A,
+        value: string
+    ) {
+        const elementKey = this.getElementKeyFromAlias(aliases, aliasKey);
+        const def = this.getElementDefFromKey(elements, elementKey);
+        await this.typeByKey(pageKey, elementKey, def, value);
+    }
+
+    protected async selectOptionByAlias<A extends AliasMap, E extends Record<string, ElementDef>>(
+        pageKey: string,
+        aliases: A,
+        elements: E,
+        aliasKey: keyof A,
+        value: string
+    ) {
+        const elementKey = this.getElementKeyFromAlias(aliases, aliasKey);
+        const def = this.getElementDefFromKey(elements, elementKey);
+        await this.selectOptionByKey(pageKey, elementKey, def, value);
     }
 }
