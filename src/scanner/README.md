@@ -1,146 +1,47 @@
-
-# to kille browser: taskkill /IM msedge.exe /F
-
-# tfor error checking: npx tsc -p tsconfig.json --noEmit
-
-# to get tree outcome: tree -L 6 -I "node_modules|.git"
-
 # 🧱 Page scanner command — from Powershell VS Code
 
-Launch Edge with remote debugging:
+# 1) Launch Edge with remote debugging (Windows powershell (Edge example))
 
 $profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
-
 & "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" `
   --remote-debugging-port=9222 `
   --user-data-dir="$profile"
 
-# Save CDP URL once (VERY IMPORTANT)
+# 2) Save CDP URL once (VERY IMPORTANT)
 
 Invoke-RestMethod http://localhost:9222/json/version
 webSocketDebuggerUrl
-$CDP = "ws://localhost:9222/devtools/browser/9449de56-396e-4b57-b6e0-9d6e18c64c11"
+" $CDP = "ws://localhost:9222/devtools/browser/9449de56-396e-4b57-b6e0-9d6e18c64c11"
 
 
-# Pages scanner command
+# 3) All commands below are run via **npm scripts**
 
-npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "common.auth-entry" `
-  --merge `
-  --verbose
+## Quick glossary
+
+- **Page maps**: JSON snapshots of UI selectors stored under `src/page-maps/<pageKey>.json`.
+- **Elements generation**: Converts page-map JSON into strongly-typed `elements.ts` files inside `src/pages/**/<page>/elements.ts`.
+- **State file**: Tracks hashes of page-map JSON files so we can auto-detect changes.
+  - Stored at: `src/.scanner-state/page-maps-state.json`
+
+---
+
+These commands use the scanner CLI:
+- `src/scanner/cli.ts`
+- They scan the **currently open tab** in a browser launched with `--remote-debugging-port`
+- Output goes to: `src/page-maps/<pageKey>.json`
 
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "common.insurance-product-type-selection" `
-  --merge `
-  --verbose
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.car-details" `
-  --merge `
-  --verbose
+$profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss")); `
+Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "--remote-debugging-port=9222 --user-data-dir=$profile"; `
+Start-Sleep -Seconds 2; `
+$CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerUrl; `
+npm run scan:page:merge -- --connectCdp $CDP --pageKey "motor.car-details"
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.driving-licence" `
-  --merge `
-  --verbose
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.personal-details" `
-  --merge `
-  --verbose
+available npm command:
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.claims-and-convictions" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.no-claim-discount" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.add-additional-driver" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.additional-driver" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.additional-driver-personal-details" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.additional-driver-claims" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.car-usage" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.policy-start-date" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.your-quote" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.your-quote-summary" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "common.account-registration" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "common.email-verification" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "common.direct-debit-setup" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "common.pay-deposit" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.dashboard" `
-  --merge `
-  --verbose
+    "scan:page": "ts-node src/scanner/cli.ts",
+    "scan:page:verbose": "ts-node src/scanner/cli.ts -- --verbose",
+    "scan:page:merge": "ts-node src/scanner/cli.ts -- --merge",
+    "scan:page:merge:verbose": "ts-node src/scanner/cli.ts -- --merge --verbose",

@@ -113,3 +113,73 @@ Sequence
 	•	Case count
 	•	Output location
 
+- **Data Builder**: Converts your Excel sheet into a JSON file under `src/data/generated/<Sheet>.json`.
+
+# 1) Data Builder commands
+
+### `npm run data:build`
+Runs the data builder with default CLI parameters (whatever your data-builder `args.ts` defines as defaults).
+
+**Typical use**: Build cases before running tests.
+
+---
+
+### `npm run data:build:verbose`
+Same as `data:build`, but adds `--verbose`.
+
+**What it does**:
+- Enables debug logs (plugin discovery, run order, timings, etc.)
+
+---
+
+### `npm run data:build:empty`
+Runs data builder with:
+- `--includeEmptyChildFields true`
+
+**What it does**:
+- Keeps empty/blank fields in generated JSON where your builder supports that behavior.
+- Useful when your API expects keys to exist even if values are empty.
+
+---
+
+### `npm run data:build:empty:verbose`
+Same as `data:build:empty` plus `--verbose`.
+
+**Use it when**:
+- You’re troubleshooting why empty values are/aren’t included.
+
+---
+
+### `npm run data:build:flowNB`
+Runs data builder with:
+- `--sheet FlowNB`
+
+**What it does**:
+- Forces the sheet name to `FlowNB` (instead of relying on defaults).
+
+---
+
+### `npm run data:build:debug`
+Same as:
+- `--includeEmptyChildFields true --verbose`
+
+**Use it when**:
+- You want maximum logging + empty fields included.
+
+---
+
+# 2) Test execution commands
+
+### `npm run e2e`
+Runs:
+1) `npm run data:build`
+2) then `npm run test:e2e`
+
+**What it does**:
+- One-shot “build data then execute tests”.
+
+**Important**:
+- If you need specific data-builder params (sheet / verbose / includeEmptyChildFields),
+  run those variants first OR create another combined script.
+
+---
