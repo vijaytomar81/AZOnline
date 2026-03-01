@@ -1,10 +1,9 @@
+// src/scanner/commands/scan.ts
 import path from "node:path";
 import { createLogger } from "../logger";
 import { scanPage } from "../page-scanner/runner";
 
-function getArg(name: string): string | undefined {
-    const argv = process.argv.slice(3); // 👈 IMPORTANT (skip command name)
-
+function getArg(argv: string[], name: string): string | undefined {
     const i = argv.indexOf(name);
     if (i >= 0) return argv[i + 1];
 
@@ -14,8 +13,8 @@ function getArg(name: string): string | undefined {
     return undefined;
 }
 
-function hasFlag(name: string): boolean {
-    return process.argv.slice(3).includes(name);
+function hasFlag(argv: string[], name: string): boolean {
+    return argv.includes(name);
 }
 
 function required(name: string, value: string | undefined): string {
@@ -23,26 +22,36 @@ function required(name: string, value: string | undefined): string {
     return value;
 }
 
-export async function runScanCommand() {
-    const connectCdp = required("--connectCdp", getArg("--connectCdp"));
-    const pageKey = required("--pageKey", getArg("--pageKey"));
+export async function runScanCommand(argv: string[]) {
+    const connectCdp = required("--connectCdp", getArg(argv, "--connectCdp"));
+    const pageKey = required("--pageKey", getArg(argv, "--pageKey"));
 
-    const outDir =
-        getArg("--outDir") ?? path.join(process.cwd(), "src", "page-maps");
+    const outDir = getArg(argv, "--outDir") ?? path.join(process.cwd(), "src", "page-maps");
 
-    const tabIndexRaw = getArg("--tabIndex");
+    const tabIndexRaw = getArg(argv, "--tabIndex");
     const tabIndex = tabIndexRaw ? Number(tabIndexRaw) : 0;
+    if (!Number.isFinite(tabIndex) || tabIndex < 0) {
+        throw new Error(`Invalid --tabIndex '${tabIndexRaw}'. Must be 0 or greater.`);
+    }
 
-    const merge = hasFlag("--merge");
-    const verbose = hasFlag("--verbose");
+    const merge = hasFlag(argv, "--merge");
+    const verbose = hasFlag(argv, "--verbose");
+
+    const logToFile = hasFlag(argv, "--logToFile");
+    const logFilePath = getArg(argv, "--logFilePath") ?? path.join(process.cwd(), "scanner.log");
 
     const log = createLogger({
         prefix: "[scanner]",
         verbose,
         withTimestamp: true,
+        logToFile,
+        logFilePath,
     });
 
-    log.info("Starting scanner...");
+    log.info("Command: scan");
+    log.debug(
+        `Args: pageKey=${pageKey} outDir=${outDir} merge=${merge} tabIndex=${tabIndex}`
+    );
 
     await scanPage({
         connectCdp,
