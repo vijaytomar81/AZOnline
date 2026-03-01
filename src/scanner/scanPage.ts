@@ -9,13 +9,13 @@ import type { PageMap, ScannedElement } from "./types";
 import { buildCandidates } from "./selectorEngine";
 
 export type ScanPageOptions = {
-    connectCdp: string; // required (http or ws)
-    pageKey: string; // required e.g. "motor.car-details"
-    outDir?: string; // default: ./src/page-maps
-    merge?: boolean; // default false
-    tabIndex?: number; // default 0
-    verbose?: boolean; // debug logs
-    log: Logger; // required
+    connectCdp: string;
+    pageKey: string;
+    outDir?: string;
+    merge?: boolean;
+    tabIndex?: number;
+    verbose?: boolean;
+    log: Logger;
 };
 
 function nowIso() {
@@ -42,6 +42,11 @@ function toCamelFromText(s: string) {
         .join("");
 }
 
+function capFirst(s: string) {
+    if (!s) return s;
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 function uniqueKey(base: string, used: Set<string>) {
     let key = base;
     let i = 2;
@@ -54,7 +59,7 @@ function uniqueKey(base: string, used: Set<string>) {
 }
 
 /**
- * Label-first key strategy (your requirement):
+ * Label-first key strategy (fallback):
  * labelText -> ariaLabel -> visible text -> placeholder -> inputName -> name -> id -> tag+index
  */
 function buildLabelFirstKey(el: ScannedElement, indexHint: number) {
@@ -70,6 +75,34 @@ function buildLabelFirstKey(el: ScannedElement, indexHint: number) {
 
     const best = candidates[0] ?? `${el.tag}-${indexHint}`;
     return toCamelFromText(best);
+}
+
+/**
+ * ✅ Enterprise key strategy (#1):
+ * For radio/checkbox groups, include group name (inputName) + option label.
+ *
+ * Examples:
+ *  - registrationNumberPolarQuestionYes
+ *  - vehicleDetailsSetCorrectlyNo
+ */
+function buildEnterpriseKey(el: ScannedElement, indexHint: number) {
+    const type = (el.typeAttr ?? "").toLowerCase();
+    const isGrouped = type === "radio" || type === "checkbox";
+
+    if (isGrouped && el.inputName) {
+        const group = toCamelFromText(el.inputName) || "group";
+        const optionLabel =
+            toCamelFromText(el.labelText ?? "") ||
+            toCamelFromText(el.ariaLabel ?? "") ||
+            toCamelFromText(el.text ?? "") ||
+            toCamelFromText(el.name ?? "") ||
+            `option${indexHint}`;
+
+        return `${group}${capFirst(optionLabel || `option${indexHint}`)}`;
+    }
+
+    // default
+    return buildLabelFirstKey(el, indexHint);
 }
 
 function classifyType(el: ScannedElement) {
@@ -98,12 +131,33 @@ function safeReadJson<T>(filePath: string): T | null {
     return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
 }
 
+/** Build a stable identity signature for collision-safe merge (#3) */
+function identitySig(e: PageMap["elements"][string]) {
+    const m: NonNullable<PageMap["elements"][string]["meta"]> = (e.meta ?? { tag: "element" }) as NonNullable<
+        PageMap["elements"][string]["meta"]
+    >;
+
+    const parts = [
+        `type=${e.type ?? ""}`,
+        `tag=${m.tag ?? ""}`,
+        `inputName=${m.inputName ?? ""}`,
+        `id=${m.id ?? ""}`,
+        `dataTestId=${m.dataTestId ?? ""}`,
+        `dataQa=${m.dataQa ?? ""}`,
+        `dataTest=${m.dataTest ?? ""}`,
+        `href=${m.href ?? ""}`,
+    ];
+
+    return parts.join("|");
+}
+
 /**
- * Merge strategy:
+ * ✅ Merge strategy (#3):
  * - Keep existing keys stable.
- * - If preferred differs, keep old as fallback and promote new preferred.
- * - Union fallbacks.
- * - Merge meta (new wins where defined), and always keep meta.tag defined.
+ * - If same key but identity differs => DO NOT overwrite.
+ *   Instead create a new key (key2/key3) and append.
+ * - If same identity => normal merge:
+ *   preferred promotion + fallbacks union + meta merge.
  */
 function mergePageMaps(existing: PageMap, incoming: PageMap): PageMap {
     const out: PageMap = {
@@ -115,14 +169,30 @@ function mergePageMaps(existing: PageMap, incoming: PageMap): PageMap {
         elements: { ...existing.elements },
     };
 
+    const usedKeys = new Set(Object.keys(out.elements));
+
     for (const [key, next] of Object.entries(incoming.elements)) {
         const cur = out.elements[key];
 
+        // new key entirely
         if (!cur) {
             out.elements[key] = next;
+            usedKeys.add(key);
             continue;
         }
 
+        // collision-safe check
+        const curSig = identitySig(cur);
+        const nextSig = identitySig(next);
+
+        if (curSig !== nextSig) {
+            // same label key but different underlying element => append instead of overwrite
+            const newKey = uniqueKey(key, usedKeys);
+            out.elements[newKey] = next;
+            continue;
+        }
+
+        // same identity => normal merge
         let preferred = cur.preferred;
         let fallbacks = uniq([...(cur.fallbacks ?? [])]);
 
@@ -318,7 +388,9 @@ export async function scanPage(opts: ScanPageOptions): Promise<void> {
         for (let idx = 0; idx < scanned.length; idx++) {
             const el = scanned[idx];
 
-            const baseKey = buildLabelFirstKey(el, idx + 1);
+            // ✅ NEW: enterprise key builder (#1)
+            const baseKey = buildEnterpriseKey(el, idx + 1);
+
             const bump = (perBaseCounter.get(baseKey) ?? 0) + 1;
             perBaseCounter.set(baseKey, bump);
 
@@ -345,6 +417,12 @@ export async function scanPage(opts: ScanPageOptions): Promise<void> {
                     placeholder: el.placeholder ?? null,
                     inputName: el.inputName ?? null,
                     typeAttr: el.typeAttr ?? null,
+
+                    // ✅ add these so merge can detect identity changes (#3)
+                    href: el.href ?? null,
+                    dataTestId: el.dataTestId ?? null,
+                    dataTest: el.dataTest ?? null,
+                    dataQa: el.dataQa ?? null,
                 },
             };
 
