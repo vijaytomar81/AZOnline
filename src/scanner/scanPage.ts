@@ -323,8 +323,13 @@ export async function scanPage(opts: ScanPageOptions): Promise<void> {
                 "[data-qa]",
             ].join(",");
 
-            const nodes = Array.from(document.querySelectorAll(selector))
-                // ✅ Exclude anything inside <footer> (stable, no classes)
+            const root = document.querySelector("#root");
+
+            // If #root is missing for some reason, fall back to the whole document
+            const scope: ParentNode = root ?? document;
+
+            const nodes = Array.from(scope.querySelectorAll(selector))
+                // ✅ Exclude anything inside <footer>
                 .filter((el) => !el.closest("footer"));
 
             return nodes.map((el) => {
