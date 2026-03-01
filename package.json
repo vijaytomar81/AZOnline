@@ -19,6 +19,7 @@
 
     "gen:elements": "ts-node src/scanner/generateElements.ts -- --merge",
     "gen:elements:verbose": "ts-node src/scanner/generateElements.ts -- --merge --verbose",
+    
     "gen:elements:changed": "ts-node src/scanner/generateElements.ts -- --changedOnly --merge",
     "gen:elements:changed:verbose": "ts-node src/scanner/generateElements.ts -- --changedOnly --merge --verbose",
 

@@ -116,6 +116,24 @@ function mapPageKeyToPageTsPath(pagesDir: string, pageKey: string) {
 }
 
 /**
+ * ✅ NEW:
+ * Determine whether Level-7 scaffold outputs are missing.
+ * If missing, we should process this page even when --changedOnly is enabled.
+ */
+function scaffoldMissingForPage(
+    pageFolder: string,
+    elementsPath: string,
+    aliasesGenPath: string,
+    aliasesHumanPath: string,
+    pageTsPath: string
+) {
+    if (!fs.existsSync(pageFolder)) return true;
+
+    const required = [elementsPath, aliasesGenPath, aliasesHumanPath, pageTsPath];
+    return required.some((p) => !fs.existsSync(p));
+}
+
+/**
  * Escape a literal string for RegExp source.
  */
 function escapeRegexLiteral(s: string) {
@@ -141,9 +159,7 @@ function buildUrlReFromUrlPath(urlPath: string): string {
 
     const last = parts[parts.length - 1] ?? "";
     const dynamic =
-        /^[a-z0-9]+$/i.test(last) && /[a-z]/i.test(last)
-            ? "[a-z0-9]+"
-            : "([^/]+)";
+        /^[a-z0-9]+$/i.test(last) && /[a-z]/i.test(last) ? "[a-z0-9]+" : "([^/]+)";
 
     const prefixParts = parts.slice(0, -1).map(escapeRegexLiteral);
     const prefix = prefixParts.length ? `/${prefixParts.join("/")}` : "";
@@ -340,11 +356,6 @@ async function generateElements(opts: GenOptions) {
         const oldHash = oldState[file];
         const changed = oldHash !== hash;
 
-        if (opts.changedOnly && !changed) {
-            if (opts.verbose) log.debug(`UNCHANGED → skipping ${file}`);
-            continue;
-        }
-
         const pageMap = JSON.parse(raw) as PageMap;
         if (!pageMap?.pageKey) throw new Error(`Invalid page-map (missing pageKey): ${file}`);
         if (!pageMap?.elements || typeof pageMap.elements !== "object") {
@@ -356,6 +367,22 @@ async function generateElements(opts: GenOptions) {
         const aliasesGenPath = mapPageKeyToAliasesGeneratedPath(opts.pagesDir, pageMap.pageKey);
         const aliasesHumanPath = mapPageKeyToAliasesHumanPath(opts.pagesDir, pageMap.pageKey);
         const pageTsPath = mapPageKeyToPageTsPath(opts.pagesDir, pageMap.pageKey);
+
+        // ✅ NEW: if scaffold is ON, treat missing scaffold as "needs processing"
+        const missing = scaffold
+            ? scaffoldMissingForPage(pageFolder, elementsPath, aliasesGenPath, aliasesHumanPath, pageTsPath)
+            : false;
+
+        // ✅ NEW skip rule:
+        // only skip when unchanged AND scaffold is not missing
+        if (opts.changedOnly && !changed && !missing) {
+            if (opts.verbose) log.debug(`UNCHANGED → skipping ${file}`);
+            continue;
+        }
+
+        if (opts.changedOnly && !changed && missing) {
+            log.info(`UNCHANGED but scaffold missing → generating: ${pageMap.pageKey}`);
+        }
 
         // Level-7: ensure folder/files exist (create-only where required)
         if (scaffold) {
