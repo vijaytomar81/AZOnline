@@ -1,11 +1,94 @@
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> $profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss")); `
->> Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "--remote-debugging-port=9222 --user-data-dir=$profile"; `
->> Start-Sleep -Seconds 2; `
->> $CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerUrl;
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run scan:page:merge -- --connectCdp "$CDP" --pageKey "motor.car-details"
+1st time:
 
-> azonline@1.0.0 scan:page:merge
-> ts-node src/scanner/cli.ts -- --merge ws://localhost:9222/devtools/browser/e665379f-6595-4e94-85f4-c5ba00f916bb motor.car-details
+    "yes": {
+      "type": "radio",
+      "preferred": "css=#registrationNumberPolarQuestionfalse",
+      "fallbacks": [
+        "css=#vehicleDetailsSetCorrectly-true",
+        "css=input[name=\"registrationNumberPolarQuestion\"]",
+        "role=textbox[name=/Yes/i]",
+        "css=input[name=\"vehicleDetailsSetCorrectly\"]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "registrationNumberPolarQuestionfalse",
+        "name": "Yes",
+        "text": null,
+        "labelText": "Yes",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "registrationNumberPolarQuestion",
+        "typeAttr": "radio"
+      }
+    },
+    "no": {
+      "type": "radio",
+      "preferred": "css=#registrationNumberPolarQuestiontrue",
+      "fallbacks": [
+        "css=#vehicleDetailsSetCorrectly-false",
+        "css=input[name=\"registrationNumberPolarQuestion\"]",
+        "role=textbox[name=/No/i]",
+        "css=input[name=\"vehicleDetailsSetCorrectly\"]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "registrationNumberPolarQuestiontrue",
+        "name": "No",
+        "text": null,
+        "labelText": "No",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "registrationNumberPolarQuestion",
+        "typeAttr": "radio"
+      }
+    },
+	
+2nd time:
 
-2026-02-28T19:39:46.268Z [scanner] ERROR: --connectCdp is required.
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline>
+
+"yes": {
+      "type": "radio",
+      "preferred": "css=#vehicleDetailsSetCorrectly-true",
+      "fallbacks": [
+        "css=#registrationNumberPolarQuestionfalse",
+        "css=input[name=\"registrationNumberPolarQuestion\"]",
+        "role=textbox[name=/Yes/i]",
+        "css=input[name=\"vehicleDetailsSetCorrectly\"]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "vehicleDetailsSetCorrectly-true",
+        "name": "Yes",
+        "text": null,
+        "labelText": "Yes",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "vehicleDetailsSetCorrectly",
+        "typeAttr": "radio"
+      }
+    },
+    "no": {
+      "type": "radio",
+      "preferred": "css=#vehicleDetailsSetCorrectly-false",
+      "fallbacks": [
+        "css=#registrationNumberPolarQuestiontrue",
+        "css=input[name=\"registrationNumberPolarQuestion\"]",
+        "role=textbox[name=/No/i]",
+        "css=input[name=\"vehicleDetailsSetCorrectly\"]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "vehicleDetailsSetCorrectly-false",
+        "name": "No",
+        "text": null,
+        "labelText": "No",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "vehicleDetailsSetCorrectly",
+        "typeAttr": "radio"
+      }
+    },
