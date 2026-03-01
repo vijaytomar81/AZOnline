@@ -16,3 +16,31 @@ New-Item -ItemType Directory -Force -Path "src\scanner\page-scanner" | Out-Null
 ) | ForEach-Object {
   New-Item -ItemType File -Force -Path $_ | Out-Null
 }
+
+
+New-Item -ItemType Directory -Force src\scanner\elements-generator\builders | Out-Null
+
+$files = @(
+  "src\scanner\elements-generator\index.ts",
+  "src\scanner\elements-generator\types.ts",
+  "src\scanner\elements-generator\paths.ts",
+  "src\scanner\elements-generator\urlMeta.ts",
+  "src\scanner\elements-generator\state.ts",
+  "src\scanner\elements-generator\scaffold.ts",
+  "src\scanner\elements-generator\runner.ts",
+  "src\scanner\elements-generator\builders\buildElementsTs.ts",
+  "src\scanner\elements-generator\builders\buildAliasesGeneratedTs.ts",
+  "src\scanner\elements-generator\builders\buildAliasesHumanTs.ts",
+  "src\scanner\elements-generator\builders\buildPageTsStub.ts"
+)
+
+$files | ForEach-Object { New-Item -ItemType File -Force $_ | Out-Null }
+
+
+
+
+
+New-Item -ItemType Directory -Force src/scanner/commands
+
+New-Item src/scanner/commands/scan.ts -ItemType File
+New-Item src/scanner/commands/generate.ts -ItemType File
