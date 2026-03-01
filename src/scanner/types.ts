@@ -21,7 +21,7 @@ export type ScannedElement = {
     dataTest: string | null;
     dataQa: string | null;
 
-    // ✅ NEW: label-first / enterprise metadata
+    // ✅ label-first / enterprise metadata
     labelText?: string | null; // resolved associated <label> text
     ariaLabel?: string | null; // raw aria-label
     placeholder?: string | null; // input placeholder
@@ -33,18 +33,18 @@ export type ScannedElement = {
     best?: SelectorCandidate;
 
     // Internal stable key we generate
-    key: string; // e.g. "date_of_claim_month" or "button.log_in"
+    key: string;
 };
 
 export type PageMap = {
-    pageKey: string; // e.g. "common.auth-entry"
-    url: string; // full url used for scan
-    urlPath?: string; // if provided
-    scannedAt: string; // ISO time
+    pageKey: string;
+    url: string;
+    urlPath?: string;
+    scannedAt: string;
     elements: Record<
         string,
         {
-            type: string; // button/link/input/...
+            type: string;
             preferred: string;
             fallbacks: string[];
             meta?: {
@@ -62,6 +62,12 @@ export type PageMap = {
                 placeholder?: string | null;
                 inputName?: string | null;
                 typeAttr?: string | null;
+
+                // ✅ helpful for collision-safe merge
+                href?: string | null;
+                dataTestId?: string | null;
+                dataTest?: string | null;
+                dataQa?: string | null;
             };
         }
     >;
