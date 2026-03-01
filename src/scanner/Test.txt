@@ -1,3 +1,18 @@
-<footer class="falcon-footer">
+# 1) Create folder
+New-Item -ItemType Directory -Force -Path "src\scanner\page-scanner" | Out-Null
 
-<div id="root">
+# 2) Create empty files
+@(
+  "src\scanner\page-scanner\types.ts",
+  "src\scanner\page-scanner\browser.ts",
+  "src\scanner\page-scanner\domExtract.ts",
+  "src\scanner\page-scanner\filters.ts",
+  "src\scanner\page-scanner\keyStrategy.ts",
+  "src\scanner\page-scanner\classify.ts",
+  "src\scanner\page-scanner\selectorPipeline.ts",
+  "src\scanner\page-scanner\merge.ts",
+  "src\scanner\page-scanner\writer.ts",
+  "src\scanner\page-scanner\runner.ts"
+) | ForEach-Object {
+  New-Item -ItemType File -Force -Path $_ | Out-Null
+}
