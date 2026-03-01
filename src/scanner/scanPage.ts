@@ -323,7 +323,9 @@ export async function scanPage(opts: ScanPageOptions): Promise<void> {
                 "[data-qa]",
             ].join(",");
 
-            const nodes = Array.from(document.querySelectorAll(selector));
+            const nodes = Array.from(document.querySelectorAll(selector))
+                // ✅ Exclude anything inside <footer> (stable, no classes)
+                .filter((el) => !el.closest("footer"));
 
             return nodes.map((el) => {
                 const tag = el.tagName.toLowerCase();
