@@ -13,11 +13,11 @@
     "test:e2e": "playwright test",
     "e2e": "npm run data:build -- && npm run test:e2e",
 
-    "scanner": "ts-node src/scanner/cli.ts --",
-    "scan:page": "ts-node src/scanner/cli.ts -- scan",
-    "scan:page:verbose": "ts-node src/scanner/cli.ts -- scan --verbose",
-    "scan:page:merge": "ts-node src/scanner/cli.ts -- scan --merge",
-    "scan:page:merge:verbose": "ts-node src/scanner/cli.ts -- scan --merge --verbose",
+    "scanner": "node -r ts-node/register src/scanner/cli.ts",
+    "scan:page": "node -r ts-node/register src/scanner/cli.ts scan",
+    "scan:page:verbose": "node -r ts-node/register src/scanner/cli.ts scan --verbose",
+    "scan:page:merge": "node -r ts-node/register src/scanner/cli.ts scan --merge",
+    "scan:page:merge:verbose": "node -r ts-node/register src/scanner/cli.ts scan --merge --verbose",
     "scanner:tsc": "tsc -p tsconfig.scanner.json --noEmit",
 
     "gen:elements": "npm run scanner -- generate --merge",
