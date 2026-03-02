@@ -37,7 +37,7 @@ Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "--
 Start-Sleep -Seconds 2; `
 $CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerUrl;
 
-npm run scan:page:merge -- --connectCdp "$CDP" --pageKey="motor.car-details"
+npm run scan:page:merge -- --connectCdp="$CDP" --pageKey="motor.car-details"
 
 npm run scan:page:merge -- --connectCdp=$CDP --pageKey=motor.car-details
 
