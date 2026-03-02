@@ -4,10 +4,22 @@ npm prefix
 
 npm run scanner -- scan --merge --connectCdp="$CDP" --pageKey=motor.car-details
 
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run scan:page:merge -- --connectCdp "$CDP" --pageKey "motor.car-details"
+
+> azonline@1.0.0 scan:page:merge
+> ts-node src/scanner/cli.ts scan --merge ws://localhost:9222/devtools/browser/c657a301-5b92-4ecc-970c-08add314151e motor.car-details
+
+2026-03-02T18:41:39.335Z [scanner] ERROR: --connectCdp is required.
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm pkg get scripts.scan:page:merge
+"ts-node src/scanner/cli.ts scan --merge"
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm pkg get scripts.scanner
+"ts-node src/scanner/cli.ts"
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm prefix
+C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline
 PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run scanner -- scan --merge --connectCdp="$CDP" --pageKey=motor.car-details
 
 > azonline@1.0.0 scanner
 > ts-node src/scanner/cli.ts scan
 
-2026-03-02T18:28:05.853Z [scanner] ERROR: --connectCdp is required.
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline>
+2026-03-02T18:42:32.603Z [scanner] ERROR: --connectCdp is required.
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
