@@ -1,9 +1,123 @@
 // src/scanner/commands/doctor.ts
+
+import fs from "node:fs";
+import path from "node:path";
 import { createLogger } from "../logger";
 
-export async function runDoctorCommand(argv: string[]) {
-    void argv;
-    const log = createLogger({ prefix: "[scanner]", verbose: true, withTimestamp: true });
+function usage() {
+    return `
+scanner doctor
+
+Usage:
+  ts-node src/scanner/cli.ts doctor [options]
+
+Options:
+  --mapsDir <path>     override page-maps directory (default: src/page-maps)
+  --pagesDir <path>    override pages directory (default: src/pages)
+  --stateDir <path>    override scanner state directory (default: src/.scanner-state)
+  --stateFile <path>   override state file path (default: <stateDir>/page-maps-state.json)
+  --verbose
+  --help
+`.trim();
+}
+
+function getArg(argv: string[], name: string): string | undefined {
+    const i = argv.indexOf(name);
+    if (i >= 0) return argv[i + 1];
+
+    const eq = argv.find((a) => a.startsWith(`${name}=`));
+    if (eq) return eq.split("=").slice(1).join("=");
+
+    return undefined;
+}
+
+function hasFlag(argv: string[], name: string) {
+    return argv.includes(name);
+}
+
+function exists(p: string) {
+    return fs.existsSync(p);
+}
+
+function canWrite(dir: string) {
+    try {
+        fs.accessSync(dir, fs.constants.W_OK);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+export async function runDoctorCommand(args: string[]) {
+    const verbose = hasFlag(args, "--verbose");
+    const log = createLogger({ prefix: "[scanner]", verbose, withTimestamp: true });
+
+    if (hasFlag(args, "--help") || hasFlag(args, "-h")) {
+        log.info(usage());
+        return;
+    }
+
+    const mapsDir = getArg(args, "--mapsDir") ?? path.join(process.cwd(), "src", "page-maps");
+    const pagesDir = getArg(args, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
+    const stateDir = getArg(args, "--stateDir") ?? path.join(process.cwd(), "src", ".scanner-state");
+    const stateFile = getArg(args, "--stateFile") ?? path.join(stateDir, "page-maps-state.json");
+
     log.info("Command: doctor");
-    log.info("TODO: diagnose environment (CDP reachable, dirs exist, permissions, etc.) (not implemented yet).");
+    log.info(`Node: ${process.version}`);
+    log.info(`cwd: ${process.cwd()}`);
+
+    const checks: Array<{ name: string; ok: boolean; detail: string }> = [];
+
+    checks.push({ name: "mapsDir exists", ok: exists(mapsDir), detail: mapsDir });
+    checks.push({ name: "pagesDir exists", ok: exists(pagesDir), detail: pagesDir });
+    checks.push({ name: "stateDir exists", ok: exists(stateDir), detail: stateDir });
+    checks.push({ name: "stateFile exists", ok: exists(stateFile), detail: stateFile });
+
+    if (exists(mapsDir)) checks.push({ name: "mapsDir writable", ok: canWrite(mapsDir), detail: mapsDir });
+    if (exists(pagesDir)) checks.push({ name: "pagesDir writable", ok: canWrite(pagesDir), detail: pagesDir });
+    if (exists(stateDir)) checks.push({ name: "stateDir writable", ok: canWrite(stateDir), detail: stateDir });
+
+    // quick page-maps count
+    if (exists(mapsDir)) {
+        const maps = fs.readdirSync(mapsDir).filter((f) => f.endsWith(".json") && !f.startsWith("."));
+        checks.push({ name: "page-maps found", ok: maps.length > 0, detail: `${maps.length} file(s)` });
+    }
+
+    for (const c of checks) {
+        log.info(`${c.ok ? "✅" : "❌"} ${c.name}: ${c.detail}`);
+    }
+
+    const failed = checks.filter((c) => !c.ok);
+    if (failed.length === 0) {
+        log.info("Doctor summary: looks healthy ✅");
+        log.info(`Next: scanner generate --merge --changedOnly`);
+        return;
+    }
+
+    log.info("Doctor summary: issues found ❌");
+    log.info("Suggested actions:");
+
+    for (const f of failed) {
+        if (f.name === "mapsDir exists") {
+            log.info(`- Create: mkdir -p ${mapsDir}`);
+        }
+        if (f.name === "pagesDir exists") {
+            log.info(`- Create: mkdir -p ${pagesDir}`);
+        }
+        if (f.name === "stateDir exists") {
+            log.info(`- Create: mkdir -p ${stateDir}`);
+        }
+        if (f.name === "stateFile exists") {
+            log.info(`- Run: scanner generate --stateOnly --verbose (to create state file)`);
+        }
+        if (f.name === "page-maps found") {
+            log.info(`- Run a scan first: scanner scan --connectCdp "$CDP" --pageKey <key> --merge`);
+        }
+        if (f.name.endsWith("writable")) {
+            log.info(`- Fix permissions for: ${f.detail}`);
+        }
+    }
+
+    // non-zero exit for CI friendliness
+    process.exitCode = 2;
 }
