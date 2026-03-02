@@ -2,6 +2,8 @@ npm pkg get scripts.scan:page:merge
 npm pkg get scripts.scanner
 npm prefix
 
+npm run scanner -- scan --merge --connectCdp="$CDP" --pageKey=motor.car-details
+
 PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run scan:page:merge -- --connectCdp="$CDP" --pageKey="motor.car-details"
 
 > azonline@1.0.0 scan:page:merge
