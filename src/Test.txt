@@ -1,13 +1,9 @@
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> Get-ChildItem -Force .\src\page-maps | Where-Object Name -like "*.state*"
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> Get-ChildItem -Force .\src\page-maps | Where-Object Name -like ".*state*"
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> $CDP
+ws://localhost:9222/devtools/browser/c657a301-5b92-4ecc-970c-08add314151e
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run scan:page:merge -- --connectCdp=$CDP --pageKey=motor.car-details
 
+> azonline@1.0.0 scan:page:merge
+> ts-node src/scanner/cli.ts -- --merge
 
-    Directory: C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\page-maps
-
-
-Mode                 LastWriteTime         Length Name
-----                 -------------         ------ ----
--a----         2/27/2026   7:27 PM           1577 .page-maps-state.json
-
-
+2026-03-02T18:12:42.536Z [scanner] ERROR: --connectCdp is required.
 PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
