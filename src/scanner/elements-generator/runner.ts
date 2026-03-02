@@ -3,45 +3,63 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import type { GenOptions, PageMap, StateFile } from "./types";
+import type { GenOptions, PageMap } from "./types";
 import { buildElementsTs } from "./builders/buildElementsTs";
-import { mapPageKeyToElementsPath } from "./paths";
+import {
+    mapPageKeyToAliasesHumanPath,
+    mapPageKeyToElementsPath,
+    mapPageKeyToPageTsPath,
+} from "./paths";
 import { ensureScaffoldFiles, hasMissingGeneratedOutputs } from "./scaffold";
-import { ensureDir, hashContent, loadState, saveState } from "./state";
+import { hashContent, loadState, saveState, ensureDir } from "./state";
 
-function listPageMapFiles(mapsDir: string): string[] {
-    if (!fs.existsSync(mapsDir)) return [];
+function readAllPageMaps(mapsDir: string): string[] {
     return fs
         .readdirSync(mapsDir)
         .filter((f) => f.endsWith(".json") && !f.startsWith("."))
         .sort((a, b) => a.localeCompare(b));
 }
 
-function readPageMap(absPath: string, fileNameForErrors: string): PageMap {
-    const raw = fs.readFileSync(absPath, "utf8");
-    const pageMap = JSON.parse(raw) as PageMap;
-
-    if (!pageMap?.pageKey) throw new Error(`Invalid page-map (missing pageKey): ${fileNameForErrors}`);
-    if (!pageMap?.elements || typeof pageMap.elements !== "object") {
-        throw new Error(`Invalid page-map (missing elements): ${fileNameForErrors}`);
+function mtimeMsSafe(p: string): number {
+    try {
+        return fs.statSync(p).mtimeMs;
+    } catch {
+        return 0;
     }
+}
 
-    return pageMap;
+/**
+ * If aliases.ts changed (human renamed keys), we must re-sync the page object region
+ * even when the page-map JSON hash did not change.
+ */
+function needsAliasSync(params: { pagesDir: string; pageKey: string }): boolean {
+    const { pagesDir, pageKey } = params;
+
+    const aliasesHumanPath = mapPageKeyToAliasesHumanPath(pagesDir, pageKey);
+    const pageTsPath = mapPageKeyToPageTsPath(pagesDir, pageKey);
+
+    if (!fs.existsSync(aliasesHumanPath) || !fs.existsSync(pageTsPath)) return false;
+
+    // If aliases.ts is newer than page object, likely human edits need re-sync
+    return mtimeMsSafe(aliasesHumanPath) > mtimeMsSafe(pageTsPath);
 }
 
 export async function runElementsGenerator(opts: GenOptions) {
     const log = opts.log;
+
     const scaffold = opts.scaffold !== false; // default true
 
-    const stateDir = opts.stateDir ?? path.join(process.cwd(), "src", ".scanner-state");
+    const stateDir =
+        opts.stateDir ?? path.join(process.cwd(), "src", ".scanner-state");
     ensureDir(stateDir);
 
-    const stateFilePath = opts.stateFile ?? path.join(stateDir, "page-maps-state.json");
+    const stateFilePath =
+        opts.stateFile ?? path.join(stateDir, "page-maps-state.json");
 
-    const oldState: StateFile = loadState(stateFilePath);
-    const newState: StateFile = {};
+    const oldState = loadState(stateFilePath);
+    const newState: Record<string, string> = {};
 
-    const mapFiles = listPageMapFiles(opts.mapsDir);
+    const mapFiles = readAllPageMaps(opts.mapsDir);
     log.info(`Found ${mapFiles.length} page-map(s).`);
 
     let processed = 0;
@@ -56,21 +74,31 @@ export async function runElementsGenerator(opts: GenOptions) {
         const oldHash = oldState[file];
         const changed = oldHash !== hash;
 
-        const pageMap = readPageMap(abs, file);
+        const pageMap = JSON.parse(raw) as PageMap;
+        if (!pageMap?.pageKey) throw new Error(`Invalid page-map (missing pageKey): ${file}`);
+        if (!pageMap?.elements || typeof pageMap.elements !== "object") {
+            throw new Error(`Invalid page-map (missing elements): ${file}`);
+        }
 
-        // ✅ even with --changedOnly, re-run if outputs are missing
+        // Even with --changedOnly, we must re-create missing outputs
         const missingOutputs = hasMissingGeneratedOutputs({
             pagesDir: opts.pagesDir,
             pageKey: pageMap.pageKey,
         });
 
-        const shouldSkip = opts.changedOnly && !changed && !missingOutputs;
+        // Even with --changedOnly, we must re-sync page object when aliases.ts changed
+        const aliasSyncNeeded = scaffold && needsAliasSync({
+            pagesDir: opts.pagesDir,
+            pageKey: pageMap.pageKey,
+        });
+
+        const shouldSkip = opts.changedOnly && !changed && !missingOutputs && !aliasSyncNeeded;
         if (shouldSkip) {
             if (opts.verbose) log.debug(`UNCHANGED → skipping ${file}`);
             continue;
         }
 
-        // Scaffold (create-only files + regenerate aliases.generated + sync page methods)
+        // Scaffold (create-only + append new alias mappings + sync page object region)
         if (scaffold) {
             ensureScaffoldFiles({
                 pagesDir: opts.pagesDir,
@@ -80,7 +108,7 @@ export async function runElementsGenerator(opts: GenOptions) {
             });
         }
 
-        // State-only: do not write elements.ts (but still update state)
+        // State-only: do not write elements.ts (but state must still update)
         if (opts.stateOnly) {
             if (opts.verbose) log.debug(`STATE-ONLY → skipping elements write for ${pageMap.pageKey}`);
             processed++;
@@ -97,13 +125,13 @@ export async function runElementsGenerator(opts: GenOptions) {
             log.info(`Writing: ${elementsPath}`);
         }
 
-        ensureDir(path.dirname(elementsPath));
+        fs.mkdirSync(path.dirname(elementsPath), { recursive: true });
         fs.writeFileSync(elementsPath, ts, "utf8");
 
         processed++;
     }
 
-    // always update state file
+    // always update state
     saveState(stateFilePath, newState);
 
     log.info(`State file updated: ${stateFilePath}`);
