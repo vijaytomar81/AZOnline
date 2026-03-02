@@ -35,7 +35,7 @@ export class CarDetailsPage extends BasePage {
     await locator.setChecked(checked, { timeout: Number(process.env.ACTION_TIMEOUT ?? 10_000) });
   }
 
-      // <scanner:aliases>
+    // <scanner:aliases>
   // This region is auto-managed. Do not edit by hand.
 
   async allDone() {
