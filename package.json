@@ -16,6 +16,7 @@
     "scan:page:verbose": "npm run scanner -- scan --verbose",
     "scan:page:merge": "npm run scanner -- scan --merge",
     "scan:page:merge:verbose": "npm run scanner -- scan --merge --verbose",
+    "scanner:tsc": "tsc -p tsconfig.scanner.json --noEmit",
     "gen:elements": "npm run scanner -- generate --merge",
     "gen:elements:verbose": "npm run scanner -- generate --merge --verbose",
     "gen:elements:changed": "npm run scanner -- generate --changedOnly --merge",
