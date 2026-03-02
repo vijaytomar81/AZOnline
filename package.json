@@ -9,14 +9,17 @@
     "data:build:empty:verbose": "ts-node src/data/data-builder/index.ts -- --includeEmptyChildFields true --verbose",
     "data:build:flowNB": "ts-node src/data/data-builder/index.ts -- --sheet FlowNB",
     "data:build:debug": "ts-node src/data/data-builder/index.ts -- --includeEmptyChildFields true --verbose",
+    
     "test:e2e": "playwright test",
     "e2e": "npm run data:build -- && npm run test:e2e",
+
     "scanner": "ts-node src/scanner/cli.ts",
     "scan:page": "npm run scanner -- scan",
     "scan:page:verbose": "npm run scanner -- scan --verbose",
     "scan:page:merge": "npm run scanner -- scan --merge",
     "scan:page:merge:verbose": "npm run scanner -- scan --merge --verbose",
     "scanner:tsc": "tsc -p tsconfig.scanner.json --noEmit",
+
     "gen:elements": "npm run scanner -- generate --merge",
     "gen:elements:verbose": "npm run scanner -- generate --merge --verbose",
     "gen:elements:changed": "npm run scanner -- generate --changedOnly --merge",
