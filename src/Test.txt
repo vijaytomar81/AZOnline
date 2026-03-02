@@ -2,10 +2,14 @@ npm pkg get scripts.scan:page:merge
 npm pkg get scripts.scanner
 npm prefix
 
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm pkg get scripts.scan:page:merge
-"npm run scanner -- scan --merge"
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm pkg get scripts.scanner
-"ts-node src/scanner/cli.ts"
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm prefix
-C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run scan:page:merge -- --connectCdp="$CDP" --pageKey="motor.car-details"
+
+> azonline@1.0.0 scan:page:merge
+> npm run scanner -- scan --merge
+
+
+> azonline@1.0.0 scanner
+> ts-node src/scanner/cli.ts scan --merge
+
+2026-03-02T18:26:11.961Z [scanner] ERROR: --connectCdp is required.
 PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
