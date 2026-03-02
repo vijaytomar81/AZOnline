@@ -5,3 +5,21 @@ npm prefix
 
 Get-ChildItem (npm prefix) package.json
 
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm pkg get scripts.scan:page:merge
+"ts-node src/scanner/cli.ts -- --merge"
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm pkg get scripts.scanner
+{}
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm prefix
+C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> Get-ChildItem (npm prefix) package.json
+
+
+    Directory: C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----         2/27/2026   5:49 PM           2080 package.json
+
+
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline>
