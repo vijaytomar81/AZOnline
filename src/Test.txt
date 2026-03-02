@@ -1,26 +1,11 @@
 npm pkg get scripts.scan:page:merge
 npm pkg get scripts.scanner
-
 npm prefix
 
-{
-  "scripts": {
-    "scanner": "ts-node src/scanner/cli.ts",
-
-    "scan:page": "npm run scanner -- scan",
-    "scan:page:verbose": "npm run scanner -- scan --verbose",
-    "scan:page:merge": "npm run scanner -- scan --merge",
-    "scan:page:merge:verbose": "npm run scanner -- scan --merge --verbose",
-
-    "scanner:tsc": "tsc -p tsconfig.scanner.json --noEmit",
-
-    "gen:elements": "npm run scanner -- generate --merge",
-    "gen:elements:verbose": "npm run scanner -- generate --merge --verbose",
-    "gen:elements:changed": "npm run scanner -- generate --changedOnly --merge",
-    "gen:elements:changed:verbose": "npm run scanner -- generate --changedOnly --merge --verbose",
-    "gen:elements:noScaffold": "npm run scanner -- generate --merge --noScaffold",
-    "gen:elements:changed:noScaffold": "npm run scanner -- generate --changedOnly --merge --noScaffold",
-    "gen:hashes": "npm run scanner -- generate --stateOnly --verbose",
-    "gen:hashes:changed": "npm run scanner -- generate --changedOnly --stateOnly --verbose"
-  }
-}
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm pkg get scripts.scan:page:merge
+"npm run scanner -- scan --merge"
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm pkg get scripts.scanner
+"ts-node src/scanner/cli.ts"
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm prefix
+C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
