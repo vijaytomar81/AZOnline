@@ -136,10 +136,20 @@ export function syncAliasesIntoPageObject(args: {
 
     if (start < 0 || end < 0 || end < start) return;
 
-    const before = pageTs.slice(0, start);
-    const after = pageTs.slice(end + endToken.length);
+    // ✅ Capture existing indentation before the startToken line
+    const lineStart = pageTs.lastIndexOf("\n", start);
+    const lineStartIdx = lineStart < 0 ? 0 : lineStart + 1;
+    const indent = pageTs.slice(lineStartIdx, start).match(/^\s*/)?.[0] ?? "";
 
-    const region = buildAliasesRegion(pageMap, aliasesTs);
+    // Build region and apply same indentation to every line
+    const rawRegion = buildAliasesRegion(pageMap, aliasesTs);
+    const region = rawRegion
+        .split("\n")
+        .map((l) => (l.length ? indent + l.replace(/^\s+/, "") : l))
+        .join("\n");
+
+    const before = pageTs.slice(0, lineStartIdx); // keep everything up to startToken line start
+    const after = pageTs.slice(end + endToken.length);
 
     const updated = before + region + after;
     fs.writeFileSync(pageTsPath, updated, "utf8");
