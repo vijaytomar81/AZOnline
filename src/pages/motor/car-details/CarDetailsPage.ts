@@ -35,111 +35,111 @@ export class CarDetailsPage extends BasePage {
     await locator.setChecked(checked, { timeout: Number(process.env.ACTION_TIMEOUT ?? 10_000) });
   }
 
-          // <scanner:aliases>
+  // <scanner:aliases>
   // This region is auto-managed. Do not edit by hand.
 
   async allDone() {
-    await this.clickAlias("allDone");
+  await this.clickAlias("allDone");
   }
 
   async back() {
-    await this.clickAlias("back");
+  await this.clickAlias("back");
   }
 
   async findMyCar() {
-    await this.clickAlias("findMyCar");
+  await this.clickAlias("findMyCar");
   }
 
   async hasmodificationFalseNo() {
-    await this.clickAlias("hasmodificationFalseNo");
+  await this.clickAlias("hasmodificationFalseNo");
   }
 
   async hasmodificationTrueYes() {
-    await this.clickAlias("hasmodificationTrueYes");
+  await this.clickAlias("hasmodificationTrueYes");
   }
 
   async linkToAllianzHomePage() {
-    await this.clickAlias("linkToAllianzHomePage");
+  await this.clickAlias("linkToAllianzHomePage");
   }
 
   async next() {
-    await this.clickAlias("next");
+  await this.clickAlias("next");
   }
 
   async purchaseMonthInputField(value: string) {
-    await this.fillAlias("purchaseMonthInputField", value);
+  await this.fillAlias("purchaseMonthInputField", value);
   }
 
   async purchaseYearInputField(value: string) {
-    await this.fillAlias("purchaseYearInputField", value);
+  await this.fillAlias("purchaseYearInputField", value);
   }
 
   async registrationnumberpolarquestionNo() {
-    await this.clickAlias("registrationnumberpolarquestionNo");
+  await this.clickAlias("registrationnumberpolarquestionNo");
   }
 
   async registrationnumberpolarquestionYes() {
-    await this.clickAlias("registrationnumberpolarquestionYes");
+  await this.clickAlias("registrationnumberpolarquestionYes");
   }
 
   async startTypingTheMakeOfYourVehicle(value: string) {
-    await this.fillAlias("startTypingTheMakeOfYourVehicle", value);
+  await this.fillAlias("startTypingTheMakeOfYourVehicle", value);
   }
 
   async startTypingTheModelNameOfYourVehicle(value: string) {
-    await this.fillAlias("startTypingTheModelNameOfYourVehicle", value);
+  await this.fillAlias("startTypingTheModelNameOfYourVehicle", value);
   }
 
   async startTypingTheModelNameOfYourVehicle2(value: string) {
-    await this.fillAlias("startTypingTheModelNameOfYourVehicle2", value);
+  await this.fillAlias("startTypingTheModelNameOfYourVehicle2", value);
   }
 
   async theCarHasnTBeenBoughtYet(checked: boolean = true) {
-    await this.setCheckedAlias("theCarHasnTBeenBoughtYet", checked);
+  await this.setCheckedAlias("theCarHasnTBeenBoughtYet", checked);
   }
 
   async uploadAPhotoOfYourCarSNumberPlate(value: string) {
-    await this.fillAlias("uploadAPhotoOfYourCarSNumberPlate", value);
+  await this.fillAlias("uploadAPhotoOfYourCarSNumberPlate", value);
   }
 
   async vehicledetailssetcorrectlyNo() {
-    await this.clickAlias("vehicledetailssetcorrectlyNo");
+  await this.clickAlias("vehicledetailssetcorrectlyNo");
   }
 
   async vehicledetailssetcorrectlyYes() {
-    await this.clickAlias("vehicledetailssetcorrectlyYes");
+  await this.clickAlias("vehicledetailssetcorrectlyYes");
   }
 
   async vehicleDoors(value: string) {
-    await this.selectOptionAlias("vehicleDoors", value);
+  await this.selectOptionAlias("vehicleDoors", value);
   }
 
   async vehiclefueltypedDiesel() {
-    await this.clickAlias("vehiclefueltypedDiesel");
+  await this.clickAlias("vehiclefueltypedDiesel");
   }
 
   async vehiclefueltypepPetrol() {
-    await this.clickAlias("vehiclefueltypepPetrol");
+  await this.clickAlias("vehiclefueltypepPetrol");
   }
 
   async vehicleManufactureYear(value: string) {
-    await this.selectOptionAlias("vehicleManufactureYear", value);
+  await this.selectOptionAlias("vehicleManufactureYear", value);
   }
 
   async vehicletransmissionaAutomatic() {
-    await this.clickAlias("vehicletransmissionaAutomatic");
+  await this.clickAlias("vehicletransmissionaAutomatic");
   }
 
   async vehicletransmissionmManual() {
-    await this.clickAlias("vehicletransmissionmManual");
+  await this.clickAlias("vehicletransmissionmManual");
   }
 
   async viewHowWeLlUseYourInfo() {
-    await this.clickAlias("viewHowWeLlUseYourInfo");
+  await this.clickAlias("viewHowWeLlUseYourInfo");
   }
 
   async whatSYourCarRegistrationNumber(value: string) {
-    await this.fillAlias("whatSYourCarRegistrationNumber", value);
+  await this.fillAlias("whatSYourCarRegistrationNumber", value);
   }
 
   // </scanner:aliases>
