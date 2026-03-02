@@ -1,4 +1,5 @@
 // src/scanner/commands/generate.ts
+
 import path from "node:path";
 import { createLogger } from "../logger";
 import { runElementsGenerator } from "../elements-generator/runner";
@@ -17,26 +18,31 @@ function hasFlag(argv: string[], name: string): boolean {
     return argv.includes(name);
 }
 
-export async function runGenerateCommand(argv: string[]) {
-    const verbose = hasFlag(argv, "--verbose");
+export async function runGenerateCommand(args: string[]) {
+    const verbose = hasFlag(args, "--verbose");
     const log = createLogger({ prefix: "[scanner]", verbose, withTimestamp: true });
 
-    const mapsDir = getArg(argv, "--mapsDir") ?? path.join(process.cwd(), "src", "page-maps");
-    const pagesDir = getArg(argv, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
-
-    const stateDir = getArg(argv, "--stateDir") ?? path.join(process.cwd(), "src", ".scanner-state");
-    const stateFile =
-        getArg(argv, "--stateFile") ?? path.join(stateDir, "page-maps-state.json");
-
-    const merge = hasFlag(argv, "--merge");
-    const changedOnly = hasFlag(argv, "--changedOnly");
-    const stateOnly = hasFlag(argv, "--stateOnly");
-    const scaffold = !hasFlag(argv, "--noScaffold");
-
     log.info("Command: generate");
-    log.debug(
-        `Args: mapsDir=${mapsDir} pagesDir=${pagesDir} merge=${merge} changedOnly=${changedOnly} stateOnly=${stateOnly} scaffold=${scaffold}`
-    );
+
+    const mapsDir = getArg(args, "--mapsDir") ?? path.join(process.cwd(), "src", "page-maps");
+    const pagesDir = getArg(args, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
+
+    const stateDir = getArg(args, "--stateDir") ?? path.join(process.cwd(), "src", ".scanner-state");
+    const stateFile =
+        getArg(args, "--stateFile") ?? path.join(stateDir, "page-maps-state.json");
+
+    const merge = hasFlag(args, "--merge");
+    const changedOnly = hasFlag(args, "--changedOnly");
+    const stateOnly = hasFlag(args, "--stateOnly");
+
+    // generator: scaffold ON by default, allow disabling
+    const scaffold = !hasFlag(args, "--noScaffold");
+
+    if (verbose) {
+        log.debug(
+            `Args: mapsDir=${mapsDir} pagesDir=${pagesDir} merge=${merge} changedOnly=${changedOnly} stateOnly=${stateOnly} scaffold=${scaffold}`
+        );
+    }
 
     await runElementsGenerator({
         mapsDir,
@@ -51,5 +57,5 @@ export async function runGenerateCommand(argv: string[]) {
         log,
     });
 
-    log.info("Done ✅");
+    log.info("Generate complete ✅");
 }

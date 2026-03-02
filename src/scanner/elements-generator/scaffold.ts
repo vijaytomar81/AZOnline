@@ -4,151 +4,183 @@ import fs from "node:fs";
 import path from "node:path";
 
 import type { PageMap } from "./types";
-import type { Logger } from "../logger";
-
 import {
     pageKeyToFolder,
     mapPageKeyToAliasesGeneratedPath,
     mapPageKeyToAliasesHumanPath,
     mapPageKeyToPageTsPath,
-    mapPageKeyToElementsPath,
 } from "./paths";
 
+import { safeWriteText, safeWriteTextIfMissing, ensureDir } from "./state";
 import { buildAliasesGeneratedTs } from "./builders/buildAliasesGeneratedTs";
 import { buildAliasesHumanTs } from "./builders/buildAliasesHumanTs";
 import { buildPageTsStub } from "./builders/buildPageTsStub";
-
-function ensureDir(dir: string) {
-    fs.mkdirSync(dir, { recursive: true });
-}
-
-function safeWriteText(file: string, content: string) {
-    ensureDir(path.dirname(file));
-    fs.writeFileSync(file, content, "utf8");
-}
-
-function safeWriteTextIfMissing(file: string, content: string): boolean {
-    if (fs.existsSync(file)) return false;
-    safeWriteText(file, content);
-    return true;
-}
-
-/**
- * Extract element keys already mapped in aliases.ts by scanning RHS:
- *   aliasesGenerated.<elementKey>
- */
-function extractCoveredElementKeysFromAliasesTs(content: string): Set<string> {
-    const covered = new Set<string>();
-    const re = /\baliasesGenerated\.([A-Za-z_$][A-Za-z0-9_$]*)\b/g;
-
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(content))) {
-        if (m[1]) covered.add(m[1]);
-    }
-    return covered;
-}
+import { syncAliasesIntoPageObject } from "./pageObject";
 
 function isValidTsIdentifier(key: string) {
     return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key);
 }
 
+function stripLineComments(ts: string) {
+    return ts.replace(/\/\/.*$/gm, "");
+}
+
 /**
- * Append missing mappings into aliases.ts without touching existing ones.
- * Inserts before the closing `} as Record<string, ElementKey>;`
+ * Detect which element keys are already mapped in aliases.ts by checking RHS usage:
+ *   aliasesGenerated.<elementKey>
+ *
+ * This is what allows humans to rename the LHS alias key without duplicates being re-added.
  */
-function appendMissingAliasMappings(opts: {
+function extractMappedElementKeysFromAliasesTs(aliasesHumanTs: string): Set<string> {
+    const mapped = new Set<string>();
+    const cleaned = stripLineComments(aliasesHumanTs);
+
+    const re = /\baliasesGenerated\.([A-Za-z_$][A-Za-z0-9_$]*)\b/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(cleaned))) {
+        if (m[1]) mapped.add(m[1]);
+    }
+    return mapped;
+}
+
+/**
+ * Extracts the body of:
+ *   export const aliases = { ... }
+ *
+ * Supports BOTH endings:
+ *  - } as Record<string, ElementKey>;
+ *  - } as const satisfies Record<string, ElementKey>;
+ */
+function extractAliasesObjectBody(aliasesHumanTs: string): { body: string; bodyStartIndex: number; bodyEndIndex: number } | null {
+    const cleaned = aliasesHumanTs; // keep original indices stable (don’t strip comments here)
+
+    // capture { BODY } and allow flexible suffix
+    const re =
+        /export\s+const\s+aliases\s*=\s*\{([\s\S]*?)\}\s*(?:as\s+const\s+satisfies\s+Record<string,\s*ElementKey>|as\s+Record<string,\s*ElementKey>)\s*;/m;
+
+    const m = cleaned.match(re);
+    if (!m || typeof m.index !== "number") return null;
+
+    const fullMatch = m[0];
+    const body = m[1] ?? "";
+
+    // Find body location inside the fullMatch to compute absolute indices
+    const relBodyStart = fullMatch.indexOf(body);
+    const relBodyEnd = relBodyStart + body.length;
+
+    const absStart = m.index + relBodyStart;
+    const absEnd = m.index + relBodyEnd;
+
+    return { body, bodyStartIndex: absStart, bodyEndIndex: absEnd };
+}
+
+/**
+ * Appends new mappings into aliases.ts (inside export const aliases = { ... }).
+ * It does NOT rewrite existing mappings.
+ *
+ * Key behavior: detect duplicates by RHS (aliasesGenerated.<elementKey>), so alias renames are safe.
+ */
+function appendNewAliases(params: {
     aliasesHumanPath: string;
     pageMap: PageMap;
     verbose?: boolean;
-    log: Logger;
+    log: { info: (s: string) => void; debug?: (s: string) => void };
 }) {
-    const { aliasesHumanPath, pageMap, verbose, log } = opts;
+    const { aliasesHumanPath, pageMap, verbose, log } = params;
 
     if (!fs.existsSync(aliasesHumanPath)) return;
 
-    const content = fs.readFileSync(aliasesHumanPath, "utf8");
-    const covered = extractCoveredElementKeysFromAliasesTs(content);
+    const txt = fs.readFileSync(aliasesHumanPath, "utf8");
+    const mapped = extractMappedElementKeysFromAliasesTs(txt);
 
-    const generatedKeys = Object.keys(pageMap.elements).sort((a, b) => a.localeCompare(b));
-    const missing = generatedKeys.filter((k) => !covered.has(k));
+    const elementKeys = Object.keys(pageMap.elements).sort((a, b) => a.localeCompare(b));
+    const missing = elementKeys.filter((k) => !mapped.has(k));
 
-    if (!missing.length) {
-        if (verbose) log.debug(`Aliases OK (no new keys): ${aliasesHumanPath}`);
+    if (missing.length === 0) {
+        if (verbose) log.debug?.(`aliases.ts up-to-date: ${aliasesHumanPath}`);
         return;
     }
 
-    const insertAnchor = `} as Record<string, ElementKey>;`;
-    const idx = content.indexOf(insertAnchor);
-    if (idx < 0) {
-        // Don’t risk corrupting a heavily customized file
-        log.error(
-            `Could not auto-append aliases (anchor not found). Please add manually: ${aliasesHumanPath}`
-        );
+    const obj = extractAliasesObjectBody(txt);
+    if (!obj) {
+        log.info(`WARN: Could not parse aliases.ts to append new keys: ${aliasesHumanPath}`);
         return;
     }
 
-    const additions = missing
-        .map((k) => {
-            const prop = isValidTsIdentifier(k) ? k : JSON.stringify(k);
-            return `  ${prop}: aliasesGenerated.${k},`;
-        })
-        .join("\n");
+    // Insert right before the closing "}" of the aliases object body.
+    // obj.bodyEndIndex points to end of captured BODY, which is right before the "}".
+    const insertAt = obj.bodyEndIndex;
 
-    const updated =
-        content.slice(0, idx) +
-        additions +
-        "\n" +
-        content.slice(idx);
+    const lines: string[] = [];
+    lines.push(``);
+    for (const k of missing) {
+        const prop = isValidTsIdentifier(k) ? k : JSON.stringify(k);
+        lines.push(`  ${prop}: aliasesGenerated.${k},`);
+    }
+
+    const updated = txt.slice(0, insertAt) + lines.join("\n") + txt.slice(insertAt);
 
     fs.writeFileSync(aliasesHumanPath, updated, "utf8");
-    log.info(`Updated aliases.ts (added ${missing.length} new alias(es)): ${aliasesHumanPath}`);
+    log.info(`Updated aliases.ts (appended ${missing.length} new mapping(s)): ${aliasesHumanPath}`);
 }
 
-export function hasMissingGeneratedOutputs(opts: { pagesDir: string; pageKey: string }): boolean {
-    const { pagesDir, pageKey } = opts;
+export function hasMissingGeneratedOutputs(params: { pagesDir: string; pageKey: string }): boolean {
+    const { pagesDir, pageKey } = params;
 
-    const elementsPath = mapPageKeyToElementsPath(pagesDir, pageKey);
-    const aliasesGenPath = mapPageKeyToAliasesGeneratedPath(pagesDir, pageKey);
+    const folder = pageKeyToFolder(pagesDir, pageKey);
     const aliasesHumanPath = mapPageKeyToAliasesHumanPath(pagesDir, pageKey);
+    const aliasesGenPath = mapPageKeyToAliasesGeneratedPath(pagesDir, pageKey);
     const pageTsPath = mapPageKeyToPageTsPath(pagesDir, pageKey);
 
-    return (
-        !fs.existsSync(elementsPath) ||
-        !fs.existsSync(aliasesGenPath) ||
-        !fs.existsSync(aliasesHumanPath) ||
-        !fs.existsSync(pageTsPath)
-    );
+    // NOTE: elements.ts is generated in runner.ts (not scaffold.ts)
+    const required = [folder, aliasesHumanPath, aliasesGenPath, pageTsPath];
+
+    for (const p of required) {
+        if (!fs.existsSync(p)) return true;
+    }
+    return false;
 }
 
-export function ensureScaffoldFiles(opts: {
+export function ensureScaffoldFiles(params: {
     pagesDir: string;
     pageMap: PageMap;
     verbose?: boolean;
-    log: Logger;
+    log: { info: (s: string) => void; debug?: (s: string) => void };
 }) {
-    const { pagesDir, pageMap, verbose, log } = opts;
+    const { pagesDir, pageMap, verbose, log } = params;
 
     const pageFolder = pageKeyToFolder(pagesDir, pageMap.pageKey);
     ensureDir(pageFolder);
 
-    const aliasesGenPath = mapPageKeyToAliasesGeneratedPath(pagesDir, pageMap.pageKey);
     const aliasesHumanPath = mapPageKeyToAliasesHumanPath(pagesDir, pageMap.pageKey);
+    const aliasesGenPath = mapPageKeyToAliasesGeneratedPath(pagesDir, pageMap.pageKey);
     const pageTsPath = mapPageKeyToPageTsPath(pagesDir, pageMap.pageKey);
 
-    // 1) aliases.ts (create-only), BUT also merge in new keys safely later
+    // 1) aliases.ts (create-only)
     const createdAliases = safeWriteTextIfMissing(aliasesHumanPath, buildAliasesHumanTs(pageMap));
-    if (createdAliases) {
-        log.info(`Scaffolded: ${aliasesHumanPath}`);
-    } else {
-        // ✅ merge new element keys into existing aliases.ts without breaking human renames
-        appendMissingAliasMappings({ aliasesHumanPath, pageMap, verbose, log });
+    if (createdAliases) log.info(`Scaffolded: ${aliasesHumanPath}`);
+
+    // If already exists, append only new element mappings
+    if (!createdAliases) {
+        appendNewAliases({ aliasesHumanPath, pageMap, verbose, log });
     }
 
-    // 2) Page object stub (create-only)
+    // 2) Page object (create-only)
     const createdPage = safeWriteTextIfMissing(pageTsPath, buildPageTsStub(pageMap));
     if (createdPage) log.info(`Scaffolded: ${pageTsPath}`);
 
-    // 3) aliases.generated.ts (overwrite-safe)
+    // 3) aliases.generated.ts (always overwrite-safe)
     safeWriteText(aliasesGenPath, buildAliasesGeneratedTs(pageMap));
-    if (verbose) log.debug(`Generated: ${aliasesGenPath}`);
+    if (verbose) log.debug?.(`Generated: ${aliasesGenPath}`);
+
+    // 4) Always sync methods region from aliases.ts into page object
+    syncAliasesIntoPageObject({
+        pageTsPath,
+        pageMap,
+        aliasesTsPath: aliasesHumanPath,
+    });
+
+    if (verbose) {
+        log.debug?.(`Synced page object aliases region: ${path.relative(process.cwd(), pageTsPath)}`);
+    }
 }

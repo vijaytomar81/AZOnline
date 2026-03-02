@@ -25,18 +25,22 @@ export function buildAliasesHumanTs(pageMap: PageMap): string {
     lines.push(`import { aliasesGenerated } from "./aliases.generated";`);
     lines.push(``);
     lines.push(`// Business-friendly aliases (edit freely)`);
+    lines.push(`// NOTE: AliasKey is derived ONLY from this object, so renaming LHS is fully supported.`);
     lines.push(`export const aliases = {`);
 
-    // Create default mappings (no comments) — human can rename LHS later
     for (const k of keys) {
         const prop = isValidTsIdentifier(k) ? k : JSON.stringify(k);
         lines.push(`  ${prop}: aliasesGenerated.${k},`);
     }
 
-    lines.push(`} as Record<string, ElementKey>;`);
+    lines.push(`} as const satisfies Record<string, ElementKey>;`);
     lines.push(``);
+    lines.push(`// Primary type used by Page Objects (business alias keys)`);
+    lines.push(`export type AliasKey = keyof typeof aliases;`);
+    lines.push(``);
+    lines.push(`// Optional: includes generated element keys too (useful for debugging/tools)`);
     lines.push(`export const allAliases = { ...aliasesGenerated, ...aliases } as const;`);
-    lines.push(`export type AliasKey = keyof typeof allAliases;`);
+    lines.push(`export type AnyAliasKey = keyof typeof allAliases;`);
 
     return lines.join("\n");
 }

@@ -1,79 +1,50 @@
 // HUMAN-MAINTAINED FILE
 // pageKey: motor.car-details
 //
-// Business-friendly aliases (Enterprise Layer).
-// NEVER edit aliases.generated.ts.
-// This file is safe from regeneration.
+// This file is safe to edit.
+// Generator behavior:
+// - On first creation, it adds a 1:1 alias for each element (alias == element key).
+// - On later runs, it ONLY appends aliases for NEW element keys.
+// - It detects "already mapped" by RHS usage: aliasesGenerated.<elementKey>
+//   so you can rename the alias key on the left and it won't re-add duplicates.
 
 import type { ElementKey } from "./elements";
 import { aliasesGenerated } from "./aliases.generated";
 
-/**
- * BUSINESS ALIASES
- *
- * Goal:
- * - Hide scanner-generated naming
- * - Expose stable business language
- * - Keep tests readable
- */
-
+// Business-friendly aliases (edit freely)
+// NOTE: AliasKey is derived ONLY from this object, so renaming LHS is fully supported.
 export const aliases = {
-  // --------------------------------------------------
-  // FLOW 1 — REGISTRATION KNOWN
-  // --------------------------------------------------
-  knowRegYes: aliasesGenerated.registrationnumberpolarquestionYes,
-  knowRegNo: aliasesGenerated.registrationnumberpolarquestionNo,
-
-  regInput: aliasesGenerated.whatSYourCarRegistrationNumber,
-  findMyCar: aliasesGenerated.findMyCar,
-
-  // --------------------------------------------------
-  // FLOW 2 — MANUAL ENTRY
-  // --------------------------------------------------
-  manualMake: aliasesGenerated.startTypingTheMakeOfYourVehicle,
-  manualModelShort: aliasesGenerated.startTypingTheModelNameOfYourVehicle,
-  manualModel: aliasesGenerated.startTypingTheModelNameOfYourVehicle2,
-
-  manufactureYear: aliasesGenerated.vehicleManufactureYear,
-
-  purchaseMonth: aliasesGenerated.purchaseMonthInputField,
-  purchaseYear: aliasesGenerated.purchaseYearInputField,
-
-  carNotBoughtYet: aliasesGenerated.theCarHasnTBeenBoughtYet,
-
-  transmissionManual: aliasesGenerated.vehicletransmissionmManual,
-  transmissionAutomatic: aliasesGenerated.vehicletransmissionaAutomatic,
-
-  fuelPetrol: aliasesGenerated.vehiclefueltypepPetrol,
-  fuelDiesel: aliasesGenerated.vehiclefueltypedDiesel,
-
-  vehicleDoors: aliasesGenerated.vehicleDoors,
-
-  // --------------------------------------------------
-  // COMMON ACTIONS
-  // --------------------------------------------------
-  next: aliasesGenerated.next,
+  allDone: aliasesGenerated.allDone,
   back: aliasesGenerated.back,
-  done: aliasesGenerated.allDone,
-  
-  confirmVehicleYes: aliasesGenerated.vehicledetailssetcorrectlyYes,
-  confirmVehicleNo: aliasesGenerated.vehicledetailssetcorrectlyNo,
+  findMyCar: aliasesGenerated.findMyCar,
+  hasmodificationFalseNo: aliasesGenerated.hasmodificationFalseNo,
+  hasmodificationTrueYes: aliasesGenerated.hasmodificationTrueYes,
+  linkToAllianzHomePage: aliasesGenerated.linkToAllianzHomePage,
+  next: aliasesGenerated.next,
+  purchaseMonthInputField: aliasesGenerated.purchaseMonthInputField,
+  purchaseYearInputField: aliasesGenerated.purchaseYearInputField,
+  registrationnumberpolarquestionNo: aliasesGenerated.registrationnumberpolarquestionNo,
+  registrationnumberpolarquestionYes: aliasesGenerated.registrationnumberpolarquestionYes,
+  startTypingTheMakeOfYourVehicle: aliasesGenerated.startTypingTheMakeOfYourVehicle,
+  startTypingTheModelNameOfYourVehicle: aliasesGenerated.startTypingTheModelNameOfYourVehicle,
+  startTypingTheModelNameOfYourVehicle2: aliasesGenerated.startTypingTheModelNameOfYourVehicle2,
+  theCarHasnTBeenBoughtYet: aliasesGenerated.theCarHasnTBeenBoughtYet,
+  uploadAPhotoOfYourCarSNumberPlate: aliasesGenerated.uploadAPhotoOfYourCarSNumberPlate,
+  vehicledetailssetcorrectlyNo: aliasesGenerated.vehicledetailssetcorrectlyNo,
+  vehicledetailssetcorrectlyYes: aliasesGenerated.vehicledetailssetcorrectlyYes,
+  vehicleDoors: aliasesGenerated.vehicleDoors,
+  vehiclefueltypedDiesel: aliasesGenerated.vehiclefueltypedDiesel,
+  vehiclefueltypepPetrol: aliasesGenerated.vehiclefueltypepPetrol,
+  vehicleManufactureYear: aliasesGenerated.vehicleManufactureYear,
+  vehicletransmissionaAutomatic: aliasesGenerated.vehicletransmissionaAutomatic,
+  vehicletransmissionmManual: aliasesGenerated.vehicletransmissionmManual,
+  viewHowWeLlUseYourInfo: aliasesGenerated.viewHowWeLlUseYourInfo,
+  whatSYourCarRegistrationNumber: aliasesGenerated.whatSYourCarRegistrationNumber,
+} as const satisfies Record<string, ElementKey>;
 
-  carModifiedYes: aliasesGenerated.hasmodificationTrueYes,
-  carModifiedNo: aliasesGenerated.hasmodificationFalseNo,
+// Primary type used by Page Objects (business alias keys)
+export type AliasKey = keyof typeof aliases;
 
-  // --------------------------------------------------
-  // OPTIONAL / UTILITY
-  // --------------------------------------------------
-  uploadVrnPhoto: aliasesGenerated.uploadAPhotoOfYourCarSNumberPlate,
-  privacyInfo: aliasesGenerated.viewHowWeLlUseYourInfo,
-  homeLink: aliasesGenerated.linkToAllianzHomePage,
-} as Record<string, ElementKey>;
-
-/**
- * Final alias set
- * (generated + human overrides)
- */
+// Optional: includes generated element keys too (useful for debugging/tools)
 export const allAliases = { ...aliasesGenerated, ...aliases } as const;
-
-export type AliasKey = keyof typeof allAliases;
+export type AnyAliasKey = keyof typeof allAliases;
