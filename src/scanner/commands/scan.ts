@@ -1,44 +1,38 @@
 // src/scanner/commands/scan.ts
+
 import path from "node:path";
 import { createLogger } from "../logger";
 import { scanPage } from "../page-scanner/runner";
+import { getArg, hasFlag, required } from "./argv";
 
-function getArg(argv: string[], name: string): string | undefined {
-    const i = argv.indexOf(name);
-    if (i >= 0) return argv[i + 1];
+function usage() {
+    return `
+scanner scan
 
-    const eq = argv.find((a) => a.startsWith(`${name}=`));
-    if (eq) return eq.split("=").slice(1).join("=");
+Usage:
+  ts-node src/scanner/cli.ts scan [options]
 
-    return undefined;
+Required:
+  --connectCdp <wsUrl>      e.g. ws://localhost:9222/devtools/browser/<id>
+  --pageKey <key>           e.g. motor.car-details
+
+Options:
+  --outDir <path>           default: src/page-maps
+  --tabIndex <n>            default: 0
+  --merge                   merge into existing page-map json
+  --verbose
+  --logToFile
+  --logFilePath <path>      default: scanner.log
+  --help
+`.trim();
 }
 
-function hasFlag(argv: string[], name: string): boolean {
-    return argv.includes(name);
-}
+export async function runScanCommand(args: string[]) {
+    const verbose = hasFlag(args, "--verbose");
 
-function required(name: string, value: string | undefined): string {
-    if (!value) throw new Error(`${name} is required.`);
-    return value;
-}
-
-export async function runScanCommand(argv: string[]) {
-    const connectCdp = required("--connectCdp", getArg(argv, "--connectCdp"));
-    const pageKey = required("--pageKey", getArg(argv, "--pageKey"));
-
-    const outDir = getArg(argv, "--outDir") ?? path.join(process.cwd(), "src", "page-maps");
-
-    const tabIndexRaw = getArg(argv, "--tabIndex");
-    const tabIndex = tabIndexRaw ? Number(tabIndexRaw) : 0;
-    if (!Number.isFinite(tabIndex) || tabIndex < 0) {
-        throw new Error(`Invalid --tabIndex '${tabIndexRaw}'. Must be 0 or greater.`);
-    }
-
-    const merge = hasFlag(argv, "--merge");
-    const verbose = hasFlag(argv, "--verbose");
-
-    const logToFile = hasFlag(argv, "--logToFile");
-    const logFilePath = getArg(argv, "--logFilePath") ?? path.join(process.cwd(), "scanner.log");
+    const logToFile = hasFlag(args, "--logToFile");
+    const logFilePath =
+        getArg(args, "--logFilePath") ?? path.join(process.cwd(), "scanner.log");
 
     const log = createLogger({
         prefix: "[scanner]",
@@ -48,10 +42,32 @@ export async function runScanCommand(argv: string[]) {
         logFilePath,
     });
 
+    if (hasFlag(args, "--help") || hasFlag(args, "-h")) {
+        log.info(usage());
+        return;
+    }
+
+    const connectCdp = required("--connectCdp", getArg(args, "--connectCdp"));
+    const pageKey = required("--pageKey", getArg(args, "--pageKey"));
+
+    const outDir =
+        getArg(args, "--outDir") ?? path.join(process.cwd(), "src", "page-maps");
+
+    const tabIndexRaw = getArg(args, "--tabIndex");
+    const tabIndex = tabIndexRaw ? Number(tabIndexRaw) : 0;
+    if (!Number.isFinite(tabIndex) || tabIndex < 0) {
+        throw new Error(`Invalid --tabIndex '${tabIndexRaw}'. Must be 0 or greater.`);
+    }
+
+    const merge = hasFlag(args, "--merge");
+
+    if (verbose) {
+        log.debug(
+            `Args: pageKey=${pageKey} outDir=${outDir} merge=${merge} tabIndex=${tabIndex} connectCdp=${connectCdp}`
+        );
+    }
+
     log.info("Command: scan");
-    log.debug(
-        `Args: pageKey=${pageKey} outDir=${outDir} merge=${merge} tabIndex=${tabIndex}`
-    );
 
     await scanPage({
         connectCdp,

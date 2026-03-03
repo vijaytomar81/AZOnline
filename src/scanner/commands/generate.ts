@@ -3,39 +3,38 @@
 import path from "node:path";
 import { createLogger } from "../logger";
 import { runElementsGenerator } from "../elements-generator/runner";
-
-function getArg(argv: string[], name: string): string | undefined {
-    const i = argv.indexOf(name);
-    if (i >= 0) return argv[i + 1];
-
-    const eq = argv.find((a) => a.startsWith(`${name}=`));
-    if (eq) return eq.split("=").slice(1).join("=");
-
-    return undefined;
-}
-
-function hasFlag(argv: string[], name: string): boolean {
-    return argv.includes(name);
-}
+import { getArg, hasFlag } from "./argv";
 
 export async function runGenerateCommand(args: string[]) {
+    // args are already normalized in cli.ts,
+    // but getArg/hasFlag also normalize internally (double safety)
+
     const verbose = hasFlag(args, "--verbose");
     const log = createLogger({ prefix: "[scanner]", verbose, withTimestamp: true });
 
     log.info("Command: generate");
 
-    const mapsDir = getArg(args, "--mapsDir") ?? path.join(process.cwd(), "src", "page-maps");
-    const pagesDir = getArg(args, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
+    const mapsDir =
+        getArg(args, "--mapsDir") ??
+        path.join(process.cwd(), "src", "page-maps");
 
-    const stateDir = getArg(args, "--stateDir") ?? path.join(process.cwd(), "src", ".scanner-state");
+    const pagesDir =
+        getArg(args, "--pagesDir") ??
+        path.join(process.cwd(), "src", "pages");
+
+    const stateDir =
+        getArg(args, "--stateDir") ??
+        path.join(process.cwd(), "src", ".scanner-state");
+
     const stateFile =
-        getArg(args, "--stateFile") ?? path.join(stateDir, "page-maps-state.json");
+        getArg(args, "--stateFile") ??
+        path.join(stateDir, "page-maps-state.json");
 
     const merge = hasFlag(args, "--merge");
     const changedOnly = hasFlag(args, "--changedOnly");
     const stateOnly = hasFlag(args, "--stateOnly");
 
-    // generator: scaffold ON by default, allow disabling
+    // scaffold ON by default, allow disabling
     const scaffold = !hasFlag(args, "--noScaffold");
 
     if (verbose) {

@@ -3,6 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createLogger } from "../logger";
+import { getArg, hasFlag } from "./argv";
 
 function usage() {
     return `
@@ -19,20 +20,6 @@ Options:
   --verbose
   --help
 `.trim();
-}
-
-function getArg(argv: string[], name: string): string | undefined {
-    const i = argv.indexOf(name);
-    if (i >= 0) return argv[i + 1];
-
-    const eq = argv.find((a) => a.startsWith(`${name}=`));
-    if (eq) return eq.split("=").slice(1).join("=");
-
-    return undefined;
-}
-
-function hasFlag(argv: string[], name: string) {
-    return argv.includes(name);
 }
 
 function exists(p: string) {
@@ -57,10 +44,17 @@ export async function runDoctorCommand(args: string[]) {
         return;
     }
 
-    const mapsDir = getArg(args, "--mapsDir") ?? path.join(process.cwd(), "src", "page-maps");
-    const pagesDir = getArg(args, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
-    const stateDir = getArg(args, "--stateDir") ?? path.join(process.cwd(), "src", ".scanner-state");
-    const stateFile = getArg(args, "--stateFile") ?? path.join(stateDir, "page-maps-state.json");
+    const mapsDir =
+        getArg(args, "--mapsDir") ?? path.join(process.cwd(), "src", "page-maps");
+
+    const pagesDir =
+        getArg(args, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
+
+    const stateDir =
+        getArg(args, "--stateDir") ?? path.join(process.cwd(), "src", ".scanner-state");
+
+    const stateFile =
+        getArg(args, "--stateFile") ?? path.join(stateDir, "page-maps-state.json");
 
     log.info("Command: doctor");
     log.info(`Node: ${process.version}`);
@@ -79,7 +73,9 @@ export async function runDoctorCommand(args: string[]) {
 
     // quick page-maps count
     if (exists(mapsDir)) {
-        const maps = fs.readdirSync(mapsDir).filter((f) => f.endsWith(".json") && !f.startsWith("."));
+        const maps = fs
+            .readdirSync(mapsDir)
+            .filter((f) => f.endsWith(".json") && !f.startsWith("."));
         checks.push({ name: "page-maps found", ok: maps.length > 0, detail: `${maps.length} file(s)` });
     }
 
@@ -88,6 +84,7 @@ export async function runDoctorCommand(args: string[]) {
     }
 
     const failed = checks.filter((c) => !c.ok);
+
     if (failed.length === 0) {
         log.info("Doctor summary: looks healthy ✅");
         log.info(`Next: scanner generate --merge --changedOnly`);

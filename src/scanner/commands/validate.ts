@@ -5,23 +5,14 @@ import path from "node:path";
 import { createLogger } from "../logger";
 
 import { validateOnePage } from "../validators/pageOutputs";
-import { checkPagesIndexHygiene, checkScannerIndexHygiene } from "../validators/indexHygiene";
+import {
+    checkPagesIndexHygiene,
+    checkScannerIndexHygiene,
+} from "../validators/indexHygiene";
+
+import { getArg, hasFlag } from "./argv";
 
 type PageMapLite = { pageKey: string };
-
-function getArg(argv: string[], name: string): string | undefined {
-    const i = argv.indexOf(name);
-    if (i >= 0) return argv[i + 1];
-
-    const eq = argv.find((a) => a.startsWith(`${name}=`));
-    if (eq) return eq.split("=").slice(1).join("=");
-
-    return undefined;
-}
-
-function hasFlag(argv: string[], name: string): boolean {
-    return argv.includes(name);
-}
 
 function safeReadJson<T>(filePath: string): T | null {
     if (!fs.existsSync(filePath)) return null;
@@ -36,16 +27,41 @@ function listPageMapFiles(mapsDir: string): string[] {
         .sort((a, b) => a.localeCompare(b));
 }
 
+function usage() {
+    return `
+scanner validate
+
+Usage:
+  ts-node src/scanner/cli.ts validate [options]
+
+Options:
+  --mapsDir <path>         default: src/page-maps
+  --pagesDir <path>        default: src/pages
+  --noIndexHygiene         skip index/import/export checks
+  --strict                 fail if warnings exist
+  --verbose
+  --help
+`.trim();
+}
+
 export async function runValidateCommand(args: string[]) {
     const verbose = hasFlag(args, "--verbose");
     const strict = hasFlag(args, "--strict");
     const checkIndex = !hasFlag(args, "--noIndexHygiene");
 
     const log = createLogger({ prefix: "[scanner]", verbose, withTimestamp: true });
+
+    if (hasFlag(args, "--help") || hasFlag(args, "-h")) {
+        log.info(usage());
+        return;
+    }
+
     log.info("Command: validate");
 
-    const mapsDir = getArg(args, "--mapsDir") ?? path.join(process.cwd(), "src", "page-maps");
-    const pagesDir = getArg(args, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
+    const mapsDir =
+        getArg(args, "--mapsDir") ?? path.join(process.cwd(), "src", "page-maps");
+    const pagesDir =
+        getArg(args, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
 
     if (!fs.existsSync(mapsDir)) {
         log.error(`mapsDir not found: ${mapsDir}`);
@@ -67,7 +83,8 @@ export async function runValidateCommand(args: string[]) {
         const res = validateOnePage({ mapsDir, pagesDir, mapFile: mf });
 
         const pageKey =
-            safeReadJson<PageMapLite>(path.join(mapsDir, mf))?.pageKey ?? mf.replace(/\.json$/, "");
+            safeReadJson<PageMapLite>(path.join(mapsDir, mf))?.pageKey ??
+            mf.replace(/\.json$/, "");
 
         if (res.ok) {
             ok++;

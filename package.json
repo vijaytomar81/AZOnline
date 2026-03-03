@@ -14,11 +14,11 @@
     "e2e": "npm run data:build -- && npm run test:e2e",
 
     "scanner": "node -r ts-node/register src/scanner/cli.ts",
-    "scan:page": "node -r ts-node/register src/scanner/cli.ts scan",
-    "scan:page:verbose": "node -r ts-node/register src/scanner/cli.ts scan --verbose",
-    "scan:page:merge": "node -r ts-node/register src/scanner/cli.ts scan --merge",
-    "scan:page:merge:verbose": "node -r ts-node/register src/scanner/cli.ts scan --merge --verbose",
-    "scanner:tsc": "tsc -p tsconfig.scanner.json --noEmit",
+
+    "scan:page": "npm run scanner -- scan",
+    "scan:page:verbose": "npm run scanner -- scan --verbose",
+    "scan:page:merge": "npm run scanner -- scan --merge",
+    "scan:page:merge:verbose": "npm run scanner -- scan --merge --verbose",
 
     "gen:elements": "npm run scanner -- generate --merge",
     "gen:elements:verbose": "npm run scanner -- generate --merge --verbose",
@@ -27,7 +27,14 @@
     "gen:elements:noScaffold": "npm run scanner -- generate --merge --noScaffold",
     "gen:elements:changed:noScaffold": "npm run scanner -- generate --changedOnly --merge --noScaffold",
     "gen:hashes": "npm run scanner -- generate --stateOnly --verbose",
-    "gen:hashes:changed": "npm run scanner -- generate --changedOnly --stateOnly --verbose"
+    "gen:hashes:changed": "npm run scanner -- generate --changedOnly --stateOnly --verbose",
+
+    "scanner:validate": "npm run scanner -- validate",
+    "scanner:validate:verbose": "npm run scanner -- validate --verbose",
+
+    "scanner:repair": "npm run scanner -- repair",
+    "scanner:doctor": "npm run scanner -- doctor",
+    "scanner:tsc": "tsc -p tsconfig.scanner.json --noEmit"
   },
   "repository": {
     "type": "git",

@@ -6,6 +6,7 @@ import { runGenerateCommand } from "./commands/generate";
 import { runValidateCommand } from "./commands/validate";
 import { runRepairCommand } from "./commands/repair";
 import { runDoctorCommand } from "./commands/doctor";
+import { normalizeArgv } from "./commands/argv";
 
 type CommandName = "scan" | "generate" | "validate" | "repair" | "doctor" | "help";
 
@@ -14,14 +15,14 @@ function usage() {
 scanner CLI
 
 Usage:
-  ts-node src/scanner/cli.ts <command> [options]
+  node -r ts-node/register src/scanner/cli.ts <command> [options]
 
 Commands:
   scan       Scan a page via CDP and write page-map json
   generate   Generate elements/aliases/pages from page-maps
-  validate   Validate generated outputs (stub)
-  repair     Repair common issues (stub)
-  doctor     Diagnose environment & config (stub)
+  validate   Validate generated outputs
+  repair     Repair common issues
+  doctor     Diagnose environment & config
 
 Examples:
   npm run scanner -- scan --connectCdp "$CDP" --pageKey motor.car-details --merge --verbose
@@ -30,18 +31,12 @@ Examples:
 }
 
 function isCommand(x: string | undefined): x is CommandName {
-    return (
-        x === "scan" ||
-        x === "generate" ||
-        x === "validate" ||
-        x === "repair" ||
-        x === "doctor" ||
-        x === "help"
-    );
+    return x === "scan" || x === "generate" || x === "validate" || x === "repair" || x === "doctor" || x === "help";
 }
 
 async function main() {
-    const argv = process.argv.slice(2);
+    // normalize EARLY
+    const argv = normalizeArgv(process.argv.slice(2));
     const cmd = argv[0];
 
     if (!isCommand(cmd)) {
@@ -54,24 +49,26 @@ async function main() {
     const args = argv.slice(1);
 
     switch (cmd) {
-        case "help": {
-            // keep it simple; no logger needed
-            // eslint-disable-next-line no-console
+        case "help":
             console.log(usage());
             return;
-        }
+
         case "scan":
             await runScanCommand(args);
             return;
+
         case "generate":
             await runGenerateCommand(args);
             return;
+
         case "validate":
             await runValidateCommand(args);
             return;
+
         case "repair":
             await runRepairCommand(args);
             return;
+
         case "doctor":
             await runDoctorCommand(args);
             return;
