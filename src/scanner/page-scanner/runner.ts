@@ -105,6 +105,7 @@ function classifyType(el: ScannedElement) {
  * - If preferred differs, keep old as fallback and promote new preferred.
  * - Union fallbacks.
  * - Merge meta (new wins where defined), and always keep meta.tag defined.
+ * - Title: prefer incoming if present, otherwise keep existing.
  */
 function mergePageMaps(existing: PageMap, incoming: PageMap): PageMap {
     const out: PageMap = {
@@ -113,6 +114,10 @@ function mergePageMaps(existing: PageMap, incoming: PageMap): PageMap {
         url: incoming.url || existing.url,
         urlPath: incoming.urlPath ?? existing.urlPath,
         scannedAt: incoming.scannedAt,
+
+        // ✅ page title: update when we have one, don't wipe if missing
+        title: incoming.title ?? existing.title,
+
         elements: { ...existing.elements },
     };
 
@@ -179,7 +184,17 @@ export async function scanPage(opts: ScanPageOptions): Promise<void> {
         const page = pages[tabIndex];
         const url = page.url();
 
-        log.info(`Scanning tab[${tabIndex}]: ${url}`);
+        // ✅ get page title (best effort)
+        let title: string | undefined;
+        try {
+            const t = await page.title();
+            title = t?.trim() ? t.trim() : undefined;
+        } catch {
+            // ignore: title is optional
+            title = undefined;
+        }
+
+        log.info(`Scanning tab[${tabIndex}]: ${url}${title ? ` (title: ${title})` : ""}`);
 
         // ✅ DOM extraction (scans only inside #root, excludes footer)
         const scanned: ScannedElement[] = await extractDomElements(page);
@@ -198,6 +213,10 @@ export async function scanPage(opts: ScanPageOptions): Promise<void> {
                 }
             })(),
             scannedAt: nowIso(),
+
+            // ✅ new field
+            title,
+
             elements: {},
         };
 

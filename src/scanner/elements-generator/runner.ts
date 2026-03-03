@@ -48,13 +48,12 @@ export async function runElementsGenerator(opts: GenOptions) {
     const log = opts.log;
 
     const scaffold = opts.scaffold !== false; // default true
+    const scaffoldIfMissing = opts.scaffoldIfMissing !== false; // default true
 
-    const stateDir =
-        opts.stateDir ?? path.join(process.cwd(), "src", ".scanner-state");
+    const stateDir = opts.stateDir ?? path.join(process.cwd(), "src", ".scanner-state");
     ensureDir(stateDir);
 
-    const stateFilePath =
-        opts.stateFile ?? path.join(stateDir, "page-maps-state.json");
+    const stateFilePath = opts.stateFile ?? path.join(stateDir, "page-maps-state.json");
 
     const oldState = loadState(stateFilePath);
     const newState: Record<string, string> = {};
@@ -86,11 +85,18 @@ export async function runElementsGenerator(opts: GenOptions) {
             pageKey: pageMap.pageKey,
         });
 
+        // Decide whether we will scaffold on this run:
+        // - normal scaffolding (opts.scaffold default true)
+        // - OR if outputs are missing and scaffoldIfMissing is enabled
+        const shouldScaffold = scaffold || (missingOutputs && scaffoldIfMissing);
+
         // Even with --changedOnly, we must re-sync page object when aliases.ts changed
-        const aliasSyncNeeded = scaffold && needsAliasSync({
-            pagesDir: opts.pagesDir,
-            pageKey: pageMap.pageKey,
-        });
+        const aliasSyncNeeded =
+            shouldScaffold &&
+            needsAliasSync({
+                pagesDir: opts.pagesDir,
+                pageKey: pageMap.pageKey,
+            });
 
         const shouldSkip = opts.changedOnly && !changed && !missingOutputs && !aliasSyncNeeded;
         if (shouldSkip) {
@@ -99,7 +105,7 @@ export async function runElementsGenerator(opts: GenOptions) {
         }
 
         // Scaffold (create-only + append new alias mappings + sync page object region)
-        if (scaffold) {
+        if (shouldScaffold) {
             ensureScaffoldFiles({
                 pagesDir: opts.pagesDir,
                 pageMap,

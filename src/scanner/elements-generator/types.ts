@@ -10,6 +10,10 @@ export type PageMap = {
     url?: string;
     urlPath?: string;
 
+    // ✅ NEW: HTML document title (from <head><title>)
+    // Optional so older page-maps remain valid.
+    title?: string;
+
     elements: Record<
         string,
         {

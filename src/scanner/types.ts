@@ -40,6 +40,11 @@ export type PageMap = {
     pageKey: string;
     url: string;
     urlPath?: string;
+
+    // ✅ NEW: HTML document title (from <head><title>…</title>)
+    // Optional so old page-maps remain valid.
+    title?: string;
+
     scannedAt: string;
     elements: Record<
         string,
