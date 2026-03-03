@@ -13,3 +13,24 @@ Copy-Item -Force src/scanner/commands/argv.ts src/page-scanner/commands/argv.ts
 Copy-Item -Force src/scanner/commands/scan.ts src/page-scanner/commands/scan.ts
 
 
+==========
+
+New-Item -ItemType Directory -Path src/page-elements-generator -Force
+New-Item -ItemType Directory -Path src/page-elements-generator/builders -Force
+New-Item -ItemType Directory -Path src/page-elements-generator/generator -Force
+
+
+
+# Copy builders
+Copy-Item src/scanner/elements-generator/builders/* src/page-elements-generator/builders/ -Recurse -Force
+
+# Copy generator core files
+Copy-Item src/scanner/elements-generator/runner.ts src/page-elements-generator/generator/ -Force
+Copy-Item src/scanner/elements-generator/scaffold.ts src/page-elements-generator/generator/ -Force
+Copy-Item src/scanner/elements-generator/state.ts src/page-elements-generator/generator/ -Force
+Copy-Item src/scanner/elements-generator/types.ts src/page-elements-generator/generator/ -Force
+Copy-Item src/scanner/elements-generator/paths.ts src/page-elements-generator/generator/ -Force
+Copy-Item src/scanner/elements-generator/urlMeta.ts src/page-elements-generator/generator/ -Force
+Copy-Item src/scanner/elements-generator/util.ts src/page-elements-generator/generator/ -Force
+Copy-Item src/scanner/elements-generator/pageObject.ts src/page-elements-generator/generator/ -Force
+

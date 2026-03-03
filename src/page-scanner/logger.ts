@@ -28,7 +28,7 @@ function ensureFileDir(filePath: string) {
 }
 
 export function createLogger(opts: LoggerOptions = {}): Logger {
-    const prefix = opts.prefix ?? "[scanner]";
+    const prefix = opts.prefix ?? "[page-scanner]";
     const verbose = !!opts.verbose;
     const withTimestamp = opts.withTimestamp !== false; // default TRUE
     const logToFile = !!opts.logToFile;
