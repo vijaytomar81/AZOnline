@@ -5,3 +5,10 @@ npm prefix
 npm run scan:page:merge `-- --connectCdp="$CDP" --pageKey="motor.car-details"
 
 npm run scan:page:merge -- --connectCdp="$CDP" --pageKey="motor.car-details"
+
+
+
+npm run gen:elements:changed
+
+
+  "title": "Car details",

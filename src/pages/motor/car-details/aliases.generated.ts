@@ -9,6 +9,8 @@ export const pageMeta = {
   pageKey: "motor.car-details",
   urlPath: "/journey/show/product/AnnualMotorInsurance/process/nb/numberPlateScan/69a409b5d35138197f847674",
   urlRe: /\/journey\/show\/product\/AnnualMotorInsurance\/process\/nb\/numberPlateScan\/[a-z0-9]+/i,
+  title: "Car Details",
+  titleRe: new RegExp("Car Details", "i"),
 } as const;
 
 // Default alias mapping: alias key == element key

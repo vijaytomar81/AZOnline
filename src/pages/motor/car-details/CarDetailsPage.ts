@@ -2,9 +2,11 @@
 // pageKey: motor.car-details
 
 import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { BasePage } from "../../core/BasePage"; // adjust if needed
 import { elements } from "./elements";
 import { aliases } from "./aliases";
+import { pageMeta } from "./aliases.generated";
 import type { AliasKey } from "./aliases";
 
 const PAGE_KEY = "motor.car-details" as const;
@@ -12,6 +14,40 @@ const PAGE_KEY = "motor.car-details" as const;
 export class CarDetailsPage extends BasePage {
   constructor(page: Page) {
     super(page);
+  }
+
+  // --------------------------------------------------
+  // Page-level helpers (URL + Title awareness)
+  // --------------------------------------------------
+
+  async waitForPage() {
+    const timeout = Number(process.env.PAGE_TIMEOUT ?? 15_000);
+
+    if (pageMeta.urlRe) {
+      await this.page.waitForURL(pageMeta.urlRe, { timeout });
+    } else if (pageMeta.urlPath) {
+      await this.page.waitForURL(new RegExp(pageMeta.urlPath), { timeout });
+    }
+
+    if ((pageMeta as any).titleRe) {
+      await expect(this.page).toHaveTitle((pageMeta as any).titleRe, { timeout });
+    } else if ((pageMeta as any).title) {
+      await expect(this.page).toHaveTitle((pageMeta as any).title, { timeout });
+    }
+  }
+
+  async assertOnPage() {
+    if (pageMeta.urlRe) {
+      await expect(this.page).toHaveURL(pageMeta.urlRe);
+    } else if (pageMeta.urlPath) {
+      await expect(this.page).toHaveURL(new RegExp(pageMeta.urlPath));
+    }
+
+    if ((pageMeta as any).titleRe) {
+      await expect(this.page).toHaveTitle((pageMeta as any).titleRe);
+    } else if ((pageMeta as any).title) {
+      await expect(this.page).toHaveTitle((pageMeta as any).title);
+    }
   }
 
   // --------------------------------------------------
