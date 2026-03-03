@@ -1,46 +1,15 @@
-# 1) Create folder
-New-Item -ItemType Directory -Force -Path "src\scanner\page-scanner" | Out-Null
+New-Item -ItemType Directory -Force src/page-scanner
+New-Item -ItemType Directory -Force src/page-scanner/commands
+New-Item -ItemType Directory -Force src/page-scanner/scanner
+New-Item -ItemType Directory -Force src/page-scanner/page-maps
 
-# 2) Create empty files
-@(
-  "src\scanner\page-scanner\types.ts",
-  "src\scanner\page-scanner\browser.ts",
-  "src\scanner\page-scanner\domExtract.ts",
-  "src\scanner\page-scanner\filters.ts",
-  "src\scanner\page-scanner\keyStrategy.ts",
-  "src\scanner\page-scanner\classify.ts",
-  "src\scanner\page-scanner\selectorPipeline.ts",
-  "src\scanner\page-scanner\merge.ts",
-  "src\scanner\page-scanner\writer.ts",
-  "src\scanner\page-scanner\runner.ts"
-) | ForEach-Object {
-  New-Item -ItemType File -Force -Path $_ | Out-Null
-}
+Copy-Item -Recurse -Force src/scanner/page-scanner/* src/page-scanner/scanner/
 
 
-New-Item -ItemType Directory -Force src\scanner\elements-generator\builders | Out-Null
+New-Item -ItemType Directory -Force src/page-scanner/commands | Out-Null
 
-$files = @(
-  "src\scanner\elements-generator\index.ts",
-  "src\scanner\elements-generator\types.ts",
-  "src\scanner\elements-generator\paths.ts",
-  "src\scanner\elements-generator\urlMeta.ts",
-  "src\scanner\elements-generator\state.ts",
-  "src\scanner\elements-generator\scaffold.ts",
-  "src\scanner\elements-generator\runner.ts",
-  "src\scanner\elements-generator\builders\buildElementsTs.ts",
-  "src\scanner\elements-generator\builders\buildAliasesGeneratedTs.ts",
-  "src\scanner\elements-generator\builders\buildAliasesHumanTs.ts",
-  "src\scanner\elements-generator\builders\buildPageTsStub.ts"
-)
-
-$files | ForEach-Object { New-Item -ItemType File -Force $_ | Out-Null }
+Copy-Item -Force src/scanner/logger.ts src/page-scanner/logger.ts
+Copy-Item -Force src/scanner/commands/argv.ts src/page-scanner/commands/argv.ts
+Copy-Item -Force src/scanner/commands/scan.ts src/page-scanner/commands/scan.ts
 
 
-
-
-
-New-Item -ItemType Directory -Force src/scanner/commands
-
-New-Item src/scanner/commands/scan.ts -ItemType File
-New-Item src/scanner/commands/generate.ts -ItemType File

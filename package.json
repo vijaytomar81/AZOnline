@@ -14,13 +14,14 @@
     "test:e2e": "playwright test",
     "e2e": "npm run data:build -- && npm run test:e2e",
 
+    "scan": "node -r ts-node/register src/page-scanner/cli.ts",
+    "scan:page": "npm run scan -- scan",
+    "scan:page:verbose": "npm run scan -- scan --verbose",
+    "scan:page:merge": "npm run scan -- scan --merge",
+    "scan:page:merge:verbose": "npm run scan -- scan --merge --verbose",
+    "scan:help": "npm run scan -- help",
+
     "scanner": "node -r ts-node/register src/scanner/cli.ts",
-
-    "scan:page": "npm run scanner -- scan",
-    "scan:page:verbose": "npm run scanner -- scan --verbose",
-    "scan:page:merge": "npm run scanner -- scan --merge",
-    "scan:page:merge:verbose": "npm run scanner -- scan --merge --verbose",
-
     "gen:elements": "npm run scanner -- generate --merge",
     "gen:elements:verbose": "npm run scanner -- generate --merge --verbose",
     "gen:elements:changed": "npm run scanner -- generate --changedOnly --merge",
