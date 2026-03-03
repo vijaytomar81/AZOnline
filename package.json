@@ -9,6 +9,7 @@
     "data:build:empty:verbose": "ts-node src/data/data-builder/index.ts -- --includeEmptyChildFields true --verbose",
     "data:build:flowNB": "ts-node src/data/data-builder/index.ts -- --sheet FlowNB",
     "data:build:debug": "ts-node src/data/data-builder/index.ts -- --includeEmptyChildFields true --verbose",
+    "data:build:help": "ts-node src/data/data-builder/index.ts -- --help",
     
     "test:e2e": "playwright test",
     "e2e": "npm run data:build -- && npm run test:e2e",
@@ -34,7 +35,9 @@
 
     "scanner:repair": "npm run scanner -- repair",
     "scanner:doctor": "npm run scanner -- doctor",
-    "scanner:tsc": "tsc -p tsconfig.scanner.json --noEmit"
+    "scanner:tsc": "tsc -p tsconfig.scanner.json --noEmit",
+
+    "scanner:help": "npm run scanner -- help"
   },
   "repository": {
     "type": "git",
