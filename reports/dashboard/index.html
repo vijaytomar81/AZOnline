@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Playwright Test Dashboard</title>
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+    <header class="app-header">
+        <div><b>Playwright Test Dashboard</b></div><div class="muted">Generated from Playwright JSON</div>
+    </header>
+
+    <main class="container">
+        <section class="top-row">
+            <div class="card">
+                <div class="card-title">Pass rate</div>
+                <div class="big">50%</div>
+                <div class="muted">Executed: 2 / Total: 3</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Totals</div>
+                <div class="grid-2">
+                    <div><span class="pill passed">Passed</span> <b>1</b></div>
+                    <div><span class="pill failed">Failed</span> <b>0</b></div>
+                    <div><span class="pill flaky">Flaky</span> <b>1</b></div>
+                    <div><span class="pill skipped">Skipped</span> <b>1</b></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Run</div>
+                <div><b>2026-03-04T19-21-36-495Z</b></div>
+                <div class="muted">Generated: 2026-03-04T19:21:36.496Z</div>
+            </div>
+        </section>
+
+        <section class="two-col">
+            <div class="card">
+                <div class="card-title">Flaky tests (top)</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Test</th>
+                                <th>Project</th>
+                                <th>Retries</th>
+                                <th>Last duration</th>
+                                <th>Last error</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="mono">src/tests/smoke › motor › should show validation errors (flaky)</td><td>chromium</td><td>1</td><td>1.6s</td><td class="muted">Expected error banner, but none found</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Slow tests (top)</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Test</th>
+                                <th>Project</th>
+                                <th>Status</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="mono">src/tests/smoke › motor › should show validation errors (flaky)</td><td>chromium</td><td><span class="pill flaky">flaky</span></td><td>1.6s</td></tr>
+<tr><td class="mono">src/tests/smoke › motor › should open car details</td><td>chromium</td><td><span class="pill passed">passed</span></td><td>1.2s</td></tr>
+<tr><td class="mono">src/tests/smoke › motor › should skip when feature disabled</td><td>chromium</td><td><span class="pill skipped">skipped</span></td><td>0ms</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-title">By file</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>File</th>
+                            <th>Total</th>
+                            <th>Passed</th>
+                            <th>Failed</th>
+                            <th>Flaky</th>
+                            <th>Skipped</th>
+                            <th>Avg ms</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="mono">src/tests/smoke/motor.spec.ts</td><td>3</td><td>1</td><td>0</td><td>1</td><td>1</td><td>928</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-title">Trend (last runs)</div>
+            <div class="muted">This reads <code>history.json</code>. If empty, it shows “No history yet”.</div>
+            <pre class="trend-box">[
+  {
+    &quot;dateIso&quot;: &quot;2026-03-04&quot;,
+    &quot;total&quot;: 3,
+    &quot;passed&quot;: 1,
+    &quot;failed&quot;: 0,
+    &quot;flaky&quot;: 1,
+    &quot;skipped&quot;: 1,
+    &quot;passRate&quot;: 0.5
+  }
+]</pre>
+        </section>
+
+        <!-- Optional: embed data for debugging or future JS charts -->
+        <script type="application/json" id="dashboard-data">
+        {&quot;summary&quot;:{&quot;runId&quot;:&quot;2026-03-04T19-21-36-495Z&quot;,&quot;startedAtIso&quot;:&quot;2026-03-04T19:21:36.495Z&quot;,&quot;endedAtIso&quot;:&quot;2026-03-04T19:21:36.495Z&quot;,&quot;durationMs&quot;:2784,&quot;total&quot;:3,&quot;passed&quot;:1,&quot;failed&quot;:0,&quot;flaky&quot;:1,&quot;skipped&quot;:1,&quot;passRate&quot;:0.5},&quot;tests&quot;:[{&quot;id&quot;:&quot;src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should open car details&quot;,&quot;title&quot;:&quot;src/tests/smoke › motor › should open car details&quot;,&quot;file&quot;:&quot;src/tests/smoke/motor.spec.ts&quot;,&quot;project&quot;:&quot;chromium&quot;,&quot;status&quot;:&quot;passed&quot;,&quot;durationMs&quot;:1234,&quot;retries&quot;:0,&quot;errors&quot;:[]},{&quot;id&quot;:&quot;src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should show validation errors (flaky)&quot;,&quot;title&quot;:&quot;src/tests/smoke › motor › should show validation errors (flaky)&quot;,&quot;file&quot;:&quot;src/tests/smoke/motor.spec.ts&quot;,&quot;project&quot;:&quot;chromium&quot;,&quot;status&quot;:&quot;flaky&quot;,&quot;durationMs&quot;:1550,&quot;retries&quot;:1,&quot;errors&quot;:[&quot;Expected error banner, but none found&quot;]},{&quot;id&quot;:&quot;src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should skip when feature disabled&quot;,&quot;title&quot;:&quot;src/tests/smoke › motor › should skip when feature disabled&quot;,&quot;file&quot;:&quot;src/tests/smoke/motor.spec.ts&quot;,&quot;project&quot;:&quot;chromium&quot;,&quot;status&quot;:&quot;skipped&quot;,&quot;durationMs&quot;:0,&quot;retries&quot;:0,&quot;errors&quot;:[]}],&quot;flakyTop&quot;:[{&quot;id&quot;:&quot;src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should show validation errors (flaky)&quot;,&quot;title&quot;:&quot;src/tests/smoke › motor › should show validation errors (flaky)&quot;,&quot;file&quot;:&quot;src/tests/smoke/motor.spec.ts&quot;,&quot;project&quot;:&quot;chromium&quot;,&quot;retries&quot;:1,&quot;lastDurationMs&quot;:1550,&quot;lastError&quot;:&quot;Expected error banner, but none found&quot;}],&quot;slowTop&quot;:[{&quot;id&quot;:&quot;src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should show validation errors (flaky)&quot;,&quot;title&quot;:&quot;src/tests/smoke › motor › should show validation errors (flaky)&quot;,&quot;file&quot;:&quot;src/tests/smoke/motor.spec.ts&quot;,&quot;project&quot;:&quot;chromium&quot;,&quot;durationMs&quot;:1550,&quot;status&quot;:&quot;flaky&quot;},{&quot;id&quot;:&quot;src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should open car details&quot;,&quot;title&quot;:&quot;src/tests/smoke › motor › should open car details&quot;,&quot;file&quot;:&quot;src/tests/smoke/motor.spec.ts&quot;,&quot;project&quot;:&quot;chromium&quot;,&quot;durationMs&quot;:1234,&quot;status&quot;:&quot;passed&quot;},{&quot;id&quot;:&quot;src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should skip when feature disabled&quot;,&quot;title&quot;:&quot;src/tests/smoke › motor › should skip when feature disabled&quot;,&quot;file&quot;:&quot;src/tests/smoke/motor.spec.ts&quot;,&quot;project&quot;:&quot;chromium&quot;,&quot;durationMs&quot;:0,&quot;status&quot;:&quot;skipped&quot;}],&quot;files&quot;:[{&quot;file&quot;:&quot;src/tests/smoke/motor.spec.ts&quot;,&quot;total&quot;:3,&quot;passed&quot;:1,&quot;failed&quot;:0,&quot;flaky&quot;:1,&quot;skipped&quot;:1,&quot;avgDurationMs&quot;:928}],&quot;trend&quot;:[{&quot;dateIso&quot;:&quot;2026-03-04&quot;,&quot;total&quot;:3,&quot;passed&quot;:1,&quot;failed&quot;:0,&quot;flaky&quot;:1,&quot;skipped&quot;:1,&quot;passRate&quot;:0.5}]}
+      </script>
+    </main>
+
+    <footer class="app-footer">
+        <div class="muted">AZOnline • Dashboard</div>
+    </footer>
+</body>
+
+</html>

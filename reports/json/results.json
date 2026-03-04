@@ -1,0 +1,77 @@
+{
+    "config": {
+        "projects": [
+            {
+                "name": "chromium"
+            }
+        ]
+    },
+    "suites": [
+        {
+            "title": "src/tests/smoke",
+            "suites": [
+                {
+                    "title": "motor",
+                    "suites": [],
+                    "specs": [
+                        {
+                            "title": "should open car details",
+                            "file": "src/tests/smoke/motor.spec.ts",
+                            "tests": [
+                                {
+                                    "results": [
+                                        {
+                                            "status": "passed",
+                                            "duration": 1234,
+                                            "errors": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "title": "should show validation errors (flaky)",
+                            "file": "src/tests/smoke/motor.spec.ts",
+                            "tests": [
+                                {
+                                    "results": [
+                                        {
+                                            "status": "failed",
+                                            "duration": 900,
+                                            "errors": [
+                                                {
+                                                    "message": "Expected error banner, but none found"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "status": "passed",
+                                            "duration": 650,
+                                            "errors": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "title": "should skip when feature disabled",
+                            "file": "src/tests/smoke/motor.spec.ts",
+                            "tests": [
+                                {
+                                    "results": [
+                                        {
+                                            "status": "skipped",
+                                            "duration": 0,
+                                            "errors": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "specs": []
+        }
+    ]
+}

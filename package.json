@@ -42,7 +42,12 @@
     "typecheck": "tsc --noEmit",
     "tools:tsc": "tsc -p tsconfig.tools.json --noEmit",
 
-    "ci:check": "npm run typecheck && npm run tools:tsc && npm run validator:run"
+    "ci:check": "npm run typecheck && npm run tools:tsc && npm run validator:run",
+
+    "report": "node -r ts-node/register src/reporters/dashboard/index.ts",
+    "report:dashboard": "npm run report",
+    "report:dashboard:verbose": "npm run report -- --verbose",
+    "report:dashboard:help": "npm run report -- --help"
   },
   "repository": {
     "type": "git",

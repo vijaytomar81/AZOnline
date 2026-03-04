@@ -1,0 +1,107 @@
+{
+  "summary": {
+    "runId": "2026-03-04T19-21-36-495Z",
+    "startedAtIso": "2026-03-04T19:21:36.495Z",
+    "endedAtIso": "2026-03-04T19:21:36.495Z",
+    "durationMs": 2784,
+    "total": 3,
+    "passed": 1,
+    "failed": 0,
+    "flaky": 1,
+    "skipped": 1,
+    "passRate": 0.5
+  },
+  "tests": [
+    {
+      "id": "src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should open car details",
+      "title": "src/tests/smoke › motor › should open car details",
+      "file": "src/tests/smoke/motor.spec.ts",
+      "project": "chromium",
+      "status": "passed",
+      "durationMs": 1234,
+      "retries": 0,
+      "errors": []
+    },
+    {
+      "id": "src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should show validation errors (flaky)",
+      "title": "src/tests/smoke › motor › should show validation errors (flaky)",
+      "file": "src/tests/smoke/motor.spec.ts",
+      "project": "chromium",
+      "status": "flaky",
+      "durationMs": 1550,
+      "retries": 1,
+      "errors": [
+        "Expected error banner, but none found"
+      ]
+    },
+    {
+      "id": "src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should skip when feature disabled",
+      "title": "src/tests/smoke › motor › should skip when feature disabled",
+      "file": "src/tests/smoke/motor.spec.ts",
+      "project": "chromium",
+      "status": "skipped",
+      "durationMs": 0,
+      "retries": 0,
+      "errors": []
+    }
+  ],
+  "flakyTop": [
+    {
+      "id": "src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should show validation errors (flaky)",
+      "title": "src/tests/smoke › motor › should show validation errors (flaky)",
+      "file": "src/tests/smoke/motor.spec.ts",
+      "project": "chromium",
+      "retries": 1,
+      "lastDurationMs": 1550,
+      "lastError": "Expected error banner, but none found"
+    }
+  ],
+  "slowTop": [
+    {
+      "id": "src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should show validation errors (flaky)",
+      "title": "src/tests/smoke › motor › should show validation errors (flaky)",
+      "file": "src/tests/smoke/motor.spec.ts",
+      "project": "chromium",
+      "durationMs": 1550,
+      "status": "flaky"
+    },
+    {
+      "id": "src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should open car details",
+      "title": "src/tests/smoke › motor › should open car details",
+      "file": "src/tests/smoke/motor.spec.ts",
+      "project": "chromium",
+      "durationMs": 1234,
+      "status": "passed"
+    },
+    {
+      "id": "src/tests/smoke/motor.spec.ts::chromium::src/tests/smoke › motor › should skip when feature disabled",
+      "title": "src/tests/smoke › motor › should skip when feature disabled",
+      "file": "src/tests/smoke/motor.spec.ts",
+      "project": "chromium",
+      "durationMs": 0,
+      "status": "skipped"
+    }
+  ],
+  "files": [
+    {
+      "file": "src/tests/smoke/motor.spec.ts",
+      "total": 3,
+      "passed": 1,
+      "failed": 0,
+      "flaky": 1,
+      "skipped": 1,
+      "avgDurationMs": 928
+    }
+  ],
+  "trend": [
+    {
+      "dateIso": "2026-03-04",
+      "total": 3,
+      "passed": 1,
+      "failed": 0,
+      "flaky": 1,
+      "skipped": 1,
+      "passRate": 0.5
+    }
+  ]
+}

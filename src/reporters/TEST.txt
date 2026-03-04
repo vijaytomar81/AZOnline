@@ -1,0 +1,25 @@
+# -----------------------------
+# REPORTS FOLDERS
+# -----------------------------
+mkdir -p reports/html
+mkdir -p reports/json/history
+mkdir -p reports/junit
+
+touch reports/json/results.json
+
+# -----------------------------
+# REPORTERS CORE
+# -----------------------------
+# create reporters folder
+New-Item -ItemType Directory -Force src/reporters | Out-Null
+
+# create dashboard folder
+New-Item -ItemType Directory -Force src/reporters/dashboard | Out-Null
+
+# create files
+New-Item -ItemType File -Force src/reporters/analytics.ts | Out-Null
+New-Item -ItemType File -Force src/reporters/history.ts | Out-Null
+New-Item -ItemType File -Force src/reporters/paths.ts | Out-Null
+New-Item -ItemType File -Force src/reporters/playwrightParser.ts | Out-Null
+New-Item -ItemType File -Force src/reporters/schema.ts | Out-Null
+New-Item -ItemType File -Force src/reporters/dashboard/buildDashboard.ts | Out-Null
