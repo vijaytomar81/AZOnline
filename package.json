@@ -30,17 +30,19 @@
     "generator:hashes:changed": "npm run generator -- generate --changedOnly --stateOnly --verbose",
     "generator:help": "npm run generator -- help",
 
-    "validate": "node -r ts-node/register src/page-elements-validator/cli.ts",
-    "validate:run": "npm run validate -- validate",
-    "validate:verbose": "npm run validate -- validate --verbose",
-    "validate:repair": "npm run validate -- repair",
-    "validate:repair:verbose": "npm run validate -- repair --verbose",
-    "validate:doctor": "npm run validate -- doctor",
-    "validate:doctor:verbose": "npm run validate -- doctor --verbose",
-    "validate:help": "npm run validate -- help",
+    "validator": "node -r ts-node/register src/page-elements-validator/cli.ts",
+    "validator:run": "npm run validator -- validate",
+    "validator:verbose": "npm run validator -- validate --verbose",
+    "validator:repair": "npm run validator -- repair",
+    "validator:repair:verbose": "npm run validator -- repair --verbose",
+    "validator:doctor": "npm run validator -- doctor",
+    "validator:doctor:verbose": "npm run validator -- doctor --verbose",
+    "validator:help": "npm run validator -- help",
 
     "typecheck": "tsc --noEmit",
-    "tools:tsc": "tsc -p tsconfig.tools.json --noEmit"
+    "tools:tsc": "tsc -p tsconfig.tools.json --noEmit",
+
+    "ci:check": "npm run typecheck && npm run tools:tsc && npm run validator:run"
   },
   "repository": {
     "type": "git",
