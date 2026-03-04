@@ -1,4 +1,16 @@
-// src/page-scanner/types.ts
+// src/page-scanner/scanner/types.ts
+
+import type { Logger } from "../logger";
+
+export type ScanPageOptions = {
+    connectCdp: string;
+    pageKey: string;
+    outDir?: string;
+    merge?: boolean;
+    tabIndex?: number;
+    verbose?: boolean;
+    log: Logger;
+};
 
 export type SelectorCandidate = {
     kind: "css" | "role" | "text";

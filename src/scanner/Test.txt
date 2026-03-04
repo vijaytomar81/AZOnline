@@ -34,3 +34,24 @@ Copy-Item src/scanner/elements-generator/urlMeta.ts src/page-elements-generator/
 Copy-Item src/scanner/elements-generator/util.ts src/page-elements-generator/generator/ -Force
 Copy-Item src/scanner/elements-generator/pageObject.ts src/page-elements-generator/generator/ -Force
 
+
+===========
+
+New-Item -ItemType Directory -Force -Path `
+  "src/page-elements-validator/validators", `
+  "src/page-elements-validator/commands" | Out-Null
+
+Copy-Item -Force src/scanner/validators/*.ts src/page-elements-validator/validators/
+
+
+New-Item -ItemType File -Force -Path `
+  "src/page-elements-validator/cli.ts", `
+  "src/page-elements-validator/logger.ts", `
+  "src/page-elements-validator/validatorHelp.ts", `
+  "src/page-elements-validator/commands/validate.ts" | Out-Null
+
+============
+
+Rename-Item tsconfig.scanner.json tsconfig.tools.json
+
+

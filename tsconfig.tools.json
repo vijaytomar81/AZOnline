@@ -4,7 +4,9 @@
     "noEmit": true
   },
   "include": [
-    "src/scanner/**/*.ts"
+    "src/page-scanner/**/*.ts",
+    "src/page-elements-generator/**/*.ts",
+    "src/page-elements-validator/**/*.ts"
   ],
   "exclude": [
     "node_modules",

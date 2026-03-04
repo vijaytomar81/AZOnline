@@ -3,16 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "data:build": "ts-node src/data/data-builder/index.ts",
-    "data:build:verbose": "ts-node src/data/data-builder/index.ts -- --verbose",
-    "data:build:empty": "ts-node src/data/data-builder/index.ts -- --includeEmptyChildFields true",
-    "data:build:empty:verbose": "ts-node src/data/data-builder/index.ts -- --includeEmptyChildFields true --verbose",
-    "data:build:flowNB": "ts-node src/data/data-builder/index.ts -- --sheet FlowNB",
-    "data:build:debug": "ts-node src/data/data-builder/index.ts -- --includeEmptyChildFields true --verbose",
-    "data:build:help": "ts-node src/data/data-builder/index.ts -- --help",
-    
     "test:e2e": "playwright test",
     "e2e": "npm run data:build -- && npm run test:e2e",
+
+    "data:build": "ts-node src/data/data-builder/index.ts",
+    "data:build:verbose": "npm run data:build -- --verbose",
+    "data:build:withEmptyFields": "npm run data:build -- --includeEmptyChildFields true",
+    "data:build:withEmptyFields:verbose": "npm run data:build -- --includeEmptyChildFields true --verbose",
+    "data:help": "npm run data:build -- --help",
 
     "scan": "node -r ts-node/register src/page-scanner/cli.ts",
     "scan:page": "npm run scan -- scan",
@@ -21,24 +19,28 @@
     "scan:page:merge:verbose": "npm run scan -- scan --merge --verbose",
     "scan:help": "npm run scan -- help",
 
-    "scanner": "node -r ts-node/register src/scanner/cli.ts",
-    "gen:elements": "npm run scanner -- generate --merge",
-    "gen:elements:verbose": "npm run scanner -- generate --merge --verbose",
-    "gen:elements:changed": "npm run scanner -- generate --changedOnly --merge",
-    "gen:elements:changed:verbose": "npm run scanner -- generate --changedOnly --merge --verbose",
-    "gen:elements:noScaffold": "npm run scanner -- generate --merge --noScaffold",
-    "gen:elements:changed:noScaffold": "npm run scanner -- generate --changedOnly --merge --noScaffold",
-    "gen:hashes": "npm run scanner -- generate --stateOnly --verbose",
-    "gen:hashes:changed": "npm run scanner -- generate --changedOnly --stateOnly --verbose",
+    "generator": "node -r ts-node/register src/page-elements-generator/cli.ts",
+    "generator:elements": "npm run generator -- generate --merge",
+    "generator:elements:verbose": "npm run generator -- generate --merge --verbose",
+    "generator:elements:changed": "npm run generator -- generate --changedOnly --merge",
+    "generator:elements:changed:verbose": "npm run generator -- generate --changedOnly --merge --verbose",
+    "generator:elements:noScaffold": "npm run generator -- generate --merge --noScaffold",
+    "generator:elements:changed:noScaffold": "npm run generator -- generate --changedOnly --merge --noScaffold",
+    "generator:hashes": "npm run generator -- generate --stateOnly --verbose",
+    "generator:hashes:changed": "npm run generator -- generate --changedOnly --stateOnly --verbose",
+    "generator:help": "npm run generator -- help",
 
-    "scanner:validate": "npm run scanner -- validate",
-    "scanner:validate:verbose": "npm run scanner -- validate --verbose",
+    "validate": "node -r ts-node/register src/page-elements-validator/cli.ts",
+    "validate:run": "npm run validate -- validate",
+    "validate:verbose": "npm run validate -- validate --verbose",
+    "validate:repair": "npm run validate -- repair",
+    "validate:repair:verbose": "npm run validate -- repair --verbose",
+    "validate:doctor": "npm run validate -- doctor",
+    "validate:doctor:verbose": "npm run validate -- doctor --verbose",
+    "validate:help": "npm run validate -- help",
 
-    "scanner:repair": "npm run scanner -- repair",
-    "scanner:doctor": "npm run scanner -- doctor",
-    "scanner:tsc": "tsc -p tsconfig.scanner.json --noEmit",
-
-    "scanner:help": "npm run scanner -- help"
+    "typecheck": "tsc --noEmit",
+    "tools:tsc": "tsc -p tsconfig.tools.json --noEmit"
   },
   "repository": {
     "type": "git",
