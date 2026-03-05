@@ -5,20 +5,17 @@
   "scripts": {
     "test:e2e": "playwright test",
     "e2e": "npm run data:build -- && npm run test:e2e",
-
     "data:build": "ts-node src/data/data-builder/index.ts",
     "data:build:verbose": "npm run data:build -- --verbose",
     "data:build:withEmptyFields": "npm run data:build -- --includeEmptyChildFields true",
     "data:build:withEmptyFields:verbose": "npm run data:build -- --includeEmptyChildFields true --verbose",
     "data:help": "npm run data:build -- --help",
-
     "scan": "node -r ts-node/register src/page-scanner/cli.ts",
     "scan:page": "npm run scan -- scan",
     "scan:page:verbose": "npm run scan -- scan --verbose",
     "scan:page:merge": "npm run scan -- scan --merge",
     "scan:page:merge:verbose": "npm run scan -- scan --merge --verbose",
     "scan:help": "npm run scan -- help",
-
     "generator": "node -r ts-node/register src/page-elements-generator/cli.ts",
     "generator:elements": "npm run generator -- generate --merge",
     "generator:elements:verbose": "npm run generator -- generate --merge --verbose",
@@ -29,7 +26,6 @@
     "generator:hashes": "npm run generator -- generate --stateOnly --verbose",
     "generator:hashes:changed": "npm run generator -- generate --changedOnly --stateOnly --verbose",
     "generator:help": "npm run generator -- help",
-
     "validator": "node -r ts-node/register src/page-elements-validator/cli.ts",
     "validator:run": "npm run validator -- validate",
     "validator:verbose": "npm run validator -- validate --verbose",
@@ -38,12 +34,9 @@
     "validator:doctor": "npm run validator -- doctor",
     "validator:doctor:verbose": "npm run validator -- doctor --verbose",
     "validator:help": "npm run validator -- help",
-
     "typecheck": "tsc --noEmit",
     "tools:tsc": "tsc -p tsconfig.tools.json --noEmit",
-
     "ci:check": "npm run typecheck && npm run tools:tsc && npm run validator:run",
-
     "report": "node -r ts-node/register src/reporters/dashboard/index.ts",
     "report:dashboard": "npm run report",
     "report:dashboard:verbose": "npm run report -- --verbose",
@@ -64,6 +57,7 @@
   "devDependencies": {
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.3.0",
+    "allure-playwright": "^3.5.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
