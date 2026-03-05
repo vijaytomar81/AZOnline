@@ -8,6 +8,8 @@ Start-Sleep -Seconds 2; `
 $CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerUrl;
 
 
+winget install EclipseAdoptium.Temurin.21.JDK
+java -version
 
 npm install -g allure-commandline
 allure --version
