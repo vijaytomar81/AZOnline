@@ -2,12 +2,18 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-function rm(p) {
-    fs.rmSync(p, { recursive: true, force: true });
+function ensureDir(dir) {
+    fs.mkdirSync(dir, { recursive: true });
 }
 
-function mkdir(p) {
-    fs.mkdirSync(p, { recursive: true });
+function rmChildEntries(dir, { keep = [] } = {}) {
+    if (!fs.existsSync(dir)) return;
+
+    const keepSet = new Set(keep.map((x) => x.toLowerCase()));
+    for (const name of fs.readdirSync(dir)) {
+        if (keepSet.has(name.toLowerCase())) continue;
+        fs.rmSync(path.join(dir, name), { recursive: true, force: true });
+    }
 }
 
 function touchGitkeep(dir) {
@@ -19,7 +25,9 @@ function main() {
     const repoRoot = process.cwd();
     const resultsDir = path.join(repoRoot, "results");
 
-    rm(resultsDir);
+    // Ensure base exists and clean inside it (safer than rm(resultsDir))
+    ensureDir(resultsDir);
+    rmChildEntries(resultsDir, { keep: [".gitkeep"] });
 
     const dirs = [
         "results/allure-results",
@@ -30,11 +38,14 @@ function main() {
 
     for (const d of dirs) {
         const abs = path.join(repoRoot, d);
-        mkdir(abs);
+        ensureDir(abs);
         touchGitkeep(abs);
     }
 
-    console.log(`✅ Cleaned + recreated results folders under: ${resultsDir}`);
+    // Keep top-level .gitkeep too
+    touchGitkeep(resultsDir);
+
+    console.log(`✅ Cleaned results contents and recreated structure under: ${resultsDir}`);
 }
 
 main();
