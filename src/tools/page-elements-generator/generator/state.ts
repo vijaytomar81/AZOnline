@@ -1,18 +1,12 @@
-// src/scanner/elements-generator/state.ts
+// src/tools/page-elements-generator/generator/state.ts
 
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 
+import { ensureDir, safeReadJson } from "../../../utils/fs";
+
 export type StateFile = Record<string, string>;
-
-// ======================================================
-// Dir helpers
-// ======================================================
-
-export function ensureDir(dir: string) {
-    fs.mkdirSync(dir, { recursive: true });
-}
 
 // ======================================================
 // Hashing + state
@@ -25,7 +19,8 @@ export function hashContent(content: string): string {
 export function loadState(filePath: string): StateFile {
     if (!fs.existsSync(filePath)) return {};
     try {
-        return JSON.parse(fs.readFileSync(filePath, "utf8")) as StateFile;
+        const data = safeReadJson<StateFile>(filePath);
+        return data ?? { /* your default empty StateFile */ };
     } catch {
         return {};
     }

@@ -1,15 +1,7 @@
-// src/scanner/elements-generator/builders/buildElementsTs.ts
+// src/tools/page-elements-generator/builders/buildElementsTs.ts
 
 import type { PageMap } from "../generator/types";
-
-function escapeTsString(s: string) {
-    // safe for "..." usage
-    return s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-}
-
-function isValidTsIdentifier(key: string) {
-    return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key);
-}
+import { escapeTsString, isValidTsIdentifier } from "../../../utils/ts";
 
 export function buildElementsTs(pageMap: PageMap): string {
     const lines: string[] = [];

@@ -1,9 +1,7 @@
-// src/scanner/elements-generator/paths.ts
+// src/tools/page-elements-generator/generator/paths.ts
 
 import path from "node:path";
-import { toPascal } from "./util";
-
-export { toPascal };
+import { toPascal } from "../../../utils/ts";
 
 export function pageKeyToFolder(pagesDir: string, pageKey: string) {
   const parts = pageKey.split(".");

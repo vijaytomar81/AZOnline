@@ -1,4 +1,4 @@
-// src/scanner/elements-generator/scaffold.ts
+// src/tools/page-elements-generator/generator/scaffold.ts
 
 import fs from "node:fs";
 import path from "node:path";
@@ -11,19 +11,14 @@ import {
     mapPageKeyToPageTsPath,
 } from "./paths";
 
-import { safeWriteText, safeWriteTextIfMissing, ensureDir } from "./state";
+import { safeWriteText, safeWriteTextIfMissing } from "./state";
+import { ensureDir } from "../../../utils/fs";
+import { isValidTsIdentifier } from "../../../utils/ts";
+import { stripLineComments } from "../../../utils/text";
 import { buildAliasesGeneratedTs } from "../builders/buildAliasesGeneratedTs";
 import { buildAliasesHumanTs } from "../builders/buildAliasesHumanTs";
 import { buildPageTsStub } from "../builders/buildPageTsStub";
 import { syncAliasesIntoPageObject } from "./pageObject";
-
-function isValidTsIdentifier(key: string) {
-    return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key);
-}
-
-function stripLineComments(ts: string) {
-    return ts.replace(/\/\/.*$/gm, "");
-}
 
 /**
  * Detect which element keys are already mapped in aliases.ts by checking RHS usage:

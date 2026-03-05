@@ -1,4 +1,4 @@
-// src/scanner/elements-generator/runner.ts
+// src/tools/page-elements-generator/generator/runner.ts
 
 import fs from "node:fs";
 import path from "node:path";
@@ -11,7 +11,8 @@ import {
     mapPageKeyToPageTsPath,
 } from "./paths";
 import { ensureScaffoldFiles, hasMissingGeneratedOutputs } from "./scaffold";
-import { hashContent, loadState, saveState, ensureDir } from "./state";
+import { hashContent, loadState, saveState } from "./state";
+import { ensureDir } from "../../../utils/fs";
 
 function readAllPageMaps(mapsDir: string): string[] {
     return fs

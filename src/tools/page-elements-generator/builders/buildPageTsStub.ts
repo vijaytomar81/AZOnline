@@ -1,7 +1,7 @@
-// src/scanner/elements-generator/builders/buildPageTsStub.ts
+// src/tools/page-elements-generator/builders/buildPageTsStub.ts
 
 import type { PageMap } from "../generator/types";
-import { toPascal } from "../generator/paths";
+import { toPascal } from "../../../utils/ts";
 
 export function buildPageTsStub(pageMap: PageMap): string {
     const pageKey = pageMap.pageKey;

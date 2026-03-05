@@ -1,12 +1,10 @@
-// src/scanner/page-scanner/writer.ts
+// src/tools/page-scanner/scanner/writer.ts
 
 import fs from "node:fs";
 import path from "node:path";
-import type { PageMap, ScanPageOptions } from "./types";
 
-function ensureDir(dir: string) {
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-}
+import { ensureDir } from "../../../utils/fs";
+import type { PageMap, ScanPageOptions } from "./types";
 
 export function writePageMap(opts: ScanPageOptions, pageMap: PageMap) {
     const outDir = opts.outDir ?? path.join(process.cwd(), "src", "page-maps");

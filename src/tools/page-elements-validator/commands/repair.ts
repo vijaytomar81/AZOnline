@@ -1,7 +1,7 @@
-// src/page-elements-validator/commands/repair.ts
+// src/tools/page-elements-validator/commands/repair.ts
 
 import path from "node:path";
-import { createLogger } from "../logger";
+import { createLogger } from "../../../utils/logger";
 
 // ✅ generator lives in page-elements-generator now
 import { runElementsGenerator } from "../../page-elements-generator/generator/runner";
@@ -33,7 +33,7 @@ function getArg(argv: string[], name: string): string | undefined {
 
 export async function runRepairCommand(args: string[]) {
     const verbose = hasFlag(args, "--verbose");
-    const log = createLogger({ prefix: "[validator]", verbose, withTimestamp: true });
+    const log = createLogger({ prefix: "[validator - repair]", verbose, withTimestamp: true });
 
     log.info("Command: repair");
 

@@ -1,10 +1,12 @@
 // src/core/locatorEngine.ts
 import type { Page, Locator } from "@playwright/test";
+import { nowIso } from "../utils/time";
+import { escapeNewlines } from "../utils/text";
 
 export type ElementDef = {
-  type: string;
-  preferred: string;
-  fallbacks: readonly string[]; // ✅ supports "as const"
+    type: string;
+    preferred: string;
+    fallbacks: readonly string[]; // ✅ supports "as const"
 };
 
 export type LocatorEngineOptions = {
@@ -14,14 +16,6 @@ export type LocatorEngineOptions = {
     prefix?: string;           // log prefix
     onHealed?: (info: { preferredWas: string; preferredNow: string }) => void;
 };
-
-function nowIso() {
-    return new Date().toISOString();
-}
-
-function escapeNewlines(s: string) {
-    return s.replace(/\r?\n/g, " ");
-}
 
 export class LocatorEngine {
     private page: Page;

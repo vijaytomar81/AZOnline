@@ -1,7 +1,8 @@
-// src/page-elements-validator/validators/indexHygiene.ts
+// src/tools/page-elements-validator/validators/indexHygiene.ts
 
 import fs from "node:fs";
 import path from "node:path";
+import { fileLooksLikeModule } from "../../../utils/text";
 
 export type HygieneResult = {
     errors: string[];
@@ -24,10 +25,6 @@ function resolveTsImportTarget(fromFile: string, spec: string): string | null {
         if (fs.existsSync(c)) return c;
     }
     return candidates[0] ?? null;
-}
-
-function fileLooksLikeModule(tsText: string): boolean {
-    return /\bexport\b|\bimport\b/.test(tsText);
 }
 
 /**

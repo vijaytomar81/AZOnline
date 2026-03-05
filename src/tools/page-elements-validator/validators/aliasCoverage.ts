@@ -1,13 +1,11 @@
-// src/page-elements-validator/validators/aliasCoverage.ts
+// src/tools/page-elements-validator/validators/aliasCoverage.ts
+
+import { stripLineComments } from "../../../utils/text";
 
 export type AliasCoverageResult = {
     errors: string[];
     warnings: string[];
 };
-
-function stripLineComments(ts: string) {
-    return ts.replace(/\/\/.*$/gm, "");
-}
 
 /**
  * Extract the `{ ... }` body of:

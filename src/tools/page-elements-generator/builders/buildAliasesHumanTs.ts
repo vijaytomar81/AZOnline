@@ -1,10 +1,7 @@
-// src/scanner/elements-generator/builders/buildAliasesHumanTs.ts
+// src/tools/page-elements-generator/builders/buildAliasesHumanTs.ts
 
 import type { PageMap } from "../generator/types";
-
-function isValidTsIdentifier(key: string) {
-    return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key);
-}
+import { isValidTsIdentifier } from "../../../utils/ts";
 
 export function buildAliasesHumanTs(pageMap: PageMap): string {
     const lines: string[] = [];

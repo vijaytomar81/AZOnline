@@ -1,4 +1,4 @@
-// src/page-elements-validator/validatorHelp.ts
+// src/tools/page-elements-validator/validatorHelp.ts
 
 type HelpTopic = "root" | "validate" | "repair" | "doctor";
 

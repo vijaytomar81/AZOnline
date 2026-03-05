@@ -1,14 +1,8 @@
-// src/scanner/page-scanner/selectorPipeline.ts
+// src/tools/page-scanner/scanner/selectorPipeline.ts
 
 import type { ScannedElement, SelectorCandidate } from "./types";
-
-function norm(s: string) {
-    return s.trim().replace(/\s+/g, " ");
-}
-
-function escapeForRegex(s: string) {
-    return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+import { normalizeSpaces } from "../../../utils/text";
+import { escapeForRegex } from "../../../utils/regex";
 
 function scoreCss(base: number) {
     return base;
@@ -115,7 +109,7 @@ function buildCandidates(el: ScannedElement): SelectorCandidate[] {
     const nm = (el.text || el.name || el.labelText || el.ariaLabel || "").trim();
 
     if (role && nm) {
-        const rx = escapeForRegex(norm(nm));
+        const rx = escapeForRegex(normalizeSpaces(nm));
         candidates.push({
             kind: "role",
             selector: `role=${role}[name=/${rx}/i]`,
@@ -126,7 +120,7 @@ function buildCandidates(el: ScannedElement): SelectorCandidate[] {
 
     // --- 7) Text fallback ---
     if (el.text) {
-        const rx = escapeForRegex(norm(el.text));
+        const rx = escapeForRegex(normalizeSpaces(el.text));
         candidates.push({
             kind: "text",
             selector: `text=/${rx}/i`,

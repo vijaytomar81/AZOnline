@@ -1,11 +1,6 @@
-// src/scanner/elements-generator/urlMeta.ts
+// src/tools/page-elements-generator/generator/urlMeta.ts
 
-/**
- * Escape a literal string for RegExp source.
- */
-export function escapeRegexLiteral(s: string) {
-    return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+import { escapeForRegex } from "../../../utils/regex";
 
 /**
  * Create a stable URL regex from urlPath by replacing the last segment with a dynamic matcher.
@@ -30,7 +25,7 @@ export function buildUrlReFromUrlPath(urlPath: string): string {
     const dynamic =
         /^[a-z0-9]+$/i.test(last) && /[a-z]/i.test(last) ? "[a-z0-9]+" : "([^/]+)";
 
-    const prefixParts = parts.slice(0, -1).map(escapeRegexLiteral);
+    const prefixParts = parts.slice(0, -1).map(escapeForRegex);
     const prefix = prefixParts.length ? `/${prefixParts.join("/")}` : "";
     const source = `${prefix}/${dynamic}`;
 

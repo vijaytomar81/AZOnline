@@ -34,6 +34,8 @@
     "validator:doctor": "npm run validator -- doctor",
     "validator:doctor:verbose": "npm run validator -- doctor --verbose",
     "validator:help": "npm run validator -- help",
+    "headers:check": "node scripts/fix-file-headers.js --dryRun",
+    "headers:fix": "node scripts/fix-file-headers.js",
     "typecheck": "tsc --noEmit",
     "tools:tsc": "tsc -p tsconfig.tools.json --noEmit",
     "ci:check": "npm run typecheck && npm run tools:tsc && npm run validator:run",

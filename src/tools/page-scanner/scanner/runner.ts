@@ -1,10 +1,14 @@
-// src/scanner/page-scanner/runner.ts
+// src/tools/page-scanner/scanner/runner.ts
 
 import fs from "node:fs";
 import path from "node:path";
 import { chromium } from "@playwright/test";
 
-import type { Logger } from "../logger";
+import type { Logger } from "../../../utils/logger";
+import { ensureDir, safeReadJson } from "../../../utils/fs";
+import { nowIso } from "../../../utils/time";
+import { uniq, uniqueKey } from "../../../utils/collections";
+import { toCamelFromText } from "../../../utils/text";
 import type { PageMap, ScannedElement } from "./types";
 import { buildSelectors } from "./selectorPipeline";
 import { extractDomElements } from "./domExtract";
@@ -18,50 +22,6 @@ export type ScanPageOptions = {
     verbose?: boolean; // debug logs
     log: Logger; // required
 };
-
-function nowIso() {
-    return new Date().toISOString();
-}
-
-function ensureDir(dir: string) {
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-}
-
-function safeReadJson<T>(filePath: string): T | null {
-    if (!fs.existsSync(filePath)) return null;
-    return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
-}
-
-function uniq(arr: string[]) {
-    return Array.from(new Set(arr.filter(Boolean)));
-}
-
-function toCamelFromText(s: string) {
-    const cleaned = s
-        .trim()
-        .toLowerCase()
-        .replace(/[\u200B-\u200D\uFEFF]/g, "")
-        .replace(/[^a-z0-9]+/g, " ")
-        .trim();
-
-    if (!cleaned) return "";
-
-    const parts = cleaned.split(/\s+/g);
-    return parts
-        .map((p, i) => (i === 0 ? p : p.charAt(0).toUpperCase() + p.slice(1)))
-        .join("");
-}
-
-function uniqueKey(base: string, used: Set<string>) {
-    let key = base;
-    let i = 2;
-    while (!key || used.has(key)) {
-        key = `${base}${i}`;
-        i++;
-    }
-    used.add(key);
-    return key;
-}
 
 /**
  * Label-first key strategy:

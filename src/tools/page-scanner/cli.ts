@@ -1,8 +1,8 @@
-// src/page-scanner/cli.ts
+// src/tools/page-scanner/cli.ts
 
-import { createLogger } from "./logger";
+import { createLogger } from "../../utils/logger";
 import { runScanCommand } from "./commands/scan";
-import { normalizeArgv } from "./commands/argv";
+import { normalizeArgv } from "../../utils/argv";
 import { usage } from "./scannerHelp";
 
 type CommandName = "scan" | "help";

@@ -1,6 +1,6 @@
-// src/page-scanner/scanner/types.ts
+// src/tools/page-scanner/scanner/types.ts
 
-import type { Logger } from "../logger";
+import type { Logger } from "../../../utils/logger";
 
 export type ScanPageOptions = {
     connectCdp: string;

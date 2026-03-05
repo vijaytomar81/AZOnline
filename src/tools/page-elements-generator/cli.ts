@@ -1,7 +1,7 @@
-// src/page-elements-generator/cli.ts
+// src/tools/page-elements-generator/cli.ts
 
 import path from "node:path";
-import { createLogger } from "./logger";
+import { createLogger } from "../../utils/logger";
 import { usage } from "./elementGeneratorHelp";
 import { runElementsGenerator } from "./generator/runner";
 

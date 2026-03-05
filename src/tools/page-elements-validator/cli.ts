@@ -1,6 +1,6 @@
-// src/page-elements-validator/cli.ts
-import { createLogger } from "./logger";
-import { normalizeArgv } from "./commands/argv";
+// src/tools/page-elements-validator/cli.ts
+import { createLogger } from "../../utils/logger";
+import { normalizeArgv } from "../../utils/argv";
 import { usage } from "./validatorHelp";
 
 import { runValidateCommand } from "./commands/validate";

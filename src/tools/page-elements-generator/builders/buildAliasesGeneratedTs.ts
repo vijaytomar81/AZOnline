@@ -1,16 +1,10 @@
-// src/scanner/elements-generator/builders/buildAliasesGeneratedTs.ts
+// src/tools/page-elements-generator/builders/buildAliasesGeneratedTs.ts
 
 import type { PageMap } from "../generator/types";
 import { buildUrlReFromUrlPath } from "../generator/urlMeta";
 
-function isValidTsIdentifier(key: string) {
-    return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key);
-}
-
-function escapeRegExp(s: string) {
-    // escape for RegExp constructor
-    return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+import { isValidTsIdentifier } from "../../../utils/ts";
+import { escapeForRegex } from "../../../utils/regex";
 
 export function buildAliasesGeneratedTs(pageMap: PageMap): string {
     const lines: string[] = [];
@@ -47,7 +41,7 @@ export function buildAliasesGeneratedTs(pageMap: PageMap): string {
         lines.push(`  title: ${JSON.stringify(title)},`);
         // Keep a "loose" matcher for convenience (case-insensitive contains)
         lines.push(
-            `  titleRe: new RegExp(${JSON.stringify(escapeRegExp(title))}, "i"),`
+            `  titleRe: new RegExp(${JSON.stringify(escapeForRegex(title))}, "i"),`
         );
     }
 

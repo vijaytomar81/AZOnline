@@ -1,4 +1,4 @@
-// src/scanner/page-scanner/classify.ts
+// src/tools/page-scanner/scanner/classify.ts
 
 import type { ScannedElement } from "./types";
 

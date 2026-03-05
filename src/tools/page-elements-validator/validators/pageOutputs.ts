@@ -1,8 +1,10 @@
-// src/page-elements-validator/validators/pageOutputs.ts
+// src/tools/page-elements-validator/validators/pageOutputs.ts
 
 import fs from "node:fs";
 import path from "node:path";
-
+import { safeReadJson } from "../../../utils/fs";
+import { toPascal } from "../../../utils/ts";
+import { stripLineComments } from "../../../utils/text";
 import type { PageMap } from "../../page-scanner/scanner/types";
 import { validateAliasCoverage } from "./aliasCoverage";
 
@@ -12,31 +14,13 @@ export type ValidateResult = {
     warnings: string[];
 };
 
-function safeReadJson<T>(filePath: string): T | null {
-    if (!fs.existsSync(filePath)) return null;
-    return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
-}
-
 function pageKeyToFolder(pagesDir: string, pageKey: string) {
     return path.join(pagesDir, ...pageKey.split("."));
-}
-
-function toPascal(s: string) {
-    return s
-        .replace(/[-_.]/g, " ")
-        .split(" ")
-        .filter(Boolean)
-        .map((p) => p[0].toUpperCase() + p.slice(1))
-        .join("");
 }
 
 function pageKeyToPageClassFile(pageKey: string) {
     const lastSeg = pageKey.split(".").slice(-1)[0] || "page";
     return `${toPascal(lastSeg)}Page.ts`;
-}
-
-function stripLineComments(ts: string) {
-    return ts.replace(/\/\/.*$/gm, "");
 }
 
 function extractTopLevelObjectKeys(ts: string, objectName: string): string[] {

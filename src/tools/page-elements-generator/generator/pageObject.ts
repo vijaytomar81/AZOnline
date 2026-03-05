@@ -1,13 +1,10 @@
-// src/scanner/elements-generator/pageObject.ts
+// src/tools/page-elements-generator/generator/pageObject.ts
 
 import fs from "node:fs";
 import type { PageMap } from "./types";
+import { stripLineComments } from "../../../utils/text";
 
 type AliasPair = { aliasKey: string; elementKey: string };
-
-function stripLineComments(ts: string) {
-    return ts.replace(/\/\/.*$/gm, "");
-}
 
 /**
  * Extract the object body from:

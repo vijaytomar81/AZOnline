@@ -2,9 +2,9 @@
 
 import path from "node:path";
 
-import { parseBuildArgs } from "./cli/args";
-import { createLogger } from "./core/logger";
-import { startTimer } from "./core/timer";
+import { parseBuildArgs } from "./cli";
+import { createLogger } from "../../utils/logger";
+import { startTimer } from "../../utils/time";
 import { loadPluginsFromFolder, runDiscoveredPlugins } from "./core/pluginLoader";
 
 import type { DataBuilderContext } from "./types";

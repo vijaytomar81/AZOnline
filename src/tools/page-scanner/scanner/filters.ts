@@ -1,4 +1,4 @@
-// src/scanner/page-scanner/filters.ts
+// src/tools/page-scanner/scanner/filters.ts
 
 import type { ScannedElement } from "./types";
 

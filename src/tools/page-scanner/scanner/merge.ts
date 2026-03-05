@@ -1,4 +1,4 @@
-// src/scanner/page-scanner/merge.ts
+// src/tools/page-scanner/scanner/merge.ts
 
 import type { PageMap } from "./types";
 

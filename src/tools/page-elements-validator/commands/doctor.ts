@@ -1,8 +1,8 @@
-// src/page-elements-validator/commands/doctor.ts
+// src/tools/page-elements-validator/commands/doctor.ts
 
 import fs from "node:fs";
 import path from "node:path";
-import { createLogger } from "../logger";
+import { createLogger } from "../../../utils/logger";
 
 // ✅ validator CLI owns argv parsing (no ./argv file)
 function normalizeArgv(argv: string[]): string[] {
@@ -44,7 +44,7 @@ function canWrite(dir: string) {
 
 export async function runDoctorCommand(args: string[]) {
     const verbose = hasFlag(args, "--verbose");
-    const log = createLogger({ prefix: "[validator]", verbose, withTimestamp: true });
+    const log = createLogger({ prefix: "[validator - doctor]", verbose, withTimestamp: true });
 
     const mapsDir =
         getArg(args, "--mapsDir") ??

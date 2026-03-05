@@ -1,10 +1,8 @@
-// src/page-scanner/commands/argv.ts
+// src/utils/argv.ts
 
 /**
  * npm/yarn sometimes inject a standalone "--" token.
- * Also, scripts sometimes include "--" (e.g. "cli.ts -- scan").
- *
- * This makes CLI parsing robust by removing ALL standalone "--" tokens.
+ * Remove ALL standalone "--" tokens to keep parsing stable.
  */
 export function normalizeArgv(argv: string[]): string[] {
     return argv.filter((a) => a !== "--");

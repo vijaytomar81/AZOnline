@@ -1,4 +1,4 @@
-// src/scanner/page-scanner/keyStrategy.ts
+// src/tools/page-scanner/scanner/keyStrategy.ts
 
 import type { ScannedElement } from "./types";
 

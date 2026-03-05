@@ -1,8 +1,9 @@
-// src/page-elements-validator/commands/validate.ts
+// src/tools/page-elements-validator/commands/validate.ts
 
 import fs from "node:fs";
 import path from "node:path";
-import { createLogger } from "../logger";
+import { createLogger } from "../../../utils/logger";
+import { safeReadJson, listFiles } from "../../../utils/fs";
 
 import { validateOnePage } from "../validators/pageOutputs";
 import { checkPagesIndexHygiene } from "../validators/indexHygiene";
@@ -35,17 +36,8 @@ function getArg(argv: string[], name: string): string | undefined {
 
 type PageMapLite = { pageKey: string };
 
-function safeReadJson<T>(filePath: string): T | null {
-    if (!fs.existsSync(filePath)) return null;
-    return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
-}
-
 function listPageMapFiles(mapsDir: string): string[] {
-    if (!fs.existsSync(mapsDir)) return [];
-    return fs
-        .readdirSync(mapsDir)
-        .filter((f) => f.endsWith(".json") && !f.startsWith("."))
-        .sort((a, b) => a.localeCompare(b));
+    return listFiles(mapsDir, { ext: ".json" }).filter((f) => !f.startsWith("."));
 }
 
 export async function runValidateCommand(args: string[]) {
@@ -53,7 +45,7 @@ export async function runValidateCommand(args: string[]) {
     const strict = hasFlag(args, "--strict");
     const checkIndex = !hasFlag(args, "--noIndexHygiene");
 
-    const log = createLogger({ prefix: "[validator]", verbose, withTimestamp: true });
+    const log = createLogger({ prefix: "[validator - validate]", verbose, withTimestamp: true });
 
     log.info("Command: validate");
 
