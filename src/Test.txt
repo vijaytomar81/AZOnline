@@ -23,3 +23,8 @@ New-Item -ItemType Directory -Force reports\allure-report | Out-Null
 New-Item -ItemType Directory -Force reports\html | Out-Null
 New-Item -ItemType Directory -Force reports\json | Out-Null
 New-Item -ItemType Directory -Force reports\junit | Out-Null
+
+
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> winget install EclipseAdoptium.Temurin.21.JDK
+This operation is disabled by Group Policy: Enable Windows Package Manager
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
