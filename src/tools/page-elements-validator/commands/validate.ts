@@ -48,34 +48,12 @@ function listPageMapFiles(mapsDir: string): string[] {
         .sort((a, b) => a.localeCompare(b));
 }
 
-function usage() {
-    return `
-Page Elements Validator
-
-Usage:
-  node -r ts-node/register src/page-elements-validator/cli.ts validate [options]
-
-Options:
-  --mapsDir <path>         default: src/page-scanner/page-maps
-  --pagesDir <path>        default: src/pages
-  --noIndexHygiene         skip index/import/export checks
-  --strict                 fail if warnings exist
-  --verbose
-  --help, -h
-`.trim();
-}
-
 export async function runValidateCommand(args: string[]) {
     const verbose = hasFlag(args, "--verbose");
     const strict = hasFlag(args, "--strict");
     const checkIndex = !hasFlag(args, "--noIndexHygiene");
 
     const log = createLogger({ prefix: "[validator]", verbose, withTimestamp: true });
-
-    if (hasFlag(args, "--help") || hasFlag(args, "-h")) {
-        log.info(usage());
-        return;
-    }
 
     log.info("Command: validate");
 

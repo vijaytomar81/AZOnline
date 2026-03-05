@@ -29,27 +29,6 @@ function getArg(argv: string[], name: string): string | undefined {
     return undefined;
 }
 
-function usage() {
-    return `
-Page Elements Validator — doctor
-
-Usage:
-  node -r ts-node/register src/page-elements-validator/cli.ts doctor [options]
-
-Options:
-  --mapsDir <path>     override page-maps directory
-                       (default: src/page-scanner/page-maps)
-  --pagesDir <path>    override pages directory
-                       (default: src/pages)
-  --stateDir <path>    override generator state directory
-                       (default: src/page-elements-generator/.state)
-  --stateFile <path>   override state file path
-                       (default: <stateDir>/page-maps-state.json)
-  --verbose
-  --help, -h
-`.trim();
-}
-
 function exists(p: string) {
     return fs.existsSync(p);
 }
@@ -66,11 +45,6 @@ function canWrite(dir: string) {
 export async function runDoctorCommand(args: string[]) {
     const verbose = hasFlag(args, "--verbose");
     const log = createLogger({ prefix: "[validator]", verbose, withTimestamp: true });
-
-    if (hasFlag(args, "--help") || hasFlag(args, "-h")) {
-        log.info(usage());
-        return;
-    }
 
     const mapsDir =
         getArg(args, "--mapsDir") ??

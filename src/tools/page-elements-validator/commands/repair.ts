@@ -31,39 +31,9 @@ function getArg(argv: string[], name: string): string | undefined {
     return undefined;
 }
 
-function usage() {
-    return `
-Page Elements Validator — repair
-
-Usage:
-  node -r ts-node/register src/page-elements-validator/cli.ts repair [options]
-
-Options:
-  --mapsDir <path>     default: src/page-scanner/page-maps
-  --pagesDir <path>    default: src/pages
-  --stateDir <path>    default: src/page-elements-generator/.state
-  --stateFile <path>   default: <stateDir>/page-maps-state.json
-
-  --merge              (forwarded to generator; informational)
-  --changedOnly        only process changed page-maps BUT still recreates missing outputs
-  --noScaffold         do not scaffold create-only files
-  --stateOnly          update state file only (no elements.ts writes)
-  --verbose
-  --help, -h
-
-What it does:
-  - Runs the elements generator in "repair mode" so missing outputs are recreated.
-`.trim();
-}
-
 export async function runRepairCommand(args: string[]) {
     const verbose = hasFlag(args, "--verbose");
     const log = createLogger({ prefix: "[validator]", verbose, withTimestamp: true });
-
-    if (hasFlag(args, "--help") || hasFlag(args, "-h")) {
-        log.info(usage());
-        return;
-    }
 
     log.info("Command: repair");
 
