@@ -82,7 +82,7 @@ export async function runValidateCommand(args: string[]) {
     // ✅ default now points to page-scanner output
     const mapsDir =
         getArg(args, "--mapsDir") ??
-        path.join(process.cwd(), "src", "page-scanner", "page-maps");
+        path.join(process.cwd(), "src", "tools", "page-scanner", "page-maps");
 
     const pagesDir =
         getArg(args, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");

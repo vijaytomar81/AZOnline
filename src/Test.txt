@@ -8,5 +8,17 @@ Start-Sleep -Seconds 2; `
 $CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerUrl;
 
 
-Select-String -Path package.json -Pattern "allure-playwright"
-Test-Path .\node_modules\allure-playwright
+New-Item -ItemType Directory -Force `
+results\playwright\html, `
+results\playwright\json, `
+results\playwright\junit, `
+results\allure-results, `
+reports\allure-report, `
+reports\excel | Out-Null
+
+New-Item -ItemType File -Force results\playwright\html\.gitkeep
+New-Item -ItemType File -Force results\playwright\json\.gitkeep
+New-Item -ItemType File -Force results\playwright\junit\.gitkeep
+New-Item -ItemType File -Force results\allure-results\.gitkeep
+New-Item -ItemType File -Force reports\allure-report\.gitkeep
+New-Item -ItemType File -Force reports\excel\.gitkeep

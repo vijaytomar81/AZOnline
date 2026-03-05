@@ -70,14 +70,14 @@ export async function runRepairCommand(args: string[]) {
     // ✅ defaults updated to new folders
     const mapsDir =
         getArg(args, "--mapsDir") ??
-        path.join(process.cwd(), "src", "page-scanner", "page-maps");
+        path.join(process.cwd(), "src", "tools", "page-scanner", "page-maps");
 
     const pagesDir =
         getArg(args, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
 
     const stateDir =
         getArg(args, "--stateDir") ??
-        path.join(process.cwd(), "src", "page-elements-generator", ".state");
+        path.join(process.cwd(), "src", "tools", "page-elements-generator", ".state");
 
     const stateFile =
         getArg(args, "--stateFile") ?? path.join(stateDir, "page-maps-state.json");

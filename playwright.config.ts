@@ -14,11 +14,11 @@ export default defineConfig({
   expect: { timeout: executionConfig.timeouts.expect },
 
   reporter: [
+    ['html', { outputFolder: 'results/playwright/html', open: 'never' }],
+    ['json', { outputFile: 'results/playwright/json/results.json' }],
+    ['junit', { outputFile: 'results/playwright/junit/results.xml' }],
     ['line'],
-    ['html', { outputFolder: 'reports/html', open: 'never' }],
-    ['json', { outputFile: 'reports/json/results.json' }],
-    ['junit', { outputFile: 'reports/junit/results.xml' }],
-    ['allure-playwright', { outputFolder: 'reports/allure-results' }],
+    ['allure-playwright', { outputFolder: 'results/allure-results' }],
   ],
 
   use: {

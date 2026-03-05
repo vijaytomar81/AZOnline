@@ -4,9 +4,9 @@
     "noEmit": true
   },
   "include": [
-    "src/page-scanner/**/*.ts",
-    "src/page-elements-generator/**/*.ts",
-    "src/page-elements-validator/**/*.ts"
+    "src/tools/page-scanner/**/*.ts",
+    "src/tools/page-elements-generator/**/*.ts",
+    "src/tools/page-elements-validator/**/*.ts"
   ],
   "exclude": [
     "node_modules",
