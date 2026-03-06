@@ -1,10 +1,11 @@
+// scripts/fix-file-headers.js
+
 const fs = require("node:fs");
 const path = require("node:path");
 
 const ROOT = process.cwd();
-const TOOLS_DIR = path.join(ROOT, "src", "data");
+const SRC_DIR = path.join(ROOT, "src");
 
-const ICON_OK = "🟢";
 const ICON_WARN = "⚠️";
 const ICON_ADD = "➕";
 
@@ -38,6 +39,7 @@ function fixOne(fileAbs, { dryRun }) {
     // Case A: first line is already a src header comment -> replace if wrong
     if (/^\s*\/\/\s*src\//.test(first)) {
         const cur = first.trim();
+
         if (cur === want) {
             return { changed: false, status: "ok", from: cur, to: want };
         }
@@ -53,7 +55,7 @@ function fixOne(fileAbs, { dryRun }) {
     return { changed: true, status: "missing", from: "(missing)", to: want };
 }
 
-function logDryRun(fileRel, res) {
+function logIssue(fileRel, res) {
     if (res.status === "missing") {
         console.log(`${ICON_ADD} MISSING HEADER`);
         console.log(`   file: ${fileRel}`);
@@ -66,50 +68,52 @@ function logDryRun(fileRel, res) {
         console.log(`   file: ${fileRel}`);
         console.log(`   current:  ${res.from}`);
         console.log(`   expected: ${res.to}\n`);
-        return;
     }
-
-    // ok
-    console.log(`${ICON_OK} OK`);
-    console.log(`   file: ${fileRel}`);
-    console.log(`   header: ${res.to}\n`);
 }
 
 function main() {
     const argv = process.argv.slice(2);
     const dryRun = argv.includes("--dryRun");
 
-    if (!fs.existsSync(TOOLS_DIR)) {
-        console.error(`❌ Not found: ${TOOLS_DIR}`);
+    if (!fs.existsSync(SRC_DIR)) {
+        console.error(`❌ Not found: ${SRC_DIR}`);
         process.exit(1);
     }
 
-    const files = walk(TOOLS_DIR);
+    const files = walk(SRC_DIR);
 
     let changed = 0;
     let scanned = 0;
+    let missing = 0;
+    let incorrect = 0;
 
     for (const f of files) {
         scanned++;
         const res = fixOne(f, { dryRun });
         const fileRel = normalizeSlashes(path.relative(ROOT, f));
 
+        if (res.status === "missing") missing++;
+        if (res.status === "incorrect") incorrect++;
+
         if (dryRun) {
-            // show all statuses (OK + incorrect + missing)
-            logDryRun(fileRel, res);
-            if (res.changed) changed++;
+            // show only files needing action
+            if (res.changed) {
+                changed++;
+                logIssue(fileRel, res);
+            }
             continue;
         }
 
-        // non-dryRun: only print when a file was changed (keep your old behavior)
+        // non-dryRun: only print changed files
         if (res.changed) {
             changed++;
-            console.log(`FIX ✅ ${fileRel}\n    ${res.from}  ->  ${res.to}`);
+            console.log(`FIX ✅ ${fileRel}`);
+            console.log(`   ${res.from}  ->  ${res.to}\n`);
         }
     }
 
     console.log(
-        `\n✅ Done. scanned=${scanned} changed=${changed}${dryRun ? " (dryRun)" : ""}`
+        `\n✅ Done. scanned=${scanned} changed=${changed} missing=${missing} incorrect=${incorrect}${dryRun ? " (dryRun)" : ""}`
     );
 
     // Optional CI behavior: fail dry-run if any changes are needed

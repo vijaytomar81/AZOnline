@@ -1,3 +1,4 @@
+// src/pages/motor/car-details/CarDetailsPage.ts
 // AUTO-SCAFFOLDED (create-only) by src/scanner/elements-generator
 // pageKey: motor.car-details
 

@@ -1,3 +1,4 @@
+// src/config/execution.config.ts
 export type ExecutionConfig = {
   browser: {
     name: 'chromium' | 'firefox' | 'webkit';

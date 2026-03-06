@@ -1,3 +1,4 @@
+// src/config/environments.ts
 export type PcwKey = 'ctmMotorUrl' | 'ctmHomeUrl' | 'cnfUrl' | 'msmUrl' | 'gocoUrl';
 export type EnvKey = 'azOnlineDev' | 'azOnlineTest' | 'azOnlineDemo' | 'azOnlineNft';
 

@@ -1,3 +1,4 @@
+// src/config/env.ts
 import { environments } from "./environments";
 import type { EnvKey, PcwKey } from "./environments";
 

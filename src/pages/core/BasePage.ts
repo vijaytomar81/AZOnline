@@ -1,4 +1,4 @@
-// src/pages/common/BasePage.ts
+// src/pages/core/BasePage.ts
 import type { Page } from "@playwright/test";
 import { PageFx } from "../../core/pageFx";
 import { CookieBanner } from "../common/cookie-banner/CookieBanner";

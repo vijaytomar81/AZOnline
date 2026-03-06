@@ -38,7 +38,7 @@
     "headers:fix": "node scripts/fix-file-headers.js",
     "typecheck": "tsc --noEmit",
     "tools:tsc": "tsc -p tsconfig.tools.json --noEmit",
-    "ci:check": "npm run typecheck && npm run tools:tsc && npm run validator:run",
+    "ci:check": "npm run headers:check && npm run typecheck && npm run tools:tsc && npm run validator:run",
     "results:clean": "node scripts/clean-results.js",
     "reports:clean": "node scripts/clean-reports.js",
     "allure:generate": "allure generate results/allure-results -o reports/allure-report --clean",

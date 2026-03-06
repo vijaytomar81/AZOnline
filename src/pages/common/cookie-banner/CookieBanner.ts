@@ -1,4 +1,4 @@
-// src/pages/common/CookieBanner.ts
+// src/pages/common/cookie-banner/CookieBanner.ts
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 
