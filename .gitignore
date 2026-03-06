@@ -50,3 +50,15 @@ reports/excel/**
 # Optional: temp or cache
 .tmp/
 .cache/
+
+# ------------------------------------------------------------
+# Gmail / Google API credentials
+# ------------------------------------------------------------
+
+# OAuth credentials
+credentials.json
+token.json
+
+# Recommended config folder for API credentials
+config/*.json
+!config/.gitkeep
