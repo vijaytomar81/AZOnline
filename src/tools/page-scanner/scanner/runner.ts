@@ -9,6 +9,7 @@ import { ensureDir, safeReadJson } from "../../../utils/fs";
 import { nowIso } from "../../../utils/time";
 import { uniq, uniqueKey } from "../../../utils/collections";
 import { toCamelFromText } from "../../../utils/text";
+import { PAGE_SCANNER_MAPS_DIR } from "../../../utils/paths";
 import type { PageMap, ScannedElement } from "./types";
 import { buildSelectors } from "./selectorPipeline";
 import { extractDomElements } from "./domExtract";
@@ -123,7 +124,7 @@ function mergePageMaps(existing: PageMap, incoming: PageMap): PageMap {
 export async function scanPage(opts: ScanPageOptions): Promise<void> {
     const log = opts.log;
 
-    const outDir = opts.outDir ?? path.join(process.cwd(), "src", "page-maps");
+    const outDir = opts.outDir ?? PAGE_SCANNER_MAPS_DIR;
     ensureDir(outDir);
 
     const outFile = path.join(outDir, `${opts.pageKey}.json`);

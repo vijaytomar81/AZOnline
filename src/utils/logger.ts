@@ -1,6 +1,7 @@
 // src/utils/logger.ts
 import fs from "node:fs";
 import path from "node:path";
+import { nowIso } from "./time";
 
 export type Logger = {
     info: (msg: string) => void;
@@ -16,10 +17,6 @@ export type CreateLoggerOptions = {
     logToFile?: boolean;      // also write logs to file
     logFilePath?: string;     // default: "<cwd>/tool.log" (caller decides)
 };
-
-function nowIso() {
-    return new Date().toISOString();
-}
 
 function ensureDir(dir: string) {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });

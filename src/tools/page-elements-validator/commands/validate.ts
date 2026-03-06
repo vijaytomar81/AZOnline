@@ -2,37 +2,13 @@
 
 import fs from "node:fs";
 import path from "node:path";
+
 import { createLogger } from "../../../utils/logger";
+import { normalizeArgv, hasFlag, getArg } from "../../../utils/argv";
 import { safeReadJson, listFiles } from "../../../utils/fs";
 
 import { validateOnePage } from "../validators/pageOutputs";
 import { checkPagesIndexHygiene } from "../validators/indexHygiene";
-
-// NOTE: validator CLI owns argv parsing now (no ./argv in this package)
-function normalizeArgv(argv: string[]): string[] {
-    // npm/yarn may inject standalone "--"
-    return argv.filter((a) => a !== "--");
-}
-
-function hasFlag(argv: string[], name: string): boolean {
-    return normalizeArgv(argv).includes(name);
-}
-
-function getArg(argv: string[], name: string): string | undefined {
-    const args = normalizeArgv(argv);
-
-    const i = args.indexOf(name);
-    if (i >= 0) {
-        const v = args[i + 1];
-        if (!v || v.startsWith("--")) return undefined;
-        return v;
-    }
-
-    const eq = args.find((a) => a.startsWith(`${name}=`));
-    if (eq) return eq.split("=").slice(1).join("=");
-
-    return undefined;
-}
 
 type PageMapLite = { pageKey: string };
 
@@ -41,21 +17,27 @@ function listPageMapFiles(mapsDir: string): string[] {
 }
 
 export async function runValidateCommand(args: string[]) {
-    const verbose = hasFlag(args, "--verbose");
-    const strict = hasFlag(args, "--strict");
-    const checkIndex = !hasFlag(args, "--noIndexHygiene");
+    const argv = normalizeArgv(args);
 
-    const log = createLogger({ prefix: "[validator - validate]", verbose, withTimestamp: true });
+    const verbose = hasFlag(argv, "--verbose");
+    const strict = hasFlag(argv, "--strict");
+    const checkIndex = !hasFlag(argv, "--noIndexHygiene");
+
+    const log = createLogger({
+        prefix: "[validator - validate]",
+        verbose,
+        withTimestamp: true,
+    });
 
     log.info("Command: validate");
 
     // ✅ default now points to page-scanner output
     const mapsDir =
-        getArg(args, "--mapsDir") ??
+        getArg(argv, "--mapsDir") ??
         path.join(process.cwd(), "src", "tools", "page-scanner", "page-maps");
 
     const pagesDir =
-        getArg(args, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
+        getArg(argv, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
 
     if (!fs.existsSync(mapsDir)) {
         log.error(`mapsDir not found: ${mapsDir}`);

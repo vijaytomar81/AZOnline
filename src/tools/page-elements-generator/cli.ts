@@ -1,37 +1,24 @@
 // src/tools/page-elements-generator/cli.ts
 
 import path from "node:path";
+
 import { createLogger } from "../../utils/logger";
+import { normalizeArgv, hasFlag, getArg } from "../../utils/argv";
 import { usage } from "./elementGeneratorHelp";
 import { runElementsGenerator } from "./generator/runner";
 
-// --------------------------------------------------
-// argv helpers (bulletproof against npm "--" tokens)
-// --------------------------------------------------
+import {
+    PAGE_SCANNER_MAPS_DIR,
+    PAGES_DIR,
+    PAGE_ELEMENTS_GENERATOR_STATE_DIR,
+    PAGE_ELEMENTS_GENERATOR_LOG_FILE,
+} from "../../utils/paths";
 
-function normalizeArgv(argv: string[]): string[] {
-    return argv.filter((a) => a !== "--");
-}
-
-function hasFlag(argv: string[], name: string): boolean {
-    return normalizeArgv(argv).includes(name);
-}
-
-function getArg(argv: string[], name: string): string | undefined {
-    const args = normalizeArgv(argv);
-
-    const i = args.indexOf(name);
-    if (i >= 0) {
-        const v = args[i + 1];
-        if (!v || v.startsWith("--")) return undefined;
-        return v;
-    }
-
-    const eq = args.find((a) => a.startsWith(`${name}=`));
-    if (eq) return eq.split("=").slice(1).join("=");
-
-    return undefined;
-}
+let log = createLogger({
+    prefix: "[page-elements-generator]",
+    verbose: true,
+    withTimestamp: true,
+});
 
 function isHelp(argv: string[]) {
     const args = normalizeArgv(argv);
@@ -52,7 +39,7 @@ async function main() {
     const args = argv[0] === "generate" ? argv.slice(1) : argv;
 
     if (isHelp(args)) {
-        console.log(usage());
+        log.info(usage());
         return;
     }
 
@@ -60,10 +47,9 @@ async function main() {
 
     const logToFile = hasFlag(args, "--logToFile");
     const logFilePath =
-        getArg(args, "--logFilePath") ??
-        path.join(process.cwd(), "page-elements-generator.log");
+        getArg(args, "--logFilePath") ?? PAGE_ELEMENTS_GENERATOR_LOG_FILE
 
-    const log = createLogger({
+    log = createLogger({
         prefix: "[page-elements-generator]",
         verbose,
         withTimestamp: true,
@@ -74,15 +60,13 @@ async function main() {
     log.info("Command: generate");
 
     const mapsDir =
-        getArg(args, "--mapsDir") ??
-        path.join(process.cwd(), "src", "page-scanner", "page-maps");
+        getArg(args, "--mapsDir") ?? PAGE_SCANNER_MAPS_DIR
 
     const pagesDir =
-        getArg(args, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
+        getArg(args, "--pagesDir") ?? PAGES_DIR;
 
     const stateDir =
-        getArg(args, "--stateDir") ??
-        path.join(process.cwd(), "src", "page-elements-generator", ".state");
+        getArg(args, "--stateDir") ?? PAGE_ELEMENTS_GENERATOR_STATE_DIR
 
     const stateFile =
         getArg(args, "--stateFile") ?? path.join(stateDir, "page-maps-state.json");
@@ -115,11 +99,6 @@ async function main() {
 }
 
 main().catch((e) => {
-    const log = createLogger({
-        prefix: "[page-elements-generator]",
-        verbose: true,
-        withTimestamp: true,
-    });
     log.error(e?.message || String(e));
     process.exit(1);
 });

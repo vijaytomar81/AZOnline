@@ -5,14 +5,14 @@ import { createLogger } from "../../../utils/logger";
 import { scanPage } from "../scanner/runner";
 import { getArg, hasFlag, required } from "../../../utils/argv";
 import { usage } from "../scannerHelp";
+import { PAGE_SCANNER_MAPS_DIR, PAGE_SCANNER_LOG_FILE } from "../../../utils/paths";
 
 export async function runScanCommand(args: string[]) {
     const verbose = hasFlag(args, "--verbose");
 
     const logToFile = hasFlag(args, "--logToFile");
     const logFilePath =
-        getArg(args, "--logFilePath") ??
-        path.join(process.cwd(), "page-scanner.log");
+        getArg(args, "--logFilePath") ?? PAGE_SCANNER_LOG_FILE
 
     const log = createLogger({
         prefix: "[page-scanner]",
@@ -31,8 +31,7 @@ export async function runScanCommand(args: string[]) {
     const pageKey = required("--pageKey", getArg(args, "--pageKey"));
 
     const outDir =
-        getArg(args, "--outDir") ??
-        path.join(process.cwd(), "src", "page-scanner", "page-maps");
+        getArg(args, "--outDir") ?? PAGE_SCANNER_MAPS_DIR
 
     const tabIndexRaw = getArg(args, "--tabIndex");
     const tabIndex = tabIndexRaw ? Number(tabIndexRaw) : 0;

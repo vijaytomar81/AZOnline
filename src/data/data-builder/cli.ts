@@ -1,8 +1,17 @@
 // src/data/data-builder/cli.ts
 import path from "node:path";
+
 import type { DataBuilderBaseArgs } from "./types";
 import { normalizeArgv, getArg, hasFlag } from "../../utils/argv";
+import { createLogger } from "../../utils/logger";
 import { usage } from "./dataBuilderHelp";
+
+const log = createLogger({
+  prefix: "[data-builder]",
+  verbose: true,
+  withTimestamp: true,
+  logToFile: false,
+});
 
 function parseBoolean(v?: string) {
   if (!v) return false;
@@ -13,7 +22,7 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
   const argv = normalizeArgv(process.argv.slice(2));
 
   if (hasFlag(argv, "--help") || hasFlag(argv, "-h")) {
-    console.log(usage());
+    log.info(usage());
     process.exit(0);
   }
 

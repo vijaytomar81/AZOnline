@@ -20,6 +20,12 @@ function isHelpTopic(x: string | undefined): x is HelpTopic {
     return x === "root" || x === "validate" || x === "repair" || x === "doctor";
 }
 
+const log = createLogger({
+    prefix: "[validator]",
+    verbose: true,
+    withTimestamp: true,
+});
+
 async function main() {
     const argv = normalizeArgv(process.argv.slice(2));
     const cmd = argv[0];
@@ -30,12 +36,11 @@ async function main() {
     if (cmd === "help") {
         const topicArg = argv[1];
         const topic: HelpTopic = isHelpTopic(topicArg) ? topicArg : "root";
-        console.log(usage(topic));
+        log.info(usage(topic));
         return;
     }
 
     if (!isCommand(cmd)) {
-        const log = createLogger({ prefix: "[validator]", verbose: true, withTimestamp: true });
         log.error(`Unknown or missing command: ${cmd ?? "(none)"}`);
         log.info(usage("root"));
         process.exit(1);
@@ -46,7 +51,7 @@ async function main() {
     // If user does: validate --help (or repair/doctor --help), show command help here
     if (args.includes("--help") || args.includes("-h")) {
         // cmd cannot be "help" here, so it's safe to treat as HelpTopic
-        console.log(usage(cmd as Exclude<CommandName, "help">));
+        log.info(usage(cmd as Exclude<CommandName, "help">));
         return;
     }
 
@@ -64,7 +69,6 @@ async function main() {
 }
 
 main().catch((e) => {
-    const log = createLogger({ prefix: "[validator]", verbose: true, withTimestamp: true });
     log.error(e?.message || String(e));
     process.exit(1);
 });

@@ -1,6 +1,7 @@
 // src/core/locatorEngine.ts
+
 import type { Page, Locator } from "@playwright/test";
-import { nowIso } from "../utils/time";
+import { createLogger, type Logger } from "../utils/logger";
 import { escapeNewlines } from "../utils/text";
 
 export type ElementDef = {
@@ -24,6 +25,7 @@ export class LocatorEngine {
     private selfHeal: boolean;
     private prefix: string;
     private onHealed?: LocatorEngineOptions["onHealed"];
+    private logRef: Logger;
 
     constructor(page: Page, opts: LocatorEngineOptions = {}) {
         this.page = page;
@@ -32,12 +34,17 @@ export class LocatorEngine {
         this.selfHeal = !!opts.selfHeal;
         this.prefix = opts.prefix ?? "[engine]";
         this.onHealed = opts.onHealed;
+
+        this.logRef = createLogger({
+            prefix: this.prefix,
+            verbose: this.verbose,
+            withTimestamp: true,
+            logToFile: false,
+        });
     }
 
     private log(msg: string) {
-        // Keep console logging minimal; can be wired to your logger later
-        // eslint-disable-next-line no-console
-        console.log(`${nowIso()} ${this.prefix} ${msg}`);
+        this.logRef.info(msg);
     }
 
     locator(def: ElementDef): Locator {
@@ -78,7 +85,9 @@ export class LocatorEngine {
                 return { locator: loc, used: sel };
             } catch (e) {
                 lastErr = e;
-                if (this.verbose) this.log(`resolve failed: ${sel} (${escapeNewlines(String(e))})`);
+                if (this.verbose) {
+                    this.log(`resolve failed: ${sel} (${escapeNewlines(String(e))})`);
+                }
             }
         }
 

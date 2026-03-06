@@ -2,32 +2,9 @@
 
 import fs from "node:fs";
 import path from "node:path";
+
 import { createLogger } from "../../../utils/logger";
-
-// ✅ validator CLI owns argv parsing (no ./argv file)
-function normalizeArgv(argv: string[]): string[] {
-    return argv.filter((a) => a !== "--");
-}
-
-function hasFlag(argv: string[], name: string): boolean {
-    return normalizeArgv(argv).includes(name);
-}
-
-function getArg(argv: string[], name: string): string | undefined {
-    const args = normalizeArgv(argv);
-
-    const i = args.indexOf(name);
-    if (i >= 0) {
-        const v = args[i + 1];
-        if (!v || v.startsWith("--")) return undefined;
-        return v;
-    }
-
-    const eq = args.find((a) => a.startsWith(`${name}=`));
-    if (eq) return eq.split("=").slice(1).join("=");
-
-    return undefined;
-}
+import { normalizeArgv, hasFlag, getArg } from "../../../utils/argv";
 
 function exists(p: string) {
     return fs.existsSync(p);
@@ -43,22 +20,28 @@ function canWrite(dir: string) {
 }
 
 export async function runDoctorCommand(args: string[]) {
-    const verbose = hasFlag(args, "--verbose");
-    const log = createLogger({ prefix: "[validator - doctor]", verbose, withTimestamp: true });
+    const argv = normalizeArgv(args);
+
+    const verbose = hasFlag(argv, "--verbose");
+    const log = createLogger({
+        prefix: "[validator - doctor]",
+        verbose,
+        withTimestamp: true,
+    });
 
     const mapsDir =
-        getArg(args, "--mapsDir") ??
+        getArg(argv, "--mapsDir") ??
         path.join(process.cwd(), "src", "tools", "page-scanner", "page-maps");
 
     const pagesDir =
-        getArg(args, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
+        getArg(argv, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
 
     const stateDir =
-        getArg(args, "--stateDir") ??
+        getArg(argv, "--stateDir") ??
         path.join(process.cwd(), "src", "tools", "page-elements-generator", ".state");
 
     const stateFile =
-        getArg(args, "--stateFile") ?? path.join(stateDir, "page-maps-state.json");
+        getArg(argv, "--stateFile") ?? path.join(stateDir, "page-maps-state.json");
 
     log.info("Command: doctor");
     log.info(`Node: ${process.version}`);
@@ -71,9 +54,15 @@ export async function runDoctorCommand(args: string[]) {
     checks.push({ name: "stateDir exists", ok: exists(stateDir), detail: stateDir });
     checks.push({ name: "stateFile exists", ok: exists(stateFile), detail: stateFile });
 
-    if (exists(mapsDir)) checks.push({ name: "mapsDir writable", ok: canWrite(mapsDir), detail: mapsDir });
-    if (exists(pagesDir)) checks.push({ name: "pagesDir writable", ok: canWrite(pagesDir), detail: pagesDir });
-    if (exists(stateDir)) checks.push({ name: "stateDir writable", ok: canWrite(stateDir), detail: stateDir });
+    if (exists(mapsDir)) {
+        checks.push({ name: "mapsDir writable", ok: canWrite(mapsDir), detail: mapsDir });
+    }
+    if (exists(pagesDir)) {
+        checks.push({ name: "pagesDir writable", ok: canWrite(pagesDir), detail: pagesDir });
+    }
+    if (exists(stateDir)) {
+        checks.push({ name: "stateDir writable", ok: canWrite(stateDir), detail: stateDir });
+    }
 
     // quick page-maps count
     if (exists(mapsDir)) {
@@ -89,7 +78,7 @@ export async function runDoctorCommand(args: string[]) {
 
     if (failed.length === 0) {
         log.info("Doctor summary: looks healthy ✅");
-        log.info(`Next: npm run gen:elements:changed:verbose (or run the generator CLI directly)`);
+        log.info("Next: npm run gen:elements:changed:verbose (or run the generator CLI directly)");
         return;
     }
 
@@ -103,13 +92,13 @@ export async function runDoctorCommand(args: string[]) {
 
         if (f.name === "stateFile exists") {
             log.info(
-                `- Run generator state-only to create state file: node -r ts-node/register src/page-elements-generator/cli.ts generate --stateOnly --verbose`
+                "- Run generator state-only to create state file: node -r ts-node/register src/tools/page-elements-generator/cli.ts generate --stateOnly --verbose"
             );
         }
 
         if (f.name === "page-maps found") {
             log.info(
-                `- Run a scan first: node -r ts-node/register src/page-scanner/cli.ts scan --connectCdp "$CDP" --pageKey <key> --merge`
+                '- Run a scan first: node -r ts-node/register src/tools/page-scanner/cli.ts scan --connectCdp "$CDP" --pageKey <key> --merge'
             );
         }
 

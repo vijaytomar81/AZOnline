@@ -9,17 +9,16 @@ import { loadPluginsFromFolder, runDiscoveredPlugins } from "./core/pluginLoader
 
 import type { DataBuilderContext } from "./types";
 
+const log = createLogger({
+    prefix: "[data-builder]",
+    withTimestamp: true,
+    logToFile: false,
+});
+
 async function main() {
     const timer = startTimer();
 
     const args = parseBuildArgs();
-
-    const log = createLogger({
-        prefix: "[data-builder]",
-        verbose: args.verbose,
-        withTimestamp: true,
-        logToFile: false,
-    });
 
     const ctx: DataBuilderContext = {
         log,
@@ -59,6 +58,6 @@ async function main() {
 
 main().catch((e: any) => {
     const msg = e?.message ?? String(e);
-    console.error(`[data-builder] ERROR: ${msg}`);
+    log.error(msg);
     process.exit(1);
 });
