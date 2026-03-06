@@ -1,4 +1,3 @@
-// src/pages/motor/car-details/aliases.ts
 // HUMAN-MAINTAINED FILE
 // pageKey: motor.car-details
 //

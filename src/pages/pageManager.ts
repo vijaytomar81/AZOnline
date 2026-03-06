@@ -1,7 +1,5 @@
 // src/pages/pageManager.ts
 import type { Page } from "@playwright/test";
-
-
 import { CarDetailsPage } from "./motor/car-details/CarDetailsPage";
 
 
@@ -29,12 +27,10 @@ export class PageManager {
         return this.cache.get(key) as T;
     }
 
-    // ----- Motor -----
     get motor() {
         return {
-
             carDetails: this.get("motor.carDetails", () => new CarDetailsPage(this.page)),
-
         };
     }
+
 }

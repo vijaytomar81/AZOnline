@@ -5,14 +5,17 @@ import path from "node:path";
 
 import type { GenOptions, PageMap } from "./types";
 import { buildElementsTs } from "../builders/buildElementsTs";
+import { syncPageRegistry } from "./syncPageRegistry";
+import type { PageRegistryEntry } from "./syncPageRegistry";
+import { toPascal } from "../../../utils/ts";
+import { ensureScaffoldFiles, hasMissingGeneratedOutputs } from "./scaffold";
+import { hashContent, loadState, saveState } from "./state";
+import { ensureDir } from "../../../utils/fs";
 import {
     mapPageKeyToAliasesHumanPath,
     mapPageKeyToElementsPath,
     mapPageKeyToPageTsPath,
 } from "./paths";
-import { ensureScaffoldFiles, hasMissingGeneratedOutputs } from "./scaffold";
-import { hashContent, loadState, saveState } from "./state";
-import { ensureDir } from "../../../utils/fs";
 
 function readAllPageMaps(mapsDir: string): string[] {
     return fs
@@ -45,6 +48,14 @@ function needsAliasSync(params: { pagesDir: string; pageKey: string }): boolean 
     return mtimeMsSafe(aliasesHumanPath) > mtimeMsSafe(pageTsPath);
 }
 
+function buildRegistryEntry(pageKey: string): PageRegistryEntry {
+    const lastSeg = pageKey.split(".").slice(-1)[0] || "Page";
+    return {
+        pageKey,
+        className: `${toPascal(lastSeg)}Page`,
+    };
+}
+
 export async function runElementsGenerator(opts: GenOptions) {
     const log = opts.log;
 
@@ -63,6 +74,7 @@ export async function runElementsGenerator(opts: GenOptions) {
     log.info(`Found ${mapFiles.length} page-map(s).`);
 
     let processed = 0;
+    const registryEntries: PageRegistryEntry[] = [];
 
     for (const file of mapFiles) {
         const abs = path.join(opts.mapsDir, file);
@@ -79,6 +91,8 @@ export async function runElementsGenerator(opts: GenOptions) {
         if (!pageMap?.elements || typeof pageMap.elements !== "object") {
             throw new Error(`Invalid page-map (missing elements): ${file}`);
         }
+
+        registryEntries.push(buildRegistryEntry(pageMap.pageKey));
 
         // Even with --changedOnly, we must re-create missing outputs
         const missingOutputs = hasMissingGeneratedOutputs({
@@ -136,6 +150,18 @@ export async function runElementsGenerator(opts: GenOptions) {
         fs.writeFileSync(elementsPath, ts, "utf8");
 
         processed++;
+    }
+
+    const syncRes = syncPageRegistry(registryEntries, opts.pagesDir);
+
+    if (syncRes.index.changed) {
+        log.info(`pages/index.ts updated with ${syncRes.index.added.length} export(s)`);
+    }
+
+    if (syncRes.pageManager.changed) {
+        log.info(
+            `pages/pageManager.ts updated with ${syncRes.pageManager.addedImports.length} import(s) and ${syncRes.pageManager.addedEntries.length} page entry(s)`
+        );
     }
 
     // always update state
