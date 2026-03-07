@@ -21,12 +21,12 @@ Page Elements Validator CLI
 
 Usage:
   npm run validate -- <command> [options]
-  node -r ts-node/register src/page-elements-validator/cli.ts <command> [options]
+  node -r ts-node/register src/tools/page-elements-validator/cli.ts <command> [options]
 
 Commands:
-  validate   Validate page-maps ↔ generated outputs (elements/aliases/page objects)
-  repair     Recreate missing outputs / resync page objects when needed
-  doctor     Diagnose environment & config for validator/generator
+  validate   Validate page-maps ↔ generated outputs and page registry
+  repair     Recreate missing outputs / resync page objects and registry
+  doctor     Diagnose environment & configuration issues
   help       Show help (global or for a command)
 
 Help:
@@ -45,13 +45,13 @@ Common examples:
   # Strict mode (fail on warnings)
   npm run validate -- validate --strict
 
-  # Skip index hygiene checks
-  npm run validate -- validate --noIndexHygiene
+  # Skip module hygiene checks
+  npm run validate -- validate --noModuleHygiene
 
-  # Repair missing outputs and resync page objects
+  # Repair missing outputs and registry entries
   npm run validate -- repair --verbose
 
-  # Environment checks
+  # Environment diagnostics
   npm run validate -- doctor --verbose
 `.trim();
 }
@@ -60,17 +60,29 @@ function validateHelp(): string {
     return `
 validate — checks consistency between page-maps and generated outputs
 
+Validation includes:
+  • elements.ts generation
+  • aliases.ts / aliases.generated.ts integrity
+  • Page object class sync
+  • Page registry consistency:
+      - src/pages/index.ts
+      - src/pages/pageManager.ts
+  • Module hygiene checks
+
 Usage:
   npm run validate -- validate [options]
 
 Options:
   --mapsDir <path>       Page-maps directory
-                         (default: src/page-scanner/page-maps)
+                         (default: src/tools/page-scanner/page-maps)
 
   --pagesDir <path>      Pages output directory
                          (default: src/pages)
 
-  --noIndexHygiene       Skip src/pages index/pageManager hygiene checks
+  --noModuleHygiene      Skip module hygiene checks for:
+                         - src/pages/index.ts
+                         - src/pages/pageManager.ts
+
   --strict               Fail if warnings exist
   --verbose              Extra logs
   --help, -h             Show this help
@@ -79,37 +91,48 @@ Examples:
   npm run validate -- validate
   npm run validate -- validate --verbose
   npm run validate -- validate --strict
-  npm run validate -- validate --noIndexHygiene
-  npm run validate -- validate --mapsDir src/page-scanner/page-maps --pagesDir src/pages
+  npm run validate -- validate --noModuleHygiene
+  npm run validate -- validate --mapsDir src/tools/page-scanner/page-maps --pagesDir src/pages
 `.trim();
 }
 
 function repairHelp(): string {
     return `
-repair — recreate missing outputs / re-sync page objects
+repair — recreate missing outputs / re-sync generated files
+
+Repair includes:
+  • Recreating missing generated files
+      - elements.ts
+      - aliases.generated.ts
+      - aliases.ts (if missing)
+      - Page object stub
+
+  • Re-syncing page object methods if aliases.ts changed
+
+  • Updating page registry entries:
+      - src/pages/index.ts
+      - src/pages/pageManager.ts
+
+  • Updating state hash file
 
 Usage:
   npm run validate -- repair [options]
 
-What it does:
-  - Recreates missing generated outputs (aliases.ts, aliases.generated.ts, Page.ts stubs, etc.)
-  - Re-syncs Page object methods from aliases.ts when aliases.ts changed
-  - Updates state hash file (if configured)
-
 Options:
-  --mapsDir <path>       (default: src/page-scanner/page-maps)
+  --mapsDir <path>       (default: src/tools/page-scanner/page-maps)
   --pagesDir <path>      (default: src/pages)
 
   --stateDir <path>      State directory (hash cache)
-                         (default: src/page-elements-generator/.state)
+                         (default: src/tools/page-elements-generator/.state)
 
   --stateFile <path>     State file path
                          (default: <stateDir>/page-maps-state.json)
 
-  --merge                (informational; forwarded)
-  --changedOnly          Only process changed page-maps, but still recreates missing outputs
-  --stateOnly            Only update state hashes (no elements.ts writes)
+  --merge                Informational flag (forwarded to generator)
+  --changedOnly          Only process changed page-maps
+  --stateOnly            Only update state hashes (skip elements.ts write)
   --noScaffold           Do not create create-only files (aliases.ts / Page.ts stubs)
+
   --verbose
   --help, -h
 
@@ -123,21 +146,26 @@ Examples:
 
 function doctorHelp(): string {
     return `
-doctor — diagnose environment & config
+doctor — diagnose environment & configuration
+
+Checks performed:
+  • mapsDir exists
+  • pagesDir exists
+  • stateDir exists
+  • stateFile exists
+  • directories are writable
+  • page-map count > 0
 
 Usage:
   npm run validate -- doctor [options]
 
-Checks:
-  - mapsDir/pagesDir/stateDir/stateFile exist
-  - directories are writable
-  - page-maps count > 0
-
 Options:
-  --mapsDir <path>       (default: src/page-scanner/page-maps)
+  --mapsDir <path>       (default: src/tools/page-scanner/page-maps)
   --pagesDir <path>      (default: src/pages)
-  --stateDir <path>      (default: src/page-elements-generator/.state)
+
+  --stateDir <path>      (default: src/tools/page-elements-generator/.state)
   --stateFile <path>     (default: <stateDir>/page-maps-state.json)
+
   --verbose
   --help, -h
 

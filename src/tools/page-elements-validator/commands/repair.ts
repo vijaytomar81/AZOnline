@@ -1,11 +1,23 @@
 // src/tools/page-elements-validator/commands/repair.ts
 
-import path from "node:path";
-
 import { createLogger } from "../../../utils/logger";
 import { normalizeArgv, hasFlag, getArg } from "../../../utils/argv";
+import {
+    PAGE_ELEMENTS_GENERATOR_STATE_DIR,
+    PAGE_ELEMENTS_GENERATOR_STATE_FILE,
+    PAGE_SCANNER_MAPS_DIR,
+    PAGES_DIR,
+} from "../../../utils/paths";
+import {
+    printSection,
+    printKeyValue,
+    printStatus,
+    printIndented,
+    printSummary,
+    success,
+    strong,
+} from "../../../utils/cliFormat";
 
-// ✅ generator lives in page-elements-generator now
 import { runElementsGenerator } from "../../page-elements-generator/generator/runner";
 
 export async function runRepairCommand(args: string[]) {
@@ -20,29 +32,38 @@ export async function runRepairCommand(args: string[]) {
 
     log.info("Command: repair");
 
-    // ✅ defaults updated to new folders
     const mapsDir =
-        getArg(argv, "--mapsDir") ??
-        path.join(process.cwd(), "src", "tools", "page-scanner", "page-maps");
+        getArg(argv, "--mapsDir") ?? PAGE_SCANNER_MAPS_DIR;
 
     const pagesDir =
-        getArg(argv, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
+        getArg(argv, "--pagesDir") ?? PAGES_DIR;
 
     const stateDir =
-        getArg(argv, "--stateDir") ??
-        path.join(process.cwd(), "src", "tools", "page-elements-generator", ".state");
+        getArg(argv, "--stateDir") ?? PAGE_ELEMENTS_GENERATOR_STATE_DIR;
 
     const stateFile =
-        getArg(argv, "--stateFile") ?? path.join(stateDir, "page-maps-state.json");
+        getArg(argv, "--stateFile") ?? PAGE_ELEMENTS_GENERATOR_STATE_FILE;
 
     const merge = hasFlag(argv, "--merge");
     const changedOnly = hasFlag(argv, "--changedOnly");
     const stateOnly = hasFlag(argv, "--stateOnly");
-
-    // scaffold ON by default, allow disabling
     const scaffold = !hasFlag(argv, "--noScaffold");
 
-    await runElementsGenerator({
+    printSection("Environment");
+    printKeyValue("mapsDir", mapsDir);
+    printKeyValue("pagesDir", pagesDir);
+    printKeyValue("stateDir", stateDir);
+    printKeyValue("stateFile", stateFile);
+
+    printSection("Flags");
+    printKeyValue("merge", merge);
+    printKeyValue("changedOnly", changedOnly);
+    printKeyValue("stateOnly", stateOnly);
+    printKeyValue("scaffold", scaffold);
+
+    printSection("Scanning page-maps");
+
+    const report = await runElementsGenerator({
         mapsDir,
         pagesDir,
         stateDir,
@@ -55,5 +76,39 @@ export async function runRepairCommand(args: string[]) {
         log,
     });
 
-    log.info("Repair complete ✅");
+    console.log(`Found ${report.pagesScanned} page-map(s)`);
+
+    printSection("Processing pages");
+
+    for (const page of report.pageReports) {
+        const symbol = page.changed ? "➕" : "✓";
+        printStatus(symbol, page.pageKey);
+
+        printIndented("elements.ts", page.elementsStatus);
+        printIndented("aliases.generated.ts", page.aliasesGeneratedStatus);
+        printIndented("page object", page.pageObjectStatus);
+
+        if (page.registryStatus === "already-registered") {
+            printIndented("registry", "already registered");
+        } else if (page.registryStatus === "added-to-index") {
+            printIndented("registry", "added to index.ts");
+        } else if (page.registryStatus === "added-to-page-manager") {
+            printIndented("registry", "added to PageManager");
+        } else if (page.registryStatus === "added-to-both") {
+            printIndented("registry", "added to index.ts");
+            printIndented("registry", "added to PageManager");
+        }
+
+        console.log("");
+    }
+
+    printSummary("REPAIR SUMMARY", [
+        ["Pages scanned", report.pagesScanned],
+        ["Pages changed", report.pagesChanged],
+        ["Files generated", report.filesGenerated],
+        ["Registry updates", report.registryUpdates],
+        ["State updated", report.stateUpdated ? "yes" : "no"],
+    ]);
+
+    console.log(`${strong("Result".padEnd(20, " "))}: ${success("COMPLETED")}`);
 }

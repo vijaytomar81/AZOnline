@@ -1,9 +1,10 @@
-// AUTO-SCAFFOLDED (create-only) by src/scanner/elements-generator
+// src/pages/motor/car-details/CarDetailsPage.ts
+// AUTO-SCAFFOLDED (create-only) by src/tools/page-elements-generator/builders/buildPageTsStub.ts
 // pageKey: motor.car-details
 
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
-import { BasePage } from "../../core/BasePage"; // adjust if needed
+import { basePage } from "../../../core/basePage"; // adjust if needed
 import { elements } from "./elements";
 import { aliases } from "./aliases";
 import { pageMeta } from "./aliases.generated";
@@ -11,9 +12,9 @@ import type { AliasKey } from "./aliases";
 
 const PAGE_KEY = "motor.car-details" as const;
 
-export class CarDetailsPage extends BasePage {
+export class CarDetailsPage extends basePage {
   constructor(page: Page) {
-    super(page);
+    super(page, PAGE_KEY);
   }
 
   // --------------------------------------------------
@@ -55,19 +56,19 @@ export class CarDetailsPage extends BasePage {
   // --------------------------------------------------
 
   protected async clickAlias(aliasKey: AliasKey) {
-    await this.clickByAlias(PAGE_KEY, aliases, elements, aliasKey);
+    await this.clickByAlias(aliases, elements, aliasKey);
   }
 
   protected async fillAlias(aliasKey: AliasKey, value: string) {
-    await this.fillByAlias(PAGE_KEY, aliases, elements, aliasKey, value);
+    await this.fillByAlias(aliases, elements, aliasKey, value);
   }
 
   protected async selectOptionAlias(aliasKey: AliasKey, value: string) {
-    await this.selectOptionByAlias(PAGE_KEY, aliases, elements, aliasKey, value);
+    await this.selectOptionByAlias(aliases, elements, aliasKey, value);
   }
 
   protected async setCheckedAlias(aliasKey: AliasKey, checked: boolean = true) {
-    const { locator } = await this.resolveByAlias(PAGE_KEY, aliases, elements, aliasKey);
+    const { locator } = await this.resolveByAlias(aliases, elements, aliasKey);
     await locator.setChecked(checked, { timeout: Number(process.env.ACTION_TIMEOUT ?? 10_000) });
   }
 

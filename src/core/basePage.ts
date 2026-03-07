@@ -1,37 +1,29 @@
-// src/pages/core/BasePage.ts
+// src/core/basePage.ts
 import type { Page } from "@playwright/test";
-import { PageFx } from "../../core/pageFx";
-import { CookieBanner } from "../common/cookie-banner/CookieBanner";
-import { SelfHealWriter } from "../../core/selfHealWriter";
-import type { ElementDef } from "../../core/locatorEngine";
+import { PageFx } from "./pageFx";
+import { SelfHealWriter } from "./selfHealWriter";
+import type { ElementDef } from "./locatorEngine";
 
 export type BasePageOptions = {
     verboseEngine?: boolean;
     selfHeal?: boolean;
     actionTimeoutMs?: number;
-
-    // cookie behavior
-    autoAcceptCookies?: boolean; // default true
-    autoRejectCookies?: boolean; // default false
 };
 
 export type AliasMap = Record<string, string>;
 
-export abstract class BasePage {
+export abstract class basePage {
     protected readonly page: Page;
+    protected readonly pageKey: string;
     protected readonly fx: PageFx;
-    protected readonly cookies: CookieBanner;
 
     // persistent self-heal (optional)
     private readonly healWriter: SelfHealWriter;
     private readonly healWriteEnabled: boolean;
 
-    // cookie switches
-    private readonly _autoAccept: boolean;
-    private readonly _autoReject: boolean;
-
-    constructor(page: Page, opts: BasePageOptions = {}) {
+    constructor(page: Page, pageKey: string, opts: BasePageOptions = {}) {
         this.page = page;
+        this.pageKey = pageKey;
 
         // persistent heal toggle (OFF by default for safety)
         this.healWriteEnabled = process.env.SELF_HEAL_WRITE === "true";
@@ -47,30 +39,23 @@ export abstract class BasePage {
             prefix: "[pw]",
             onHealed: ({ preferredWas, preferredNow }) => {
                 // We can only persist if caller provides pageKey/elementKey.
-                // That happens when pages use resolveByKey/clickByKey/fillByKey.
-                // So this callback exists mainly for runtime logs.
                 // Persistent writing is done inside resolveByKey() below.
                 void preferredWas;
                 void preferredNow;
             },
         });
+    }
 
-        this.cookies = new CookieBanner(page);
+    getSelfHealEvents() {
+        return this.healWriter.getEvents();
+    }
 
-        // defaults
-        this._autoAccept = opts.autoAcceptCookies ?? process.env.AUTO_ACCEPT_COOKIES !== "false";
-        this._autoReject = opts.autoRejectCookies ?? process.env.AUTO_REJECT_COOKIES === "true";
+    clearSelfHealEvents() {
+        this.healWriter.clearEvents();
     }
 
     async goto(url: string) {
         await this.page.goto(url, { waitUntil: "domcontentloaded" });
-
-        // handle cookie banner safely
-        if (this._autoReject) {
-            await this.cookies.rejectIfVisible();
-        } else if (this._autoAccept) {
-            await this.cookies.acceptIfVisible();
-        }
     }
 
     async waitForNetworkIdle(timeoutMs = 10_000) {
@@ -85,15 +70,15 @@ export abstract class BasePage {
      * elementKey should match the key inside the generated elements.ts.
      */
 
-    protected async resolveByKey(pageKey: string, elementKey: string, def: ElementDef) {
+    protected async resolveByKey(elementKey: string, def: ElementDef) {
         const beforePreferred = def.preferred;
-        const res = await this.fx.resolveKey(pageKey, elementKey, def);
+        const res = await this.fx.resolveKey(this.pageKey, elementKey, def);
 
         // If runtime selfHeal promoted fallback -> preferred, def.preferred will change.
         // Persist that change when enabled.
         if (this.healWriteEnabled && def.preferred !== beforePreferred) {
             this.healWriter.apply({
-                pageKey,
+                pageKey: this.pageKey,
                 elementKey,
                 preferredWas: beforePreferred,
                 preferredNow: def.preferred,
@@ -103,28 +88,28 @@ export abstract class BasePage {
         return res;
     }
 
-    protected async clickByKey(pageKey: string, elementKey: string, def: ElementDef) {
-        const { locator } = await this.resolveByKey(pageKey, elementKey, def);
+    protected async clickByKey(elementKey: string, def: ElementDef) {
+        const { locator } = await this.resolveByKey(elementKey, def);
         await locator.click({ timeout: Number(process.env.ACTION_TIMEOUT ?? 10_000) });
     }
 
-    protected async fillByKey(pageKey: string, elementKey: string, def: ElementDef, value: string) {
-        const { locator } = await this.resolveByKey(pageKey, elementKey, def);
+    protected async fillByKey(elementKey: string, def: ElementDef, value: string) {
+        const { locator } = await this.resolveByKey(elementKey, def);
         await locator.fill(value, { timeout: Number(process.env.ACTION_TIMEOUT ?? 10_000) });
     }
 
-    protected async typeByKey(pageKey: string, elementKey: string, def: ElementDef, value: string) {
-        const { locator } = await this.resolveByKey(pageKey, elementKey, def);
+    protected async typeByKey(elementKey: string, def: ElementDef, value: string) {
+        const { locator } = await this.resolveByKey(elementKey, def);
         await locator.type(value, { timeout: Number(process.env.ACTION_TIMEOUT ?? 10_000) });
     }
 
-    protected async selectOptionByKey(pageKey: string, elementKey: string, def: ElementDef, value: string) {
-        const { locator } = await this.resolveByKey(pageKey, elementKey, def);
+    protected async selectOptionByKey(elementKey: string, def: ElementDef, value: string) {
+        const { locator } = await this.resolveByKey(elementKey, def);
         await locator.selectOption(value, { timeout: Number(process.env.ACTION_TIMEOUT ?? 10_000) });
     }
 
     // ============================================================
-    // ✅ Alias Engine (enterprise)
+    // Alias Engine (enterprise)
     // ============================================================
 
     protected getElementKeyFromAlias<A extends AliasMap>(aliases: A, aliasKey: keyof A): string {
@@ -148,29 +133,26 @@ export abstract class BasePage {
      * Useful for expect() because it returns locator.
      */
     protected async resolveByAlias<A extends AliasMap, E extends Record<string, ElementDef>>(
-        pageKey: string,
         aliases: A,
         elements: E,
         aliasKey: keyof A
     ) {
         const elementKey = this.getElementKeyFromAlias(aliases, aliasKey);
         const def = this.getElementDefFromKey(elements, elementKey);
-        return await this.resolveByKey(pageKey, elementKey, def);
+        return await this.resolveByKey(elementKey, def);
     }
 
     protected async clickByAlias<A extends AliasMap, E extends Record<string, ElementDef>>(
-        pageKey: string,
         aliases: A,
         elements: E,
         aliasKey: keyof A
     ) {
         const elementKey = this.getElementKeyFromAlias(aliases, aliasKey);
         const def = this.getElementDefFromKey(elements, elementKey);
-        await this.clickByKey(pageKey, elementKey, def);
+        await this.clickByKey(elementKey, def);
     }
 
     protected async fillByAlias<A extends AliasMap, E extends Record<string, ElementDef>>(
-        pageKey: string,
         aliases: A,
         elements: E,
         aliasKey: keyof A,
@@ -178,11 +160,10 @@ export abstract class BasePage {
     ) {
         const elementKey = this.getElementKeyFromAlias(aliases, aliasKey);
         const def = this.getElementDefFromKey(elements, elementKey);
-        await this.fillByKey(pageKey, elementKey, def, value);
+        await this.fillByKey(elementKey, def, value);
     }
 
     protected async typeByAlias<A extends AliasMap, E extends Record<string, ElementDef>>(
-        pageKey: string,
         aliases: A,
         elements: E,
         aliasKey: keyof A,
@@ -190,11 +171,10 @@ export abstract class BasePage {
     ) {
         const elementKey = this.getElementKeyFromAlias(aliases, aliasKey);
         const def = this.getElementDefFromKey(elements, elementKey);
-        await this.typeByKey(pageKey, elementKey, def, value);
+        await this.typeByKey(elementKey, def, value);
     }
 
     protected async selectOptionByAlias<A extends AliasMap, E extends Record<string, ElementDef>>(
-        pageKey: string,
         aliases: A,
         elements: E,
         aliasKey: keyof A,
@@ -202,6 +182,6 @@ export abstract class BasePage {
     ) {
         const elementKey = this.getElementKeyFromAlias(aliases, aliasKey);
         const def = this.getElementDefFromKey(elements, elementKey);
-        await this.selectOptionByKey(pageKey, elementKey, def, value);
+        await this.selectOptionByKey(elementKey, def, value);
     }
 }

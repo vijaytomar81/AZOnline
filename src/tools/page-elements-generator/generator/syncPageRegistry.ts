@@ -11,6 +11,22 @@ export type PageRegistryEntry = {
     className: string; // e.g. "CarDetailsPage"
 };
 
+export type SyncPagesIndexResult = {
+    changed: boolean;
+    added: string[];
+};
+
+export type SyncPageManagerResult = {
+    changed: boolean;
+    addedImports: string[];
+    addedEntries: string[];
+};
+
+export type SyncPageRegistryResult = {
+    index: SyncPagesIndexResult;
+    pageManager: SyncPageManagerResult;
+};
+
 function normalizeLines(text: string): string[] {
     return text.replace(/\r\n/g, "\n").split("\n");
 }
@@ -58,11 +74,7 @@ function buildPageManagerEntryLine(entry: PageRegistryEntry): string {
     return `            ${member}: this.get("${group}.${member}", () => new ${entry.className}(this.page)),`;
 }
 
-/* ---------------------------------------------------------
- * src/pages/index.ts
- * ------------------------------------------------------- */
-
-export function syncPagesIndex(entries: PageRegistryEntry[], pagesDir = PAGES_DIR) {
+export function syncPagesIndex(entries: PageRegistryEntry[], pagesDir = PAGES_DIR): SyncPagesIndexResult {
     const indexFile = path.join(pagesDir, "index.ts");
 
     const raw =
@@ -85,7 +97,7 @@ export function syncPagesIndex(entries: PageRegistryEntry[], pagesDir = PAGES_DI
     );
 
     if (missing.length === 0) {
-        return { changed: false, added: [] as string[] };
+        return { changed: false, added: [] };
     }
 
     const nextLines = [...lines];
@@ -101,10 +113,6 @@ export function syncPagesIndex(entries: PageRegistryEntry[], pagesDir = PAGES_DI
 
     return { changed: true, added: missing };
 }
-
-/* ---------------------------------------------------------
- * src/pages/pageManager.ts
- * ------------------------------------------------------- */
 
 function insertMissingImports(lines: string[], missingImports: string[]) {
     if (missingImports.length === 0) return lines;
@@ -161,7 +169,7 @@ function buildGroupBlock(group: string, entryLines: string[]): string[] {
     ];
 }
 
-export function syncPageManager(entries: PageRegistryEntry[], pagesDir = PAGES_DIR) {
+export function syncPageManager(entries: PageRegistryEntry[], pagesDir = PAGES_DIR): SyncPageManagerResult {
     const file = path.join(pagesDir, "pageManager.ts");
 
     const raw = safeReadText(file);
@@ -173,8 +181,6 @@ export function syncPageManager(entries: PageRegistryEntry[], pagesDir = PAGES_D
     let changed = false;
     const addedImports: string[] = [];
     const addedEntries: string[] = [];
-
-    /* ---------- imports ---------- */
 
     const existingImports = new Set(
         lines
@@ -194,8 +200,6 @@ export function syncPageManager(entries: PageRegistryEntry[], pagesDir = PAGES_D
         addedImports.push(...missingImports);
         changed = true;
     }
-
-    /* ---------- grouped page manager entries ---------- */
 
     const byGroup = new Map<string, PageRegistryEntry[]>();
 
@@ -240,7 +244,6 @@ export function syncPageManager(entries: PageRegistryEntry[], pagesDir = PAGES_D
             continue;
         }
 
-        // group does not exist -> append a new group block before class closing brace
         const classEnd = findClassEnd(lines);
         const newBlock = buildGroupBlock(group, wantedEntryLines);
 
@@ -265,8 +268,8 @@ export function syncPageManager(entries: PageRegistryEntry[], pagesDir = PAGES_D
     if (!changed) {
         return {
             changed: false,
-            addedImports: [] as string[],
-            addedEntries: [] as string[],
+            addedImports: [],
+            addedEntries: [],
         };
     }
 
@@ -280,11 +283,7 @@ export function syncPageManager(entries: PageRegistryEntry[], pagesDir = PAGES_D
     };
 }
 
-/* ---------------------------------------------------------
- * combined sync
- * ------------------------------------------------------- */
-
-export function syncPageRegistry(entries: PageRegistryEntry[], pagesDir = PAGES_DIR) {
+export function syncPageRegistry(entries: PageRegistryEntry[], pagesDir = PAGES_DIR): SyncPageRegistryResult {
     const deduped = uniqueSorted(entries, (e) => `${e.pageKey}::${e.className}`);
 
     return {

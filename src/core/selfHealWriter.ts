@@ -26,9 +26,9 @@ export type HealEvent = {
 };
 
 export type SelfHealWriterOptions = {
-    pageMapsDir?: string;     // default: src/page-maps
-    prefix?: string;          // log prefix
-    enabled?: boolean;        // default false (enterprise safety)
+    pageMapsDir?: string;
+    prefix?: string;
+    enabled?: boolean; // default false
 };
 
 export class SelfHealWriter {
@@ -36,6 +36,7 @@ export class SelfHealWriter {
     private enabled: boolean;
     private prefix: string;
     private log: Logger;
+    private events: HealEvent[] = [];
 
     constructor(opts: SelfHealWriterOptions = {}) {
         this.dir = opts.pageMapsDir ?? PAGE_SCANNER_MAPS_DIR;
@@ -47,6 +48,14 @@ export class SelfHealWriter {
             withTimestamp: true,
             logToFile: false,
         });
+    }
+
+    getEvents(): HealEvent[] {
+        return [...this.events];
+    }
+
+    clearEvents() {
+        this.events = [];
     }
 
     apply(event: HealEvent) {
@@ -72,7 +81,6 @@ export class SelfHealWriter {
         // If preferred already equals the healed selector, nothing to do.
         if (el.preferred === event.preferredNow) return;
 
-        // Promote new preferred; keep old preferred inside fallbacks (if not already there)
         const nextFallbacks = Array.from(
             new Set(
                 [event.preferredWas, ...(el.fallbacks ?? [])]
@@ -85,6 +93,8 @@ export class SelfHealWriter {
         el.fallbacks = nextFallbacks;
 
         fs.writeFileSync(file, JSON.stringify(map, null, 2), "utf8");
+
+        this.events.push(event);
 
         this.log.info(
             `Healed ${event.pageKey}.${event.elementKey}: preferred updated`

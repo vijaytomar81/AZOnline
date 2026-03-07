@@ -10,7 +10,8 @@ export function buildPageTsStub(pageMap: PageMap): string {
 
     const lines: string[] = [];
 
-    lines.push(`// AUTO-SCAFFOLDED (create-only) by src/scanner/elements-generator`);
+    lines.push(`// src/pages/${pageKey.split(".").join("/")}/${className}.ts`);
+    lines.push(`// AUTO-SCAFFOLDED (create-only) by src/tools/page-elements-generator/builders/buildPageTsStub.ts`);
     lines.push(`// pageKey: ${pageKey}`);
     lines.push(``);
     lines.push(`import type { Page } from "@playwright/test";`);
@@ -25,7 +26,7 @@ export function buildPageTsStub(pageMap: PageMap): string {
     lines.push(``);
     lines.push(`export class ${className} extends BasePage {`);
     lines.push(`  constructor(page: Page) {`);
-    lines.push(`    super(page);`);
+    lines.push(`    super(page, PAGE_KEY);`);
     lines.push(`  }`);
     lines.push(``);
     lines.push(`  // --------------------------------------------------`);
@@ -67,19 +68,19 @@ export function buildPageTsStub(pageMap: PageMap): string {
     lines.push(`  // --------------------------------------------------`);
     lines.push(``);
     lines.push(`  protected async clickAlias(aliasKey: AliasKey) {`);
-    lines.push(`    await this.clickByAlias(PAGE_KEY, aliases, elements, aliasKey);`);
+    lines.push(`    await this.clickByAlias(aliases, elements, aliasKey);`);
     lines.push(`  }`);
     lines.push(``);
     lines.push(`  protected async fillAlias(aliasKey: AliasKey, value: string) {`);
-    lines.push(`    await this.fillByAlias(PAGE_KEY, aliases, elements, aliasKey, value);`);
+    lines.push(`    await this.fillByAlias(aliases, elements, aliasKey, value);`);
     lines.push(`  }`);
     lines.push(``);
     lines.push(`  protected async selectOptionAlias(aliasKey: AliasKey, value: string) {`);
-    lines.push(`    await this.selectOptionByAlias(PAGE_KEY, aliases, elements, aliasKey, value);`);
+    lines.push(`    await this.selectOptionByAlias(aliases, elements, aliasKey, value);`);
     lines.push(`  }`);
     lines.push(``);
     lines.push(`  protected async setCheckedAlias(aliasKey: AliasKey, checked: boolean = true) {`);
-    lines.push(`    const { locator } = await this.resolveByAlias(PAGE_KEY, aliases, elements, aliasKey);`);
+    lines.push(`    const { locator } = await this.resolveByAlias(aliases, elements, aliasKey);`);
     lines.push(`    await locator.setChecked(checked, { timeout: Number(process.env.ACTION_TIMEOUT ?? 10_000) });`);
     lines.push(`  }`);
     lines.push(``);

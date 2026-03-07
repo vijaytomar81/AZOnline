@@ -6,9 +6,21 @@ import path from "node:path";
 import { createLogger } from "../../../utils/logger";
 import { normalizeArgv, hasFlag, getArg } from "../../../utils/argv";
 import { safeReadJson, listFiles } from "../../../utils/fs";
+import { PAGE_SCANNER_MAPS_DIR, PAGES_DIR } from "../../../utils/paths";
+import {
+    printSection,
+    printKeyValue,
+    printStatus,
+    printSummary,
+    success,
+    warning,
+    failure,
+    strong,
+} from "../../../utils/cliFormat";
 
 import { validateOnePage } from "../validators/pageOutputs";
-import { checkPagesIndexHygiene } from "../validators/indexHygiene";
+import { checkPagesModuleHygiene } from "../validators/moduleHygiene";
+import { checkPageRegistry } from "../validators/pageRegistry";
 
 type PageMapLite = { pageKey: string };
 
@@ -21,7 +33,9 @@ export async function runValidateCommand(args: string[]) {
 
     const verbose = hasFlag(argv, "--verbose");
     const strict = hasFlag(argv, "--strict");
-    const checkIndex = !hasFlag(argv, "--noIndexHygiene");
+    const checkModuleHygiene =
+        !hasFlag(argv, "--noModuleHygiene") &&
+        !hasFlag(argv, "--noIndexHygiene");
 
     const log = createLogger({
         prefix: "[validator - validate]",
@@ -31,29 +45,39 @@ export async function runValidateCommand(args: string[]) {
 
     log.info("Command: validate");
 
-    // ✅ default now points to page-scanner output
     const mapsDir =
-        getArg(argv, "--mapsDir") ??
-        path.join(process.cwd(), "src", "tools", "page-scanner", "page-maps");
+        getArg(argv, "--mapsDir") ?? PAGE_SCANNER_MAPS_DIR;
 
     const pagesDir =
-        getArg(argv, "--pagesDir") ?? path.join(process.cwd(), "src", "pages");
+        getArg(argv, "--pagesDir") ?? PAGES_DIR;
+
+    printSection("Environment");
+    printKeyValue("mapsDir", mapsDir);
+    printKeyValue("pagesDir", pagesDir);
+    printKeyValue("strict", strict);
+    printKeyValue("moduleHygiene", checkModuleHygiene);
 
     if (!fs.existsSync(mapsDir)) {
         log.error(`mapsDir not found: ${mapsDir}`);
         process.exit(1);
     }
+
     if (!fs.existsSync(pagesDir)) {
         log.error(`pagesDir not found: ${pagesDir}`);
         process.exit(1);
     }
 
     const mapFiles = listPageMapFiles(mapsDir);
-    log.info(`Found ${mapFiles.length} page-map(s).`);
+
+    printSection("Scanning page-maps");
+    console.log(`Found ${mapFiles.length} page-map(s)`);
 
     let ok = 0;
     let bad = 0;
+    let warnOnly = 0;
     let warnCount = 0;
+
+    printSection("Validating pages");
 
     for (const mf of mapFiles) {
         const res = validateOnePage({ mapsDir, pagesDir, mapFile: mf });
@@ -62,41 +86,82 @@ export async function runValidateCommand(args: string[]) {
             safeReadJson<PageMapLite>(path.join(mapsDir, mf))?.pageKey ??
             mf.replace(/\.json$/, "");
 
-        if (res.ok) {
-            ok++;
-            log.info(`✅ ${pageKey} OK`);
-        } else {
+        const registryRes = checkPageRegistry({
+            pageKey,
+            pagesDir,
+        });
+
+        const pageWarnings = [...res.warnings, ...registryRes.warnings];
+        const pageErrors = [...res.errors, ...registryRes.errors];
+
+        warnCount += pageWarnings.length;
+
+        if (pageErrors.length > 0) {
             bad++;
-            log.error(`❌ ${pageKey} FAILED`);
+            printStatus("❌", pageKey);
+
+            for (const e of pageErrors) {
+                console.log(`  ${e}`);
+            }
+
+            for (const w of pageWarnings) {
+                if (verbose) log.debug(`WARN: ${pageKey}: ${w}`);
+                else console.log(`  ${warning("⚠️")} ${w}`);
+            }
+
+            console.log("");
+            continue;
         }
 
-        for (const w of res.warnings) {
-            warnCount++;
-            if (verbose) log.debug(`WARN: ${pageKey}: ${w}`);
-            else log.info(`⚠️  ${pageKey}: ${w}`);
+        if (pageWarnings.length > 0) {
+            warnOnly++;
+            printStatus("⚠️", pageKey);
+
+            for (const w of pageWarnings) {
+                if (verbose) log.debug(`WARN: ${pageKey}: ${w}`);
+                else console.log(`  ${warning("⚠️")} ${w}`);
+            }
+
+            console.log("");
+            continue;
         }
 
-        for (const e of res.errors) {
-            log.error(`${pageKey}: ${e}`);
-        }
+        ok++;
+        printStatus("✓", pageKey);
     }
 
-    // ✅ index hygiene checks (pages only)
-    if (checkIndex) {
-        const pagesH = checkPagesIndexHygiene(pagesDir);
+    if (checkModuleHygiene) {
+        printSection("Module hygiene");
+
+        const pagesH = checkPagesModuleHygiene(pagesDir);
         warnCount += pagesH.warnings.length;
 
-        for (const w of pagesH.warnings) {
-            if (verbose) log.debug(`WARN: ${w}`);
-            else log.info(`⚠️  ${w}`);
-        }
-        for (const e of pagesH.errors) {
-            bad++;
-            log.error(`❌ ${e}`);
+        if (pagesH.errors.length === 0 && pagesH.warnings.length === 0) {
+            printStatus("✓", "src/pages/index.ts / pageManager.ts");
+        } else {
+            for (const w of pagesH.warnings) {
+                console.log(`  ${warning("⚠️")} ${w}`);
+            }
+
+            for (const e of pagesH.errors) {
+                bad++;
+                printStatus("❌", e);
+            }
         }
     }
 
-    log.info(`Validate summary: ok=${ok} bad=${bad} warnings=${warnCount}`);
+    printSummary("VALIDATE SUMMARY", [
+        ["Pages checked", mapFiles.length],
+        ["OK", ok],
+        ["Warnings", warnOnly],
+        ["Failed", bad],
+        ["Total warns", warnCount],
+    ]);
+
+    const resultText =
+        bad > 0 ? failure("FAILED") : strict && warnCount > 0 ? failure("FAILED") : success("PASSED");
+
+    console.log(`${strong("Result".padEnd(20, " "))}: ${resultText}`);
 
     if (bad > 0) process.exit(1);
 
