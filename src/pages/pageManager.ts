@@ -2,7 +2,6 @@
 import type { Page } from "@playwright/test";
 import { CarDetailsPage } from "./motor/car-details/CarDetailsPage";
 
-
 /**
  * Enterprise PageManager / Factory
  * - Single place to construct Page Objects
