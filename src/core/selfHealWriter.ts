@@ -45,6 +45,7 @@ export class SelfHealWriter {
 
         this.log = createLogger({
             prefix: this.prefix,
+            logLevel: "info",
             withTimestamp: true,
             logToFile: false,
         });

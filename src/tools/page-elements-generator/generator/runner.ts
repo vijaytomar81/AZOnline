@@ -77,6 +77,11 @@ function buildRegistryEntry(pageKey: string): PageRegistryEntry {
 export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunReport> {
     const log = opts.log;
 
+    const scaffoldLog = log.child("scaffold");
+    const registryLog = log.child("registry");
+    const stateLog = log.child("state");
+    const endRun = log.time("elements-generator");
+
     const scaffold = opts.scaffold !== false;
     const scaffoldIfMissing = opts.scaffoldIfMissing !== false;
 
@@ -149,7 +154,7 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
                 pagesDir: opts.pagesDir,
                 pageMap,
                 verbose: opts.verbose,
-                log,
+                log: scaffoldLog,
             });
         }
 
@@ -178,7 +183,9 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
         pageReports.push(report);
     }
 
+    const endRegistrySync = registryLog.time("sync-page-registry");
     const syncRes = syncPageRegistry(registryEntries, opts.pagesDir);
+    endRegistrySync();
 
     const addedIndexPaths = new Set(
         syncRes.index.added.map((line) => {
@@ -234,9 +241,11 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
         }
     }
 
+    const endStateSave = stateLog.time("save-state");
     saveState(stateFilePath, newState);
+    endStateSave();
 
-    log.info(`State file updated: ${stateFilePath}`);
+    stateLog.info(`State file updated: ${stateFilePath}`);
     log.info(`Processed pages: ${processed}`);
 
     const pagesChanged = pageReports.filter((r) => r.changed).length;
@@ -252,6 +261,8 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
         syncRes.index.added.length +
         syncRes.pageManager.addedImports.length +
         syncRes.pageManager.addedEntries.length;
+
+    endRun();
 
     return {
         pagesScanned: mapFiles.length,

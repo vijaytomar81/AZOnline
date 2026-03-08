@@ -16,7 +16,7 @@ export async function runScanCommand(args: string[]) {
 
     const log = createLogger({
         prefix: "[page-scanner]",
-        verbose,
+        logLevel: verbose ? "debug" : "info",
         withTimestamp: true,
         logToFile,
         logFilePath,
@@ -56,7 +56,7 @@ export async function runScanCommand(args: string[]) {
         merge,
         tabIndex,
         verbose,
-        log,
+        log: log.child("runner"),
     });
 
     log.info("Done ✅");

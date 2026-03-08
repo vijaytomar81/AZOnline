@@ -26,7 +26,7 @@ export async function runRepairCommand(args: string[]) {
     const verbose = hasFlag(argv, "--verbose");
     const log = createLogger({
         prefix: "[validator - repair]",
-        verbose,
+        logLevel: verbose ? "debug" : "info",
         withTimestamp: true,
     });
 

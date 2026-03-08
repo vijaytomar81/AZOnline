@@ -86,6 +86,7 @@ function printSelfHealReport(events: HealEvent[]) {
 function createCaseRunnerLogger(scriptName: string) {
     return createLogger({
         prefix: `[case-runner${scriptName ? `:${scriptName}` : ""}]`,
+        logLevel: "info",
         withTimestamp: true,
         logToFile: false,
     });

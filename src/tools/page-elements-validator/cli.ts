@@ -22,7 +22,6 @@ function isHelpTopic(x: string | undefined): x is HelpTopic {
 
 const log = createLogger({
     prefix: "[validator]",
-    verbose: true,
     withTimestamp: true,
 });
 

@@ -37,9 +37,10 @@ export async function runDoctorCommand(args: string[]) {
     const argv = normalizeArgv(args);
 
     const verbose = hasFlag(argv, "--verbose");
+    
     const log = createLogger({
         prefix: "[validator - doctor]",
-        verbose,
+        logLevel: verbose ? "debug" : "info",
         withTimestamp: true,
     });
 

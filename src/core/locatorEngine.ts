@@ -37,7 +37,7 @@ export class LocatorEngine {
 
         this.logRef = createLogger({
             prefix: this.prefix,
-            verbose: this.verbose,
+            logLevel: this.verbose ? "debug" : "info",
             withTimestamp: true,
             logToFile: false,
         });

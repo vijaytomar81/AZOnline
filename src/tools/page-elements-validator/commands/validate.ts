@@ -39,7 +39,7 @@ export async function runValidateCommand(args: string[]) {
 
     const log = createLogger({
         prefix: "[validator - validate]",
-        verbose,
+        logLevel: verbose ? "debug" : "info",
         withTimestamp: true,
     });
 

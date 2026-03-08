@@ -11,9 +11,8 @@ function isCommand(x: string | undefined): x is CommandName {
     return x === "scan" || x === "help";
 }
 
-const log = createLogger({
+const rootLog = createLogger({
     prefix: "[page-scanner]",
-    verbose: true,
     withTimestamp: true,
 });
 
@@ -22,8 +21,8 @@ async function main() {
     const cmd = argv[0];
 
     if (!isCommand(cmd)) {
-        log.error(`Unknown or missing command: ${cmd ?? "(none)"}`);
-        log.info(usage());
+        rootLog.error(`Unknown or missing command: ${cmd ?? "(none)"}`);
+        rootLog.info(usage());
         process.exit(1);
     }
 
@@ -31,7 +30,7 @@ async function main() {
 
     switch (cmd) {
         case "help":
-            log.info(usage());
+            rootLog.info(usage());
             return;
 
         case "scan":
@@ -41,6 +40,6 @@ async function main() {
 }
 
 main().catch((e) => {
-    log.error(e?.message || String(e));
+    rootLog.error(e?.message || String(e));
     process.exit(1);
 });

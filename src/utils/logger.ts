@@ -1,7 +1,9 @@
 // src/utils/logger.ts
 import fs from "node:fs";
 import path from "node:path";
-import { nowIso } from "./time";
+import { nowIso, startTimer } from "./time";
+
+export type LogLevel = "error" | "warn" | "info" | "debug";
 
 export type Logger = {
     info: (msg: string) => void;
@@ -9,14 +11,15 @@ export type Logger = {
     error: (msg: string) => void;
     debug: (msg: string) => void;
     child: (name: string) => Logger;
+    time: (label: string) => () => void;
 };
 
 export type CreateLoggerOptions = {
     prefix?: string;          // e.g. "[page-scanner]"
-    verbose?: boolean;        // enables debug()
+    logLevel?: LogLevel;      // default: "info"
     withTimestamp?: boolean;  // default true
     logToFile?: boolean;      // also write logs to file
-    logFilePath?: string;     // default: "<cwd>/tool.log" (caller decides)
+    logFilePath?: string;     // caller decides
 };
 
 function ensureDir(dir: string) {
@@ -36,50 +39,67 @@ function buildChildPrefix(parentPrefix: string, childName: string): string {
     const trimmedChild = childName.trim();
     if (!trimmedChild) return parentPrefix;
 
-    // "[data-builder]" + "pipeline" -> "[data-builder:pipeline]"
     const match = parentPrefix.match(/^\[(.*)\]$/);
     if (match) {
         return `[${match[1]}:${trimmedChild}]`;
     }
 
-    // fallback if prefix is not wrapped in brackets
     return `${parentPrefix}:${trimmedChild}`;
+}
+
+function shouldLog(currentLevel: LogLevel, incomingLevel: LogLevel): boolean {
+    const rank: Record<LogLevel, number> = {
+        error: 0,
+        warn: 1,
+        info: 2,
+        debug: 3,
+    };
+
+    return rank[incomingLevel] <= rank[currentLevel];
 }
 
 export function createLogger(opts: CreateLoggerOptions = {}): Logger {
     const prefix = opts.prefix ?? "[tool]";
-    const verbose = !!opts.verbose;
-    const withTimestamp = opts.withTimestamp !== false; // default true
+    const logLevel = opts.logLevel ?? "info";
+    const withTimestamp = opts.withTimestamp !== false;
     const logToFile = !!opts.logToFile;
-    const logFilePath = opts.logFilePath; // optional
+    const logFilePath = opts.logFilePath;
 
     const fmt = (level: "INFO" | "WARN" | "ERROR" | "DEBUG", msg: string) => {
         const ts = withTimestamp ? `${nowIso()} ` : "";
         return `${ts}${prefix} ${level}: ${msg}`;
     };
 
-    const write = (line: string, isError: boolean) => {
-        if (isError) console.error(line);
+    const write = (line: string, level: LogLevel) => {
+        if (!shouldLog(logLevel, level)) return;
+
+        if (level === "error") console.error(line);
         else console.log(line);
 
         if (logToFile && logFilePath) appendLine(logFilePath, line);
     };
 
     return {
-        info: (msg) => write(fmt("INFO", msg), false),
-        warn: (msg) => write(fmt("WARN", msg), false),
-        error: (msg) => write(fmt("ERROR", msg), true),
-        debug: (msg) => {
-            if (!verbose) return;
-            write(fmt("DEBUG", msg), false);
-        },
+        info: (msg) => write(fmt("INFO", msg), "info"),
+        warn: (msg) => write(fmt("WARN", msg), "warn"),
+        error: (msg) => write(fmt("ERROR", msg), "error"),
+        debug: (msg) => write(fmt("DEBUG", msg), "debug"),
+
         child: (name: string) =>
             createLogger({
                 prefix: buildChildPrefix(prefix, name),
-                verbose,
+                logLevel,
                 withTimestamp,
                 logToFile,
                 logFilePath,
             }),
+
+        time: (label: string) => {
+            const timer = startTimer();
+
+            return () => {
+                write(fmt("INFO", `${label} completed in ${timer.elapsedSecondsText()}`), "info");
+            };
+        },
     };
 }

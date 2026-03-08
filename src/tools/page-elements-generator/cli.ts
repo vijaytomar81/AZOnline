@@ -16,7 +16,7 @@ import {
 
 let log = createLogger({
     prefix: "[page-elements-generator]",
-    verbose: true,
+    logLevel: "info",
     withTimestamp: true,
 });
 
@@ -51,7 +51,7 @@ async function main() {
 
     log = createLogger({
         prefix: "[page-elements-generator]",
-        verbose,
+        logLevel: verbose ? "debug" : "info",
         withTimestamp: true,
         logToFile,
         logFilePath,
@@ -92,7 +92,7 @@ async function main() {
         stateOnly,
         scaffold,
         verbose,
-        log,
+        log: log.child("runner"),
     });
 
     log.info("Generate complete ✅");

@@ -7,10 +7,10 @@ import { createLogger } from "../../utils/logger";
 import { printSection } from "../../utils/cliFormat";
 import { usage } from "./dataBuilderHelp";
 
-export function createDataBuilderLogger(verbose = true) {
+export function createDataBuilderLogger(verbose = false) {
   return createLogger({
     prefix: "[data-builder]",
-    verbose,
+    logLevel: verbose ? "debug" : "info",
     withTimestamp: true,
     logToFile: false,
   });
