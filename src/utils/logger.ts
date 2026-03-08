@@ -8,6 +8,7 @@ export type Logger = {
     warn: (msg: string) => void;
     error: (msg: string) => void;
     debug: (msg: string) => void;
+    child: (name: string) => Logger;
 };
 
 export type CreateLoggerOptions = {
@@ -29,6 +30,20 @@ function appendLine(filePath: string, line: string) {
     } catch {
         // Never break the CLI due to file logging
     }
+}
+
+function buildChildPrefix(parentPrefix: string, childName: string): string {
+    const trimmedChild = childName.trim();
+    if (!trimmedChild) return parentPrefix;
+
+    // "[data-builder]" + "pipeline" -> "[data-builder:pipeline]"
+    const match = parentPrefix.match(/^\[(.*)\]$/);
+    if (match) {
+        return `[${match[1]}:${trimmedChild}]`;
+    }
+
+    // fallback if prefix is not wrapped in brackets
+    return `${parentPrefix}:${trimmedChild}`;
 }
 
 export function createLogger(opts: CreateLoggerOptions = {}): Logger {
@@ -58,5 +73,13 @@ export function createLogger(opts: CreateLoggerOptions = {}): Logger {
             if (!verbose) return;
             write(fmt("DEBUG", msg), false);
         },
+        child: (name: string) =>
+            createLogger({
+                prefix: buildChildPrefix(prefix, name),
+                verbose,
+                withTimestamp,
+                logToFile,
+                logFilePath,
+            }),
     };
 }

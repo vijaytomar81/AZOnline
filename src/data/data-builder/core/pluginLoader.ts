@@ -6,7 +6,7 @@ import url from "node:url";
 import { createRequire } from "node:module";
 
 import type { PipelineContext, PipelinePlugin } from "./pipeline";
-import type { Logger } from "../types";
+import type { Logger } from "../../../utils/logger";
 
 type DiscoveredPlugin = {
     file: string;
@@ -52,7 +52,7 @@ function isPipelinePlugin(v: any): v is PipelinePlugin {
 export async function loadPluginsFromFolder(opts: {
     pluginsDirAbs: string;
     verbose?: boolean;
-    onlyNames?: string[]; // optional allowlist
+    onlyNames?: string[];
     log?: Logger;
 }): Promise<DiscoveredPlugin[]> {
     const { pluginsDirAbs, verbose = false, onlyNames, log } = opts;
@@ -68,17 +68,11 @@ export async function loadPluginsFromFolder(opts: {
 
     const discovered: DiscoveredPlugin[] = [];
 
-    /**
-     * ✅ IMPORTANT:
-     * Avoid import.meta.url because your TS module setting is not ESM.
-     * Use a real file path to create a require() function.
-     */
     const requireFromProject = createRequire(path.join(process.cwd(), "package.json"));
 
     for (const fileAbs of files) {
         let mod: any;
 
-        // Try dynamic import, fallback to require
         try {
             const fileUrl = url.pathToFileURL(fileAbs).href;
             mod = await import(fileUrl);
@@ -96,19 +90,18 @@ export async function loadPluginsFromFolder(opts: {
 
         const plugin = pickPluginExport(mod);
         if (!plugin) {
-            if (verbose) log?.debug?.(`Skipping ${path.basename(fileAbs)} (no plugin export found)`);
+            if (verbose) log?.debug(`Skipping ${path.basename(fileAbs)} (no plugin export found)`);
             continue;
         }
 
         if (onlyNames && onlyNames.length > 0 && !onlyNames.includes(plugin.name)) {
-            if (verbose) log?.debug?.(`Skipping ${plugin.name} (not in onlyNames allowlist)`);
+            if (verbose) log?.debug(`Skipping ${plugin.name} (not in onlyNames allowlist)`);
             continue;
         }
 
         discovered.push({ file: fileAbs, plugin });
     }
 
-    // Hard stop if duplicate plugin names exist
     const names = discovered.map((d) => d.plugin.name);
     const dup = names.filter((n, i) => names.indexOf(n) !== i);
     if (dup.length > 0) {
@@ -117,9 +110,9 @@ export async function loadPluginsFromFolder(opts: {
     }
 
     if (verbose) {
-        log?.debug?.(`Discovered plugins (${discovered.length}):`);
+        log?.debug(`Discovered plugins (${discovered.length}):`);
         for (const d of discovered) {
-            log?.debug?.(`- name=${d.plugin.name} file=${path.basename(d.file)}`);
+            log?.debug(`- name=${d.plugin.name} file=${path.basename(d.file)}`);
         }
     }
 
@@ -128,10 +121,6 @@ export async function loadPluginsFromFolder(opts: {
 
 /**
  * Executes plugins in the correct order.
- * Order rules:
- * - Dependency graph based on requires/provides (ignores external:*)
- * - Topological sort
- * - Tie-breaker: order asc, then name
  */
 export async function runDiscoveredPlugins(
     ctx: PipelineContext,
@@ -142,13 +131,19 @@ export async function runDiscoveredPlugins(
     ctx.log.info(`Run order: ${ordered.map((p) => p.name).join(" -> ")}`);
 
     for (const p of ordered) {
-        ctx.log.info(`Plugin start: ${p.name}`);
+        const pluginLog = ctx.log.child(`plugin:${p.name}`);
+        const pluginCtx = {
+            ...ctx,
+            log: pluginLog,
+        };
+
+        pluginLog.info(`Plugin start: ${p.name}`);
         const started = Date.now();
 
-        await p.run(ctx);
+        await p.run(pluginCtx);
 
         const ms = Date.now() - started;
-        ctx.log.info(`Plugin done: ${p.name} (${(ms / 1000).toFixed(2)}s)`);
+        pluginLog.info(`Plugin done: ${p.name} (${(ms / 1000).toFixed(2)}s)`);
     }
 
     return ordered.map((p) => p.name);
@@ -161,23 +156,20 @@ function isExternal(req: string) {
 }
 
 function resolveRunOrderOrThrow(all: PipelinePlugin[]): PipelinePlugin[] {
-    // Map: token -> single provider plugin name
     const providers = new Map<string, string>();
 
     for (const p of all) {
         for (const token of p.provides ?? []) {
             const existing = providers.get(token);
             if (existing && existing !== p.name) {
-                // strict: only 1 provider per token
                 throw new Error(`Multiple providers for token "${token}": ${existing}, ${p.name}`);
             }
             providers.set(token, p.name);
         }
     }
 
-    // Build adjacency
-    const deps = new Map<string, Set<string>>(); // plugin -> dependsOn names
-    const out = new Map<string, Set<string>>();  // plugin -> outgoing dependents
+    const deps = new Map<string, Set<string>>();
+    const out = new Map<string, Set<string>>();
     const byName = new Map<string, PipelinePlugin>();
 
     for (const p of all) {
@@ -186,10 +178,9 @@ function resolveRunOrderOrThrow(all: PipelinePlugin[]): PipelinePlugin[] {
         out.set(p.name, new Set());
     }
 
-    // Add edges based on requires
     for (const p of all) {
         for (const req of p.requires ?? []) {
-            if (isExternal(req)) continue; // CLI-provided; no edge required
+            if (isExternal(req)) continue;
 
             const providerName = providers.get(req);
             if (!providerName) {
@@ -202,7 +193,6 @@ function resolveRunOrderOrThrow(all: PipelinePlugin[]): PipelinePlugin[] {
         }
     }
 
-    // Kahn topo-sort with tie-breaking (order then name)
     const indeg = new Map<string, number>();
     for (const [name, incoming] of deps.entries()) indeg.set(name, incoming.size);
 

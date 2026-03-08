@@ -4,14 +4,17 @@ import path from "node:path";
 import type { DataBuilderBaseArgs } from "./types";
 import { normalizeArgv, getArg, hasFlag } from "../../utils/argv";
 import { createLogger } from "../../utils/logger";
+import { printSection } from "../../utils/cliFormat";
 import { usage } from "./dataBuilderHelp";
 
-const log = createLogger({
-  prefix: "[data-builder]",
-  verbose: true,
-  withTimestamp: true,
-  logToFile: false,
-});
+export function createDataBuilderLogger(verbose = true) {
+  return createLogger({
+    prefix: "[data-builder]",
+    verbose,
+    withTimestamp: true,
+    logToFile: false,
+  });
+}
 
 function parseBoolean(v?: string) {
   if (!v) return false;
@@ -21,7 +24,14 @@ function parseBoolean(v?: string) {
 export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
   const argv = normalizeArgv(process.argv.slice(2));
 
+  const verbose =
+    hasFlag(argv, "--verbose") ||
+    (process.env.VERBOSE ?? "").toLowerCase() === "true";
+
+  const log = createDataBuilderLogger(verbose);
+
   if (hasFlag(argv, "--help") || hasFlag(argv, "-h")) {
+    printSection("Data Builder Help");
     log.info(usage());
     process.exit(0);
   }
@@ -34,10 +44,6 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
   );
 
   const scriptIdFilter = (getArg(argv, "--ids") ?? process.env.SCRIPT_IDS ?? "").trim();
-
-  const verbose =
-    hasFlag(argv, "--verbose") ||
-    (process.env.VERBOSE ?? "").toLowerCase() === "true";
 
   if (!excelPath) throw new Error("❌ EXCEL_PATH is required (or use --excel).");
   if (!sheetName) throw new Error("❌ SHEET is required (or use --sheet).");
