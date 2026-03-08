@@ -1,5 +1,6 @@
 // src/tools/page-elements-validator/cli.ts
 import { createLogger } from "../../utils/logger";
+import { printCommandTitle } from "../../utils/cliFormat";
 import { normalizeArgv } from "../../utils/argv";
 import { usage } from "./validatorHelp";
 
@@ -56,12 +57,17 @@ async function main() {
 
     switch (cmd) {
         case "validate":
+            printCommandTitle("VALIDATE", "validateIcon");
             await runValidateCommand(args);
             return;
+
         case "repair":
+            printCommandTitle("REPAIR", "repairIcon");
             await runRepairCommand(args);
             return;
+
         case "doctor":
+            printCommandTitle("DOCTOR", "doctorIcon");
             await runDoctorCommand(args);
             return;
     }

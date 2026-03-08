@@ -4,6 +4,7 @@ import { createLogger } from "../../utils/logger";
 import { runScanCommand } from "./commands/scan";
 import { normalizeArgv } from "../../utils/argv";
 import { usage } from "./scannerHelp";
+import { printCommandTitle } from "../../utils/cliFormat";
 
 type CommandName = "scan" | "help";
 
@@ -17,6 +18,7 @@ const rootLog = createLogger({
 });
 
 async function main() {
+    printCommandTitle("PAGE SCANNER", "pageScannerIcon");
     const argv = normalizeArgv(process.argv.slice(2));
     const cmd = argv[0];
 

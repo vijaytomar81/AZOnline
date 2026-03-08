@@ -5,6 +5,7 @@ import path from "node:path";
 import { createLogger } from "../../utils/logger";
 import { normalizeArgv, hasFlag, getArg } from "../../utils/argv";
 import { usage } from "./elementGeneratorHelp";
+import { printCommandTitle } from "../../utils/cliFormat";
 import { runElementsGenerator } from "./generator/runner";
 
 import {
@@ -31,6 +32,7 @@ function isHelp(argv: string[]) {
 }
 
 async function main() {
+    printCommandTitle("PAGE ELEMENTS GENERATOR", "elementsGeneratorIcon");
     const argv = normalizeArgv(process.argv.slice(2));
 
     // Allow either:

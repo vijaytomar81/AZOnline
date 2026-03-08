@@ -10,6 +10,7 @@ import {
     printSummary,
     success,
     strong,
+    printCommandTitle,
 } from "../utils/cliFormat";
 
 import type { HealEvent } from "./selfHealWriter";
@@ -101,26 +102,33 @@ export async function runFlowForCase(opts: {
     payload: Record<string, any>;
     flow: FlowFn;
 }) {
+    printCommandTitle("CASE RUNNER", "caseRunnerIcon");
+    process.env.TEST_SCRIPT = opts.scriptName;
+
     const log = createCaseRunnerLogger(opts.scriptName);
     const pages = new PageManager(opts.page);
 
-    log.info("Starting flow execution");
+    try {
+        log.info("Starting flow execution");
 
-    await opts.flow({
-        page: opts.page,
-        pages,
-        data: opts.payload,
-        scriptName: opts.scriptName,
-    });
+        await opts.flow({
+            page: opts.page,
+            pages,
+            data: opts.payload,
+            scriptName: opts.scriptName,
+        });
 
-    log.info("Flow execution completed");
+        log.info("Flow execution completed");
 
-    const healEvents = getHealEventsFromPageManager(pages);
+        const healEvents = getHealEventsFromPageManager(pages);
 
-    if (healEvents.length > 0) {
-        log.info(`Self-heal events found: ${healEvents.length}`);
+        if (healEvents.length > 0) {
+            log.info(`Self-heal events found: ${healEvents.length}`);
+        }
+
+        printSelfHealReport(healEvents);
+        clearHealEventsFromPageManager(pages);
+    } finally {
+        delete process.env.TEST_SCRIPT;
     }
-
-    printSelfHealReport(healEvents);
-    clearHealEventsFromPageManager(pages);
 }

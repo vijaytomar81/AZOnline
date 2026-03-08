@@ -1,4 +1,6 @@
-// src/utils/cliFormat.ts
+// src/old/utils/cliFormat.ts
+
+import { ICONS, type IconKey } from "./icons";
 
 const ANSI = {
     reset: "\x1b[0m",
@@ -41,6 +43,18 @@ export function strong(text: string): string {
     return color(text, ANSI.bold);
 }
 
+export function printCommandTitle(title: string, icon?: IconKey) {
+    const iconPrefix = icon ? `${ICONS[icon]} ` : "";
+    const text = `${iconPrefix}${title}`.trim();
+
+    const line = "*".repeat(Math.max(text.length, 32));
+
+    console.log("");
+    console.log(muted(line));
+    console.log(strong(text));
+    console.log(muted(line));
+}
+
 export function printSection(title: string) {
     console.log("");
     console.log(strong(title));
@@ -78,7 +92,7 @@ export function printStatus(symbol: string, text: string) {
 }
 
 export function printSummary(title: string, rows: Array<[string, string | number]>) {
-    const line = "-".repeat(50);
+    const line = "-".repeat(Math.max(title.length, 32));
 
     console.log("");
     console.log(muted(line));

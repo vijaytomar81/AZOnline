@@ -59,9 +59,24 @@ function shouldLog(currentLevel: LogLevel, incomingLevel: LogLevel): boolean {
 }
 
 export function createLogger(opts: CreateLoggerOptions = {}): Logger {
-    const prefix = opts.prefix ?? "[tool]";
+    let prefix = opts.prefix ?? "[tool]";
+
+    const scriptName = process.env.TEST_SCRIPT?.trim();
+    if (scriptName && prefix.startsWith("[pw")) {
+        const match = prefix.match(/^\[(.*)\]$/);
+        if (match) {
+            prefix = `[${match[1]}:${scriptName}]`;
+        }
+    }
     const logLevel = opts.logLevel ?? "info";
-    const withTimestamp = opts.withTimestamp !== false;
+
+    const isPlaywrightRun =
+        process.env.PLAYWRIGHT_TEST === "true" ||
+        process.env.PW_TEST === "true";
+
+    const withTimestamp =
+        opts.withTimestamp !== false && !isPlaywrightRun;
+
     const logToFile = !!opts.logToFile;
     const logFilePath = opts.logFilePath;
 

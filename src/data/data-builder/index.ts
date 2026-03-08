@@ -11,11 +11,13 @@ import {
     printSummary,
     strong,
     success,
+    printCommandTitle,
 } from "../../utils/cliFormat";
 
 import type { DataBuilderContext } from "./types";
 
 async function main() {
+    printCommandTitle("DATA BUILDER", "dataBuilderIcon");
     const timer = startTimer();
 
     const args = parseBuildArgs();
