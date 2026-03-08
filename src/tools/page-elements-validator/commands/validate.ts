@@ -70,7 +70,7 @@ export async function runValidateCommand(args: string[]) {
     const mapFiles = listPageMapFiles(mapsDir);
 
     printSection("Scanning page-maps");
-    console.log(`Found ${mapFiles.length} page-map(s)`);
+    log.info(`Found ${mapFiles.length} page-map(s)`);
 
     let ok = 0;
     let bad = 0;
@@ -101,15 +101,15 @@ export async function runValidateCommand(args: string[]) {
             printStatus("❌", pageKey);
 
             for (const e of pageErrors) {
-                console.log(`  ${e}`);
+                log.info(`  ${e}`);
             }
 
             for (const w of pageWarnings) {
                 if (verbose) log.debug(`WARN: ${pageKey}: ${w}`);
-                else console.log(`  ${warning("⚠️")} ${w}`);
+                else log.info(`  ${warning("⚠️")} ${w}`);
             }
 
-            console.log("");
+            log.info("");
             continue;
         }
 
@@ -119,10 +119,10 @@ export async function runValidateCommand(args: string[]) {
 
             for (const w of pageWarnings) {
                 if (verbose) log.debug(`WARN: ${pageKey}: ${w}`);
-                else console.log(`  ${warning("⚠️")} ${w}`);
+                else log.info(`  ${warning("⚠️")} ${w}`);
             }
 
-            console.log("");
+            log.info("");
             continue;
         }
 
@@ -140,7 +140,7 @@ export async function runValidateCommand(args: string[]) {
             printStatus("✓", "src/pages/index.ts / pageManager.ts");
         } else {
             for (const w of pagesH.warnings) {
-                console.log(`  ${warning("⚠️")} ${w}`);
+                log.info(`  ${warning("⚠️")} ${w}`);
             }
 
             for (const e of pagesH.errors) {
@@ -161,7 +161,7 @@ export async function runValidateCommand(args: string[]) {
     const resultText =
         bad > 0 ? failure("FAILED") : strict && warnCount > 0 ? failure("FAILED") : success("PASSED");
 
-    console.log(`${strong("Result".padEnd(20, " "))}: ${resultText}`);
+    log.info(`${strong("Result".padEnd(20, " "))}: ${resultText}`);
 
     if (bad > 0) process.exit(1);
 

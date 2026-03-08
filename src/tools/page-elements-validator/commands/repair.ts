@@ -76,7 +76,7 @@ export async function runRepairCommand(args: string[]) {
         log,
     });
 
-    console.log(`Found ${report.pagesScanned} page-map(s)`);
+    log.info(`Found ${report.pagesScanned} page-map(s)`);
 
     printSection("Processing pages");
 
@@ -99,7 +99,7 @@ export async function runRepairCommand(args: string[]) {
             printIndented("registry", "added to PageManager");
         }
 
-        console.log("");
+        log.info("");
     }
 
     printSummary("REPAIR SUMMARY", [
@@ -110,5 +110,5 @@ export async function runRepairCommand(args: string[]) {
         ["State updated", report.stateUpdated ? "yes" : "no"],
     ]);
 
-    console.log(`${strong("Result".padEnd(20, " "))}: ${success("COMPLETED")}`);
+    log.info(`${strong("Result".padEnd(20, " "))}: ${success("COMPLETED")}`);
 }

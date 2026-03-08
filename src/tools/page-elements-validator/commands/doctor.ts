@@ -104,12 +104,12 @@ export async function runDoctorCommand(args: string[]) {
             okCount++;
             printStatus("✓", c.name);
             if (verbose) {
-                console.log(`  ${c.detail}`);
+                log.info(`  ${c.detail}`);
             }
         } else {
             badCount++;
             printStatus("❌", c.name);
-            console.log(`  ${c.detail}`);
+            log.info(`  ${c.detail}`);
         }
     }
 
@@ -120,33 +120,33 @@ export async function runDoctorCommand(args: string[]) {
 
         for (const f of failed) {
             if (f.name === "mapsDir exists") {
-                console.log(`- Create: mkdir -p ${mapsDir}`);
+                log.info(`- Create: mkdir -p ${mapsDir}`);
             }
 
             if (f.name === "pagesDir exists") {
-                console.log(`- Create: mkdir -p ${pagesDir}`);
+                log.info(`- Create: mkdir -p ${pagesDir}`);
             }
 
             if (f.name === "stateDir exists") {
-                console.log(`- Create: mkdir -p ${stateDir}`);
+                log.info(`- Create: mkdir -p ${stateDir}`);
             }
 
             if (f.name === "stateFile exists") {
-                console.log(
+                log.info(
                     "- Run generator state-only to create state file: " +
                     "node -r ts-node/register src/tools/page-elements-generator/cli.ts generate --stateOnly --verbose"
                 );
             }
 
             if (f.name === "page-maps found") {
-                console.log(
+                log.info(
                     '- Run a scan first: ' +
                     'node -r ts-node/register src/tools/page-scanner/cli.ts scan --connectCdp "$CDP" --pageKey <key> --merge'
                 );
             }
 
             if (f.name.endsWith("writable")) {
-                console.log(`- Fix permissions for: ${f.detail}`);
+                log.info(`- Fix permissions for: ${f.detail}`);
             }
         }
     }
@@ -156,12 +156,12 @@ export async function runDoctorCommand(args: string[]) {
         ["Checks failed", badCount],
     ]);
 
-    console.log(
+    log.info(
         `${strong("Result".padEnd(20, " "))}: ${badCount > 0 ? failure("ISSUES FOUND") : success("HEALTHY")}`
     );
 
     if (badCount === 0) {
-        console.log("Next: npm run gen:elements:changed:verbose (or run the generator CLI directly)");
+        log.info("Next: npm run gen:elements:changed:verbose (or run the generator CLI directly)");
         return;
     }
 

@@ -47,7 +47,7 @@ function isPipelinePlugin(v: any): v is PipelinePlugin {
 
 /**
  * Loads plugins from a folder (no execution here).
- * Uses logger (no console.log) so timestamps/prefix are consistent.
+ * Uses logger so timestamps/prefix are consistent.
  */
 export async function loadPluginsFromFolder(opts: {
     pluginsDirAbs: string;

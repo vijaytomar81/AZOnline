@@ -6,8 +6,44 @@ const path = require("node:path");
 const ROOT = process.cwd();
 const SRC_DIR = path.join(ROOT, "src");
 
+const ICON_OK = "✓";
 const ICON_WARN = "⚠️";
 const ICON_ADD = "➕";
+const ICON_FAIL = "❌";
+
+function printSection(title) {
+    console.log("");
+    console.log(title);
+    console.log("-".repeat(title.length));
+}
+
+function printKeyValue(key, value) {
+    const label = String(key).padEnd(10, " ");
+    console.log(`${label}: ${value}`);
+}
+
+function printStatus(symbol, text) {
+    console.log(`${symbol} ${text}`);
+}
+
+function printIndented(label, value) {
+    const padded = String(label).padEnd(24, " ");
+    console.log(`  ${padded}${value}`);
+}
+
+function printSummary(title, rows) {
+    console.log("");
+    console.log("--------------------------------------------------");
+    console.log(title);
+    console.log("--------------------------------------------------");
+
+    for (const [k, v] of rows) {
+        const label = String(k).padEnd(20, " ");
+        console.log(`${label}: ${v}`);
+    }
+
+    console.log("--------------------------------------------------");
+}
 
 function walk(dir) {
     const out = [];
@@ -30,13 +66,11 @@ function fixOne(fileAbs, { dryRun }) {
     const raw = fs.readFileSync(fileAbs, "utf8");
     const lines = raw.split(/\r?\n/);
 
-    // Respect shebang if any (rare in TS, but safe)
     let i = 0;
     if (lines[0]?.startsWith("#!")) i = 1;
 
     const first = lines[i] ?? "";
 
-    // Case A: first line is already a src header comment -> replace if wrong
     if (/^\s*\/\/\s*src\//.test(first)) {
         const cur = first.trim();
 
@@ -49,26 +83,34 @@ function fixOne(fileAbs, { dryRun }) {
         return { changed: true, status: "incorrect", from: cur, to: want };
     }
 
-    // Case B: no header -> insert at top (after shebang if present)
     lines.splice(i, 0, want);
     if (!dryRun) fs.writeFileSync(fileAbs, lines.join("\n"), "utf8");
     return { changed: true, status: "missing", from: "(missing)", to: want };
 }
 
-function logIssue(fileRel, res) {
+function logDryRunIssue(fileRel, res) {
     if (res.status === "missing") {
-        console.log(`${ICON_ADD} MISSING HEADER`);
-        console.log(`   file: ${fileRel}`);
-        console.log(`   expected: ${res.to}\n`);
+        printStatus(ICON_ADD, fileRel);
+        printIndented("status", "missing header");
+        printIndented("expected", res.to);
+        console.log("");
         return;
     }
 
     if (res.status === "incorrect") {
-        console.log(`${ICON_WARN} INCORRECT HEADER`);
-        console.log(`   file: ${fileRel}`);
-        console.log(`   current:  ${res.from}`);
-        console.log(`   expected: ${res.to}\n`);
+        printStatus(ICON_WARN, fileRel);
+        printIndented("status", "incorrect header");
+        printIndented("current", res.from);
+        printIndented("expected", res.to);
+        console.log("");
     }
+}
+
+function logFix(fileRel, res) {
+    printStatus(ICON_OK, fileRel);
+    printIndented("from", res.from);
+    printIndented("to", res.to);
+    console.log("");
 }
 
 function main() {
@@ -76,16 +118,26 @@ function main() {
     const dryRun = argv.includes("--dryRun");
 
     if (!fs.existsSync(SRC_DIR)) {
-        console.error(`❌ Not found: ${SRC_DIR}`);
+        printStatus(ICON_FAIL, `Not found: ${SRC_DIR}`);
         process.exit(1);
     }
 
+    printSection("Header Check");
+    printKeyValue("mode", dryRun ? "dry-run" : "fix");
+    printKeyValue("root", ROOT);
+    printKeyValue("srcDir", SRC_DIR);
+
+    printSection("Scanning files");
+
     const files = walk(SRC_DIR);
+    console.log(`Found ${files.length} TypeScript file(s)`);
 
     let changed = 0;
     let scanned = 0;
     let missing = 0;
     let incorrect = 0;
+
+    printSection(dryRun ? "Header issues" : "Applying fixes");
 
     for (const f of files) {
         scanned++;
@@ -96,28 +148,43 @@ function main() {
         if (res.status === "incorrect") incorrect++;
 
         if (dryRun) {
-            // show only files needing action
             if (res.changed) {
                 changed++;
-                logIssue(fileRel, res);
+                logDryRunIssue(fileRel, res);
             }
             continue;
         }
 
-        // non-dryRun: only print changed files
         if (res.changed) {
             changed++;
-            console.log(`FIX ✅ ${fileRel}`);
-            console.log(`   ${res.from}  ->  ${res.to}\n`);
+            logFix(fileRel, res);
         }
     }
 
+    if (dryRun && changed === 0) {
+        printStatus(ICON_OK, "No header issues found");
+    }
+
+    if (!dryRun && changed === 0) {
+        printStatus(ICON_OK, "No files needed header updates");
+    }
+
+    printSummary("HEADER SUMMARY", [
+        ["Files scanned", scanned],
+        ["Files changed", changed],
+        ["Missing", missing],
+        ["Incorrect", incorrect],
+        ["Mode", dryRun ? "dry-run" : "fix"],
+    ]);
+
     console.log(
-        `\n✅ Done. scanned=${scanned} changed=${changed} missing=${missing} incorrect=${incorrect}${dryRun ? " (dryRun)" : ""}`
+        `Result               : ${changed > 0 ? (dryRun ? "ISSUES FOUND" : "COMPLETED") : "CLEAN"
+        }`
     );
 
-    // Optional CI behavior: fail dry-run if any changes are needed
-    // if (dryRun && changed > 0) process.exitCode = 1;
+    if (dryRun && changed > 0) {
+        process.exitCode = 1;
+    }
 }
 
 main();

@@ -1,6 +1,17 @@
 // src/core/caseRunner.ts
 import type { Page } from "@playwright/test";
+
 import { PageManager } from "../pages";
+import { createLogger } from "../utils/logger";
+import {
+    printSection,
+    printStatus,
+    printIndented,
+    printSummary,
+    success,
+    strong,
+} from "../utils/cliFormat";
+
 import type { HealEvent } from "./selfHealWriter";
 
 export type FlowFn = (args: {
@@ -56,16 +67,28 @@ function printSelfHealReport(events: HealEvent[]) {
         return;
     }
 
-    console.log("");
-    console.log("SELF HEAL REPORT");
-    console.log("----------------");
+    printSection("Self Heal Report");
 
     for (const event of events) {
-        console.log(`${event.pageKey}.${event.elementKey}`);
-        console.log(`  preferred was : ${event.preferredWas}`);
-        console.log(`  preferred now : ${event.preferredNow}`);
+        printStatus("➕", `${event.pageKey}.${event.elementKey}`);
+        printIndented("preferred was", event.preferredWas);
+        printIndented("preferred now", event.preferredNow);
         console.log("");
     }
+
+    printSummary("SELF HEAL SUMMARY", [
+        ["Healed items", events.length],
+    ]);
+
+    console.log(`${strong("Result".padEnd(20, " "))}: ${success("RECORDED")}`);
+}
+
+function createCaseRunnerLogger(scriptName: string) {
+    return createLogger({
+        prefix: `[case-runner${scriptName ? `:${scriptName}` : ""}]`,
+        withTimestamp: true,
+        logToFile: false,
+    });
 }
 
 /**
@@ -77,7 +100,10 @@ export async function runFlowForCase(opts: {
     payload: Record<string, any>;
     flow: FlowFn;
 }) {
+    const log = createCaseRunnerLogger(opts.scriptName);
     const pages = new PageManager(opts.page);
+
+    log.info("Starting flow execution");
 
     await opts.flow({
         page: opts.page,
@@ -86,7 +112,14 @@ export async function runFlowForCase(opts: {
         scriptName: opts.scriptName,
     });
 
+    log.info("Flow execution completed");
+
     const healEvents = getHealEventsFromPageManager(pages);
+
+    if (healEvents.length > 0) {
+        log.info(`Self-heal events found: ${healEvents.length}`);
+    }
+
     printSelfHealReport(healEvents);
     clearHealEventsFromPageManager(pages);
 }
