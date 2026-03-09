@@ -1,0 +1,655 @@
+{
+  "pageKey": "motor.ph-claims-and-convictions",
+  "url": "https://myinsurance-allianz-nft.athenapaas.com/journey/show/product/AnnualMotorInsurance/process/nb/claimsPage/69aec1fabe84b34399895bf0",
+  "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/claimsPage/69aec1fabe84b34399895bf0",
+  "scannedAt": "2026-03-09T13:01:37.900Z",
+  "title": "Claims & convictions",
+  "elements": {
+    "1": {
+      "type": "radio",
+      "preferred": "css=#numberOfClaims1",
+      "fallbacks": [
+        "css=input[name=\"numberOfClaims\"]",
+        "role=textbox[name=/1/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "numberOfClaims1",
+        "name": "1",
+        "text": null,
+        "labelText": "1",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "numberOfClaims",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "2": {
+      "type": "radio",
+      "preferred": "css=#numberOfClaims2",
+      "fallbacks": [
+        "css=input[name=\"numberOfClaims\"]",
+        "role=textbox[name=/2/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "numberOfClaims2",
+        "name": "2",
+        "text": null,
+        "labelText": "2",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "numberOfClaims",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "3": {
+      "type": "radio",
+      "preferred": "css=#numberOfClaims3",
+      "fallbacks": [
+        "css=input[name=\"numberOfClaims\"]",
+        "role=textbox[name=/3/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "numberOfClaims3",
+        "name": "3",
+        "text": null,
+        "labelText": "3",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "numberOfClaims",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "4": {
+      "type": "radio",
+      "preferred": "css=#numberOfClaims4",
+      "fallbacks": [
+        "css=input[name=\"numberOfClaims\"]",
+        "role=textbox[name=/4\\+/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "numberOfClaims4",
+        "name": "4+",
+        "text": null,
+        "labelText": "4+",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "numberOfClaims",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "linkToAllianzHomePage": {
+      "type": "link",
+      "preferred": "css=#goToAllianzHomePage",
+      "fallbacks": [
+        "css=a[aria-label=\"Link to Allianz home page\"]",
+        "role=link[name=/Link to Allianz home page/i]"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "goToAllianzHomePage",
+        "name": "Link to Allianz home page",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": "Link to Allianz home page",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://www.allianz.co.uk",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "yes": {
+      "type": "radio",
+      "preferred": "css=#-true",
+      "fallbacks": [
+        "role=textbox[name=/Yes/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "-true",
+        "name": "Yes",
+        "text": null,
+        "labelText": "Yes",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "no": {
+      "type": "radio",
+      "preferred": "css=#-false",
+      "fallbacks": [
+        "role=textbox[name=/No/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "-false",
+        "name": "No",
+        "text": null,
+        "labelText": "No",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "month": {
+      "type": "input",
+      "preferred": "css=#claim_1_date-month",
+      "fallbacks": [
+        "css=input[aria-label=\"Month input field\"]",
+        "css=input[placeholder=\"MM\"]",
+        "role=textbox[name=/Month input field/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "claim_1_date-month",
+        "name": "Month input field",
+        "text": null,
+        "labelText": "Month",
+        "ariaLabel": "Month input field",
+        "placeholder": "MM",
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "year": {
+      "type": "input",
+      "preferred": "css=#claim_1_date-year",
+      "fallbacks": [
+        "css=input[aria-label=\"Year input field\"]",
+        "css=input[placeholder=\"YYYY\"]",
+        "role=textbox[name=/Year input field/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "claim_1_date-year",
+        "name": "Year input field",
+        "text": null,
+        "labelText": "Year",
+        "ariaLabel": "Year input field",
+        "placeholder": "YYYY",
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "whatHappened": {
+      "type": "select",
+      "preferred": "css=#claim_1_description",
+      "fallbacks": [
+        "role=combobox[name=/What happened\\?/i]"
+      ],
+      "meta": {
+        "tag": "select",
+        "role": null,
+        "id": "claim_1_description",
+        "name": "What happened?",
+        "text": null,
+        "labelText": "What happened?",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "removeClaim": {
+      "type": "link",
+      "preferred": "role=link[name=/Remove claim/i]",
+      "fallbacks": [
+        "text=/Remove claim/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": null,
+        "name": "Remove claim",
+        "text": "Remove claim",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "javascript:void(0)",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "month2": {
+      "type": "input",
+      "preferred": "css=#claim_2_date-month",
+      "fallbacks": [
+        "css=input[aria-label=\"Month input field\"]",
+        "css=input[placeholder=\"MM\"]",
+        "role=textbox[name=/Month input field/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "claim_2_date-month",
+        "name": "Month input field",
+        "text": null,
+        "labelText": "Month",
+        "ariaLabel": "Month input field",
+        "placeholder": "MM",
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "year2": {
+      "type": "input",
+      "preferred": "css=#claim_2_date-year",
+      "fallbacks": [
+        "css=input[aria-label=\"Year input field\"]",
+        "css=input[placeholder=\"YYYY\"]",
+        "role=textbox[name=/Year input field/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "claim_2_date-year",
+        "name": "Year input field",
+        "text": null,
+        "labelText": "Year",
+        "ariaLabel": "Year input field",
+        "placeholder": "YYYY",
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "whatHappened2": {
+      "type": "select",
+      "preferred": "css=#claim_2_description",
+      "fallbacks": [
+        "role=combobox[name=/What happened\\?/i]"
+      ],
+      "meta": {
+        "tag": "select",
+        "role": null,
+        "id": "claim_2_description",
+        "name": "What happened?",
+        "text": null,
+        "labelText": "What happened?",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "removeClaim2": {
+      "type": "link",
+      "preferred": "role=link[name=/Remove claim/i]",
+      "fallbacks": [
+        "text=/Remove claim/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": null,
+        "name": "Remove claim",
+        "text": "Remove claim",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "javascript:void(0)",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "month3": {
+      "type": "input",
+      "preferred": "css=#claim_3_date-month",
+      "fallbacks": [
+        "css=input[aria-label=\"Month input field\"]",
+        "css=input[placeholder=\"MM\"]",
+        "role=textbox[name=/Month input field/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "claim_3_date-month",
+        "name": "Month input field",
+        "text": null,
+        "labelText": "Month",
+        "ariaLabel": "Month input field",
+        "placeholder": "MM",
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "year3": {
+      "type": "input",
+      "preferred": "css=#claim_3_date-year",
+      "fallbacks": [
+        "css=input[aria-label=\"Year input field\"]",
+        "css=input[placeholder=\"YYYY\"]",
+        "role=textbox[name=/Year input field/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "claim_3_date-year",
+        "name": "Year input field",
+        "text": null,
+        "labelText": "Year",
+        "ariaLabel": "Year input field",
+        "placeholder": "YYYY",
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "whatHappened3": {
+      "type": "select",
+      "preferred": "css=#claim_3_description",
+      "fallbacks": [
+        "role=combobox[name=/What happened\\?/i]"
+      ],
+      "meta": {
+        "tag": "select",
+        "role": null,
+        "id": "claim_3_description",
+        "name": "What happened?",
+        "text": null,
+        "labelText": "What happened?",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "removeClaim3": {
+      "type": "link",
+      "preferred": "role=link[name=/Remove claim/i]",
+      "fallbacks": [
+        "text=/Remove claim/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": null,
+        "name": "Remove claim",
+        "text": "Remove claim",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "javascript:void(0)",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "month4": {
+      "type": "input",
+      "preferred": "css=#claim_4_date-month",
+      "fallbacks": [
+        "css=input[aria-label=\"Month input field\"]",
+        "css=input[placeholder=\"MM\"]",
+        "role=textbox[name=/Month input field/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "claim_4_date-month",
+        "name": "Month input field",
+        "text": null,
+        "labelText": "Month",
+        "ariaLabel": "Month input field",
+        "placeholder": "MM",
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "year4": {
+      "type": "input",
+      "preferred": "css=#claim_4_date-year",
+      "fallbacks": [
+        "css=input[aria-label=\"Year input field\"]",
+        "css=input[placeholder=\"YYYY\"]",
+        "role=textbox[name=/Year input field/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "claim_4_date-year",
+        "name": "Year input field",
+        "text": null,
+        "labelText": "Year",
+        "ariaLabel": "Year input field",
+        "placeholder": "YYYY",
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "whatHappened4": {
+      "type": "select",
+      "preferred": "css=#claim_4_description",
+      "fallbacks": [
+        "role=combobox[name=/What happened\\?/i]"
+      ],
+      "meta": {
+        "tag": "select",
+        "role": null,
+        "id": "claim_4_description",
+        "name": "What happened?",
+        "text": null,
+        "labelText": "What happened?",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "removeClaim4": {
+      "type": "link",
+      "preferred": "role=link[name=/Remove claim/i]",
+      "fallbacks": [
+        "text=/Remove claim/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": null,
+        "name": "Remove claim",
+        "text": "Remove claim",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "javascript:void(0)",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "yes2": {
+      "type": "radio",
+      "preferred": "css=#unspentCriminalConvictionsQuestiontrue",
+      "fallbacks": [
+        "css=input[name=\"unspentCriminalConvictionsQuestion\"]",
+        "role=textbox[name=/Yes/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "unspentCriminalConvictionsQuestiontrue",
+        "name": "Yes",
+        "text": null,
+        "labelText": "Yes",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "unspentCriminalConvictionsQuestion",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "no2": {
+      "type": "radio",
+      "preferred": "css=#unspentCriminalConvictionsQuestionfalse",
+      "fallbacks": [
+        "css=input[name=\"unspentCriminalConvictionsQuestion\"]",
+        "role=textbox[name=/No/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "unspentCriminalConvictionsQuestionfalse",
+        "name": "No",
+        "text": null,
+        "labelText": "No",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "unspentCriminalConvictionsQuestion",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "next": {
+      "type": "button",
+      "preferred": "css=#navigatorNext",
+      "fallbacks": [
+        "role=button[name=/Next/i]",
+        "text=/Next/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": "navigatorNext",
+        "name": "Next",
+        "text": "Next",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "back": {
+      "type": "button",
+      "preferred": "css=#navigatorBack",
+      "fallbacks": [
+        "role=link[name=/Back/i]",
+        "text=/Back/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": "link",
+        "id": "navigatorBack",
+        "name": "Back",
+        "text": "Back",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    }
+  }
+}
