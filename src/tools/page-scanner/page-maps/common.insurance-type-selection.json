@@ -1,0 +1,220 @@
+{
+  "pageKey": "common.insurance-type-selection",
+  "url": "https://myinsurance-allianz-nft.athenapaas.com/products",
+  "urlPath": "/products",
+  "scannedAt": "2026-03-09T12:49:52.264Z",
+  "title": "Get a new quote or view saved quotes",
+  "elements": {
+    "linkToAllianzHomePage": {
+      "type": "link",
+      "preferred": "css=#goToAllianzHomePage",
+      "fallbacks": [
+        "css=a[aria-label=\"Link to Allianz home page\"]",
+        "role=link[name=/Link to Allianz home page/i]"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "goToAllianzHomePage",
+        "name": "Link to Allianz home page",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": "Link to Allianz home page",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://www.allianz.co.uk",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "back": {
+      "type": "button",
+      "preferred": "role=button[name=/Back/i]",
+      "fallbacks": [
+        "text=/Back/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": null,
+        "name": "Back",
+        "text": "Back",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "carQuote": {
+      "type": "link",
+      "preferred": "css=#viewSavedSubscriptionCarQuotes",
+      "fallbacks": [
+        "role=link[name=/Car quote/i]",
+        "text=/Car quote/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "viewSavedSubscriptionCarQuotes",
+        "name": "Car quote",
+        "text": "Car quote",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/journey/show/product/AnnualMotorInsurance/process/nb",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "carQuote2": {
+      "type": "button",
+      "preferred": "role=button[name=/Car quote/i]",
+      "fallbacks": [
+        "text=/Car quote/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": null,
+        "name": "Car quote",
+        "text": "Car quote",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "homeQuote": {
+      "type": "link",
+      "preferred": "css=#viewSavedSubscriptionHomeQuotes",
+      "fallbacks": [
+        "role=link[name=/Home quote/i]",
+        "text=/Home quote/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "viewSavedSubscriptionHomeQuotes",
+        "name": "Home quote",
+        "text": "Home quote",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/journey/show/product/AnnualHomeInsurance/process/nb/dashboardEntryPage",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "homeQuote2": {
+      "type": "button",
+      "preferred": "role=button[name=/Home quote/i]",
+      "fallbacks": [
+        "text=/Home quote/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": null,
+        "name": "Home quote",
+        "text": "Home quote",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "letUsKnow": {
+      "type": "link",
+      "preferred": "css=#renewal-date-capture-link",
+      "fallbacks": [
+        "role=link[name=/Let us know/i]",
+        "text=/Let us know/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "renewal-date-capture-link",
+        "name": "Let us know",
+        "text": "Let us know",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://cloud.comms.allianz.co.uk/RenewalDateCapture",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "back2": {
+      "type": "link",
+      "preferred": "role=link[name=/Back/i]",
+      "fallbacks": [
+        "text=/Back/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": null,
+        "name": "Back",
+        "text": "Back",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/dashboard",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "back3": {
+      "type": "button",
+      "preferred": "role=link[name=/Back/i]",
+      "fallbacks": [
+        "text=/Back/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": "link",
+        "id": null,
+        "name": "Back",
+        "text": "Back",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    }
+  }
+}
