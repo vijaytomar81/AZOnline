@@ -73,14 +73,16 @@ async function main() {
     log.info(`Total time: ${timer.elapsedSecondsText()}`);
     log.info("Done ✅");
 
-    printSummary("DATA BUILDER SUMMARY", [
-        ["Plugins executed", ranNames.length],
-        ["Cases generated", caseCount],
-        ["Output file", absOut || "(not set)"],
-        ["Total time", timer.elapsedSecondsText()],
-    ]);
-
-    console.log(`${strong("Result".padEnd(20, " "))}: ${success("COMPLETED")}`);
+    printSummary(
+        "DATA BUILDER SUMMARY",
+        [
+            ["Plugins executed", ranNames.length],
+            ["Cases generated", caseCount],
+            ["Output file", absOut || "(not set)"],
+            ["Total time", timer.elapsedSecondsText()],
+        ],
+        success("COMPLETED")
+    );
 }
 
 main().catch((e: any) => {

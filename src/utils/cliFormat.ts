@@ -1,4 +1,4 @@
-// src/old/utils/cliFormat.ts
+// src/utils/cliFormat.ts
 
 import { ICONS } from "./icons";
 import type { IconKey } from "./icons";
@@ -18,6 +18,10 @@ const ANSI = {
 
 function color(text: string, code: string): string {
     return `${code}${text}${ANSI.reset}`;
+}
+
+function stripAnsi(text: string): string {
+    return String(text).replace(/\x1B\[[0-9;]*m/g, "");
 }
 
 export function success(text: string): string {
@@ -48,7 +52,7 @@ export function printCommandTitle(title: string, icon?: IconKey) {
     const iconPrefix = icon ? `${ICONS[icon]} ` : "";
     const text = `${iconPrefix}${title}`.trim();
 
-    const line = "*".repeat(Math.max(text.length, 32));
+    const line = "*".repeat(Math.max(stripAnsi(text).length, 32));
 
     console.log("");
     console.log(muted(line));
@@ -81,29 +85,51 @@ export function printIndented(label: string, value: string) {
 export function printStatus(symbol: string, text: string) {
     let s = symbol;
 
-    if (symbol === "✓" || symbol === "✅" || symbol === "➕") {
+    if (symbol === ICONS.successIcon || symbol === ICONS.doneIcon || symbol === ICONS.addIcon) {
         s = success(symbol);
-    } else if (symbol === "⚠️") {
+    } else if (symbol === ICONS.warningIcon) {
         s = warning(symbol);
-    } else if (symbol === "❌") {
+    } else if (symbol === ICONS.failIcon) {
         s = failure(symbol);
     }
 
-    console.log(`${s} ${text}`);
+    const iconPad = 2;
+    console.log(`${s}${" ".repeat(iconPad)}${text}`);
 }
 
-export function printSummary(title: string, rows: Array<[string, string | number]>) {
-    const line = "-".repeat(Math.max(title.length, 32));
-
+export function printSummary(
+    title: string,
+    rows: Array<[string, string | number]>,
+    resultText?: string
+) {
     console.log("");
+
+    const allRows: Array<[string, string | number]> =
+        resultText !== undefined
+            ? [...rows, ["Result", resultText]]
+            : rows;
+
+    const longestKey = Math.max(...allRows.map(([k]) => stripAnsi(String(k)).length));
+    const longestValue = Math.max(...allRows.map(([, v]) => stripAnsi(String(v)).length));
+
+    const pad = longestKey + 3;
+    const lineWidth = Math.max(pad + 2 + longestValue + 2, 32);
+    const line = "-".repeat(lineWidth);
+
     console.log(muted(line));
     console.log(strong(title));
     console.log(muted(line));
 
     for (const [k, v] of rows) {
-        const label = k.padEnd(20, " ");
+        const label = String(k).padEnd(pad, " ");
         console.log(`${muted(label)}: ${v}`);
     }
 
     console.log(muted(line));
+
+    if (resultText !== undefined) {
+        const label = "Result".padEnd(pad, " ");
+        console.log(`${muted(label)}: ${resultText}`);
+        console.log(muted(line));
+    }
 }

@@ -37,7 +37,7 @@ export async function runDoctorCommand(args: string[]) {
     const argv = normalizeArgv(args);
 
     const verbose = hasFlag(argv, "--verbose");
-    
+
     const log = createLogger({
         prefix: "[validator - doctor]",
         logLevel: verbose ? "debug" : "info",
@@ -104,13 +104,19 @@ export async function runDoctorCommand(args: string[]) {
         if (c.ok) {
             okCount++;
             printStatus("✓", c.name);
+
             if (verbose) {
-                log.info(`  ${c.detail}`);
+                log.debug(`  ${c.detail}`);
             }
         } else {
             badCount++;
             printStatus("❌", c.name);
-            log.info(`  ${c.detail}`);
+
+            if (verbose) {
+                log.debug(`  ${c.detail}`);
+            } else {
+                log.info(`  ${c.detail}`);
+            }
         }
     }
 
@@ -152,19 +158,18 @@ export async function runDoctorCommand(args: string[]) {
         }
     }
 
-    printSummary("DOCTOR SUMMARY", [
-        ["Checks passed", okCount],
-        ["Checks failed", badCount],
-    ]);
-
-    log.info(
-        `${strong("Result".padEnd(20, " "))}: ${badCount > 0 ? failure("ISSUES FOUND") : success("HEALTHY")}`
+    printSummary(
+        "DOCTOR SUMMARY",
+        [
+            ["Maps dir", exists(mapsDir) ? "OK" : "MISSING"],
+            ["Pages dir", exists(pagesDir) ? "OK" : "MISSING"],
+            ["State dir", exists(stateDir) ? "OK" : "MISSING"],
+            ["State file", exists(stateFile) ? "OK" : "MISSING"],
+        ],
+        failed.length === 0
+            ? success("ALL GOOD")
+            : failure("ISSUE FOUND")
     );
-
-    if (badCount === 0) {
-        log.info("Next: npm run gen:elements:changed:verbose (or run the generator CLI directly)");
-        return;
-    }
 
     process.exitCode = 2;
 }

@@ -102,13 +102,15 @@ export async function runRepairCommand(args: string[]) {
         log.info("");
     }
 
-    printSummary("REPAIR SUMMARY", [
-        ["Pages scanned", report.pagesScanned],
-        ["Pages changed", report.pagesChanged],
-        ["Files generated", report.filesGenerated],
-        ["Registry updates", report.registryUpdates],
-        ["State updated", report.stateUpdated ? "yes" : "no"],
-    ]);
-
-    log.info(`${strong("Result".padEnd(20, " "))}: ${success("COMPLETED")}`);
+    printSummary(
+        "REPAIR SUMMARY",
+        [
+            ["Pages scanned", report.pagesScanned],
+            ["Pages changed", report.pagesChanged],
+            ["Files generated", report.filesGenerated],
+            ["Registry updates", report.registryUpdates],
+            ["State updated", report.stateUpdated ? "yes" : "no"],
+        ],
+        success("COMPLETED")
+    );
 }

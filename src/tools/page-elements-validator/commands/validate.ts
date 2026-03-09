@@ -149,19 +149,20 @@ export async function runValidateCommand(args: string[]) {
             }
         }
     }
-
-    printSummary("VALIDATE SUMMARY", [
-        ["Pages checked", mapFiles.length],
-        ["OK", ok],
-        ["Warnings", warnOnly],
-        ["Failed", bad],
-        ["Total warns", warnCount],
-    ]);
-
     const resultText =
-        bad > 0 ? failure("FAILED") : strict && warnCount > 0 ? failure("FAILED") : success("PASSED");
+        bad > 0 ? failure("FAILED") : strict && warnCount > 0 ? failure("ISSUE FOUND") : success("ALL GOOD");
 
-    log.info(`${strong("Result".padEnd(20, " "))}: ${resultText}`);
+    printSummary(
+        "VALIDATE SUMMARY",
+        [
+            ["Pages checked", mapFiles.length],
+            ["OK", ok],
+            ["Warnings", warnOnly],
+            ["Failed", bad],
+            ["Total warns", warnCount],
+        ],
+        resultText
+    );
 
     if (bad > 0) process.exit(1);
 
