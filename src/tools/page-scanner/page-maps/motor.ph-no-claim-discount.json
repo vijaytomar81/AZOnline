@@ -1,0 +1,248 @@
+{
+  "pageKey": "motor.ph-no-claim-discount",
+  "url": "https://myinsurance-allianz-nft.athenapaas.com/journey/show/product/AnnualMotorInsurance/process/nb/ncd/69aec1fabe84b34399895bf0",
+  "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/ncd/69aec1fabe84b34399895bf0",
+  "scannedAt": "2026-03-09T13:02:53.695Z",
+  "title": "No claim discount",
+  "elements": {
+    "linkToAllianzHomePage": {
+      "type": "link",
+      "preferred": "css=#goToAllianzHomePage",
+      "fallbacks": [
+        "css=a[aria-label=\"Link to Allianz home page\"]",
+        "role=link[name=/Link to Allianz home page/i]"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "goToAllianzHomePage",
+        "name": "Link to Allianz home page",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": "Link to Allianz home page",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://www.allianz.co.uk",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "ncdyearsquestion": {
+      "type": "select",
+      "preferred": "css=#ncdYearsQuestion",
+      "fallbacks": [
+        "role=combobox[name=/ncdYearsQuestion/i]"
+      ],
+      "meta": {
+        "tag": "select",
+        "role": null,
+        "id": "ncdYearsQuestion",
+        "name": "ncdYearsQuestion",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "withThisCarSh11ukaOrAPreviousCar": {
+      "type": "radio",
+      "preferred": "css=#ncdEarnTypeQuestion1",
+      "fallbacks": [
+        "css=input[name=\"ncdEarnTypeQuestion\"]",
+        "role=textbox[name=/With this car \\(SH11UKA\\) or a previous car/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "ncdEarnTypeQuestion1",
+        "name": "With this car  (SH11UKA) or a previous car",
+        "text": null,
+        "labelText": "With this car  (SH11UKA) or a previous car",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "ncdEarnTypeQuestion",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "withACompanyCar": {
+      "type": "radio",
+      "preferred": "css=#ncdEarnTypeQuestion2",
+      "fallbacks": [
+        "css=input[name=\"ncdEarnTypeQuestion\"]",
+        "role=textbox[name=/With a company car/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "ncdEarnTypeQuestion2",
+        "name": "With a company car",
+        "text": null,
+        "labelText": "With a company car",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "ncdEarnTypeQuestion",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "namedDriverOnAnotherPolicy": {
+      "type": "radio",
+      "preferred": "css=#ncdEarnTypeQuestion3",
+      "fallbacks": [
+        "css=input[name=\"ncdEarnTypeQuestion\"]",
+        "role=textbox[name=/Named driver on another policy/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "ncdEarnTypeQuestion3",
+        "name": "Named driver on another policy",
+        "text": null,
+        "labelText": "Named driver on another policy",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "ncdEarnTypeQuestion",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "inAnotherCountry": {
+      "type": "radio",
+      "preferred": "css=#ncdEarnTypeQuestion4",
+      "fallbacks": [
+        "css=input[name=\"ncdEarnTypeQuestion\"]",
+        "role=textbox[name=/In another country/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "ncdEarnTypeQuestion4",
+        "name": "In another country",
+        "text": null,
+        "labelText": "In another country",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "ncdEarnTypeQuestion",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "yes": {
+      "type": "radio",
+      "preferred": "css=#protectedNcdQuestion-true",
+      "fallbacks": [
+        "css=input[name=\"protectedNcdQuestion-true\"]",
+        "role=textbox[name=/Yes/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "protectedNcdQuestion-true",
+        "name": "Yes",
+        "text": null,
+        "labelText": "Yes",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "protectedNcdQuestion-true",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "no": {
+      "type": "radio",
+      "preferred": "css=#protectedNcdQuestion-false",
+      "fallbacks": [
+        "css=input[name=\"protectedNcdQuestion-false\"]",
+        "role=textbox[name=/No/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "protectedNcdQuestion-false",
+        "name": "No",
+        "text": null,
+        "labelText": "No",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "protectedNcdQuestion-false",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "next": {
+      "type": "button",
+      "preferred": "css=#navigatorNext",
+      "fallbacks": [
+        "role=button[name=/Next/i]",
+        "text=/Next/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": "navigatorNext",
+        "name": "Next",
+        "text": "Next",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "back": {
+      "type": "button",
+      "preferred": "css=#navigatorBack",
+      "fallbacks": [
+        "role=link[name=/Back/i]",
+        "text=/Back/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": "link",
+        "id": "navigatorBack",
+        "name": "Back",
+        "text": "Back",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    }
+  }
+}
