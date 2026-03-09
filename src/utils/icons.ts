@@ -10,7 +10,7 @@ export const ICONS = {
 
     validateIcon: "🔍",
     repairIcon: "🔧",
-    doctorIcon: "🩺",
+    doctorIcon: "🧪",
 
     dataBuilderIcon: "🧾",
 
