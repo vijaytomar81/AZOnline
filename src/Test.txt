@@ -1,8 +1,19 @@
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run ci:check
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run ci:check:verbose
 
-> azonline@1.0.0 ci:check
-> sh -c 'npm run typecheck && npm run tools:tsc && npm run headers:check && npm run validator -- doctor && npm run validator:run'
+> azonline@1.0.0 ci:check:verbose
+> npm run typecheck && npm run tools:tsc && npm run headers:check && npm run validator:doctor:verbose && npm run validator:verbose
 
-'sh' is not recognized as an internal or external command,
-operable program or batch file.
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline>
+
+> azonline@1.0.0 typecheck
+> tsc --noEmit
+
+
+> azonline@1.0.0 tools:tsc
+> tsc -p tsconfig.tools.json --noEmit
+
+error TS18003: No inputs were found in config file 'C:/Users/tp70707/OneDrive - Allianz/My Documents/Automation/AZOnline/tsconfig.tools.json'. Specified 'include' paths were '["src/page-scanner/**/*.ts","src/page-elements-generator/**/*.ts","src/page-elements-validator/**/*.ts"]' and 'exclude' paths were '["node_modules","dist"]'.
+
+
+Found 1 error.
+
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
