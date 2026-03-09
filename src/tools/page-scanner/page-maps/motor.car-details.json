@@ -1,9 +1,9 @@
 {
   "pageKey": "motor.car-details",
-  "url": "https://customer-portal-lv-test.athenapaas.com/journey/show/product/AnnualMotorInsurance/process/nb/numberPlateScan/69a409b5d35138197f847674",
-  "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/numberPlateScan/69a409b5d35138197f847674",
-  "title": "Car Details",
-  "scannedAt": "2026-03-01T09:43:18.087Z",
+  "url": "https://myinsurance-allianz-nft.athenapaas.com/journey/show/product/AnnualMotorInsurance/process/nb/numberPlateScan/69aec1fabe84b34399895bf0",
+  "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/numberPlateScan/69aec1fabe84b34399895bf0",
+  "scannedAt": "2026-03-09T12:52:20.271Z",
+  "title": "Car details",
   "elements": {
     "linkToAllianzHomePage": {
       "type": "link",
@@ -53,12 +53,14 @@
         "dataQa": null
       }
     },
-    "registrationnumberpolarquestionYes": {
+    "yes": {
       "type": "radio",
       "preferred": "css=#registrationNumberPolarQuestionfalse",
       "fallbacks": [
+        "css=#vehicleDetailsSetCorrectly-true",
         "css=input[name=\"registrationNumberPolarQuestion\"]",
-        "role=textbox[name=/Yes/i]"
+        "role=textbox[name=/Yes/i]",
+        "css=input[name=\"vehicleDetailsSetCorrectly\"]"
       ],
       "meta": {
         "tag": "input",
@@ -77,12 +79,14 @@
         "dataQa": null
       }
     },
-    "registrationnumberpolarquestionNo": {
+    "no": {
       "type": "radio",
       "preferred": "css=#registrationNumberPolarQuestiontrue",
       "fallbacks": [
+        "css=#vehicleDetailsSetCorrectly-false",
         "css=input[name=\"registrationNumberPolarQuestion\"]",
-        "role=textbox[name=/No/i]"
+        "role=textbox[name=/No/i]",
+        "css=input[name=\"vehicleDetailsSetCorrectly\"]"
       ],
       "meta": {
         "tag": "input",
@@ -170,55 +174,7 @@
         "dataQa": null
       }
     },
-    "vehicledetailssetcorrectlyYes": {
-      "type": "radio",
-      "preferred": "css=#vehicleDetailsSetCorrectly-true",
-      "fallbacks": [
-        "css=input[name=\"vehicleDetailsSetCorrectly\"]",
-        "role=textbox[name=/Yes/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "vehicleDetailsSetCorrectly-true",
-        "name": "Yes",
-        "text": null,
-        "labelText": "Yes",
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": "vehicleDetailsSetCorrectly",
-        "typeAttr": "radio",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null
-      }
-    },
-    "vehicledetailssetcorrectlyNo": {
-      "type": "radio",
-      "preferred": "css=#vehicleDetailsSetCorrectly-false",
-      "fallbacks": [
-        "css=input[name=\"vehicleDetailsSetCorrectly\"]",
-        "role=textbox[name=/No/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "vehicleDetailsSetCorrectly-false",
-        "name": "No",
-        "text": null,
-        "labelText": "No",
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": "vehicleDetailsSetCorrectly",
-        "typeAttr": "radio",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null
-      }
-    },
-    "hasmodificationTrueYes": {
+    "yes2": {
       "type": "radio",
       "preferred": "css=#hasModificationstrue",
       "fallbacks": [
@@ -242,7 +198,7 @@
         "dataQa": null
       }
     },
-    "hasmodificationFalseNo": {
+    "no2": {
       "type": "radio",
       "preferred": "css=#hasModificationsfalse",
       "fallbacks": [
@@ -459,7 +415,7 @@
         "dataQa": null
       }
     },
-    "vehicletransmissionmManual": {
+    "manual": {
       "type": "radio",
       "preferred": "css=#vehicleTransmissionM",
       "fallbacks": [
@@ -483,7 +439,7 @@
         "dataQa": null
       }
     },
-    "vehicletransmissionaAutomatic": {
+    "automatic": {
       "type": "radio",
       "preferred": "css=#vehicleTransmissionA",
       "fallbacks": [
@@ -507,7 +463,7 @@
         "dataQa": null
       }
     },
-    "vehiclefueltypepPetrol": {
+    "petrol": {
       "type": "radio",
       "preferred": "css=#vehicleFuelTypeP",
       "fallbacks": [
@@ -531,7 +487,7 @@
         "dataQa": null
       }
     },
-    "vehiclefueltypedDiesel": {
+    "diesel": {
       "type": "radio",
       "preferred": "css=#vehicleFuelTypeD",
       "fallbacks": [
