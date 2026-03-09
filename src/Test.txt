@@ -1,1 +1,23 @@
 npm install @google-cloud/local-auth exceljs googleapis
+
+
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm install @google-cloud/local-auth
+
+added 28 packages, and audited 155 packages in 6s
+
+10 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm install googleapis
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+
+added 83 packages, and audited 238 packages in 49s
+
+38 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
