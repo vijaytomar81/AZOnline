@@ -1,6 +1,7 @@
 // src/old/utils/cliFormat.ts
 
-import { ICONS, type IconKey } from "./icons";
+import { ICONS } from "./icons";
+import type { IconKey } from "./icons";
 
 const ANSI = {
     reset: "\x1b[0m",
