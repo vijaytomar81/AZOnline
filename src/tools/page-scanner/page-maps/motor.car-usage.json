@@ -1,0 +1,770 @@
+{
+  "pageKey": "motor.car-usage",
+  "url": "https://myinsurance-allianz-nft.athenapaas.com/journey/show/product/AnnualMotorInsurance/process/nb/additionalCarDetails/69aec1fabe84b34399895bf0",
+  "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/additionalCarDetails/69aec1fabe84b34399895bf0",
+  "scannedAt": "2026-03-09T13:12:39.305Z",
+  "title": "Car Usage",
+  "elements": {
+    "1": {
+      "type": "radio",
+      "preferred": "css=#carsInHouseholdQuestionInput1",
+      "fallbacks": [
+        "css=input[name=\"carsInHouseholdQuestionInput\"]",
+        "role=textbox[name=/1/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "carsInHouseholdQuestionInput1",
+        "name": "1",
+        "text": null,
+        "labelText": "1",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "carsInHouseholdQuestionInput",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "2": {
+      "type": "radio",
+      "preferred": "css=#carsInHouseholdQuestionInput2",
+      "fallbacks": [
+        "css=input[name=\"carsInHouseholdQuestionInput\"]",
+        "role=textbox[name=/2/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "carsInHouseholdQuestionInput2",
+        "name": "2",
+        "text": null,
+        "labelText": "2",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "carsInHouseholdQuestionInput",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "3": {
+      "type": "radio",
+      "preferred": "css=#carsInHouseholdQuestionInput3",
+      "fallbacks": [
+        "css=input[name=\"carsInHouseholdQuestionInput\"]",
+        "role=textbox[name=/3/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "carsInHouseholdQuestionInput3",
+        "name": "3",
+        "text": null,
+        "labelText": "3",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "carsInHouseholdQuestionInput",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "4": {
+      "type": "radio",
+      "preferred": "css=#carsInHouseholdQuestionInput4",
+      "fallbacks": [
+        "css=input[name=\"carsInHouseholdQuestionInput\"]",
+        "role=textbox[name=/4/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "carsInHouseholdQuestionInput4",
+        "name": "4",
+        "text": null,
+        "labelText": "4",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "carsInHouseholdQuestionInput",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "5": {
+      "type": "radio",
+      "preferred": "css=#carsInHouseholdQuestionInput5",
+      "fallbacks": [
+        "css=input[name=\"carsInHouseholdQuestionInput\"]",
+        "role=textbox[name=/5/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "carsInHouseholdQuestionInput5",
+        "name": "5",
+        "text": null,
+        "labelText": "5",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "carsInHouseholdQuestionInput",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "6": {
+      "type": "radio",
+      "preferred": "css=#carsInHouseholdQuestionInput6",
+      "fallbacks": [
+        "css=input[name=\"carsInHouseholdQuestionInput\"]",
+        "role=textbox[name=/6\\+/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "carsInHouseholdQuestionInput6",
+        "name": "6+",
+        "text": null,
+        "labelText": "6+",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "carsInHouseholdQuestionInput",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "linkToAllianzHomePage": {
+      "type": "link",
+      "preferred": "css=#goToAllianzHomePage",
+      "fallbacks": [
+        "css=a[aria-label=\"Link to Allianz home page\"]",
+        "role=link[name=/Link to Allianz home page/i]"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "goToAllianzHomePage",
+        "name": "Link to Allianz home page",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": "Link to Allianz home page",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://www.allianz.co.uk",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "vjTomaredit": {
+      "type": "checkbox",
+      "preferred": "css=#ef1e466f-f71f-41a4-96eb-0ef53d586e1a",
+      "fallbacks": [
+        "css=input[aria-label=\"VJ Tomar\"]",
+        "role=textbox[name=/VJ Tomar/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "ef1e466f-f71f-41a4-96eb-0ef53d586e1a",
+        "name": "VJ Tomar",
+        "text": null,
+        "labelText": "VJ TomarEdit",
+        "ariaLabel": "VJ Tomar",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": "checkbox",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "vjTomaredit2": {
+      "type": "link",
+      "preferred": "css=#edit-0",
+      "fallbacks": [
+        "role=link[name=/Edit/i]",
+        "text=/Edit/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "edit-0",
+        "name": "VJ TomarEdit",
+        "text": "Edit",
+        "labelText": "VJ TomarEdit",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/journey/show/product/AnnualMotorInsurance/process/nb/additionalCarDetails/69aec1fabe84b34399895bf0",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "tomAlleneditdelete": {
+      "type": "checkbox",
+      "preferred": "css=#89500a49-d935-44a2-97ce-648e2ab6a877",
+      "fallbacks": [
+        "css=input[aria-label=\"Tom Allen\"]",
+        "role=textbox[name=/Tom Allen/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "89500a49-d935-44a2-97ce-648e2ab6a877",
+        "name": "Tom Allen",
+        "text": null,
+        "labelText": "Tom AllenEditDelete",
+        "ariaLabel": "Tom Allen",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": "checkbox",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "tomAlleneditdelete2": {
+      "type": "link",
+      "preferred": "css=#edit-1",
+      "fallbacks": [
+        "role=link[name=/Edit/i]",
+        "text=/Edit/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "edit-1",
+        "name": "Tom AllenEditDelete",
+        "text": "Edit",
+        "labelText": "Tom AllenEditDelete",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/journey/show/product/AnnualMotorInsurance/process/nb/additionalCarDetails/69aec1fabe84b34399895bf0",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "tomAlleneditdelete3": {
+      "type": "link",
+      "preferred": "css=#delete-89500a49-d935-44a2-97ce-648e2ab6a877",
+      "fallbacks": [
+        "role=link[name=/Delete/i]",
+        "text=/Delete/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "delete-89500a49-d935-44a2-97ce-648e2ab6a877",
+        "name": "Tom AllenEditDelete",
+        "text": "Delete",
+        "labelText": "Tom AllenEditDelete",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/journey/show/product/AnnualMotorInsurance/process/nb/additionalCarDetails/69aec1fabe84b34399895bf0",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "addAnotherDriver": {
+      "type": "link",
+      "preferred": "role=link[name=/Add another driver/i]",
+      "fallbacks": [
+        "text=/Add another driver/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": null,
+        "name": "Add another driver",
+        "text": "Add another driver",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/journey/show/product/AnnualMotorInsurance/process/nb/additionalCarDetails/69aec1fabe84b34399895bf0",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "maindriver": {
+      "type": "select",
+      "preferred": "css=#mainDriver",
+      "fallbacks": [
+        "role=combobox[name=/mainDriver/i]"
+      ],
+      "meta": {
+        "tag": "select",
+        "role": null,
+        "id": "mainDriver",
+        "name": "mainDriver",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "registeredkeeper": {
+      "type": "select",
+      "preferred": "css=#registeredKeeper",
+      "fallbacks": [
+        "role=combobox[name=/registeredKeeper/i]"
+      ],
+      "meta": {
+        "tag": "select",
+        "role": null,
+        "id": "registeredKeeper",
+        "name": "registeredKeeper",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "registeredkeeper2": {
+      "type": "select",
+      "preferred": "css=#registeredKeeper",
+      "fallbacks": [
+        "role=combobox[name=/registeredKeeper/i]"
+      ],
+      "meta": {
+        "tag": "select",
+        "role": null,
+        "id": "registeredKeeper",
+        "name": "registeredKeeper",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "whatSYourEstimatedAnnualMileage": {
+      "type": "select",
+      "preferred": "css=#mileage",
+      "fallbacks": [
+        "role=combobox[name=/What's your estimated annual mileage\\?/i]"
+      ],
+      "meta": {
+        "tag": "select",
+        "role": null,
+        "id": "mileage",
+        "name": "What's your estimated annual mileage?",
+        "text": null,
+        "labelText": "What's your estimated annual mileage?",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "yes": {
+      "type": "radio",
+      "preferred": "css=#overnightLocationIsHometrue",
+      "fallbacks": [
+        "css=input[name=\"overnightLocationIsHome\"]",
+        "role=textbox[name=/Yes/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "overnightLocationIsHometrue",
+        "name": "Yes",
+        "text": null,
+        "labelText": "Yes",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "overnightLocationIsHome",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "no": {
+      "type": "radio",
+      "preferred": "css=#overnightLocationIsHomefalse",
+      "fallbacks": [
+        "css=input[name=\"overnightLocationIsHome\"]",
+        "role=textbox[name=/No/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "overnightLocationIsHomefalse",
+        "name": "No",
+        "text": null,
+        "labelText": "No",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "overnightLocationIsHome",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "whereIsThisCarKeptPleaseEnterPostCodeOnly": {
+      "type": "input",
+      "preferred": "css=#overnightPostcode",
+      "fallbacks": [
+        "role=textbox[name=/Where is this car kept\\? Please enter post code only\\./i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "overnightPostcode",
+        "name": "Where is this car kept? Please enter post code only.",
+        "text": null,
+        "labelText": "Where is this car kept? Please enter post code only.",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "drive": {
+      "type": "radio",
+      "preferred": "css=#overNightPlace1",
+      "fallbacks": [
+        "css=input[name=\"overNightPlace\"]",
+        "role=textbox[name=/Drive/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "overNightPlace1",
+        "name": "Drive",
+        "text": null,
+        "labelText": "Drive",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "overNightPlace",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "garage": {
+      "type": "radio",
+      "preferred": "css=#overNightPlace2",
+      "fallbacks": [
+        "css=input[name=\"overNightPlace\"]",
+        "role=textbox[name=/Garage/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "overNightPlace2",
+        "name": "Garage",
+        "text": null,
+        "labelText": "Garage",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "overNightPlace",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "road": {
+      "type": "radio",
+      "preferred": "css=#overNightPlace3",
+      "fallbacks": [
+        "css=input[name=\"overNightPlace\"]",
+        "role=textbox[name=/Road/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "overNightPlace3",
+        "name": "Road",
+        "text": null,
+        "labelText": "Road",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "overNightPlace",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "securedCarPark": {
+      "type": "radio",
+      "preferred": "css=#overNightPlace4",
+      "fallbacks": [
+        "css=input[name=\"overNightPlace\"]",
+        "role=textbox[name=/Secured car park/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "overNightPlace4",
+        "name": "Secured car park",
+        "text": null,
+        "labelText": "Secured car park",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "overNightPlace",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "unsecuredCarPark": {
+      "type": "radio",
+      "preferred": "css=#overNightPlace5",
+      "fallbacks": [
+        "css=input[name=\"overNightPlace\"]",
+        "role=textbox[name=/Unsecured car park/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "overNightPlace5",
+        "name": "Unsecured car park",
+        "text": null,
+        "labelText": "Unsecured car park",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "overNightPlace",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "whatIsThisMiniCooperSh11ukaUsedFor": {
+      "type": "button",
+      "preferred": "css=div[aria-label=\"Info button for more information about car usage\"]",
+      "fallbacks": [
+        "role=button[name=/Info button for more information about car usage/i]"
+      ],
+      "meta": {
+        "tag": "div",
+        "role": "button",
+        "id": null,
+        "name": "Info button for more information about car usage",
+        "text": null,
+        "labelText": "What is this MINI, COOPER (SH11UKA) used for?",
+        "ariaLabel": "Info button for more information about car usage",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "socialDomesticPleasureAndCommutingSdpC": {
+      "type": "radio",
+      "preferred": "css=#carUsageChoice-SDP+C",
+      "fallbacks": [
+        "css=input[name=\"carUsageChoice-SDP+C\"]",
+        "role=textbox[name=/Social, Domestic, Pleasure and Commuting \\(SDP\\+C\\)/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "carUsageChoice-SDP+C",
+        "name": "Social, Domestic, Pleasure and Commuting (SDP+C)",
+        "text": null,
+        "labelText": "Social, Domestic, Pleasure and Commuting (SDP+C)",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "carUsageChoice-SDP+C",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "socialDomesticAndPleasure": {
+      "type": "radio",
+      "preferred": "css=#carUsageChoice-SDP",
+      "fallbacks": [
+        "css=input[name=\"carUsageChoice-SDP\"]",
+        "role=textbox[name=/Social, Domestic and Pleasure/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "carUsageChoice-SDP",
+        "name": "Social, Domestic and Pleasure",
+        "text": null,
+        "labelText": "Social, Domestic and Pleasure",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "carUsageChoice-SDP",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "businessUseNonCommercial": {
+      "type": "radio",
+      "preferred": "css=#carUsageChoice-BU-Class1",
+      "fallbacks": [
+        "css=input[name=\"carUsageChoice-BU-Class1\"]",
+        "role=textbox[name=/Business use non-commercial/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "carUsageChoice-BU-Class1",
+        "name": "Business use non-commercial",
+        "text": null,
+        "labelText": "Business use non-commercial",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "carUsageChoice-BU-Class1",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "businessUseCommercial": {
+      "type": "radio",
+      "preferred": "css=#carUsageChoice-BU-Class3",
+      "fallbacks": [
+        "css=input[name=\"carUsageChoice-BU-Class3\"]",
+        "role=textbox[name=/Business use commercial/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "carUsageChoice-BU-Class3",
+        "name": "Business use commercial",
+        "text": null,
+        "labelText": "Business use commercial",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "carUsageChoice-BU-Class3",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "next": {
+      "type": "button",
+      "preferred": "css=#navigatorNext",
+      "fallbacks": [
+        "role=button[name=/Next/i]",
+        "text=/Next/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": "navigatorNext",
+        "name": "Next",
+        "text": "Next",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "back": {
+      "type": "button",
+      "preferred": "css=#navigatorBack",
+      "fallbacks": [
+        "role=link[name=/Back/i]",
+        "text=/Back/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": "link",
+        "id": "navigatorBack",
+        "name": "Back",
+        "text": "Back",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    }
+  }
+}
