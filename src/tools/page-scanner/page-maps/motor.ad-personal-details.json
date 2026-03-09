@@ -1,0 +1,502 @@
+{
+  "pageKey": "motor.ad-personal-details",
+  "url": "https://myinsurance-allianz-nft.athenapaas.com/journey/show/product/AnnualMotorInsurance/process/nb/additionalDriver1PersonalDetailsPage/69aec1fabe84b34399895bf0",
+  "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/additionalDriver1PersonalDetailsPage/69aec1fabe84b34399895bf0",
+  "scannedAt": "2026-03-09T13:10:29.991Z",
+  "title": "Personal details for additional driver",
+  "elements": {
+    "linkToAllianzHomePage": {
+      "type": "link",
+      "preferred": "css=#goToAllianzHomePage",
+      "fallbacks": [
+        "css=a[aria-label=\"Link to Allianz home page\"]",
+        "role=link[name=/Link to Allianz home page/i]"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "goToAllianzHomePage",
+        "name": "Link to Allianz home page",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": "Link to Allianz home page",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://www.allianz.co.uk",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "whatSDriverSEmploymentStatus": {
+      "type": "select",
+      "preferred": "css=#additionalDriver1EmploymentStatusQuestion",
+      "fallbacks": [
+        "role=combobox[name=/What's driver's employment status\\?/i]"
+      ],
+      "meta": {
+        "tag": "select",
+        "role": null,
+        "id": "additionalDriver1EmploymentStatusQuestion",
+        "name": "What's driver's employment status?",
+        "text": null,
+        "labelText": "What's driver's employment status?",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "reactSelect16Input": {
+      "type": "input",
+      "preferred": "css=#react-select-16-input",
+      "fallbacks": [
+        "role=textbox[name=/react-select-16-input/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "react-select-16-input",
+        "name": "react-select-16-input",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "reactSelect17Input": {
+      "type": "input",
+      "preferred": "css=#react-select-17-input",
+      "fallbacks": [
+        "role=textbox[name=/react-select-17-input/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "react-select-17-input",
+        "name": "react-select-17-input",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "yes": {
+      "type": "radio",
+      "preferred": "css=#haveSecondaryOccupationtrue",
+      "fallbacks": [
+        "css=input[name=\"haveSecondaryOccupation\"]",
+        "role=textbox[name=/Yes/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "haveSecondaryOccupationtrue",
+        "name": "Yes",
+        "text": null,
+        "labelText": "Yes",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "haveSecondaryOccupation",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "no": {
+      "type": "radio",
+      "preferred": "css=#haveSecondaryOccupationfalse",
+      "fallbacks": [
+        "css=input[name=\"haveSecondaryOccupation\"]",
+        "role=textbox[name=/No/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "haveSecondaryOccupationfalse",
+        "name": "No",
+        "text": null,
+        "labelText": "No",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "haveSecondaryOccupation",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "reactSelect18Input": {
+      "type": "input",
+      "preferred": "css=#react-select-18-input",
+      "fallbacks": [
+        "role=textbox[name=/react-select-18-input/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "react-select-18-input",
+        "name": "react-select-18-input",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "reactSelect19Input": {
+      "type": "input",
+      "preferred": "css=#react-select-19-input",
+      "fallbacks": [
+        "role=textbox[name=/react-select-19-input/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "react-select-19-input",
+        "name": "react-select-19-input",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "whatSDriverSMaritalStatus": {
+      "type": "select",
+      "preferred": "css=#additionalDriver1MaritalStatusQuestion",
+      "fallbacks": [
+        "role=combobox[name=/What's driver's marital status\\?/i]"
+      ],
+      "meta": {
+        "tag": "select",
+        "role": null,
+        "id": "additionalDriver1MaritalStatusQuestion",
+        "name": "What's driver's marital status?",
+        "text": null,
+        "labelText": "What's driver's marital status?",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "whatSDriverSRelationshipToAccountHolder": {
+      "type": "select",
+      "preferred": "css=#additionalDriver1RelationshipToAccountHolderQuestion",
+      "fallbacks": [
+        "role=combobox[name=/What's driver's relationship to account holder\\?/i]"
+      ],
+      "meta": {
+        "tag": "select",
+        "role": null,
+        "id": "additionalDriver1RelationshipToAccountHolderQuestion",
+        "name": "What's driver's relationship to account holder?",
+        "text": null,
+        "labelText": "What's driver's relationship to account holder?",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "yes2": {
+      "type": "radio",
+      "preferred": "css=#residenceOfUKTermtrue",
+      "fallbacks": [
+        "css=input[name=\"residenceOfUKTerm\"]",
+        "role=textbox[name=/Yes/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "residenceOfUKTermtrue",
+        "name": "Yes",
+        "text": null,
+        "labelText": "Yes",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "residenceOfUKTerm",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "no2": {
+      "type": "radio",
+      "preferred": "css=#residenceOfUKTermfalse",
+      "fallbacks": [
+        "css=input[name=\"residenceOfUKTerm\"]",
+        "role=textbox[name=/No/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "residenceOfUKTermfalse",
+        "name": "No",
+        "text": null,
+        "labelText": "No",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "residenceOfUKTerm",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "lessThan1Year": {
+      "type": "radio",
+      "preferred": "css=#residencyTerm1",
+      "fallbacks": [
+        "css=input[name=\"residencyTerm\"]",
+        "role=textbox[name=/Less than 1 year/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "residencyTerm1",
+        "name": "Less than 1 year",
+        "text": null,
+        "labelText": "Less than 1 year",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "residencyTerm",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "12Years": {
+      "type": "radio",
+      "preferred": "css=#residencyTerm2",
+      "fallbacks": [
+        "css=input[name=\"residencyTerm\"]",
+        "role=textbox[name=/1 - 2 years/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "residencyTerm2",
+        "name": "1 - 2 years",
+        "text": null,
+        "labelText": "1 - 2 years",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "residencyTerm",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "23Years": {
+      "type": "radio",
+      "preferred": "css=#residencyTerm3",
+      "fallbacks": [
+        "css=input[name=\"residencyTerm\"]",
+        "role=textbox[name=/2 - 3 years/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "residencyTerm3",
+        "name": "2 - 3 years",
+        "text": null,
+        "labelText": "2 - 3 years",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "residencyTerm",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "next": {
+      "type": "button",
+      "preferred": "css=#navigatorNext",
+      "fallbacks": [
+        "role=button[name=/Next/i]",
+        "text=/Next/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": "navigatorNext",
+        "name": "Next",
+        "text": "Next",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "back": {
+      "type": "button",
+      "preferred": "css=#navigatorBack",
+      "fallbacks": [
+        "role=link[name=/Back/i]",
+        "text=/Back/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": "link",
+        "id": "navigatorBack",
+        "name": "Back",
+        "text": "Back",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "closeAlert": {
+      "type": "button",
+      "preferred": "css=button[aria-label=\"close alert\"]",
+      "fallbacks": [
+        "role=button[name=/close alert/i]"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": null,
+        "name": "close alert",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": "close alert",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "pleaseChooseTheTypeOfDriverSEducation": {
+      "type": "select",
+      "preferred": "css=#additionalDriver1EducationQuestion",
+      "fallbacks": [
+        "role=combobox[name=/Please choose the type of driver's education/i]"
+      ],
+      "meta": {
+        "tag": "select",
+        "role": null,
+        "id": "additionalDriver1EducationQuestion",
+        "name": "Please choose the type of driver's education",
+        "text": null,
+        "labelText": "Please choose the type of driver's education",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "reactSelect20Input": {
+      "type": "input",
+      "preferred": "css=#react-select-20-input",
+      "fallbacks": [
+        "role=textbox[name=/react-select-20-input/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "react-select-20-input",
+        "name": "react-select-20-input",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "reactSelect21Input": {
+      "type": "input",
+      "preferred": "css=#react-select-21-input",
+      "fallbacks": [
+        "role=textbox[name=/react-select-21-input/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "react-select-21-input",
+        "name": "react-select-21-input",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    }
+  }
+}
