@@ -8,11 +8,11 @@ import type { Logger } from "../../../utils/logger";
 import { ensureDir, safeReadJson } from "../../../utils/fs";
 import { nowIso } from "../../../utils/time";
 import { uniq, uniqueKey } from "../../../utils/collections";
-import { toCamelFromText } from "../../../utils/text";
 import { PAGE_SCANNER_MAPS_DIR } from "../../../utils/paths";
 import type { PageMap, ScannedElement } from "./types";
 import { buildSelectors } from "./selectorPipeline";
 import { extractDomElements } from "./domExtract";
+import { getSmartElementKey } from "./getSmartElementsKey";
 
 export type ScanPageOptions = {
     connectCdp: string; // required (http or ws)
@@ -23,105 +23,6 @@ export type ScanPageOptions = {
     verbose?: boolean; // debug logs
     log: Logger; // required
 };
-
-function cleanValue(value?: string | null): string | undefined {
-    const v = value?.trim();
-    return v ? v : undefined;
-}
-
-function isWeakKeyCandidate(value?: string | null): boolean {
-    const v = cleanValue(value);
-    if (!v) return true;
-
-    // numeric-only labels like "1", "2", "3"
-    if (/^\d+$/.test(v)) return true;
-
-    // pure symbols / punctuation
-    if (/^[^a-zA-Z0-9]+$/.test(v)) return true;
-
-    return false;
-}
-
-function firstStrongCandidate(candidates: Array<string | null | undefined>): string | undefined {
-    for (const c of candidates) {
-        const v = cleanValue(c);
-        if (v && !isWeakKeyCandidate(v)) {
-            return v;
-        }
-    }
-
-    for (const c of candidates) {
-        const v = cleanValue(c);
-        if (v) {
-            return v;
-        }
-    }
-
-    return undefined;
-}
-
-/**
- * Better key strategy:
- * - Prefer semantic metadata (inputName / id) over weak numeric labels.
- * - For radio / checkbox groups, combine group name with option label when possible.
- * - Fall back safely to first strong candidate, then any candidate, then tag+index.
- */
-function buildLabelFirstKey(el: ScannedElement, indexHint: number) {
-    const inputType = (el.typeAttr || "").toLowerCase();
-    const isChoiceControl = inputType === "radio" || inputType === "checkbox";
-
-    const labelText = cleanValue(el.labelText);
-    const text = cleanValue(el.text);
-    const ariaLabel = cleanValue(el.ariaLabel);
-    const placeholder = cleanValue(el.placeholder);
-    const inputName = cleanValue(el.inputName);
-    const name = cleanValue(el.name);
-    const id = cleanValue(el.id);
-
-    const strongOptionLabel = firstStrongCandidate([
-        labelText,
-        text,
-        ariaLabel,
-        name,
-    ]);
-
-    const numericOptionLabel =
-        [labelText, text, ariaLabel, name]
-            .map(cleanValue)
-            .find((v) => v && /^\d+$/.test(v));
-
-    // Special handling for radio / checkbox groups such as:
-    // inputName=additionalDriver1NumberOfClaims
-    // labelText=1
-    // => additionalDriver1NumberOfClaims1
-    if (isChoiceControl && inputName) {
-        if (strongOptionLabel && strongOptionLabel !== inputName) {
-            return toCamelFromText(`${inputName} ${strongOptionLabel}`);
-        }
-
-        if (numericOptionLabel) {
-            return toCamelFromText(`${inputName} ${numericOptionLabel}`);
-        }
-
-        if (id && id !== inputName) {
-            return toCamelFromText(id);
-        }
-
-        return toCamelFromText(inputName);
-    }
-
-    const best = firstStrongCandidate([
-        inputName,
-        id,
-        ariaLabel,
-        placeholder,
-        labelText,
-        text,
-        name,
-    ]) ?? `${el.tag}-${indexHint}`;
-
-    return toCamelFromText(best);
-}
 
 function classifyType(el: ScannedElement) {
     const tag = (el.tag || "").toLowerCase();
@@ -135,6 +36,7 @@ function classifyType(el: ScannedElement) {
     if (tag === "a" || role === "link") return "link";
     if (tag === "select" || role === "combobox") return "select";
     if (tag === "textarea") return "textarea";
+
     if (tag === "input") {
         if (type === "checkbox") return "checkbox";
         if (type === "radio") return "radio";
@@ -161,10 +63,7 @@ function mergePageMaps(existing: PageMap, incoming: PageMap): PageMap {
         url: incoming.url || existing.url,
         urlPath: incoming.urlPath ?? existing.urlPath,
         scannedAt: incoming.scannedAt,
-
-        // page title: update when we have one, don't wipe if missing
         title: incoming.title ?? existing.title,
-
         elements: { ...existing.elements },
     };
 
@@ -220,11 +119,15 @@ export async function scanPage(opts: ScanPageOptions): Promise<void> {
 
     try {
         const contexts = browser.contexts();
-        if (!contexts.length) throw new Error("No browser contexts found via CDP.");
+        if (!contexts.length) {
+            throw new Error("No browser contexts found via CDP.");
+        }
 
         const ctx = contexts[0];
         const pages = ctx.pages();
-        if (!pages.length) throw new Error("No tabs/pages found in the connected browser.");
+        if (!pages.length) {
+            throw new Error("No tabs/pages found in the connected browser.");
+        }
 
         const tabIndex = opts.tabIndex ?? 0;
         if (tabIndex < 0 || tabIndex >= pages.length) {
@@ -267,11 +170,14 @@ export async function scanPage(opts: ScanPageOptions): Promise<void> {
         for (let idx = 0; idx < scanned.length; idx++) {
             const el = scanned[idx];
 
-            const baseKey = buildLabelFirstKey(el, idx + 1);
+            const baseKey = getSmartElementKey(el, idx + 1);
             const bump = (perBaseCounter.get(baseKey) ?? 0) + 1;
             perBaseCounter.set(baseKey, bump);
 
-            const finalKey = uniqueKey(bump === 1 ? baseKey : `${baseKey}${bump}`, usedKeys);
+            const finalKey = uniqueKey(
+                bump === 1 ? baseKey : `${baseKey}${bump}`,
+                usedKeys
+            );
 
             const cands = buildSelectors(el);
             const best = cands[0];
@@ -299,6 +205,12 @@ export async function scanPage(opts: ScanPageOptions): Promise<void> {
                     dataTestId: el.dataTestId ?? null,
                     dataTest: el.dataTest ?? null,
                     dataQa: el.dataQa ?? null,
+
+                    // smart-key context meta
+                    ownerId: el.ownerId ?? null,
+                    ownerLabelText: el.ownerLabelText ?? null,
+                    ownerAriaLabel: el.ownerAriaLabel ?? null,
+                    isFrameworkSearchInput: el.isFrameworkSearchInput ?? null,
                 },
             };
 

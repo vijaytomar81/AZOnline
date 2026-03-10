@@ -109,6 +109,59 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
             return rect.width > 0 || rect.height > 0;
         }
 
+        function isMeaningfulOwnerId(value: string | null): boolean {
+            if (!value) return false;
+            if (/^react-select-\d+-input$/i.test(value)) return false;
+            if (/^\d+$/.test(value)) return false;
+            return true;
+        }
+
+        function resolveOwnerContext(el: Element): {
+            ownerId: string | null;
+            ownerLabelText: string | null;
+            ownerAriaLabel: string | null;
+            isFrameworkSearchInput: boolean;
+        } {
+            const id = getAttr(el, "id");
+            const isFrameworkSearchInput = !!id && /^react-select-\d+-input$/i.test(id);
+
+            const formGroup = el.closest(".form-group");
+            const inputGroup = el.closest(".input-group");
+
+            let ownerId: string | null = null;
+            let ownerLabelText: string | null = null;
+            let ownerAriaLabel: string | null = null;
+
+            // 1) nearest meaningful ancestor id
+            let cur: Element | null = el.parentElement;
+            while (cur) {
+                const curId = getAttr(cur, "id");
+                if (isMeaningfulOwnerId(curId)) {
+                    ownerId = curId;
+                    break;
+                }
+                cur = cur.parentElement;
+            }
+
+            // 2) enclosing form-group label
+            if (formGroup) {
+                const label = formGroup.querySelector("label");
+                ownerLabelText = safeText(label?.textContent ?? null);
+            }
+
+            // 3) enclosing input-group aria-label
+            if (inputGroup) {
+                ownerAriaLabel = safeText(getAttr(inputGroup, "aria-label"));
+            }
+
+            return {
+                ownerId,
+                ownerLabelText,
+                ownerAriaLabel,
+                isFrameworkSearchInput,
+            };
+        }
+
         const roots = [
             document.querySelector("#root"),
             ...Array.from(
@@ -176,11 +229,15 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
 
             const typeAttr = tag === "input" ? getAttr(el, "type") : null;
 
+            const owner = resolveOwnerContext(el);
+
             const derivedName =
                 ariaLabel ||
                 labelText ||
                 text ||
                 placeholder ||
+                owner.ownerLabelText ||
+                owner.ownerAriaLabel ||
                 nameAttr ||
                 id ||
                 null;
@@ -204,6 +261,11 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
                 inputName: nameAttr,
                 typeAttr,
                 valueAttr: null,
+
+                ownerId: owner.ownerId,
+                ownerLabelText: owner.ownerLabelText,
+                ownerAriaLabel: owner.ownerAriaLabel,
+                isFrameworkSearchInput: owner.isFrameworkSearchInput,
 
                 candidates: [],
                 key: "",

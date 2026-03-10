@@ -10,22 +10,22 @@ export type ElementDef = {
 };
 
 export const elements = {
-  "1": {
+  additionalDriver1NumberOfClaims1: {
     type: "radio",
     preferred: "css=#additionalDriver1NumberOfClaims1",
     fallbacks: ["css=input[name=\"additionalDriver1NumberOfClaims\"]", "role=textbox[name=/1/i]"],
   },
-  "2": {
+  additionalDriver1NumberOfClaims2: {
     type: "radio",
     preferred: "css=#additionalDriver1NumberOfClaims2",
     fallbacks: ["css=input[name=\"additionalDriver1NumberOfClaims\"]", "role=textbox[name=/2/i]"],
   },
-  "3": {
+  additionalDriver1NumberOfClaims3: {
     type: "radio",
     preferred: "css=#additionalDriver1NumberOfClaims3",
     fallbacks: ["css=input[name=\"additionalDriver1NumberOfClaims\"]", "role=textbox[name=/3/i]"],
   },
-  "4": {
+  additionalDriver1NumberOfClaims4: {
     type: "radio",
     preferred: "css=#additionalDriver1NumberOfClaims4",
     fallbacks: ["css=input[name=\"additionalDriver1NumberOfClaims\"]", "role=textbox[name=/4\\+/i]"],

@@ -24,27 +24,29 @@ export type ScannedElement = {
     role: string | null;
     id: string | null;
 
-    // Existing fields
-    name: string | null; // aria-label or derived label/text
-    text: string | null; // innerText
+    name: string | null;
+    text: string | null;
     href: string | null;
 
     dataTestId: string | null;
     dataTest: string | null;
     dataQa: string | null;
 
-    // ✅ label-first / enterprise metadata
-    labelText?: string | null; // resolved associated <label> text
-    ariaLabel?: string | null; // raw aria-label
-    placeholder?: string | null; // input placeholder
-    inputName?: string | null; // input[name="..."]
-    typeAttr?: string | null; // input type="text|email|..."
-    valueAttr?: string | null; // optional (keep null by default to avoid PII)
+    labelText?: string | null;
+    ariaLabel?: string | null;
+    placeholder?: string | null;
+    inputName?: string | null;
+    typeAttr?: string | null;
+    valueAttr?: string | null;
+
+    // NEW: smart-key context
+    ownerId?: string | null;
+    ownerLabelText?: string | null;
+    ownerAriaLabel?: string | null;
+    isFrameworkSearchInput?: boolean;
 
     candidates: SelectorCandidate[];
     best?: SelectorCandidate;
-
-    // Internal stable key we generate
     key: string;
 };
 
@@ -73,18 +75,22 @@ export type PageMap = {
                 name?: string | null;
                 text?: string | null;
 
-                // ✅ NEW meta (stored in mapper json)
                 labelText?: string | null;
                 ariaLabel?: string | null;
                 placeholder?: string | null;
                 inputName?: string | null;
                 typeAttr?: string | null;
 
-                // ✅ helpful for collision-safe merge
                 href?: string | null;
                 dataTestId?: string | null;
                 dataTest?: string | null;
                 dataQa?: string | null;
+
+                // NEW: smart-key context
+                ownerId?: string | null;
+                ownerLabelText?: string | null;
+                ownerAriaLabel?: string | null;
+                isFrameworkSearchInput?: boolean | null;
             };
         }
     >;
