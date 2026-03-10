@@ -52,13 +52,14 @@ function normalizeOptionText(value?: string | null): string | undefined {
 
 function pickBestOwnerBase(el: ScannedElement): string | undefined {
     const candidates = [
+        clean(el.inputName),
         clean(el.ownerId),
+        clean(el.ownerGroupLabelFor),
         clean(el.ownerLabelText),
         clean(el.ownerAriaLabel),
         clean(el.labelText),
         clean(el.ariaLabel),
         clean(el.placeholder),
-        clean(el.inputName),
         clean(el.name),
         clean(el.id),
     ];

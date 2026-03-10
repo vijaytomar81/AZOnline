@@ -120,6 +120,7 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
             ownerId: string | null;
             ownerLabelText: string | null;
             ownerAriaLabel: string | null;
+            ownerGroupLabelFor: string | null;
             isFrameworkSearchInput: boolean;
         } {
             const id = getAttr(el, "id");
@@ -131,6 +132,7 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
             let ownerId: string | null = null;
             let ownerLabelText: string | null = null;
             let ownerAriaLabel: string | null = null;
+            let ownerGroupLabelFor: string | null = null;
 
             // 1) nearest meaningful ancestor id
             let cur: Element | null = el.parentElement;
@@ -147,6 +149,7 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
             if (formGroup) {
                 const label = formGroup.querySelector("label");
                 ownerLabelText = safeText(label?.textContent ?? null);
+                ownerGroupLabelFor = safeText(getAttr(label as Element, "for"));
             }
 
             // 3) enclosing input-group aria-label
@@ -158,6 +161,7 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
                 ownerId,
                 ownerLabelText,
                 ownerAriaLabel,
+                ownerGroupLabelFor,
                 isFrameworkSearchInput,
             };
         }
@@ -238,6 +242,7 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
                 placeholder ||
                 owner.ownerLabelText ||
                 owner.ownerAriaLabel ||
+                owner.ownerGroupLabelFor ||
                 nameAttr ||
                 id ||
                 null;
@@ -265,6 +270,7 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
                 ownerId: owner.ownerId,
                 ownerLabelText: owner.ownerLabelText,
                 ownerAriaLabel: owner.ownerAriaLabel,
+                ownerGroupLabelFor: owner.ownerGroupLabelFor,
                 isFrameworkSearchInput: owner.isFrameworkSearchInput,
 
                 candidates: [],

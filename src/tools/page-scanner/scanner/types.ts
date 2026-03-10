@@ -43,6 +43,7 @@ export type ScannedElement = {
     ownerId?: string | null;
     ownerLabelText?: string | null;
     ownerAriaLabel?: string | null;
+    ownerGroupLabelFor?: string | null;
     isFrameworkSearchInput?: boolean;
 
     candidates: SelectorCandidate[];
@@ -90,6 +91,7 @@ export type PageMap = {
                 ownerId?: string | null;
                 ownerLabelText?: string | null;
                 ownerAriaLabel?: string | null;
+                ownerGroupLabelFor?: string | null;
                 isFrameworkSearchInput?: boolean | null;
             };
         }
