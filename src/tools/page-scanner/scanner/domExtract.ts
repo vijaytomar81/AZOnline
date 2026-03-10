@@ -4,12 +4,13 @@ import type { Page } from "@playwright/test";
 import type { ScannedElement } from "./types";
 
 /**
- * Extracts interactive elements from the currently loaded page.
+ * Extracts relevant elements from the currently loaded page.
  *
  * Rules:
- *  - Only scan inside: <div id="root">
- *  - Exclude anything inside <footer> (and exclude the footer element itself)
- *  - Do NOT rely on CSS classes (unstable)
+ *  - Scan inside #root
+ *  - Also scan visible dialogs / modals rendered outside #root
+ *  - Exclude anything inside <footer>
+ *  - Include interactive elements + alerts / important messages
  */
 export async function extractDomElements(page: Page): Promise<ScannedElement[]> {
     const scanned = await page.evaluate(() => {
@@ -19,7 +20,7 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
         }
 
         function safeText(s: string | null | undefined): string | null {
-            const t = (s ?? "").trim();
+            const t = (s ?? "").replace(/\s+/g, " ").trim();
             return t ? t : null;
         }
 
@@ -64,7 +65,26 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
 
         function elementText(el: Element): string | null {
             const tag = el.tagName.toLowerCase();
-            if (tag === "button" || tag === "a") return safeText(el.textContent ?? null);
+            const role = getAttr(el, "role");
+
+            if (
+                tag === "button" ||
+                tag === "a" ||
+                role === "alert" ||
+                role === "dialog"
+            ) {
+                return safeText(el.textContent ?? null);
+            }
+
+            if (
+                el.matches(".invalid-feedback") ||
+                el.matches("[aria-live]") ||
+                el.matches(".modal-body") ||
+                el.matches(".modal-title")
+            ) {
+                return safeText(el.textContent ?? null);
+            }
+
             return null;
         }
 
@@ -74,10 +94,34 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
             return Boolean(el.closest("footer"));
         }
 
-        // ✅ only scan inside #root
-        const root = document.querySelector("#root") ?? document.body;
+        function isVisible(el: Element): boolean {
+            const htmlEl = el as HTMLElement;
+            const style = window.getComputedStyle(htmlEl);
 
-        // Only elements we care about (same set you had)
+            if (style.display === "none" || style.visibility === "hidden") {
+                return false;
+            }
+
+            if (htmlEl.hidden) return false;
+            if (htmlEl.getAttribute("aria-hidden") === "true") return false;
+
+            const rect = htmlEl.getBoundingClientRect();
+            return rect.width > 0 || rect.height > 0;
+        }
+
+        const roots = [
+            document.querySelector("#root"),
+            ...Array.from(
+                document.querySelectorAll(
+                    "[role='dialog'], .modal-dialog, .modal, .modal-content"
+                )
+            ),
+        ].filter(Boolean) as Element[];
+
+        if (roots.length === 0) {
+            roots.push(document.body);
+        }
+
         const selector = [
             "input",
             "select",
@@ -88,14 +132,29 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
             "[role='link']",
             "[role='textbox']",
             "[role='combobox']",
+            "[role='alert']",
+            "[role='dialog']",
+            ".invalid-feedback",
+            "[aria-live]",
             "[data-testid]",
             "[data-test]",
             "[data-qa]",
         ].join(",");
 
-        const nodes = Array.from(root.querySelectorAll(selector)).filter(
-            (el) => !isInsideFooter(el)
-        );
+        const seen = new Set<Element>();
+        const nodes: Element[] = [];
+
+        for (const root of roots) {
+            const found = Array.from(root.querySelectorAll(selector)).filter(
+                (el) => !isInsideFooter(el) && isVisible(el)
+            );
+
+            for (const el of found) {
+                if (seen.has(el)) continue;
+                seen.add(el);
+                nodes.push(el);
+            }
+        }
 
         return nodes.map((el) => {
             const tag = el.tagName.toLowerCase();
@@ -117,8 +176,14 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
 
             const typeAttr = tag === "input" ? getAttr(el, "type") : null;
 
-            // "name" here = the old derivedName field you already used
-            const derivedName = ariaLabel || labelText || text || placeholder || nameAttr || id || null;
+            const derivedName =
+                ariaLabel ||
+                labelText ||
+                text ||
+                placeholder ||
+                nameAttr ||
+                id ||
+                null;
 
             return {
                 tag,

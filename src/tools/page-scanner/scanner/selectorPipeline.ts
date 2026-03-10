@@ -110,12 +110,29 @@ function buildCandidates(el: ScannedElement): SelectorCandidate[] {
 
     if (role && nm) {
         const rx = escapeForRegex(normalizeSpaces(nm));
-        candidates.push({
-            kind: "role",
-            selector: `role=${role}[name=/${rx}/i]`,
-            score: scoreRole(65),
-            reason: "role+name",
-        });
+
+        if (role === "alert" || role === "dialog") {
+            candidates.push({
+                kind: "role",
+                selector: `role=${role}`,
+                score: scoreRole(66),
+                reason: `${role} role`,
+            });
+
+            candidates.push({
+                kind: "text",
+                selector: `text=/${rx}/i`,
+                score: scoreText(64),
+                reason: `${role} text`,
+            });
+        } else {
+            candidates.push({
+                kind: "role",
+                selector: `role=${role}[name=/${rx}/i]`,
+                score: scoreRole(65),
+                reason: "role+name",
+            });
+        }
     }
 
     // --- 7) Text fallback ---

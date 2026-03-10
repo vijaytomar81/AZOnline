@@ -128,6 +128,9 @@ function classifyType(el: ScannedElement) {
     const role = (el.role || "").toLowerCase();
     const type = (el.typeAttr || "").toLowerCase();
 
+    if (role === "alert") return "alert";
+    if (role === "dialog") return "dialog";
+
     if (tag === "button" || role === "button") return "button";
     if (tag === "a" || role === "link") return "link";
     if (tag === "select" || role === "combobox") return "select";
@@ -137,6 +140,9 @@ function classifyType(el: ScannedElement) {
         if (type === "radio") return "radio";
         return "input";
     }
+
+    if (tag === "div" && el.text) return "message";
+
     return role || tag || "element";
 }
 
