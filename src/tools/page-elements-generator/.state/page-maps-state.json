@@ -1,3 +1,15 @@
 {
-  "motor.car-details.json": "ac9f8c12e1bdaa84475a5864200525d8df1954be"
+  "common.insurance-type-selection.json": "6c798cd416307adb0cdca0744f50998865a26e86",
+  "common.login-or-registration.json": "20178c2d116076e3c5872f1e60a498884a12c722",
+  "motor.ad-claims-and-convictions.json": "522be5963de8607a0dcc9e681f260f5a3eb46db8",
+  "motor.ad-driving-licence-details.json": "39802b89a3bae7c32868d74b58d4e816f08dd25a",
+  "motor.ad-personal-details.json": "cfc71754804f618cf98132c4ff940040bbdce58f",
+  "motor.car-details.json": "7e6d48572e38fe7ce429313fe76954da52f6bae8",
+  "motor.car-usage.json": "dae617c22739625b323248d52a41c77a8d2016be",
+  "motor.cover-start-date.json": "c76a073f9ad29e22c2eea420976e6951d19d1eed",
+  "motor.ph-add-driver.json": "a7d916fbfb8c0eb869f322951476d2b0f7566099",
+  "motor.ph-claims-and-convictions.json": "d9870b4eb1a9410430599c253b095259a2b73973",
+  "motor.ph-driving-licence-details.json": "a9e82d94bb89fdf78feca717800fca354bb63e49",
+  "motor.ph-no-claim-discount.json": "ee985dc58a8fe144f05db8426da7332a1f000e7f",
+  "motor.ph-personal-details.json": "fa1d7d195fa81d33ae5498671acf1c444fe5a8cd"
 }

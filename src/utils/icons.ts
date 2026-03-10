@@ -17,14 +17,14 @@ export const ICONS = {
     caseRunnerIcon: "🚀",
     selfHealIcon: "🧬",
     locatorEngineIcon: "🎯",
+    doneIcon: "✅",
 
     // status icons (NEW)
-    successIcon: "✓",
-    warningIcon: "⚠️",
-    failIcon: "❌",
-    addIcon: "➕",
-    hintIcon: "💡",
-    doneIcon: "✅",
+    successIcon: "✔",
+    failIcon: "✖",
+    warningIcon: "⚠",
+    addIcon: "+",
+    hintIcon: "ℹ",
 } as const;
 
 export type IconKey = keyof typeof ICONS;

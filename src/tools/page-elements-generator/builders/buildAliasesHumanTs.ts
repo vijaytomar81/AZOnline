@@ -3,11 +3,18 @@
 import type { PageMap } from "../generator/types";
 import { isValidTsIdentifier } from "../../../utils/ts";
 
+function toPropertyAccess(objectName: string, key: string): string {
+    return isValidTsIdentifier(key)
+        ? `${objectName}.${key}`
+        : `${objectName}[${JSON.stringify(key)}]`;
+}
+
 export function buildAliasesHumanTs(pageMap: PageMap): string {
     const lines: string[] = [];
 
     const keys = Object.keys(pageMap.elements).sort((a, b) => a.localeCompare(b));
 
+    lines.push(`// src/pages/${pageMap.pageKey.split(".").join("/")}/aliases.ts`);
     lines.push(`// HUMAN-MAINTAINED FILE`);
     lines.push(`// pageKey: ${pageMap.pageKey}`);
     lines.push(`//`);
@@ -27,7 +34,8 @@ export function buildAliasesHumanTs(pageMap: PageMap): string {
 
     for (const k of keys) {
         const prop = isValidTsIdentifier(k) ? k : JSON.stringify(k);
-        lines.push(`  ${prop}: aliasesGenerated.${k},`);
+        const rhs = toPropertyAccess("aliasesGenerated", k);
+        lines.push(`  ${prop}: ${rhs},`);
     }
 
     lines.push(`} as const satisfies Record<string, ElementKey>;`);

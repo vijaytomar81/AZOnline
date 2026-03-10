@@ -7,6 +7,9 @@ import { createLogger } from "../../../utils/logger";
 import { normalizeArgv, hasFlag, getArg } from "../../../utils/argv";
 import { safeReadJson, listFiles } from "../../../utils/fs";
 import { PAGE_SCANNER_MAPS_DIR, PAGES_DIR } from "../../../utils/paths";
+import { ICONS } from "../../../utils/icons";
+import { printTree } from "../../../utils/cliTree";
+
 import {
     printSection,
     printKeyValue,
@@ -15,10 +18,11 @@ import {
     success,
     warning,
     failure,
+    info,
     strong,
 } from "../../../utils/cliFormat";
 
-import { validateOnePage } from "../validators/pageOutputs";
+import { validateOnePage } from "../validators/pageChain";
 import { checkPagesModuleHygiene } from "../validators/moduleHygiene";
 import { checkPageRegistry } from "../validators/pageRegistry";
 
@@ -26,6 +30,20 @@ type PageMapLite = { pageKey: string };
 
 function listPageMapFiles(mapsDir: string): string[] {
     return listFiles(mapsDir, { ext: ".json" }).filter((f) => !f.startsWith("."));
+}
+
+function statusToIcon(status: "OK" | "WARN" | "FAIL"): string {
+    if (status === "WARN") return ICONS.warningIcon;
+    if (status === "FAIL") return ICONS.failIcon;
+    return ICONS.successIcon;
+}
+
+function shouldExpandPage(opts: {
+    verbose: boolean;
+    pageErrors: string[];
+    pageWarnings: string[];
+}): boolean {
+    return opts.verbose || opts.pageErrors.length > 0 || opts.pageWarnings.length > 0;
 }
 
 export async function runValidateCommand(args: string[]) {
@@ -45,11 +63,8 @@ export async function runValidateCommand(args: string[]) {
 
     log.info("Command: validate");
 
-    const mapsDir =
-        getArg(argv, "--mapsDir") ?? PAGE_SCANNER_MAPS_DIR;
-
-    const pagesDir =
-        getArg(argv, "--pagesDir") ?? PAGES_DIR;
+    const mapsDir = getArg(argv, "--mapsDir") ?? PAGE_SCANNER_MAPS_DIR;
+    const pagesDir = getArg(argv, "--pagesDir") ?? PAGES_DIR;
 
     printSection("Environment");
     printKeyValue("mapsDir", mapsDir);
@@ -70,14 +85,21 @@ export async function runValidateCommand(args: string[]) {
     const mapFiles = listPageMapFiles(mapsDir);
 
     printSection("Scanning page-maps");
-    log.info(`Found ${mapFiles.length} page-map(s)`);
+    printStatus(ICONS.successIcon, `Found ${mapFiles.length} page-map(s)`);
 
     let ok = 0;
     let bad = 0;
     let warnOnly = 0;
     let warnCount = 0;
+    let errorCount = 0;
 
     printSection("Validating pages");
+    console.log(
+        info(
+            "Page Map → Elements → Generated Aliases → Business Aliases → Page Object → Structure"
+        )
+    );
+    console.log("");
 
     for (const mf of mapFiles) {
         const res = validateOnePage({ mapsDir, pagesDir, mapFile: mf });
@@ -86,48 +108,64 @@ export async function runValidateCommand(args: string[]) {
             safeReadJson<PageMapLite>(path.join(mapsDir, mf))?.pageKey ??
             mf.replace(/\.json$/, "");
 
-        const registryRes = checkPageRegistry({
-            pageKey,
-            pagesDir,
-        });
+        const registryRes = checkPageRegistry({ pageKey, pagesDir });
 
-        const pageWarnings = [...res.warnings, ...registryRes.warnings];
         const pageErrors = [...res.errors, ...registryRes.errors];
+        const pageWarnings = [...res.warnings, ...registryRes.warnings];
 
         warnCount += pageWarnings.length;
+        errorCount += pageErrors.length;
 
         if (pageErrors.length > 0) {
             bad++;
-            printStatus("❌", pageKey);
-
-            for (const e of pageErrors) {
-                log.info(`  ${e}`);
-            }
-
-            for (const w of pageWarnings) {
-                if (verbose) log.debug(`WARN: ${pageKey}: ${w}`);
-                else log.info(`  ${warning("⚠️")} ${w}`);
-            }
-
-            log.info("");
-            continue;
-        }
-
-        if (pageWarnings.length > 0) {
+            printStatus(failure(strong(ICONS.failIcon)), strong(pageKey));
+        } else if (pageWarnings.length > 0) {
             warnOnly++;
-            printStatus("⚠️", pageKey);
-
-            for (const w of pageWarnings) {
-                if (verbose) log.debug(`WARN: ${pageKey}: ${w}`);
-                else log.info(`  ${warning("⚠️")} ${w}`);
-            }
-
-            log.info("");
-            continue;
+            printStatus(warning(strong(ICONS.warningIcon)), strong(pageKey));
+        } else {
+            ok++;
+            printStatus(success(strong(ICONS.successIcon)), strong(pageKey));
         }
 
-        ok++;
-        printStatus("✓", pageKey);
+        if (shouldExpandPage({ verbose, pageErrors, pageWarnings })) {
+            const treeSteps = res.steps.map((step) => ({
+                icon: statusToIcon(step.status),
+                title: step.step,
+                summary: step.summary,
+            }));
+
+            printTree(treeSteps);
+
+            if (registryRes.warnings.length > 0) {
+                for (const w of registryRes.warnings) {
+                    console.log(`   ${ICONS.warningIcon} Registry : ${w}`);
+                }
+            }
+
+            if (registryRes.errors.length > 0) {
+                for (const e of registryRes.errors) {
+                    console.log(`   ${ICONS.failIcon} Registry : ${e}`);
+                }
+            }
+
+            if (verbose) {
+                for (const step of res.steps) {
+                    for (const m of step.messages) {
+                        log.debug(`${pageKey}: ${m}`);
+                    }
+                }
+
+                for (const w of registryRes.warnings) {
+                    log.debug(`${pageKey}: registry warning: ${w}`);
+                }
+
+                for (const e of registryRes.errors) {
+                    log.debug(`${pageKey}: registry error: ${e}`);
+                }
+            }
+
+            console.log("");
+        }
     }
 
     if (checkModuleHygiene) {
@@ -135,31 +173,56 @@ export async function runValidateCommand(args: string[]) {
 
         const pagesH = checkPagesModuleHygiene(pagesDir);
         warnCount += pagesH.warnings.length;
+        errorCount += pagesH.errors.length;
 
         if (pagesH.errors.length === 0 && pagesH.warnings.length === 0) {
-            printStatus("✓", "src/pages/index.ts / pageManager.ts");
+            printStatus(ICONS.successIcon, "src/pages/index.ts / pageManager.ts");
         } else {
-            for (const w of pagesH.warnings) {
-                log.info(`  ${warning("⚠️")} ${w}`);
+            if (pagesH.warnings.length > 0) {
+                printStatus(ICONS.warningIcon, "src/pages/index.ts / pageManager.ts");
+                for (const w of pagesH.warnings) {
+                    console.log(`   ${ICONS.warningIcon} ${w}`);
+                    if (verbose) {
+                        log.debug(`module hygiene: ${w}`);
+                    }
+                }
             }
 
-            for (const e of pagesH.errors) {
+            if (pagesH.errors.length > 0) {
                 bad++;
-                printStatus("❌", e);
+                printStatus(ICONS.failIcon, "src/pages/index.ts / pageManager.ts");
+                for (const e of pagesH.errors) {
+                    console.log(`   ${ICONS.failIcon} ${e}`);
+                    if (verbose) {
+                        log.debug(`module hygiene: ${e}`);
+                    }
+                }
             }
         }
+
+        console.log("");
     }
-    const resultText =
-        bad > 0 ? failure("FAILED") : strict && warnCount > 0 ? failure("ISSUE FOUND") : success("ALL GOOD");
+
+    let resultText: string;
+
+    if (errorCount > 0) {
+        resultText = failure("ERROR FOUND");
+    } else if (warnCount > 0) {
+        resultText = warning("WARNING FOUND");
+    } else {
+        resultText = success("ALL GOOD");
+    }
 
     printSummary(
         "VALIDATE SUMMARY",
         [
             ["Pages checked", mapFiles.length],
-            ["OK", ok],
-            ["Warnings", warnOnly],
-            ["Failed", bad],
-            ["Total warns", warnCount],
+            ["Clean pages", ok],
+            ["Warn pages", warnOnly],
+            ["Error pages", bad],
+            ["Total warnings", warnCount],
+            ["Total errors", errorCount],
+            ["Strict mode", strict ? "ON" : "OFF"],
         ],
         resultText
     );

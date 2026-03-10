@@ -24,22 +24,102 @@ export type ScanPageOptions = {
     log: Logger; // required
 };
 
+function cleanValue(value?: string | null): string | undefined {
+    const v = value?.trim();
+    return v ? v : undefined;
+}
+
+function isWeakKeyCandidate(value?: string | null): boolean {
+    const v = cleanValue(value);
+    if (!v) return true;
+
+    // numeric-only labels like "1", "2", "3"
+    if (/^\d+$/.test(v)) return true;
+
+    // pure symbols / punctuation
+    if (/^[^a-zA-Z0-9]+$/.test(v)) return true;
+
+    return false;
+}
+
+function firstStrongCandidate(candidates: Array<string | null | undefined>): string | undefined {
+    for (const c of candidates) {
+        const v = cleanValue(c);
+        if (v && !isWeakKeyCandidate(v)) {
+            return v;
+        }
+    }
+
+    for (const c of candidates) {
+        const v = cleanValue(c);
+        if (v) {
+            return v;
+        }
+    }
+
+    return undefined;
+}
+
 /**
- * Label-first key strategy:
- * labelText -> ariaLabel -> visible text -> placeholder -> inputName -> name -> id -> tag+index
+ * Better key strategy:
+ * - Prefer semantic metadata (inputName / id) over weak numeric labels.
+ * - For radio / checkbox groups, combine group name with option label when possible.
+ * - Fall back safely to first strong candidate, then any candidate, then tag+index.
  */
 function buildLabelFirstKey(el: ScannedElement, indexHint: number) {
-    const candidates = [
-        el.labelText,
-        el.ariaLabel,
-        el.text,
-        el.placeholder,
-        el.inputName,
-        el.name,
-        el.id,
-    ].filter(Boolean) as string[];
+    const inputType = (el.typeAttr || "").toLowerCase();
+    const isChoiceControl = inputType === "radio" || inputType === "checkbox";
 
-    const best = candidates[0] ?? `${el.tag}-${indexHint}`;
+    const labelText = cleanValue(el.labelText);
+    const text = cleanValue(el.text);
+    const ariaLabel = cleanValue(el.ariaLabel);
+    const placeholder = cleanValue(el.placeholder);
+    const inputName = cleanValue(el.inputName);
+    const name = cleanValue(el.name);
+    const id = cleanValue(el.id);
+
+    const strongOptionLabel = firstStrongCandidate([
+        labelText,
+        text,
+        ariaLabel,
+        name,
+    ]);
+
+    const numericOptionLabel =
+        [labelText, text, ariaLabel, name]
+            .map(cleanValue)
+            .find((v) => v && /^\d+$/.test(v));
+
+    // Special handling for radio / checkbox groups such as:
+    // inputName=additionalDriver1NumberOfClaims
+    // labelText=1
+    // => additionalDriver1NumberOfClaims1
+    if (isChoiceControl && inputName) {
+        if (strongOptionLabel && strongOptionLabel !== inputName) {
+            return toCamelFromText(`${inputName} ${strongOptionLabel}`);
+        }
+
+        if (numericOptionLabel) {
+            return toCamelFromText(`${inputName} ${numericOptionLabel}`);
+        }
+
+        if (id && id !== inputName) {
+            return toCamelFromText(id);
+        }
+
+        return toCamelFromText(inputName);
+    }
+
+    const best = firstStrongCandidate([
+        inputName,
+        id,
+        ariaLabel,
+        placeholder,
+        labelText,
+        text,
+        name,
+    ]) ?? `${el.tag}-${indexHint}`;
+
     return toCamelFromText(best);
 }
 
@@ -76,7 +156,7 @@ function mergePageMaps(existing: PageMap, incoming: PageMap): PageMap {
         urlPath: incoming.urlPath ?? existing.urlPath,
         scannedAt: incoming.scannedAt,
 
-        // ✅ page title: update when we have one, don't wipe if missing
+        // page title: update when we have one, don't wipe if missing
         title: incoming.title ?? existing.title,
 
         elements: { ...existing.elements },
@@ -148,19 +228,16 @@ export async function scanPage(opts: ScanPageOptions): Promise<void> {
         const page = pages[tabIndex];
         const url = page.url();
 
-        // ✅ get page title (best effort)
         let title: string | undefined;
         try {
             const t = await page.title();
             title = t?.trim() ? t.trim() : undefined;
         } catch {
-            // ignore: title is optional
             title = undefined;
         }
 
         log.info(`Scanning tab[${tabIndex}]: ${url}${title ? ` (title: ${title})` : ""}`);
 
-        // ✅ DOM extraction (scans only inside #root, excludes footer)
         const scanned: ScannedElement[] = await extractDomElements(page);
 
         const usedKeys = new Set<string>();
@@ -177,10 +254,7 @@ export async function scanPage(opts: ScanPageOptions): Promise<void> {
                 }
             })(),
             scannedAt: nowIso(),
-
-            // ✅ new field
             title,
-
             elements: {},
         };
 

@@ -4,6 +4,7 @@ import fs from "node:fs";
 
 import { createLogger } from "../../../utils/logger";
 import { normalizeArgv, hasFlag, getArg } from "../../../utils/argv";
+import { ICONS } from "../../../utils/icons";
 import {
     PAGE_ELEMENTS_GENERATOR_STATE_DIR,
     PAGE_ELEMENTS_GENERATOR_STATE_FILE,
@@ -16,8 +17,10 @@ import {
     printStatus,
     printSummary,
     success,
+    warning,
     failure,
     strong,
+    info,
 } from "../../../utils/cliFormat";
 
 function exists(p: string) {
@@ -103,19 +106,19 @@ export async function runDoctorCommand(args: string[]) {
     for (const c of checks) {
         if (c.ok) {
             okCount++;
-            printStatus("✓", c.name);
+            printStatus(ICONS.successIcon, c.name);
 
             if (verbose) {
-                log.debug(`  ${c.detail}`);
+                log.debug(c.detail);
             }
         } else {
             badCount++;
-            printStatus("❌", c.name);
+            printStatus(ICONS.failIcon, c.name);
 
             if (verbose) {
-                log.debug(`  ${c.detail}`);
+                log.debug(c.detail);
             } else {
-                log.info(`  ${c.detail}`);
+                console.log(`   ${info(c.detail)}`);
             }
         }
     }
@@ -127,49 +130,63 @@ export async function runDoctorCommand(args: string[]) {
 
         for (const f of failed) {
             if (f.name === "mapsDir exists") {
-                log.info(`- Create: mkdir -p ${mapsDir}`);
+                console.log(`   ${ICONS.hintIcon} Create : mkdir -p ${mapsDir}`);
             }
 
             if (f.name === "pagesDir exists") {
-                log.info(`- Create: mkdir -p ${pagesDir}`);
+                console.log(`   ${ICONS.hintIcon} Create : mkdir -p ${pagesDir}`);
             }
 
             if (f.name === "stateDir exists") {
-                log.info(`- Create: mkdir -p ${stateDir}`);
+                console.log(`   ${ICONS.hintIcon} Create : mkdir -p ${stateDir}`);
             }
 
             if (f.name === "stateFile exists") {
-                log.info(
-                    "- Run generator state-only to create state file: " +
-                    "node -r ts-node/register src/tools/page-elements-generator/cli.ts generate --stateOnly --verbose"
+                console.log(
+                    `   ${ICONS.hintIcon} Run    : node -r ts-node/register src/tools/page-elements-generator/cli.ts generate --stateOnly --verbose`
                 );
             }
 
             if (f.name === "page-maps found") {
-                log.info(
-                    '- Run a scan first: ' +
-                    'node -r ts-node/register src/tools/page-scanner/cli.ts scan --connectCdp "$CDP" --pageKey <key> --merge'
+                console.log(
+                    `   ${ICONS.hintIcon} Run    : node -r ts-node/register src/tools/page-scanner/cli.ts scan --connectCdp "$CDP" --pageKey <key> --merge`
                 );
             }
 
             if (f.name.endsWith("writable")) {
-                log.info(`- Fix permissions for: ${f.detail}`);
+                console.log(`   ${ICONS.hintIcon} Fix    : permissions for ${f.detail}`);
             }
         }
+
+        console.log("");
+    }
+
+    let resultText: string;
+
+    if (badCount > 0) {
+        resultText = failure("ISSUE FOUND");
+    } else {
+        resultText = success("ALL GOOD");
     }
 
     printSummary(
         "DOCTOR SUMMARY",
         [
-            ["Maps dir", exists(mapsDir) ? "OK" : "MISSING"],
-            ["Pages dir", exists(pagesDir) ? "OK" : "MISSING"],
-            ["State dir", exists(stateDir) ? "OK" : "MISSING"],
-            ["State file", exists(stateFile) ? "OK" : "MISSING"],
+            ["Maps dir", exists(mapsDir) ? success("OK") : failure("MISSING")],
+            ["Pages dir", exists(pagesDir) ? success("OK") : failure("MISSING")],
+            ["State dir", exists(stateDir) ? success("OK") : failure("MISSING")],
+            ["State file", exists(stateFile) ? success("OK") : failure("MISSING")],
+            ["Checks passed", okCount],
+            ["Checks failed", badCount],
         ],
-        failed.length === 0
-            ? success("ALL GOOD")
-            : failure("ISSUE FOUND")
+        resultText
     );
+
+    if (failed.length === 0) {
+        console.log(`${ICONS.doneIcon} ${strong("Doctor checks completed successfully")}`);
+        process.exitCode = 0;
+        return;
+    }
 
     process.exitCode = 2;
 }

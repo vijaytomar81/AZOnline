@@ -1,6 +1,6 @@
-// src/tools/page-elements-validator/validators/aliasCoverage.ts
+// src/tools/page-elements-validator/validators/pageChain/aliasCoverage.ts
 
-import { stripLineComments } from "../../../utils/text";
+import { stripLineComments } from "../../../../utils/text";
 
 export type AliasCoverageResult = {
     errors: string[];
@@ -33,7 +33,6 @@ function extractAliasesObjectBody(ts: string): string | null {
         if (ch === "}") {
             depth--;
             if (depth === 0) {
-                // body excludes outer braces
                 return cleaned.slice(braceStart + 1, i);
             }
         }
@@ -45,11 +44,23 @@ export function extractAliasesHumanTargets(aliasesHumanTs: string): Set<string> 
     const targets = new Set<string>();
     const cleaned = stripLineComments(aliasesHumanTs);
 
-    // aliasesGenerated.<ElementKey>
-    const re = /\baliasesGenerated\.([A-Za-z_$][A-Za-z0-9_$]*)\b/g;
+    // aliasesGenerated.someKey
+    const dotRe = /\baliasesGenerated\.([A-Za-z_$][A-Za-z0-9_$]*)\b/g;
 
     let m: RegExpExecArray | null;
-    while ((m = re.exec(cleaned))) {
+    while ((m = dotRe.exec(cleaned))) {
+        if (m[1]) targets.add(m[1]);
+    }
+
+    // aliasesGenerated["some-key"]
+    const bracketDoubleRe = /\baliasesGenerated\["([^"]+)"\]/g;
+    while ((m = bracketDoubleRe.exec(cleaned))) {
+        if (m[1]) targets.add(m[1]);
+    }
+
+    // aliasesGenerated['some-key']
+    const bracketSingleRe = /\baliasesGenerated\['([^']+)'\]/g;
+    while ((m = bracketSingleRe.exec(cleaned))) {
         if (m[1]) targets.add(m[1]);
     }
 
@@ -62,7 +73,7 @@ export function extractAliasesHumanKeys(aliasesHumanTs: string): Set<string> {
     const body = extractAliasesObjectBody(aliasesHumanTs);
     if (!body) return keys;
 
-    // `foo:` OR `"foo-bar":`
+    // `foo:` OR `"foo-bar":` OR `'foo-bar':`
     const keyRe = /^\s*([A-Za-z_$][A-Za-z0-9_$]*|"[^"]+"|'[^']+')\s*:/gm;
 
     let m: RegExpExecArray | null;

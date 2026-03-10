@@ -85,7 +85,7 @@ export function printIndented(label: string, value: string) {
 export function printStatus(symbol: string, text: string) {
     let s = symbol;
 
-    if (symbol === ICONS.successIcon || symbol === ICONS.doneIcon || symbol === ICONS.addIcon) {
+    if (symbol === ICONS.successIcon || symbol === ICONS.addIcon) {
         s = success(symbol);
     } else if (symbol === ICONS.warningIcon) {
         s = warning(symbol);

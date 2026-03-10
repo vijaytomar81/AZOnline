@@ -16,7 +16,7 @@ export function buildPageTsStub(pageMap: PageMap): string {
     lines.push(``);
     lines.push(`import type { Page } from "@playwright/test";`);
     lines.push(`import { expect } from "@playwright/test";`);
-    lines.push(`import { BasePage } from "../../core/BasePage"; // adjust if needed`);
+    lines.push(`import { basePage } from "../../../core/basePage"; // adjust if needed`);
     lines.push(`import { elements } from "./elements";`);
     lines.push(`import { aliases } from "./aliases";`);
     lines.push(`import { pageMeta } from "./aliases.generated";`);
@@ -24,7 +24,7 @@ export function buildPageTsStub(pageMap: PageMap): string {
     lines.push(``);
     lines.push(`const PAGE_KEY = ${JSON.stringify(pageKey)} as const;`);
     lines.push(``);
-    lines.push(`export class ${className} extends BasePage {`);
+    lines.push(`export class ${className} extends basePage {`);
     lines.push(`  constructor(page: Page) {`);
     lines.push(`    super(page, PAGE_KEY);`);
     lines.push(`  }`);

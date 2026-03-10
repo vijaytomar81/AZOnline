@@ -79,28 +79,44 @@ export class CarDetailsPage extends basePage {
   await this.clickAlias("allDone");
   }
 
+  async automatic() {
+  await this.clickAlias("automatic");
+  }
+
   async back() {
   await this.clickAlias("back");
+  }
+
+  async diesel() {
+  await this.clickAlias("diesel");
   }
 
   async findMyCar() {
   await this.clickAlias("findMyCar");
   }
 
-  async hasmodificationFalseNo() {
-  await this.clickAlias("hasmodificationFalseNo");
-  }
-
-  async hasmodificationTrueYes() {
-  await this.clickAlias("hasmodificationTrueYes");
-  }
-
   async linkToAllianzHomePage() {
   await this.clickAlias("linkToAllianzHomePage");
   }
 
+  async manual() {
+  await this.clickAlias("manual");
+  }
+
   async next() {
   await this.clickAlias("next");
+  }
+
+  async no() {
+  await this.clickAlias("no");
+  }
+
+  async no2() {
+  await this.clickAlias("no2");
+  }
+
+  async petrol() {
+  await this.clickAlias("petrol");
   }
 
   async purchaseMonthInputField(value: string) {
@@ -109,14 +125,6 @@ export class CarDetailsPage extends basePage {
 
   async purchaseYearInputField(value: string) {
   await this.fillAlias("purchaseYearInputField", value);
-  }
-
-  async registrationnumberpolarquestionNo() {
-  await this.clickAlias("registrationnumberpolarquestionNo");
-  }
-
-  async registrationnumberpolarquestionYes() {
-  await this.clickAlias("registrationnumberpolarquestionYes");
   }
 
   async startTypingTheMakeOfYourVehicle(value: string) {
@@ -139,36 +147,12 @@ export class CarDetailsPage extends basePage {
   await this.fillAlias("uploadAPhotoOfYourCarSNumberPlate", value);
   }
 
-  async vehicledetailssetcorrectlyNo() {
-  await this.clickAlias("vehicledetailssetcorrectlyNo");
-  }
-
-  async vehicledetailssetcorrectlyYes() {
-  await this.clickAlias("vehicledetailssetcorrectlyYes");
-  }
-
   async vehicleDoors(value: string) {
   await this.selectOptionAlias("vehicleDoors", value);
   }
 
-  async vehiclefueltypedDiesel() {
-  await this.clickAlias("vehiclefueltypedDiesel");
-  }
-
-  async vehiclefueltypepPetrol() {
-  await this.clickAlias("vehiclefueltypepPetrol");
-  }
-
   async vehicleManufactureYear(value: string) {
   await this.selectOptionAlias("vehicleManufactureYear", value);
-  }
-
-  async vehicletransmissionaAutomatic() {
-  await this.clickAlias("vehicletransmissionaAutomatic");
-  }
-
-  async vehicletransmissionmManual() {
-  await this.clickAlias("vehicletransmissionmManual");
   }
 
   async viewHowWeLlUseYourInfo() {
@@ -177,6 +161,14 @@ export class CarDetailsPage extends basePage {
 
   async whatSYourCarRegistrationNumber(value: string) {
   await this.fillAlias("whatSYourCarRegistrationNumber", value);
+  }
+
+  async yes() {
+  await this.clickAlias("yes");
+  }
+
+  async yes2() {
+  await this.clickAlias("yes2");
   }
 
   // </scanner:aliases>
