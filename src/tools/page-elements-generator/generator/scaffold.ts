@@ -20,6 +20,38 @@ import { buildAliasesHumanTs } from "../builders/buildAliasesHumanTs";
 import { buildPageTsStub } from "../builders/buildPageTsStub";
 import { syncAliasesIntoPageObject } from "./pageObject";
 
+function toPropertyAccess(objectName: string, key: string): string {
+    return isValidTsIdentifier(key)
+        ? `${objectName}.${key}`
+        : `${objectName}[${JSON.stringify(key)}]`;
+}
+
+function extractAliasKeysFromAliasesTs(aliasesHumanTs: string): Set<string> {
+    const aliasKeys = new Set<string>();
+    const obj = extractAliasesObjectBody(aliasesHumanTs);
+    if (!obj) return aliasKeys;
+
+    const body = stripLineComments(obj.body);
+
+    // Matches:
+    //   back:
+    //   next:
+    //   "1":
+    //   "driverClaims":
+    const re = /(?:^|\n)\s*(?:"([^"]+)"|'([^']+)'|([A-Za-z_$][A-Za-z0-9_$]*))\s*:/g;
+
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(body))) {
+        const quotedDouble = m[1];
+        const quotedSingle = m[2];
+        const identifier = m[3];
+        const key = quotedDouble ?? quotedSingle ?? identifier;
+        if (key) aliasKeys.add(key);
+    }
+
+    return aliasKeys;
+}
+
 /**
  * Detect which element keys are already mapped in aliases.ts by checking RHS usage:
  *   aliasesGenerated.<elementKey>
@@ -30,11 +62,22 @@ function extractMappedElementKeysFromAliasesTs(aliasesHumanTs: string): Set<stri
     const mapped = new Set<string>();
     const cleaned = stripLineComments(aliasesHumanTs);
 
-    const re = /\baliasesGenerated\.([A-Za-z_$][A-Za-z0-9_$]*)\b/g;
+    // matches:
+    //   aliasesGenerated.back
+    //   aliasesGenerated["2"]
+    //   aliasesGenerated['2']
+    const re =
+        /\baliasesGenerated(?:\.([A-Za-z_$][A-Za-z0-9_$]*)|\[(?:"([^"]+)"|'([^']+)')\])/g;
+
     let m: RegExpExecArray | null;
     while ((m = re.exec(cleaned))) {
-        if (m[1]) mapped.add(m[1]);
+        const dotKey = m[1];
+        const bracketDouble = m[2];
+        const bracketSingle = m[3];
+        const key = dotKey ?? bracketDouble ?? bracketSingle;
+        if (key) mapped.add(key);
     }
+
     return mapped;
 }
 
@@ -87,9 +130,10 @@ function appendNewAliases(params: {
 
     const txt = fs.readFileSync(aliasesHumanPath, "utf8");
     const mapped = extractMappedElementKeysFromAliasesTs(txt);
+    const existingAliasKeys = extractAliasKeysFromAliasesTs(txt);
 
     const elementKeys = Object.keys(pageMap.elements).sort((a, b) => a.localeCompare(b));
-    const missing = elementKeys.filter((k) => !mapped.has(k));
+    const missing = elementKeys.filter((k) => !mapped.has(k) && !existingAliasKeys.has(k));
 
     if (missing.length === 0) {
         if (verbose) log.debug?.(`aliases.ts up-to-date: ${aliasesHumanPath}`);
@@ -110,7 +154,8 @@ function appendNewAliases(params: {
     lines.push(``);
     for (const k of missing) {
         const prop = isValidTsIdentifier(k) ? k : JSON.stringify(k);
-        lines.push(`  ${prop}: aliasesGenerated.${k},`);
+        const rhs = toPropertyAccess("aliasesGenerated", k);
+        lines.push(`  ${prop}: ${rhs},`);
     }
 
     const updated = txt.slice(0, insertAt) + lines.join("\n") + txt.slice(insertAt);
