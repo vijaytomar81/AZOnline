@@ -1,6 +1,7 @@
 // src/core/pageFx.ts
 import type { Page } from "@playwright/test";
-import { LocatorEngine, type LocatorEngineOptions, type ElementDef } from "./locatorEngine";
+import { LocatorEngine } from "./locatorEngine";
+import type { LocatorEngineOptions, ElementDef } from "./locatorEngine";
 
 export type ResolveKeyResult = {
     locator: ReturnType<Page["locator"]>;
