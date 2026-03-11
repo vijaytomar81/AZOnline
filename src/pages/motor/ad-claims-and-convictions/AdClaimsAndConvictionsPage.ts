@@ -75,22 +75,6 @@ export class AdClaimsAndConvictionsPage extends basePage {
   // <scanner:aliases>
   // This region is auto-managed. Do not edit by hand.
 
-  async additionalDriver1NumberOfClaims1() {
-  await this.clickAlias("additionalDriver1NumberOfClaims1");
-  }
-
-  async additionalDriver1NumberOfClaims2() {
-  await this.clickAlias("additionalDriver1NumberOfClaims2");
-  }
-
-  async additionalDriver1NumberOfClaims3() {
-  await this.clickAlias("additionalDriver1NumberOfClaims3");
-  }
-
-  async additionalDriver1NumberOfClaims4() {
-  await this.clickAlias("additionalDriver1NumberOfClaims4");
-  }
-
   async back() {
   await this.clickAlias("back");
   }

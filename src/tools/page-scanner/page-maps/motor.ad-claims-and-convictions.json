@@ -5,7 +5,7 @@
   "scannedAt": "2026-03-09T13:11:23.711Z",
   "title": "Claims for additional driver",
   "elements": {
-    "additionalDriver1NumberOfClaims1": {
+    "1": {
       "type": "radio",
       "preferred": "css=#additionalDriver1NumberOfClaims1",
       "fallbacks": [
@@ -29,7 +29,7 @@
         "dataQa": null
       }
     },
-    "additionalDriver1NumberOfClaims2": {
+    "2": {
       "type": "radio",
       "preferred": "css=#additionalDriver1NumberOfClaims2",
       "fallbacks": [
@@ -53,7 +53,7 @@
         "dataQa": null
       }
     },
-    "additionalDriver1NumberOfClaims3": {
+    "3": {
       "type": "radio",
       "preferred": "css=#additionalDriver1NumberOfClaims3",
       "fallbacks": [
@@ -77,7 +77,7 @@
         "dataQa": null
       }
     },
-    "additionalDriver1NumberOfClaims4": {
+    "4": {
       "type": "radio",
       "preferred": "css=#additionalDriver1NumberOfClaims4",
       "fallbacks": [

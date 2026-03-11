@@ -16,10 +16,10 @@ export const pageMeta = {
 
 // Default alias mapping: alias key == element key
 export const aliasesGenerated = {
-  additionalDriver1NumberOfClaims1: "additionalDriver1NumberOfClaims1" as ElementKey,
-  additionalDriver1NumberOfClaims2: "additionalDriver1NumberOfClaims2" as ElementKey,
-  additionalDriver1NumberOfClaims3: "additionalDriver1NumberOfClaims3" as ElementKey,
-  additionalDriver1NumberOfClaims4: "additionalDriver1NumberOfClaims4" as ElementKey,
+  "1": "1" as ElementKey,
+  "2": "2" as ElementKey,
+  "3": "3" as ElementKey,
+  "4": "4" as ElementKey,
   back: "back" as ElementKey,
   linkToAllianzHomePage: "linkToAllianzHomePage" as ElementKey,
   month: "month" as ElementKey,

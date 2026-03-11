@@ -40,11 +40,7 @@ export const aliases = {
   year3: aliasesGenerated.year3,
   year4: aliasesGenerated.year4,
   yes: aliasesGenerated.yes,
-
-  additionalDriver1NumberOfClaims1: aliasesGenerated.additionalDriver1NumberOfClaims1,
-  additionalDriver1NumberOfClaims2: aliasesGenerated.additionalDriver1NumberOfClaims2,
-  additionalDriver1NumberOfClaims3: aliasesGenerated.additionalDriver1NumberOfClaims3,
-  additionalDriver1NumberOfClaims4: aliasesGenerated.additionalDriver1NumberOfClaims4,} as const satisfies Record<string, ElementKey>;
+} as const satisfies Record<string, ElementKey>;
 
 // Primary type used by Page Objects (business alias keys)
 export type AliasKey = keyof typeof aliases;
