@@ -3,3 +3,10 @@
 # tfor error checking: npx tsc -p tsconfig.json --noEmit
 
 # to get tree outcome: tree -L 6 -I "node_modules|.git"
+
+
+npm install -g @mermaid-js/mermaid-cli
+
+
+
+mmdc -i src/Onboarding.md -o src/Onboarding.png
