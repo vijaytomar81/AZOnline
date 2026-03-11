@@ -1,4 +1,21 @@
+
+# Test Execution Flow
+
+This document explains how tests are executed in the framework.
+
+Execution is powered by:
+
+- Playwright
+- Case Runner
+- Page Manager
+- Page Objects
+
+---
+
+# Test Execution Flow
+
 ```mermaid
+
 sequenceDiagram
     participant User
     participant Script as package.json / scripts/e2e.js
@@ -27,10 +44,13 @@ sequenceDiagram
     Runner->>Report: Publish result
     PW->>Report: Generate artifacts
 ```
+---
 
-## Flowchart version of test execution
+
+# Execution Flow (Simplified)
 
 ```mermaid
+
 flowchart LR
 
 CMD["npm run e2e"] --> PW["Playwright"]
@@ -48,4 +68,3 @@ BASE --> UI["Browser UI"]
 RUN --> RES["results/"]
 RUN --> REP["reports/"]
 ```
-

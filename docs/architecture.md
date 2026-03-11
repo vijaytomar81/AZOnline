@@ -1,3 +1,19 @@
+# Automation Framework Architecture
+
+This document describes the overall architecture of the automation framework.
+
+The framework consists of:
+
+- **Input Layer** (UI, Excel, Config)
+- **Automation Toolchain** (Scanner, Generator, Validator)
+- **Generated Assets** (Page Objects, Elements, Aliases)
+- **Execution Runtime** (Playwright, Page Manager, Case Runner)
+- **Outputs** (Reports, Results)
+
+---
+
+# Automation Architecture Diagram
+
 ```mermaid
 flowchart TB
 
