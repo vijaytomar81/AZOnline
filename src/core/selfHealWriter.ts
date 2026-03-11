@@ -2,7 +2,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { createLogger, type Logger } from "../utils/logger";
+import { createLogger } from "../utils/logger";
+import type { Logger } from "../utils/logger";
 import { PAGE_SCANNER_MAPS_DIR } from "../utils/paths";
 
 type PageMap = {
