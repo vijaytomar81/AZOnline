@@ -1,7 +1,8 @@
 // src/core/locatorEngine.ts
 
 import type { Page, Locator } from "@playwright/test";
-import { createLogger, type Logger } from "../utils/logger";
+import { createLogger } from "../utils/logger";
+import type { Logger } from "../utils/logger";
 import { escapeNewlines } from "../utils/text";
 
 export type ElementDef = {
