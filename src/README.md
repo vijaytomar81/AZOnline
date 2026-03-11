@@ -1,160 +1,113 @@
+# AZOnline Automation Framework
 
-# to kille browser: taskkill /IM msedge.exe /F
+This project is a **Playwright + TypeScript automation framework** designed for scalable UI test automation with automated page model generation, data-driven testing, and validation tooling.
 
-# tfor error checking: npx tsc -p tsconfig.json --noEmit
+The framework combines:
 
-# to get tree outcome: tree -L 6 -I "node_modules|.git"
+- UI Test Execution
+- Automated Page Object Generation
+- Page Structure Validation
+- Excel-driven Test Data
+- Gmail Integration
+- Self-Healing Locators
+- Modular Toolchain
 
-# 2) Test execution commands
-
-### `npm run e2e`
-Runs:
-1) `npm run data:build`
-2) then `npm run test:e2e`
-
-**What it does**:
-- One-shot “build data then execute tests”.
-
-**Important**:
-- If you need specific data-builder params (sheet / verbose / includeEmptyChildFields),
-  run those variants first OR create another combined script.
 
 ---
 
-Launch Edge with remote debugging:
+## Automation System Overview
 
-$profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
+```mermaid
+flowchart LR
 
-& "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" `
-  --remote-debugging-port=9222 `
-  --user-data-dir="$profile"
+A["Excel Test Data"] --> B["Data Builder"]
+B --> C["Case JSON"]
 
-# Save CDP URL once (VERY IMPORTANT)
+D["Application UI"] --> E["Page Scanner"]
+E --> F["Page Maps"]
 
-Invoke-RestMethod http://localhost:9222/json/version
-webSocketDebuggerUrl
-$CDP = "ws://localhost:9222/devtools/browser/9449de56-396e-4b57-b6e0-9d6e18c64c11"
+F --> G["Page Elements Generator"]
+G --> H["Generated Page Objects"]
 
+H --> I["Page Elements Validator"]
 
-# Pages scanner command
+C --> J["Playwright Test Execution"]
+H --> J
+I --> J
 
-npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "common.auth-entry" `
-  --merge `
-  --verbose
+J --> K["Results"]
+J --> L["Reports"]
 
+M["Gmail Integration"] --> J
+N["Config + Utils"] --> B
+N --> E
+N --> G
+N --> I
+N --> J
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "common.insurance-product-type-selection" `
-  --merge `
-  --verbose
+---
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.car-details" `
-  --merge `
-  --verbose
+# High Level Architecture
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.driving-licence" `
-  --merge `
-  --verbose
+```mermaid
+flowchart TB
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.personal-details" `
-  --merge `
-  --verbose
+subgraph Entry["Execution Entry"]
+PKG["package.json scripts"]
+E2E["scripts/e2e.js"]
+PW["playwright.config.ts"]
+end
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.claims-and-convictions" `
-  --merge `
-  --verbose
+subgraph Tests
+T["src/tests"]
+R["reports"]
+RES["results"]
+end
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.no-claim-discount" `
-  --merge `
-  --verbose
+subgraph Runtime
+CR["caseRunner"]
+PM["pageManager"]
+BP["basePage"]
+LE["locatorEngine"]
+FX["pageFx"]
+SH["selfHealWriter"]
+end
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.add-additional-driver" `
-  --merge `
-  --verbose
+subgraph Pages
+PO["PageObjects"]
+ALIAS["aliases"]
+ELEMENTS["elements"]
+end
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.additional-driver" `
-  --merge `
-  --verbose
+subgraph Tools
+SCAN["page-scanner"]
+GEN["elements-generator"]
+VAL["elements-validator"]
+end
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.additional-driver-personal-details" `
-  --merge `
-  --verbose
+subgraph Data
+DB["data-builder"]
+EXCEL["Excel"]
+JSON["Case JSON"]
+end
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.additional-driver-claims" `
-  --merge `
-  --verbose
+EXCEL --> DB
+DB --> JSON
+JSON --> CR
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.car-usage" `
-  --merge `
-  --verbose
+CR --> PM
+PM --> PO
+PO --> BP
+BP --> LE
+BP --> FX
+BP --> SH
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.policy-start-date" `
-  --merge `
-  --verbose
+SCAN --> GEN
+GEN --> ELEMENTS
+GEN --> ALIAS
+GEN --> PO
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.your-quote" `
-  --merge `
-  --verbose
+VAL --> PO
 
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.your-quote-summary" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "common.account-registration" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "common.email-verification" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "common.direct-debit-setup" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "common.pay-deposit" `
-  --merge `
-  --verbose
-
-  npx ts-node .\src\scanner\cli.ts `
-  --connectCdp $CDP `
-  --pageKey "motor.dashboard" `
-  --merge `
-  --verbose
+CR --> R
+CR --> RES
