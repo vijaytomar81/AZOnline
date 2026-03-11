@@ -10,66 +10,107 @@ The toolchain includes:
 
 ---
 
+# 0) Compact flow
+
+```mermaid
+flowchart TB
+
+subgraph ROW1[" "]
+direction LR
+A["CLI: page-scanner"] --> B["commands/scan.ts"] --> C["scanner/runner.ts"]
+--> D["Connect to browser via CDP"] --> E["Read active page / tab"]
+end
+
+subgraph ROW2[" "]
+direction LR
+F["domExtract.ts"] --> G["Extract interactive elements"]
+--> H["Resolve metadata"] --> I["Parent form-group label discovery"]
+--> J["getSmartElementsKey.ts"]
+end
+
+subgraph ROW3[" "]
+direction LR
+K["Generate smart keys"] --> L["classify.ts"]
+--> M["selectorPipeline.ts"] --> N["Build selector candidates"]
+--> O["Choose preferred + fallbacks"]
+end
+
+subgraph ROW4[" "]
+direction LR
+P["merge.ts"] --> Q["writer.ts"] --> R["page-map.json"]
+end
+
+E --> F
+J --> K
+O --> P
+
+style ROW1 fill:transparent,stroke:transparent
+style ROW2 fill:transparent,stroke:transparent
+style ROW3 fill:transparent,stroke:transparent
+style ROW4 fill:transparent,stroke:transparent
+```
+
 # 1) Page Scanner Flow
 
 ```mermaid
 flowchart TB
 
-A["CLI: page-scanner"]
-B["commands/scan.ts"]
-C["scanner/runner.ts"]
+A["Scanner CLI<br/>page-scanner"] --> B["Scan Command<br/>commands/scan.ts"] --> C["Scan Runner<br/>scanner/runner.ts"]
 
-A --> B --> C
-
-subgraph S1["Browser Connection"]
+subgraph P1["Phase 1 · Browser Session"]
 direction LR
-D["Connect to browser via CDP"]
-E["Read active page / tab"]
+D["Connect to browser<br/>via CDP"]
+E["Select context / tab"]
+F["Read page URL + title"]
 end
 
-C --> D --> E
+C --> D --> E --> F
 
-subgraph S2["DOM Extraction"]
+subgraph P2["Phase 2 · DOM Discovery"]
 direction RL
-F["domExtract.ts"]
-G["Extract interactive elements"]
-H["Resolve metadata"]
+G["Define scan root<br/>root + modal containers"]
+H["Collect candidate nodes"]
+I["Filter unsupported / footer nodes"]
+J["Extract raw DOM metadata"]
 end
 
-E --> H
+F --> J
+J --> I
+I --> H
 H --> G
-G --> F
 
-subgraph S3["Smart Key Generation"]
+subgraph P3["Phase 3 · Semantic Enrichment"]
 direction LR
-I["Parent form-group label discovery"]
-J["getSmartElementsKey.ts"]
-K["Generate smart keys"]
+K["Resolve labels<br/>for / wrapped / aria-labelledby"]
+L["Resolve parent form-group context"]
+M["Capture meta fields"]
+N["Build smart business key"]
 end
 
-F --> I --> J --> K
+G --> K --> L --> M --> N
 
-subgraph S4["Selector Generation"]
+subgraph P4["Phase 4 · Selector Modeling"]
 direction RL
-L["classify.ts"]
-M["selectorPipeline.ts"]
-N["Build selector candidates"]
-O["Choose preferred + fallbacks"]
+O["Classify element type"]
+P["Build selector candidates"]
+Q["Rank preferred selector"]
+R["Collect fallback selectors"]
 end
 
-K --> O
-O --> N
-N --> M
-M --> L
+N --> R
+R --> Q
+Q --> P
+P --> O
 
-subgraph S5["Finalize Page Map"]
+subgraph P5["Phase 5 · Page Map Assembly"]
 direction LR
-P["merge.ts"]
-Q["writer.ts"]
-R["page-map.json"]
+S["Merge with existing map<br/>if merge mode enabled"]
+T["Assemble page-map JSON"]
+U["Write page-map file"]
+V["page-maps/*.json"]
 end
 
-L --> P --> Q --> R
+O --> S --> T --> U --> V
 ```
 
 ---
