@@ -53,19 +53,21 @@ function extractAliasKeysFromAliasesTs(aliasesHumanTs: string): Set<string> {
 }
 
 /**
- * Detect which element keys are already mapped in aliases.ts by checking RHS usage:
- *   aliasesGenerated.<elementKey>
+ * Detect which element keys are already mapped in aliases.ts by checking RHS usage
+ * of aliasesGenerated references.
  *
- * This is what allows humans to rename the LHS alias key without duplicates being re-added.
+ * Supported formats:
+ *   aliasesGenerated.elementKey
+ *   aliasesGenerated["elementKey"]
+ *   aliasesGenerated['elementKey']
+ *
+ * This is what allows humans to rename the LHS alias key without duplicates
+ * being re-added.
  */
 function extractMappedElementKeysFromAliasesTs(aliasesHumanTs: string): Set<string> {
     const mapped = new Set<string>();
     const cleaned = stripLineComments(aliasesHumanTs);
 
-    // matches:
-    //   aliasesGenerated.back
-    //   aliasesGenerated["2"]
-    //   aliasesGenerated['2']
     const re =
         /\baliasesGenerated(?:\.([A-Za-z_$][A-Za-z0-9_$]*)|\[(?:"([^"]+)"|'([^']+)')\])/g;
 
@@ -112,11 +114,103 @@ function extractAliasesObjectBody(aliasesHumanTs: string): { body: string; bodyS
     return { body, bodyStartIndex: absStart, bodyEndIndex: absEnd };
 }
 
+type AliasEntry = {
+    rawLine: string;
+    aliasKey: string | null;
+    generatedKey: string | null;
+};
+
+function parseAliasEntryLine(line: string): AliasEntry {
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+        return { rawLine: line, aliasKey: null, generatedKey: null };
+    }
+
+    const aliasMatch = trimmed.match(/^(?:"([^"]+)"|'([^']+)'|([A-Za-z_$][A-Za-z0-9_$]*))\s*:/);
+    const aliasKey = aliasMatch
+        ? (aliasMatch[1] ?? aliasMatch[2] ?? aliasMatch[3] ?? null)
+        : null;
+
+    const generatedMatch = trimmed.match(
+        /\baliasesGenerated(?:\.([A-Za-z_$][A-Za-z0-9_$]*)|\[(?:"([^"]+)"|'([^']+)')\])/
+    );
+    const generatedKey = generatedMatch
+        ? (generatedMatch[1] ?? generatedMatch[2] ?? generatedMatch[3] ?? null)
+        : null;
+
+    return {
+        rawLine: line,
+        aliasKey,
+        generatedKey,
+    };
+}
+
+function removeStaleAliases(params: {
+    aliasesHumanPath: string;
+    pageMap: PageMap;
+    verbose?: boolean;
+    log: { info: (s: string) => void; debug?: (s: string) => void };
+}): boolean {
+    const { aliasesHumanPath, pageMap, verbose, log } = params;
+
+    if (!fs.existsSync(aliasesHumanPath)) return false;
+
+    const txt = fs.readFileSync(aliasesHumanPath, "utf8");
+    const obj = extractAliasesObjectBody(txt);
+    if (!obj) {
+        log.info(`WARN: Could not parse aliases.ts to remove stale keys: ${aliasesHumanPath}`);
+        return false;
+    }
+
+    const validGeneratedKeys = new Set(Object.keys(pageMap.elements));
+    const lines = obj.body.split("\n");
+
+    let removedCount = 0;
+    const keptLines: string[] = [];
+
+    for (const line of lines) {
+        const parsed = parseAliasEntryLine(line);
+
+        // Keep blank lines / comments / anything that is not a direct aliasesGenerated mapping
+        if (!parsed.generatedKey) {
+            keptLines.push(line);
+            continue;
+        }
+
+        // Remove only mappings whose RHS generated key no longer exists
+        if (!validGeneratedKeys.has(parsed.generatedKey)) {
+            removedCount++;
+            if (verbose) {
+                log.debug?.(
+                    `Removing stale alias mapping: ${parsed.aliasKey ?? "<unknown>"} -> ${parsed.generatedKey}`
+                );
+            }
+            continue;
+        }
+
+        keptLines.push(line);
+    }
+
+    if (removedCount === 0) {
+        return false;
+    }
+
+    const newBody = keptLines.join("\n");
+    const updated = txt.slice(0, obj.bodyStartIndex) + newBody + txt.slice(obj.bodyEndIndex);
+
+    fs.writeFileSync(aliasesHumanPath, updated, "utf8");
+    log.info(`Updated aliases.ts (removed ${removedCount} stale mapping(s)): ${aliasesHumanPath}`);
+    return true;
+}
+
 /**
  * Appends new mappings into aliases.ts (inside export const aliases = { ... }).
- * It does NOT rewrite existing mappings.
+ * It does NOT rewrite existing valid mappings.
  *
- * Key behavior: detect duplicates by RHS (aliasesGenerated.<elementKey>), so alias renames are safe.
+ * Duplicate protection:
+ * - by RHS usage of aliasesGenerated.*
+ * - by existing alias keys on the LHS
  */
 function appendNewAliases(params: {
     aliasesHumanPath: string;
@@ -200,8 +294,9 @@ export function ensureScaffoldFiles(params: {
     const createdAliases = safeWriteTextIfMissing(aliasesHumanPath, buildAliasesHumanTs(pageMap));
     if (createdAliases) log.info(`Scaffolded: ${aliasesHumanPath}`);
 
-    // If already exists, append only new element mappings
+    // If already exists, first remove stale mappings, then append only new valid mappings
     if (!createdAliases) {
+        removeStaleAliases({ aliasesHumanPath, pageMap, verbose, log });
         appendNewAliases({ aliasesHumanPath, pageMap, verbose, log });
     }
 
