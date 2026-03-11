@@ -1,1 +1,0 @@
-<div class="invalid-feedback d-block" role="alert">Sorry, we don't cover cars with modifications</div>
