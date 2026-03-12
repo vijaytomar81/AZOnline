@@ -15,6 +15,6 @@ $CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerU
 
 
 
-npm run scan:page:verbose `-- --connectCdp="$CDP" --pageKey="common.login-or-registration"
+npm run scan:page:verbose `-- --connectCdp="$CDP" --pageKey="athena.motor.car-details"
 
 ==============
