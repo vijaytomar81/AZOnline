@@ -1,3 +1,4 @@
+// src/tools/page-scanner/scanner/keyNaming/strategies.ts
 import type { ScannedElement } from "../types";
 import {
     isClickable,

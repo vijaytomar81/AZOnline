@@ -1,3 +1,4 @@
+// src/tools/page-scanner/scanner/getSmartElementsKey.ts
 import type { ScannedElement } from "./types";
 import { buildFrameworkSearchKey, buildGenericKey, buildRadioCheckboxKey } from "./keyNaming/strategies";
 import { buildSemanticKey } from "./keyNaming/semantic";
