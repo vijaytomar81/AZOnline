@@ -1,7 +1,5 @@
-// \src/tools/page-scanner/scanner/pageMap/buildPageMap.ts
-
-import { nowIso } from "../../../../utils/time";
-import { uniq, uniqueKey } from "../../../../utils/collections";
+import { nowIso } from "@/utils/time";
+import { uniq, uniqueKey } from "@/utils/collections";
 import type {
     PageMap,
     PageMapElementEntry,
@@ -12,6 +10,7 @@ import { buildSelectors } from "../selectors/buildSelectors";
 import { getSmartElementKey } from "../getSmartElementsKey";
 import { appendGroupedRadioCheckboxEntries } from "./groupControls";
 import { classifyElementType } from "./classifyElementType";
+import { buildStableElementKey } from "./buildStableElementKey";
 
 function toPageMapEntry(
     el: ScannedElement,
@@ -19,7 +18,7 @@ function toPageMapEntry(
     fallbacks: string[],
     type: string
 ): PageMapElementEntry {
-    return {
+    const entry: PageMapElementEntry = {
         type,
         preferred: best.selector,
         fallbacks,
@@ -45,6 +44,9 @@ function toPageMapEntry(
             isFrameworkSearchInput: el.isFrameworkSearchInput ?? null,
         },
     };
+
+    entry.stableKey = buildStableElementKey(entry);
+    return entry;
 }
 
 export function buildPageMap(params: {

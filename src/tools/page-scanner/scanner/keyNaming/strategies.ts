@@ -1,90 +1,94 @@
-// src/tools/page-scanner/scanner/keyNaming/strategies.ts
 import type { ScannedElement } from "../types";
-import {
-    isClickable,
-    isVerboseImplementationId,
-    pickBestDisplayBase,
-    pickBestElementBase,
-    pickBestOwnerBase,
-    shouldUseOwnerContext,
-} from "./heuristics";
-import { clean, normalizeBusinessPhrase, toKeyPreservingIdentifiers, upperFirst } from "./normalize";
+import { normalizeBusinessPhrase, toKeyPreservingIdentifiers } from "./normalize";
 
-function normalizeOptionText(value?: string | null): string | undefined {
-    const v = clean(value);
-    if (!v) return undefined;
+function normalizeKeyPart(value?: string | null): string | undefined {
+    const normalized = normalizeBusinessPhrase(value ?? undefined);
+    const key = toKeyPreservingIdentifiers(normalized);
+    return key || undefined;
+}
 
-    const lowered = v.toLowerCase();
+function getControlPrefix(el: ScannedElement): string {
+    const type = (el.typeAttr || "").toLowerCase();
+    if (type === "radio") return "radio";
+    if (type === "checkbox") return "checkbox";
+    if (el.isFrameworkSearchInput) return "searchSelect";
+    return "input";
+}
 
-    if (lowered === "yes") return "Yes";
-    if (lowered === "no") return "No";
+function buildChoiceGroupBase(el: ScannedElement): string | undefined {
+    return (
+        normalizeKeyPart(el.inputName) ||
+        normalizeKeyPart(el.ownerLabelText) ||
+        normalizeKeyPart(el.ownerAriaLabel) ||
+        normalizeKeyPart(el.ownerId) ||
+        normalizeKeyPart(el.ownerGroupLabelFor)
+    );
+}
 
-    const key = toKeyPreservingIdentifiers(v.replace(/\s*-\s*/g, " to "));
-    return upperFirst(key);
+function buildChoiceOptionBase(el: ScannedElement): string | undefined {
+    return (
+        normalizeKeyPart(el.labelText) ||
+        normalizeKeyPart(el.ariaLabel) ||
+        normalizeKeyPart(el.text) ||
+        normalizeKeyPart(el.name) ||
+        normalizeKeyPart(el.id)
+    );
+}
+
+function joinWithoutDup(left?: string, right?: string): string | undefined {
+    if (!left && !right) return undefined;
+    if (!left) return right;
+    if (!right) return left;
+
+    const leftLower = left.toLowerCase();
+    const rightLower = right.toLowerCase();
+
+    if (rightLower.startsWith(leftLower)) return right;
+    if (leftLower.endsWith(rightLower)) return left;
+
+    return `${left}${right}`;
 }
 
 export function buildRadioCheckboxKey(el: ScannedElement): string | undefined {
     const type = (el.typeAttr || "").toLowerCase();
     if (type !== "radio" && type !== "checkbox") return undefined;
 
-    const groupBase = pickBestOwnerBase({
-        ...el,
-        ownerId: el.inputName ?? el.ownerId ?? null,
-        labelText: el.ownerLabelText ?? el.labelText ?? null,
-    });
+    const prefix = getControlPrefix(el);
+    const groupBase = buildChoiceGroupBase(el);
+    const optionBase = buildChoiceOptionBase(el);
 
-    const optionBase = normalizeOptionText(el.labelText || el.text || el.name);
+    const finalBase = joinWithoutDup(groupBase, optionBase);
+    if (!finalBase) return undefined;
 
-    if (groupBase && optionBase) return `${groupBase}${optionBase}`;
-    if (groupBase) return groupBase;
-
-    return undefined;
+    return `${prefix}${finalBase}`;
 }
 
 export function buildFrameworkSearchKey(el: ScannedElement): string | undefined {
-    if (!shouldUseOwnerContext(el)) return undefined;
+    if (!el.isFrameworkSearchInput) return undefined;
 
-    const ownerBase = pickBestOwnerBase(el);
-    if (!ownerBase) return undefined;
+    const base =
+        normalizeKeyPart(el.ownerLabelText) ||
+        normalizeKeyPart(el.ownerAriaLabel) ||
+        normalizeKeyPart(el.ownerId) ||
+        normalizeKeyPart(el.id) ||
+        normalizeKeyPart(el.name);
 
-    return `${ownerBase}SearchInput`;
-}
-
-function buildNormalizedDisplayBase(el: ScannedElement): string | undefined {
-    const candidates = [
-        normalizeBusinessPhrase(el.text),
-        normalizeBusinessPhrase(el.ariaLabel),
-        normalizeBusinessPhrase(el.labelText),
-        normalizeBusinessPhrase(el.name),
-    ];
-
-    for (const c of candidates) {
-        const key = toKeyPreservingIdentifiers(c);
-        if (key) return key;
-    }
-
-    return undefined;
+    if (!base) return undefined;
+    return `searchSelect${base}`;
 }
 
 export function buildGenericKey(el: ScannedElement, indexHint: number): string {
-    const displayBase = buildNormalizedDisplayBase(el) || pickBestDisplayBase(el);
-    const ownBase = pickBestElementBase(el);
+    const prefix = getControlPrefix(el);
 
-    if (
-        isClickable(el) &&
-        displayBase &&
-        ownBase &&
-        el.id &&
-        isVerboseImplementationId(el.id)
-    ) {
-        return displayBase;
-    }
+    const base =
+        normalizeKeyPart(el.id) ||
+        normalizeKeyPart(el.name) ||
+        normalizeKeyPart(el.labelText) ||
+        normalizeKeyPart(el.ariaLabel) ||
+        normalizeKeyPart(el.placeholder) ||
+        normalizeKeyPart(el.text) ||
+        normalizeKeyPart(el.tag) ||
+        `Element${indexHint}`;
 
-    if (displayBase && !ownBase) return displayBase;
-    if (ownBase) return ownBase;
-
-    const ownerBase = pickBestOwnerBase(el);
-    if (ownerBase) return ownerBase;
-
-    return toKeyPreservingIdentifiers(`${el.tag || "element"} ${indexHint}`) || `element${indexHint}`;
+    return `${prefix}${base}`;
 }

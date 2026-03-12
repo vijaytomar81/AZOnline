@@ -1,6 +1,4 @@
-// \src/tools/page-scanner/scanner/types.ts
-
-import type { Logger } from "../../../utils/logger";
+import type { Logger } from "@/utils/logger";
 
 export type ScanPageOptions = {
     connectCdp: string;
@@ -78,6 +76,7 @@ export type PageMapElementMeta = {
 
 export type PageMapElementEntry = {
     type: string;
+    stableKey?: string;
     preferred: string;
     fallbacks: string[];
     meta?: PageMapElementMeta;
@@ -85,6 +84,7 @@ export type PageMapElementEntry = {
 
 export type PageMapGroupEntry = {
     type: "radio-group" | "checkbox-group";
+    stableKey?: string;
     preferred: "";
     fallbacks: [];
     options: Record<string, string>;

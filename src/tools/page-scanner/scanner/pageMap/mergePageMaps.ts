@@ -1,20 +1,66 @@
-// \src/tools/page-scanner/scanner/pageMap/mergePageMaps.ts
+// src/tools/page-scanner/scanner/pageMap/mergePageMaps.ts
 
-import { uniq } from "../../../../utils/collections";
-import type { PageMap, PageMapEntry, PageMapGroupEntry } from "../types";
+import type { PageMap, PageMapElementEntry, PageMapEntry } from "../types";
 
-function isGroupEntry(entry: PageMapEntry): entry is PageMapGroupEntry {
+function isGroupEntry(
+    entry: PageMapEntry
+): entry is Extract<PageMapEntry, { type: "radio-group" | "checkbox-group" }> {
     return entry.type === "radio-group" || entry.type === "checkbox-group";
 }
 
-/**
- * Merge strategy:
- * - Keep existing keys stable.
- * - If preferred differs, keep old as fallback and promote new preferred.
- * - Union fallbacks.
- * - Merge meta where possible.
- * - Group entries are replaced by incoming version.
- */
+function isElementEntry(entry: PageMapEntry): entry is PageMapElementEntry {
+    return !isGroupEntry(entry);
+}
+
+function mergeElement(cur: PageMapElementEntry, next: PageMapElementEntry): PageMapElementEntry {
+    let preferred = cur.preferred;
+    let fallbacks = [...(cur.fallbacks ?? [])];
+
+    if (preferred !== next.preferred) {
+        fallbacks = Array.from(
+            new Set(
+                [preferred, ...fallbacks, ...(next.fallbacks ?? [])].filter(
+                    (x) => x && x !== next.preferred
+                )
+            )
+        );
+        preferred = next.preferred;
+    } else {
+        fallbacks = Array.from(new Set([...(cur.fallbacks ?? []), ...(next.fallbacks ?? [])]));
+    }
+
+    return {
+        ...cur,
+        ...next,
+        stableKey: cur.stableKey ?? next.stableKey,
+        preferred,
+        fallbacks,
+        meta: {
+            ...(cur.meta ?? {}),
+            ...(next.meta ?? {}),
+            tag: next.meta?.tag ?? cur.meta?.tag ?? "element",
+        },
+    };
+}
+
+function mergeGroupEntry(
+    cur: Extract<PageMapEntry, { type: "radio-group" | "checkbox-group" }>,
+    next: Extract<PageMapEntry, { type: "radio-group" | "checkbox-group" }>
+): Extract<PageMapEntry, { type: "radio-group" | "checkbox-group" }> {
+    return {
+        ...cur,
+        ...next,
+        options: {
+            ...(cur.options ?? {}),
+            ...(next.options ?? {}),
+        },
+        meta: {
+            ...(cur.meta ?? {}),
+            ...(next.meta ?? {}),
+        },
+    };
+}
+
 export function mergePageMaps(existing: PageMap, incoming: PageMap): PageMap {
     const out: PageMap = {
         ...existing,
@@ -26,45 +72,44 @@ export function mergePageMaps(existing: PageMap, incoming: PageMap): PageMap {
         elements: { ...existing.elements },
     };
 
-    for (const key of Object.keys(incoming.elements)) {
-        const next = incoming.elements[key];
-        const cur = out.elements[key];
+    const existingKeyByStableKey = new Map<string, string>();
 
-        if (!cur) {
-            out.elements[key] = next;
+    for (const [existingKey, existingElement] of Object.entries(existing.elements)) {
+        if ("stableKey" in existingElement && existingElement.stableKey) {
+            existingKeyByStableKey.set(existingElement.stableKey, existingKey);
+        }
+    }
+
+    for (const [incomingKey, incomingElement] of Object.entries(incoming.elements)) {
+        const matchedExistingKey =
+            out.elements[incomingKey]
+                ? incomingKey
+                : "stableKey" in incomingElement && incomingElement.stableKey
+                    ? existingKeyByStableKey.get(incomingElement.stableKey)
+                    : undefined;
+
+        if (!matchedExistingKey) {
+            out.elements[incomingKey] = incomingElement;
+
+            if ("stableKey" in incomingElement && incomingElement.stableKey) {
+                existingKeyByStableKey.set(incomingElement.stableKey, incomingKey);
+            }
             continue;
         }
 
-        if (isGroupEntry(next) || isGroupEntry(cur)) {
-            out.elements[key] = next;
+        const currentElement = out.elements[matchedExistingKey];
+
+        if (isElementEntry(currentElement) && isElementEntry(incomingElement)) {
+            out.elements[matchedExistingKey] = mergeElement(currentElement, incomingElement);
             continue;
         }
 
-        let preferred = cur.preferred;
-        let fallbacks = uniq([...(cur.fallbacks ?? [])]);
-
-        if (preferred !== next.preferred) {
-            fallbacks = uniq(
-                [preferred, ...fallbacks, ...(next.fallbacks ?? [])].filter(
-                    (x) => x !== next.preferred
-                )
-            );
-            preferred = next.preferred;
-        } else {
-            fallbacks = uniq([...(cur.fallbacks ?? []), ...(next.fallbacks ?? [])]);
+        if (isGroupEntry(currentElement) && isGroupEntry(incomingElement)) {
+            out.elements[matchedExistingKey] = mergeGroupEntry(currentElement, incomingElement);
+            continue;
         }
 
-        out.elements[key] = {
-            ...cur,
-            type: cur.type || next.type,
-            preferred,
-            fallbacks,
-            meta: {
-                ...(cur.meta ?? {}),
-                ...(next.meta ?? {}),
-                tag: next.meta?.tag ?? cur.meta?.tag ?? cur.type ?? next.type ?? "element",
-            },
-        };
+        out.elements[matchedExistingKey] = incomingElement;
     }
 
     return out;
