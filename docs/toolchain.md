@@ -10,46 +10,6 @@ The toolchain includes:
 
 ---
 
-# 0) Compact flow
-
-```mermaid
-flowchart TB
-
-subgraph ROW1[" "]
-direction LR
-A["CLI: page-scanner"] --> B["commands/scan.ts"] --> C["scanner/runner.ts"]
---> D["Connect to browser via CDP"] --> E["Read active page / tab"]
-end
-
-subgraph ROW2[" "]
-direction LR
-F["domExtract.ts"] --> G["Extract interactive elements"]
---> H["Resolve metadata"] --> I["Parent form-group label discovery"]
---> J["getSmartElementsKey.ts"]
-end
-
-subgraph ROW3[" "]
-direction LR
-K["Generate smart keys"] --> L["classify.ts"]
---> M["selectorPipeline.ts"] --> N["Build selector candidates"]
---> O["Choose preferred + fallbacks"]
-end
-
-subgraph ROW4[" "]
-direction LR
-P["merge.ts"] --> Q["writer.ts"] --> R["page-map.json"]
-end
-
-E --> F
-J --> K
-O --> P
-
-style ROW1 fill:transparent,stroke:transparent
-style ROW2 fill:transparent,stroke:transparent
-style ROW3 fill:transparent,stroke:transparent
-style ROW4 fill:transparent,stroke:transparent
-```
-
 # 1) Page Scanner Flow
 
 ```mermaid
