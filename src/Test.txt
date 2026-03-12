@@ -20,18 +20,23 @@ npm run scan:page:verbose `-- --connectCdp="$CDP" --pageKey="athena.motor.car-de
 ==============
 
 > azonline@1.0.0 scan
-> node -r ts-node/register src/tools/page-scanner/cli.ts scan --verbose --connectCdp=ws://localhost:9222/devtools/browser/2d341fa4-d444-4fd3-bf0f-62feff400d25 --pageKey=athena.common.login-or-registration
+> node -r ts-node/register src/tools/page-scanner/cli.ts scan --verbose --connectCdp=ws://localhost:9222/devtools/browser/2d341fa4-d444-4fd3-bf0f-62feff400d25 --pageKey=athena.motor.ph-driving-licence-details
 
 
 ********************************
 🛰 PAGE SCANNER
 ********************************
-2026-03-12T12:15:40.115Z [page-scanner] DEBUG: Args: pageKey=athena.common.login-or-registration outDir=C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\tools\page-scanner\page-maps merge=false tabIndex=0 connectCdp=ws://localhost:9222/devtools/browser/2d341fa4-d444-4fd3-bf0f-62feff400d25
-2026-03-12T12:15:40.116Z [page-scanner] INFO: Command: scan
-2026-03-12T12:15:40.117Z [page-scanner:runner] INFO: Connecting to browser: ws://localhost:9222/devtools/browser/2d341fa4-d444-4fd3-bf0f-62feff400d25
-2026-03-12T12:15:40.230Z [page-scanner:runner] INFO: Scanning tab[0]: https://customer-portal-lv-test.athenapaas.com/ (title: Allianz login page)
-2026-03-12T12:15:40.249Z [page-scanner] ERROR: page.evaluate: ReferenceError: roots_1 is not defined
-    at eval (eval at evaluate (:290:30), <anonymous>:2:35)
+2026-03-12T12:57:57.475Z [page-scanner] DEBUG: Args: pageKey=athena.motor.ph-driving-licence-details outDir=C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline\src\tools\page-scanner\page-maps merge=false tabIndex=0 connectCdp=ws://localhost:9222/devtools/browser/2d341fa4-d444-4fd3-bf0f-62feff400d25
+2026-03-12T12:57:57.476Z [page-scanner] INFO: Command: scan
+2026-03-12T12:57:57.476Z [page-scanner:runner] INFO: Connecting to browser: ws://localhost:9222/devtools/browser/2d341fa4-d444-4fd3-bf0f-62feff400d25
+2026-03-12T12:57:57.780Z [page-scanner:runner] INFO: Scanning tab[0]: https://customer-portal-lv-test.athenapaas.com/journey/show/product/AnnualMotorInsurance/process/nb/drivingLicenceScan/69b2b77f19f0b1757f6aa9be (title: Driving licence details)
+2026-03-12T12:57:57.823Z [page-scanner] ERROR: page.evaluate: TypeError: Cannot read properties of null (reading 'getAttribute')
+    at getAttr (eval at evaluate (:290:30), <anonymous>:6:22)
+    at resolveOwnerContext (eval at evaluate (:290:30), <anonymous>:153:43)
+    at serializeElement (eval at evaluate (:290:30), <anonymous>:196:23)
+    at eval (eval at evaluate (:290:30), <anonymous>:249:30)
+    at Array.map (<anonymous>)
+    at browserExtractDomElements (eval at evaluate (:290:30), <anonymous>:249:18)
     at UtilityScript.evaluate (<anonymous>:292:16)
     at UtilityScript.<anonymous> (<anonymous>:1:44)
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline>
