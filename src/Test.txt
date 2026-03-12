@@ -20,13 +20,13 @@ npm run scan:page:verbose `-- --connectCdp="$CDP" --pageKey="athena.motor.car-de
 ==============
 
 {
-  "pageKey": "athena.common.login-or-registration",
-  "url": "https://customer-portal-lv-test.athenapaas.com/",
-  "urlPath": "/",
-  "scannedAt": "2026-03-12T10:25:53.563Z",
-  "title": "Allianz login page",
+  "pageKey": "athena.common.insurance-type-selection",
+  "url": "https://customer-portal-lv-test.athenapaas.com/products",
+  "urlPath": "/products",
+  "scannedAt": "2026-03-12T10:56:28.053Z",
+  "title": "Get a new quote or view saved quotes",
   "elements": {
-    "root": {
+    "gotoallianzhomepage": {
       "type": "link",
       "preferred": "css=#goToAllianzHomePage",
       "fallbacks": [
@@ -54,19 +54,210 @@ npm run scan:page:verbose `-- --connectCdp="$CDP" --pageKey="athena.motor.car-de
         "isFrameworkSearchInput": false
       }
     },
-    "root2": {
-      "type": "link",
-      "preferred": "css=#login",
+    "backSearchInput": {
+      "type": "button",
+      "preferred": "role=button[name=/Back/i]",
       "fallbacks": [
-        "role=link[name=/Log in/i]",
-        "text=/Log in/i"
+        "text=/Back/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": null,
+        "name": "Back",
+        "text": "Back",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "root",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "isFrameworkSearchInput": false
+      }
+    },
+    "viewsavedsubscriptioncarquotes": {
+      "type": "link",
+      "preferred": "css=#viewSavedSubscriptionCarQuotes",
+      "fallbacks": [
+        "role=link[name=/Car quote/i]",
+        "text=/Car quote/i"
       ],
       "meta": {
         "tag": "a",
         "role": null,
-        "id": "login",
-        "name": "Log in",
-        "text": "Log in",
+        "id": "viewSavedSubscriptionCarQuotes",
+        "name": "Car quote",
+        "text": "Car quote",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/journey/show/product/AnnualMotorInsurance/process/nb",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "root",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "isFrameworkSearchInput": false
+      }
+    },
+    "viewsavedsubscriptioncarquotesSearchInput": {
+      "type": "button",
+      "preferred": "role=button[name=/Car quote/i]",
+      "fallbacks": [
+        "text=/Car quote/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": null,
+        "name": "Car quote",
+        "text": "Car quote",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "viewSavedSubscriptionCarQuotes",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "isFrameworkSearchInput": false
+      }
+    },
+    "viewsavedsubscriptionhomequotes": {
+      "type": "link",
+      "preferred": "css=#viewSavedSubscriptionHomeQuotes",
+      "fallbacks": [
+        "role=link[name=/Home quote/i]",
+        "text=/Home quote/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "viewSavedSubscriptionHomeQuotes",
+        "name": "Home quote",
+        "text": "Home quote",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/journey/show/product/AnnualHomeInsurance/process/nb/dashboardEntryPage",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "root",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "isFrameworkSearchInput": false
+      }
+    },
+    "viewsavedsubscriptionhomequotesSearchInput": {
+      "type": "button",
+      "preferred": "role=button[name=/Home quote/i]",
+      "fallbacks": [
+        "text=/Home quote/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": null,
+        "name": "Home quote",
+        "text": "Home quote",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "viewSavedSubscriptionHomeQuotes",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "isFrameworkSearchInput": false
+      }
+    },
+    "tCsApplySearchInput": {
+      "type": "link",
+      "preferred": "role=link[name=/T&Cs apply/i]",
+      "fallbacks": [
+        "text=/T&Cs apply/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": null,
+        "name": "T&Cs apply",
+        "text": "T&Cs apply",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://cloud.comms.allianz.co.uk/accountrdctcs",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "root",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "isFrameworkSearchInput": false
+      }
+    },
+    "renewalDateCaptureLink": {
+      "type": "link",
+      "preferred": "css=#renewal-date-capture-link",
+      "fallbacks": [
+        "role=link[name=/Let us know/i]",
+        "text=/Let us know/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "renewal-date-capture-link",
+        "name": "Let us know",
+        "text": "Let us know",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://cloud.comms.allianz.co.uk/RenewalDateCapture",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "root",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "isFrameworkSearchInput": false
+      }
+    },
+    "backSearchInput2": {
+      "type": "link",
+      "preferred": "role=link[name=/Back/i]",
+      "fallbacks": [
+        "text=/Back/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": null,
+        "name": "Back",
+        "text": "Back",
         "labelText": null,
         "ariaLabel": null,
         "placeholder": null,
@@ -82,53 +273,24 @@ npm run scan:page:verbose `-- --connectCdp="$CDP" --pageKey="athena.motor.car-de
         "isFrameworkSearchInput": false
       }
     },
-    "root3": {
-      "type": "link",
-      "preferred": "css=#register",
+    "backSearchInput3": {
+      "type": "button",
+      "preferred": "role=link[name=/Back/i]",
       "fallbacks": [
-        "role=link[name=/Register/i]",
-        "text=/Register/i"
+        "text=/Back/i"
       ],
       "meta": {
-        "tag": "a",
-        "role": null,
-        "id": "register",
-        "name": "Register",
-        "text": "Register",
+        "tag": "button",
+        "role": "link",
+        "id": null,
+        "name": "Back",
+        "text": "Back",
         "labelText": null,
         "ariaLabel": null,
         "placeholder": null,
         "inputName": null,
         "typeAttr": null,
-        "href": "https://id-lv-test.athenapaas.com/auth/realms/customer-portal/protocol/openid-connect/registrations?client_id=customer-portal-web&redirect_uri=https%3A%2F%2Fcustomer-portal-lv-test.athenapaas.com%2Fdashboard&state=9d4a4cd3-9d43-4851-ab73-75351dbe60ed&response_mode=fragment&response_type=code&scope=openid&nonce=d731afbd-d60e-4aed-a9b0-901996f49f23&code_challenge=t4pn9p4pVMHMtezHtGGS-uXtYpZx9NFoZh7Lr5iox-8&code_challenge_method=S256",
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "root",
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "isFrameworkSearchInput": false
-      }
-    },
-    "root4": {
-      "type": "link",
-      "preferred": "css=#skipRegistration",
-      "fallbacks": [
-        "role=link[name=/Skip this step, I’ll register later/i]",
-        "text=/Skip this step, I’ll register later/i"
-      ],
-      "meta": {
-        "tag": "a",
-        "role": null,
-        "id": "skipRegistration",
-        "name": "Skip this step, I’ll register later",
-        "text": "Skip this step, I’ll register later",
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": "/products",
+        "href": null,
         "dataTestId": null,
         "dataTest": null,
         "dataQa": null,
