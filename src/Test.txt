@@ -18,3 +18,125 @@ $CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerU
 npm run scan:page:verbose `-- --connectCdp="$CDP" --pageKey="athena.motor.car-details"
 
 ==============
+
+{
+  "pageKey": "athena.common.login-or-registration",
+  "url": "https://customer-portal-lv-test.athenapaas.com/",
+  "urlPath": "/",
+  "scannedAt": "2026-03-12T10:25:53.563Z",
+  "title": "Allianz login page",
+  "elements": {
+    "root": {
+      "type": "link",
+      "preferred": "css=#goToAllianzHomePage",
+      "fallbacks": [
+        "css=a[aria-label=\"Link to Allianz home page\"]",
+        "role=link[name=/Link to Allianz home page/i]"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "goToAllianzHomePage",
+        "name": "Link to Allianz home page",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": "Link to Allianz home page",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://www.allianz.co.uk",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "root",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "isFrameworkSearchInput": false
+      }
+    },
+    "root2": {
+      "type": "link",
+      "preferred": "css=#login",
+      "fallbacks": [
+        "role=link[name=/Log in/i]",
+        "text=/Log in/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "login",
+        "name": "Log in",
+        "text": "Log in",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/dashboard",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "root",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "isFrameworkSearchInput": false
+      }
+    },
+    "root3": {
+      "type": "link",
+      "preferred": "css=#register",
+      "fallbacks": [
+        "role=link[name=/Register/i]",
+        "text=/Register/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "register",
+        "name": "Register",
+        "text": "Register",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://id-lv-test.athenapaas.com/auth/realms/customer-portal/protocol/openid-connect/registrations?client_id=customer-portal-web&redirect_uri=https%3A%2F%2Fcustomer-portal-lv-test.athenapaas.com%2Fdashboard&state=9d4a4cd3-9d43-4851-ab73-75351dbe60ed&response_mode=fragment&response_type=code&scope=openid&nonce=d731afbd-d60e-4aed-a9b0-901996f49f23&code_challenge=t4pn9p4pVMHMtezHtGGS-uXtYpZx9NFoZh7Lr5iox-8&code_challenge_method=S256",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "root",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "isFrameworkSearchInput": false
+      }
+    },
+    "root4": {
+      "type": "link",
+      "preferred": "css=#skipRegistration",
+      "fallbacks": [
+        "role=link[name=/Skip this step, I’ll register later/i]",
+        "text=/Skip this step, I’ll register later/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "skipRegistration",
+        "name": "Skip this step, I’ll register later",
+        "text": "Skip this step, I’ll register later",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/products",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "root",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "isFrameworkSearchInput": false
+      }
+    }
+  }
+}
