@@ -5,8 +5,16 @@
 # to get tree outcome: tree -L 6 -I "node_modules|.git"
 
 
-npm install -g @mermaid-js/mermaid-cli
+=========
+
+
+$profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss")); `
+Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "--remote-debugging-port=9222 --user-data-dir=$profile"; `
+Start-Sleep -Seconds 2; `
+$CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerUrl;
 
 
 
-mmdc -i src/Onboarding.md -o src/Onboarding.png
+npm run scan:page:verbose `-- --connectCdp="$CDP" --pageKey="common.login-or-registration"
+
+==============
