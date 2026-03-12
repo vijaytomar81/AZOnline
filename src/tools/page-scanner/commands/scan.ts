@@ -1,6 +1,5 @@
 // src/tools/page-scanner/commands/scan.ts
 
-import path from "node:path";
 import { createLogger } from "../../../utils/logger";
 import { scanPage } from "../scanner/runner";
 import { getArg, hasFlag, required } from "../../../utils/argv";

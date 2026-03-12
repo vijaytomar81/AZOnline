@@ -9,7 +9,6 @@ import {
     printSection,
     printKeyValue,
     printSummary,
-    strong,
     success,
     printCommandTitle,
 } from "../../utils/cliFormat";

@@ -15,7 +15,6 @@ import {
     printIndented,
     printSummary,
     success,
-    strong,
 } from "../../../utils/cliFormat";
 
 import { runElementsGenerator } from "../../page-elements-generator/generator/runner";

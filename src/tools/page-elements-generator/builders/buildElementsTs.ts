@@ -1,7 +1,7 @@
 // src/tools/page-elements-generator/builders/buildElementsTs.ts
 
 import type { PageMap } from "../generator/types";
-import { escapeTsString, isValidTsIdentifier, toPascal } from "../../../utils/ts";
+import { escapeTsString, isValidTsIdentifier } from "../../../utils/ts";
 
 export function buildElementsTs(pageMap: PageMap): string {
     

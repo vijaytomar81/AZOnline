@@ -37,10 +37,11 @@
     "validator:help": "npm run validator -- help",
     "headers:check": "node -r ts-node/register src/tools/file-header-checker/cli.ts --checkMode",
     "headers:fix": "node -r ts-node/register src/tools/file-header-checker/cli.ts",
-    "typecheck": "tsc --noEmit",
+    "check:types": "tsc --noEmit",
+    "check:dead": "ts-prune",
     "tools:tsc": "tsc -p tsconfig.tools.json --noEmit",
-    "ci:check": "npm run typecheck && npm run tools:tsc && npm run headers:check && npm run validator:doctor && npm run validator:check:strict",
-    "ci:check:verbose": "npm run typecheck && npm run tools:tsc && npm run headers:check && npm run validator:doctor:verbose && npm run validator:check:verbose",
+    "ci:check": "npm run check:types && npm run tools:tsc && npm run headers:check && npm run validator:doctor && npm run validator:check:strict",
+    "ci:check:verbose": "npm run check:types && npm run tools:tsc && npm run headers:check && npm run validator:doctor:verbose && npm run validator:check:verbose",
     "results:clean": "node scripts/clean-results.js",
     "reports:clean": "node scripts/clean-reports.js",
     "allure:generate": "allure generate results/allure-results -o reports/allure-report --clean",
@@ -65,6 +66,7 @@
     "@types/node": "^25.3.0",
     "allure-playwright": "^3.5.0",
     "ts-node": "^10.9.2",
+    "ts-prune": "^0.10.3",
     "typescript": "^5.9.3"
   },
   "dependencies": {

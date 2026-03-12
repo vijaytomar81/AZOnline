@@ -2,6 +2,7 @@
 import type { Page } from "@playwright/test";
 
 
+
 /**
  * Enterprise PageManager / Factory
  * - Single place to construct Page Objects
@@ -25,6 +26,5 @@ export class PageManager {
         }
         return this.cache.get(key) as T;
     }
-
 
 }

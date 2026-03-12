@@ -1,29 +1,66 @@
 // src/tools/page-scanner/scanner/keyNaming/semantic.ts
+
 import type { ScannedElement } from "../types";
 import {
     isClickable,
     isVerboseImplementationId,
     pickBestElementBase,
 } from "./heuristics";
-import { normalizeBusinessPhrase, toKeyPreservingIdentifiers } from "./normalize";
+import { clean, normalizeBusinessPhrase, toKeyPreservingIdentifiers } from "./normalize";
 
 function buildDisplayCandidate(el: ScannedElement): string | undefined {
+    const textCandidate = normalizeBusinessPhrase(el.text);
+    const ariaCandidate = normalizeBusinessPhrase(el.ariaLabel);
+    const labelCandidate = normalizeBusinessPhrase(el.labelText);
+    const nameCandidate = normalizeBusinessPhrase(el.name);
+
     const raw =
-        normalizeBusinessPhrase(el.text) ||
-        normalizeBusinessPhrase(el.ariaLabel) ||
-        normalizeBusinessPhrase(el.labelText) ||
-        normalizeBusinessPhrase(el.name);
+        (!isWeakActionText(textCandidate) ? textCandidate : undefined) ||
+        (!isWeakActionText(ariaCandidate) ? ariaCandidate : undefined) ||
+        (!isWeakActionText(labelCandidate) ? labelCandidate : undefined) ||
+        (!isWeakActionText(nameCandidate) ? nameCandidate : undefined);
 
     return toKeyPreservingIdentifiers(raw);
+}
+
+function isWeakActionText(value?: string | null): boolean {
+    const v = clean(value)?.toLowerCase();
+    if (!v) return true;
+
+    return [
+        "click here",
+        "here",
+        "select",
+        "choose",
+        "continue",
+        "next",
+        "previous",
+        "back",
+        "submit",
+        "open",
+        "close",
+        "ok",
+        "yes",
+        "no",
+        "learn more",
+        "read more",
+        "more",
+    ].includes(v);
 }
 
 function isTooGenericDisplayKey(value?: string): boolean {
     if (!value) return true;
 
-    return /^(clickHere|learnMore|readMore|continue|next|previous|back|submit|open|close|yes|no)$/i.test(value);
+    return /^(clickHere|here|select|choose|continue|next|previous|back|submit|open|close|ok|yes|no|learnMore|readMore|more)$/i.test(
+        value
+    );
 }
 
-function shouldPreferDisplayOverId(el: ScannedElement, displayKey?: string, ownBase?: string): boolean {
+function shouldPreferDisplayOverId(
+    el: ScannedElement,
+    displayKey?: string,
+    ownBase?: string
+): boolean {
     if (!displayKey) return false;
     if (!ownBase) return true;
     if (!el.id) return true;

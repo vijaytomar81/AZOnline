@@ -17,7 +17,6 @@ import {
     printStatus,
     printSummary,
     success,
-    warning,
     failure,
     strong,
     info,
