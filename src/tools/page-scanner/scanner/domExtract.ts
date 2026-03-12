@@ -240,11 +240,11 @@ export async function extractDomElements(page: Page): Promise<ScannedElement[]> 
                 labelText ||
                 text ||
                 placeholder ||
+                nameAttr ||
+                id ||
                 owner.ownerLabelText ||
                 owner.ownerAriaLabel ||
                 owner.ownerGroupLabelFor ||
-                nameAttr ||
-                id ||
                 null;
 
             return {

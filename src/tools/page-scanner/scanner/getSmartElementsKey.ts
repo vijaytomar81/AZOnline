@@ -25,6 +25,11 @@ function isWeakValue(value?: string | null): boolean {
     // framework-ish ids
     if (/^react-select-\d+-input$/i.test(v)) return true;
 
+    // generic container-ish ids / names
+    if (/^(root|app|main|container|wrapper|content|page|section|panel)$/i.test(v)) {
+        return true;
+    }
+
     return false;
 }
 
@@ -32,7 +37,6 @@ function normalizeOptionText(value?: string | null): string | undefined {
     const v = clean(value);
     if (!v) return undefined;
 
-    // Common friendly normalizations
     const lowered = v.toLowerCase();
 
     if (lowered === "yes") return "Yes";
@@ -42,7 +46,6 @@ function normalizeOptionText(value?: string | null): string | undefined {
         return toCamelFromText(v);
     }
 
-    // 1 - 2 years => 1 To 2 Years
     if (/^\d+\s*-\s*\d+\s+year(s)?$/i.test(v)) {
         return toCamelFromText(v.replace(/\s*-\s*/g, " to "));
     }
@@ -50,13 +53,43 @@ function normalizeOptionText(value?: string | null): string | undefined {
     return toCamelFromText(v);
 }
 
+/**
+ * Use the element's own identity first.
+ * Owner context should only be a fallback.
+ */
+function pickBestElementBase(el: ScannedElement): string | undefined {
+    const candidates = [
+        clean(el.id),
+        clean(el.dataTestId),
+        clean(el.dataTest),
+        clean(el.dataQa),
+        clean(el.inputName),
+        clean(el.ariaLabel),
+        clean(el.labelText),
+        clean(el.placeholder),
+        clean(el.text),
+        clean(el.name),
+    ];
+
+    for (const c of candidates) {
+        if (!isWeakValue(c)) {
+            return toCamelFromText(c!);
+        }
+    }
+
+    return undefined;
+}
+
+/**
+ * Owner/group context is useful for grouped controls and framework widgets.
+ */
 function pickBestOwnerBase(el: ScannedElement): string | undefined {
     const candidates = [
         clean(el.inputName),
-        clean(el.ownerId),
         clean(el.ownerGroupLabelFor),
         clean(el.ownerLabelText),
         clean(el.ownerAriaLabel),
+        clean(el.ownerId),
         clean(el.labelText),
         clean(el.ariaLabel),
         clean(el.placeholder),
@@ -87,7 +120,6 @@ function buildRadioCheckboxKey(el: ScannedElement): string | undefined {
 
     const groupBase = pickBestOwnerBase({
         ...el,
-        // for radios/checkboxes prefer inputName first
         ownerId: el.inputName ?? el.ownerId ?? null,
         labelText: el.ownerLabelText ?? el.labelText ?? null,
     });
@@ -113,8 +145,11 @@ function buildFrameworkSearchKey(el: ScannedElement): string | undefined {
 }
 
 function buildGenericKey(el: ScannedElement, indexHint: number): string {
-    const base = pickBestOwnerBase(el);
-    if (base) return base;
+    const ownBase = pickBestElementBase(el);
+    if (ownBase) return ownBase;
+
+    const ownerBase = pickBestOwnerBase(el);
+    if (ownerBase) return ownerBase;
 
     return toCamelFromText(`${el.tag || "element"} ${indexHint}`);
 }
