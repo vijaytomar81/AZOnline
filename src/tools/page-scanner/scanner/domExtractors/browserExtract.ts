@@ -1,4 +1,3 @@
-// src/tools/page-scanner/scanner/domExtractors/browserExtract.ts
 // \src\tools\page-scanner\scanner\domExtractors\browserExtract.ts
 
 type BrowserExtractArgs = {
@@ -10,7 +9,8 @@ export function browserExtractDomElements({ selector }: BrowserExtractArgs) {
     // Section 1: generic DOM helpers
     // --------------------------------------------------
 
-    function getAttr(el: Element, name: string): string | null {
+    function getAttr(el: Element | null | undefined, name: string): string | null {
+        if (!el) return null;
         const v = el.getAttribute(name);
         return v && v.trim() ? v.trim() : null;
     }
@@ -188,7 +188,7 @@ export function browserExtractDomElements({ selector }: BrowserExtractArgs) {
         if (formGroup) {
             const label = formGroup.querySelector("label");
             ownerLabelText = safeText(label?.textContent ?? null);
-            ownerGroupLabelFor = safeText(getAttr(label as Element, "for"));
+            ownerGroupLabelFor = safeText(getAttr(label, "for"));
         }
 
         if (inputGroup) {
@@ -301,11 +301,12 @@ export function browserExtractDomElements({ selector }: BrowserExtractArgs) {
 
     for (const root of roots) {
         const found = Array.from(root.querySelectorAll(selector)).filter(
-            (el) =>
-                !isInsideFooter(el) &&
-                isVisible(el) &&
-                !isNestedInteractiveDuplicate(el)
-        );
+            (node) =>
+                node instanceof Element &&
+                !isInsideFooter(node) &&
+                isVisible(node) &&
+                !isNestedInteractiveDuplicate(node)
+        ) as Element[];
 
         for (const el of found) {
             if (seen.has(el)) continue;
