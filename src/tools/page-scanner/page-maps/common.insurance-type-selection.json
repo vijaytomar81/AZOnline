@@ -2,10 +2,10 @@
   "pageKey": "athena.common.insurance-type-selection",
   "url": "https://customer-portal-lv-test.athenapaas.com/products",
   "urlPath": "/products",
-  "scannedAt": "2026-03-12T10:56:28.053Z",
+  "scannedAt": "2026-03-13T10:57:20.737Z",
   "title": "Get a new quote or view saved quotes",
   "elements": {
-    "gotoallianzhomepage": {
+    "linkToAllianzHomePage": {
       "type": "link",
       "preferred": "css=#goToAllianzHomePage",
       "fallbacks": [
@@ -27,13 +27,15 @@
         "dataTestId": null,
         "dataTest": null,
         "dataQa": null,
-        "ownerId": "root",
+        "ownerId": null,
         "ownerLabelText": null,
         "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
         "isFrameworkSearchInput": false
-      }
+      },
+      "stableKey": "a49b80f2b5e9"
     },
-    "backSearchInput": {
+    "buttonInputBack": {
       "type": "button",
       "preferred": "role=button[name=/Back/i]",
       "fallbacks": [
@@ -54,13 +56,15 @@
         "dataTestId": null,
         "dataTest": null,
         "dataQa": null,
-        "ownerId": "root",
+        "ownerId": null,
         "ownerLabelText": null,
         "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
         "isFrameworkSearchInput": false
-      }
+      },
+      "stableKey": "8ebb2ee7d230"
     },
-    "viewsavedsubscriptioncarquotes": {
+    "linkCarQuote": {
       "type": "link",
       "preferred": "css=#viewSavedSubscriptionCarQuotes",
       "fallbacks": [
@@ -82,40 +86,15 @@
         "dataTestId": null,
         "dataTest": null,
         "dataQa": null,
-        "ownerId": "root",
+        "ownerId": null,
         "ownerLabelText": null,
         "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
         "isFrameworkSearchInput": false
-      }
+      },
+      "stableKey": "273843c5aa23"
     },
-    "viewsavedsubscriptioncarquotesSearchInput": {
-      "type": "button",
-      "preferred": "role=button[name=/Car quote/i]",
-      "fallbacks": [
-        "text=/Car quote/i"
-      ],
-      "meta": {
-        "tag": "button",
-        "role": null,
-        "id": null,
-        "name": "Car quote",
-        "text": "Car quote",
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "viewSavedSubscriptionCarQuotes",
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "isFrameworkSearchInput": false
-      }
-    },
-    "viewsavedsubscriptionhomequotes": {
+    "linkHomeQuote": {
       "type": "link",
       "preferred": "css=#viewSavedSubscriptionHomeQuotes",
       "fallbacks": [
@@ -137,40 +116,15 @@
         "dataTestId": null,
         "dataTest": null,
         "dataQa": null,
-        "ownerId": "root",
+        "ownerId": null,
         "ownerLabelText": null,
         "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
         "isFrameworkSearchInput": false
-      }
+      },
+      "stableKey": "6d720003f394"
     },
-    "viewsavedsubscriptionhomequotesSearchInput": {
-      "type": "button",
-      "preferred": "role=button[name=/Home quote/i]",
-      "fallbacks": [
-        "text=/Home quote/i"
-      ],
-      "meta": {
-        "tag": "button",
-        "role": null,
-        "id": null,
-        "name": "Home quote",
-        "text": "Home quote",
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "viewSavedSubscriptionHomeQuotes",
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "isFrameworkSearchInput": false
-      }
-    },
-    "tCsApplySearchInput": {
+    "linkTermsAndConditionsApply": {
       "type": "link",
       "preferred": "role=link[name=/T&Cs apply/i]",
       "fallbacks": [
@@ -191,13 +145,15 @@
         "dataTestId": null,
         "dataTest": null,
         "dataQa": null,
-        "ownerId": "root",
+        "ownerId": null,
         "ownerLabelText": null,
         "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
         "isFrameworkSearchInput": false
-      }
+      },
+      "stableKey": "b2536f31be95"
     },
-    "renewalDateCaptureLink": {
+    "linkLetUsKnow": {
       "type": "link",
       "preferred": "css=#renewal-date-capture-link",
       "fallbacks": [
@@ -219,13 +175,15 @@
         "dataTestId": null,
         "dataTest": null,
         "dataQa": null,
-        "ownerId": "root",
+        "ownerId": null,
         "ownerLabelText": null,
         "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
         "isFrameworkSearchInput": false
-      }
+      },
+      "stableKey": "b4db5fa6a06b"
     },
-    "backSearchInput2": {
+    "linkInputBack": {
       "type": "link",
       "preferred": "role=link[name=/Back/i]",
       "fallbacks": [
@@ -246,38 +204,13 @@
         "dataTestId": null,
         "dataTest": null,
         "dataQa": null,
-        "ownerId": "root",
+        "ownerId": null,
         "ownerLabelText": null,
         "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
         "isFrameworkSearchInput": false
-      }
-    },
-    "backSearchInput3": {
-      "type": "button",
-      "preferred": "role=link[name=/Back/i]",
-      "fallbacks": [
-        "text=/Back/i"
-      ],
-      "meta": {
-        "tag": "button",
-        "role": "link",
-        "id": null,
-        "name": "Back",
-        "text": "Back",
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "root",
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "isFrameworkSearchInput": false
-      }
+      },
+      "stableKey": "db022e0e13e1"
     }
   }
 }
