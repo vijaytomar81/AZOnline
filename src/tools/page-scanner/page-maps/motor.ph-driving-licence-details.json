@@ -1,11 +1,11 @@
 {
   "pageKey": "athena.motor.ph-driving-licence-details",
-  "url": "https://customer-portal-lv-test.athenapaas.com/error?e=We%20are%20experiencing%20some%20technical%20issues,%20please%20come%20back%20later",
-  "urlPath": "/error",
-  "scannedAt": "2026-03-13T13:04:15.674Z",
+  "url": "https://customer-portal-lv-test.athenapaas.com/journey/show/product/AnnualMotorInsurance/process/nb/drivingLicenceScan/69b442a3e1389c2e75667e1d",
+  "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/drivingLicenceScan/69b442a3e1389c2e75667e1d",
+  "scannedAt": "2026-03-13T17:03:49.922Z",
   "title": "Driving licence details",
   "elements": {
-    "linkLinkToAllianzHomePage": {
+    "linkToAllianzHomePage": {
       "type": "link",
       "preferred": "css=#goToAllianzHomePage",
       "fallbacks": [
@@ -35,7 +35,7 @@
       },
       "stableKey": "a49b80f2b5e9"
     },
-    "radioDrivingLicenceHandyYes": {
+    "radioDrivingLicenceHandyyes": {
       "type": "radio",
       "preferred": "css=#drivingLicenceHandytrue",
       "fallbacks": [
@@ -65,7 +65,7 @@
       },
       "stableKey": "85190e7e5213"
     },
-    "radioDrivingLicenceHandyNo": {
+    "radioDrivingLicenceHandyno": {
       "type": "radio",
       "preferred": "css=#drivingLicenceHandyfalse",
       "fallbacks": [
@@ -392,7 +392,7 @@
       },
       "stableKey": "7d3d891a766c"
     },
-    "radioDrivingLicenceTypesuKFull": {
+    "radioDrivingLicenceTypesukFull": {
       "type": "radio",
       "preferred": "css=#drivingLicenceTypes1",
       "fallbacks": [
@@ -422,7 +422,7 @@
       },
       "stableKey": "e074d5634d50"
     },
-    "radioDrivingLicenceTypesuKFullAutomaticOnly": {
+    "radioDrivingLicenceTypesukFullAutomaticOnly": {
       "type": "radio",
       "preferred": "css=#drivingLicenceTypes2",
       "fallbacks": [
@@ -452,7 +452,7 @@
       },
       "stableKey": "d6beeedffaa9"
     },
-    "radioDrivingLicenceTypesuKProvisional": {
+    "radioDrivingLicenceTypesukProvisional": {
       "type": "radio",
       "preferred": "css=#drivingLicenceTypes3",
       "fallbacks": [
@@ -482,7 +482,7 @@
       },
       "stableKey": "2abfb28f2396"
     },
-    "radioDrivingLicenceTypeseUFull": {
+    "radioDrivingLicenceTypeseuFull": {
       "type": "radio",
       "preferred": "css=#drivingLicenceTypes4",
       "fallbacks": [
@@ -512,7 +512,7 @@
       },
       "stableKey": "e942d639a797"
     },
-    "radioDrivingLicenceTypeseUProvisional": {
+    "radioDrivingLicenceTypeseuProvisional": {
       "type": "radio",
       "preferred": "css=#drivingLicenceTypes5",
       "fallbacks": [
@@ -542,7 +542,7 @@
       },
       "stableKey": "865eeaef4b9b"
     },
-    "radioDrivingLicenceTypesOther": {
+    "radioDrivingLicenceTypesother": {
       "type": "radio",
       "preferred": "css=#drivingLicenceTypes6",
       "fallbacks": [
@@ -601,7 +601,7 @@
       },
       "stableKey": "514030ddac4b"
     },
-    "radioHasConvictionsQuestionYes": {
+    "radioHasConvictionsQuestionyes": {
       "type": "radio",
       "preferred": "css=#hasConvictionsQuestiontrue",
       "fallbacks": [
@@ -631,7 +631,7 @@
       },
       "stableKey": "4a8f6dc50477"
     },
-    "radioHasConvictionsQuestionNo": {
+    "radioHasConvictionsQuestionno": {
       "type": "radio",
       "preferred": "css=#hasConvictionsQuestionfalse",
       "fallbacks": [
@@ -723,7 +723,7 @@
       },
       "stableKey": "67fb160ac359"
     },
-    "searchSelectSelectTheConvictionCode": {
+    "searchSelectTheConvictionCode": {
       "type": "input",
       "preferred": "css=#react-select-2-input",
       "fallbacks": [
@@ -752,7 +752,7 @@
       },
       "stableKey": "04a163268e53"
     },
-    "radioConviction0ResultedToABanYes": {
+    "radioConviction0ResultedToABanyes": {
       "type": "radio",
       "preferred": "css=#Conviction0ResultedToABantrue",
       "fallbacks": [
@@ -782,7 +782,7 @@
       },
       "stableKey": "3663e0bdf123"
     },
-    "radioConviction0ResultedToABanNo": {
+    "radioConviction0ResultedToABanno": {
       "type": "radio",
       "preferred": "css=#Conviction0ResultedToABanfalse",
       "fallbacks": [
@@ -840,161 +840,6 @@
         "isFrameworkSearchInput": false
       },
       "stableKey": "8ef186ee3d20"
-    },
-    "buttonAddAnotherConviction": {
-      "type": "button",
-      "preferred": "css=#addAnotherConvictionButton",
-      "fallbacks": [
-        "css=button[name=\"addAnotherConvictionButton\"]",
-        "role=button[name=/Add another conviction/i]",
-        "text=/Add another conviction/i"
-      ],
-      "meta": {
-        "tag": "button",
-        "role": null,
-        "id": "addAnotherConvictionButton",
-        "name": "Add another conviction",
-        "text": "Add another conviction",
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": "addAnotherConvictionButton",
-        "typeAttr": null,
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": null,
-        "isFrameworkSearchInput": false
-      },
-      "stableKey": "b5a2399a7e10"
-    },
-    "buttonNavigatorNext": {
-      "type": "button",
-      "preferred": "css=#navigatorNext",
-      "fallbacks": [
-        "role=button[name=/Next/i]",
-        "text=/Next/i"
-      ],
-      "meta": {
-        "tag": "button",
-        "role": null,
-        "id": "navigatorNext",
-        "name": "Next",
-        "text": "Next",
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": null,
-        "isFrameworkSearchInput": false
-      },
-      "stableKey": "44dc406f64a9"
-    },
-    "buttonNavigatorBack": {
-      "type": "button",
-      "preferred": "css=#navigatorBack",
-      "fallbacks": [
-        "role=link[name=/Back/i]",
-        "text=/Back/i"
-      ],
-      "meta": {
-        "tag": "button",
-        "role": "link",
-        "id": "navigatorBack",
-        "name": "Back",
-        "text": "Back",
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": null,
-        "isFrameworkSearchInput": false
-      },
-      "stableKey": "9b7b267f10a1"
-    },
-    "radioDrivingLicenceHandy": {
-      "type": "radio-group",
-      "preferred": "",
-      "fallbacks": [],
-      "options": {
-        "Yes": "radioDrivingLicenceHandyYes",
-        "No": "radioDrivingLicenceHandyNo"
-      },
-      "meta": {
-        "inputName": "drivingLicenceHandy",
-        "ownerLabelText": "Do you have your driving licence handy?",
-        "ownerAriaLabel": "Do you have your driving licence handy?",
-        "ownerId": null
-      }
-    },
-    "radioDrivingLicenceTypes": {
-      "type": "radio-group",
-      "preferred": "",
-      "fallbacks": [],
-      "options": {
-        "UK Full": "radioDrivingLicenceTypesuKFull",
-        "UK Full - Automatic only": "radioDrivingLicenceTypesuKFullAutomaticOnly",
-        "UK Provisional": "radioDrivingLicenceTypesuKProvisional",
-        "EU Full": "radioDrivingLicenceTypeseUFull",
-        "EU Provisional": "radioDrivingLicenceTypeseUProvisional",
-        "Other": "radioDrivingLicenceTypesOther"
-      },
-      "meta": {
-        "inputName": "drivingLicenceTypes",
-        "ownerLabelText": "What type of driving licence do you have?",
-        "ownerAriaLabel": "What type of driving licence do you have?",
-        "ownerId": null
-      }
-    },
-    "radioHasConvictionsQuestion": {
-      "type": "radio-group",
-      "preferred": "",
-      "fallbacks": [],
-      "options": {
-        "Yes": "radioHasConvictionsQuestionYes",
-        "No": "radioHasConvictionsQuestionNo"
-      },
-      "meta": {
-        "inputName": "hasConvictionsQuestion",
-        "ownerLabelText": "Yes",
-        "ownerAriaLabel": null,
-        "ownerId": "hasConvictionsQuestion"
-      }
-    },
-    "radioConviction0ResultedToABan": {
-      "type": "radio-group",
-      "preferred": "",
-      "fallbacks": [],
-      "options": {
-        "Yes": "radioConviction0ResultedToABanYes",
-        "No": "radioConviction0ResultedToABanNo"
-      },
-      "meta": {
-        "inputName": "Conviction0ResultedToABan",
-        "ownerLabelText": "Did the conviction result in a disqualification?",
-        "ownerAriaLabel": "Did the conviction result in a disqualification?",
-        "ownerId": null
-      }
     },
     "inputConviction2DateMonth": {
       "type": "input",
@@ -1058,7 +903,7 @@
       },
       "stableKey": "a7e5d02af331"
     },
-    "searchSelectSelectTheConvictionCode2": {
+    "searchSelectTheConvictionCode2": {
       "type": "input",
       "preferred": "css=#react-select-3-input",
       "fallbacks": [
@@ -1087,7 +932,7 @@
       },
       "stableKey": "61518ae35236"
     },
-    "radioConviction1ResultedToABanYes": {
+    "radioConviction1ResultedToABanyes": {
       "type": "radio",
       "preferred": "css=#Conviction1ResultedToABantrue",
       "fallbacks": [
@@ -1117,7 +962,7 @@
       },
       "stableKey": "02aa132063b2"
     },
-    "radioConviction1ResultedToABanNo": {
+    "radioConviction1ResultedToABanno": {
       "type": "radio",
       "preferred": "css=#Conviction1ResultedToABanfalse",
       "fallbacks": [
@@ -1146,6 +991,35 @@
         "isFrameworkSearchInput": false
       },
       "stableKey": "ef634c424b5a"
+    },
+    "linkRemoveConviction2": {
+      "type": "link",
+      "preferred": "role=link[name=/Remove conviction/i]",
+      "fallbacks": [
+        "text=/Remove conviction/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": null,
+        "name": "Remove conviction",
+        "text": "Remove conviction",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "javascript:void(0)",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "8ef186ee3d20"
     },
     "inputConviction3DateMonth": {
       "type": "input",
@@ -1209,7 +1083,7 @@
       },
       "stableKey": "4bbbc597a1dc"
     },
-    "searchSelectSelectTheConvictionCode3": {
+    "searchSelectTheConvictionCode3": {
       "type": "input",
       "preferred": "css=#react-select-4-input",
       "fallbacks": [
@@ -1238,7 +1112,7 @@
       },
       "stableKey": "c2c22e2f4751"
     },
-    "radioConviction2ResultedToABanYes": {
+    "radioConviction2ResultedToABanyes": {
       "type": "radio",
       "preferred": "css=#Conviction2ResultedToABantrue",
       "fallbacks": [
@@ -1268,7 +1142,7 @@
       },
       "stableKey": "a688eebcf3e3"
     },
-    "radioConviction2ResultedToABanNo": {
+    "radioConviction2ResultedToABanno": {
       "type": "radio",
       "preferred": "css=#Conviction2ResultedToABanfalse",
       "fallbacks": [
@@ -1298,13 +1172,166 @@
       },
       "stableKey": "94ec9889fc23"
     },
-    "radioConviction1ResultedToABan": {
+    "linkRemoveConviction3": {
+      "type": "link",
+      "preferred": "role=link[name=/Remove conviction/i]",
+      "fallbacks": [
+        "text=/Remove conviction/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": null,
+        "name": "Remove conviction",
+        "text": "Remove conviction",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "javascript:void(0)",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "8ef186ee3d20"
+    },
+    "buttonNavigatorNext": {
+      "type": "button",
+      "preferred": "css=#navigatorNext",
+      "fallbacks": [
+        "role=button[name=/Next/i]",
+        "text=/Next/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": "navigatorNext",
+        "name": "Next",
+        "text": "Next",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "44dc406f64a9"
+    },
+    "buttonNavigatorBack": {
+      "type": "button",
+      "preferred": "css=#navigatorBack",
+      "fallbacks": [
+        "role=link[name=/Back/i]",
+        "text=/Back/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": "link",
+        "id": "navigatorBack",
+        "name": "Back",
+        "text": "Back",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "9b7b267f10a1"
+    },
+    "groupRadioDrivingLicenceHandy": {
       "type": "radio-group",
       "preferred": "",
       "fallbacks": [],
       "options": {
-        "Yes": "radioConviction1ResultedToABanYes",
-        "No": "radioConviction1ResultedToABanNo"
+        "Yes": "radioDrivingLicenceHandyyes",
+        "No": "radioDrivingLicenceHandyno"
+      },
+      "meta": {
+        "inputName": "drivingLicenceHandy",
+        "ownerLabelText": "Do you have your driving licence handy?",
+        "ownerAriaLabel": "Do you have your driving licence handy?",
+        "ownerId": null
+      }
+    },
+    "groupRadioDrivingLicenceTypes": {
+      "type": "radio-group",
+      "preferred": "",
+      "fallbacks": [],
+      "options": {
+        "UK Full": "radioDrivingLicenceTypesukFull",
+        "UK Full - Automatic only": "radioDrivingLicenceTypesukFullAutomaticOnly",
+        "UK Provisional": "radioDrivingLicenceTypesukProvisional",
+        "EU Full": "radioDrivingLicenceTypeseuFull",
+        "EU Provisional": "radioDrivingLicenceTypeseuProvisional",
+        "Other": "radioDrivingLicenceTypesother"
+      },
+      "meta": {
+        "inputName": "drivingLicenceTypes",
+        "ownerLabelText": "What type of driving licence do you have?",
+        "ownerAriaLabel": "What type of driving licence do you have?",
+        "ownerId": null
+      }
+    },
+    "groupRadioHasConvictionsQuestion": {
+      "type": "radio-group",
+      "preferred": "",
+      "fallbacks": [],
+      "options": {
+        "Yes": "radioHasConvictionsQuestionyes",
+        "No": "radioHasConvictionsQuestionno"
+      },
+      "meta": {
+        "inputName": "hasConvictionsQuestion",
+        "ownerLabelText": "Yes",
+        "ownerAriaLabel": null,
+        "ownerId": "hasConvictionsQuestion"
+      }
+    },
+    "groupRadioConviction0ResultedToABan": {
+      "type": "radio-group",
+      "preferred": "",
+      "fallbacks": [],
+      "options": {
+        "Yes": "radioConviction0ResultedToABanyes",
+        "No": "radioConviction0ResultedToABanno"
+      },
+      "meta": {
+        "inputName": "Conviction0ResultedToABan",
+        "ownerLabelText": "Did the conviction result in a disqualification?",
+        "ownerAriaLabel": "Did the conviction result in a disqualification?",
+        "ownerId": null
+      }
+    },
+    "groupRadioConviction1ResultedToABan": {
+      "type": "radio-group",
+      "preferred": "",
+      "fallbacks": [],
+      "options": {
+        "Yes": "radioConviction1ResultedToABanyes",
+        "No": "radioConviction1ResultedToABanno"
       },
       "meta": {
         "inputName": "Conviction1ResultedToABan",
@@ -1313,13 +1340,13 @@
         "ownerId": null
       }
     },
-    "radioConviction2ResultedToABan": {
+    "groupRadioConviction2ResultedToABan": {
       "type": "radio-group",
       "preferred": "",
       "fallbacks": [],
       "options": {
-        "Yes": "radioConviction2ResultedToABanYes",
-        "No": "radioConviction2ResultedToABanNo"
+        "Yes": "radioConviction2ResultedToABanyes",
+        "No": "radioConviction2ResultedToABanno"
       },
       "meta": {
         "inputName": "Conviction2ResultedToABan",
@@ -1327,6 +1354,37 @@
         "ownerAriaLabel": "Did the conviction result in a disqualification?",
         "ownerId": null
       }
+    },
+    "buttonAddAnotherConviction": {
+      "type": "button",
+      "preferred": "css=#addAnotherConvictionButton",
+      "fallbacks": [
+        "css=button[name=\"addAnotherConvictionButton\"]",
+        "role=button[name=/Add another conviction/i]",
+        "text=/Add another conviction/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": "addAnotherConvictionButton",
+        "name": "Add another conviction",
+        "text": "Add another conviction",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "addAnotherConvictionButton",
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "b5a2399a7e10"
     }
   }
 }
