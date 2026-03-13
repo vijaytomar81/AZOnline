@@ -1,15 +1,17 @@
 // src/tools/page-scanner/scanner/pageMap/mergePageMaps.ts
 
-import type { PageMap, PageMapElementEntry, PageMapEntry } from "../types";
+import type { PageMap, PageMapElementEntry, PageMapEntry, PageMapGroupEntry } from "../types";
 
-function isGroupEntry(
-    entry: PageMapEntry
-): entry is Extract<PageMapEntry, { type: "radio-group" | "checkbox-group" }> {
+function isGroupEntry(entry: PageMapEntry): entry is PageMapGroupEntry {
     return entry.type === "radio-group" || entry.type === "checkbox-group";
 }
 
 function isElementEntry(entry: PageMapEntry): entry is PageMapElementEntry {
     return !isGroupEntry(entry);
+}
+
+function getStableKey(entry: PageMapEntry): string | undefined {
+    return "stableKey" in entry ? entry.stableKey : undefined;
 }
 
 function mergeElement(cur: PageMapElementEntry, next: PageMapElementEntry): PageMapElementEntry {
@@ -26,7 +28,9 @@ function mergeElement(cur: PageMapElementEntry, next: PageMapElementEntry): Page
         );
         preferred = next.preferred;
     } else {
-        fallbacks = Array.from(new Set([...(cur.fallbacks ?? []), ...(next.fallbacks ?? [])]));
+        fallbacks = Array.from(
+            new Set([...(cur.fallbacks ?? []), ...(next.fallbacks ?? [])])
+        );
     }
 
     return {
@@ -44,12 +48,13 @@ function mergeElement(cur: PageMapElementEntry, next: PageMapElementEntry): Page
 }
 
 function mergeGroupEntry(
-    cur: Extract<PageMapEntry, { type: "radio-group" | "checkbox-group" }>,
-    next: Extract<PageMapEntry, { type: "radio-group" | "checkbox-group" }>
-): Extract<PageMapEntry, { type: "radio-group" | "checkbox-group" }> {
+    cur: PageMapGroupEntry,
+    next: PageMapGroupEntry
+): PageMapGroupEntry {
     return {
         ...cur,
         ...next,
+        stableKey: cur.stableKey ?? next.stableKey,
         options: {
             ...(cur.options ?? {}),
             ...(next.options ?? {}),
@@ -74,42 +79,46 @@ export function mergePageMaps(existing: PageMap, incoming: PageMap): PageMap {
 
     const existingKeyByStableKey = new Map<string, string>();
 
-    for (const [existingKey, existingElement] of Object.entries(existing.elements)) {
-        if ("stableKey" in existingElement && existingElement.stableKey) {
-            existingKeyByStableKey.set(existingElement.stableKey, existingKey);
+    for (const [existingKey, existingEntry] of Object.entries(existing.elements)) {
+        const stableKey = getStableKey(existingEntry);
+        if (stableKey) {
+            existingKeyByStableKey.set(stableKey, existingKey);
         }
     }
 
-    for (const [incomingKey, incomingElement] of Object.entries(incoming.elements)) {
+    for (const [incomingKey, incomingEntry] of Object.entries(incoming.elements)) {
+        const incomingStableKey = getStableKey(incomingEntry);
+
         const matchedExistingKey =
             out.elements[incomingKey]
                 ? incomingKey
-                : "stableKey" in incomingElement && incomingElement.stableKey
-                    ? existingKeyByStableKey.get(incomingElement.stableKey)
+                : incomingStableKey
+                    ? existingKeyByStableKey.get(incomingStableKey)
                     : undefined;
 
         if (!matchedExistingKey) {
-            out.elements[incomingKey] = incomingElement;
+            out.elements[incomingKey] = incomingEntry;
 
-            if ("stableKey" in incomingElement && incomingElement.stableKey) {
-                existingKeyByStableKey.set(incomingElement.stableKey, incomingKey);
+            if (incomingStableKey) {
+                existingKeyByStableKey.set(incomingStableKey, incomingKey);
             }
             continue;
         }
 
-        const currentElement = out.elements[matchedExistingKey];
+        const currentEntry = out.elements[matchedExistingKey];
 
-        if (isElementEntry(currentElement) && isElementEntry(incomingElement)) {
-            out.elements[matchedExistingKey] = mergeElement(currentElement, incomingElement);
+        if (isElementEntry(currentEntry) && isElementEntry(incomingEntry)) {
+            out.elements[matchedExistingKey] = mergeElement(currentEntry, incomingEntry);
             continue;
         }
 
-        if (isGroupEntry(currentElement) && isGroupEntry(incomingElement)) {
-            out.elements[matchedExistingKey] = mergeGroupEntry(currentElement, incomingElement);
+        if (isGroupEntry(currentEntry) && isGroupEntry(incomingEntry)) {
+            out.elements[matchedExistingKey] = mergeGroupEntry(currentEntry, incomingEntry);
             continue;
         }
 
-        out.elements[matchedExistingKey] = incomingElement;
+        // Fallback: if entry kinds changed, prefer latest scan but keep manual key
+        out.elements[matchedExistingKey] = incomingEntry;
     }
 
     return out;

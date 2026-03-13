@@ -1,3 +1,5 @@
+// src/tools/page-scanner/scanner/types.ts
+
 import type { Logger } from "@/utils/logger";
 
 export type ScanPageOptions = {
@@ -76,17 +78,17 @@ export type PageMapElementMeta = {
 
 export type PageMapElementEntry = {
     type: string;
-    stableKey?: string;
     preferred: string;
     fallbacks: string[];
+    stableKey?: string;
     meta?: PageMapElementMeta;
 };
 
 export type PageMapGroupEntry = {
     type: "radio-group" | "checkbox-group";
-    stableKey?: string;
     preferred: "";
     fallbacks: [];
+    stableKey?: string;
     options: Record<string, string>;
     meta?: {
         inputName?: string | null;
@@ -105,4 +107,19 @@ export type PageMap = {
     title?: string;
     scannedAt: string;
     elements: Record<string, PageMapEntry>;
+};
+
+export type PageDiffItem = {
+    stableKey: string;
+    status: "added" | "removed" | "updated" | "unchanged";
+    existingKey?: string;
+    incomingKey?: string;
+    reason?: string;
+};
+
+export type PageDiffSummary = {
+    added: PageDiffItem[];
+    removed: PageDiffItem[];
+    updated: PageDiffItem[];
+    unchanged: PageDiffItem[];
 };

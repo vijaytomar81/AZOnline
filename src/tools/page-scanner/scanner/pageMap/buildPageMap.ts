@@ -1,3 +1,5 @@
+// src/tools/page-scanner/scanner/pageMap/buildPageMap.ts
+
 import { nowIso } from "@/utils/time";
 import { uniq, uniqueKey } from "@/utils/collections";
 import type {
@@ -113,7 +115,9 @@ export function buildPageMap(params: {
         });
 
         if (verbose && onDebug) {
-            onDebug(`KEY=${finalKey} type=${type} best=${best.selector} (${best.reason})`);
+            onDebug(
+                `KEY=${finalKey} stableKey=${entry.stableKey} type=${type} best=${best.selector} (${best.reason})`
+            );
         }
     }
 
