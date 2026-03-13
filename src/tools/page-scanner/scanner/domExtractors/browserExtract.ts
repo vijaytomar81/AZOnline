@@ -103,7 +103,18 @@ export function browserExtractDomElements({ selector }: BrowserExtractArgs) {
         return Boolean(el.closest("footer"));
     }
 
-    function isVisible(el: Element): boolean {
+    function hasNonZeroRect(el: Element): boolean {
+        const rect = (el as HTMLElement).getBoundingClientRect();
+        return rect.width > 0 || rect.height > 0;
+    }
+
+    function getAssociatedLabel(el: Element): Element | null {
+        const id = getAttr(el, "id");
+        if (!id) return null;
+        return document.querySelector(`label[for='${CSS.escape(id)}']`);
+    }
+
+    function isElementStyleVisible(el: Element): boolean {
         const htmlEl = el as HTMLElement;
         const style = window.getComputedStyle(htmlEl);
 
@@ -114,8 +125,40 @@ export function browserExtractDomElements({ selector }: BrowserExtractArgs) {
         if (htmlEl.hidden) return false;
         if (htmlEl.getAttribute("aria-hidden") === "true") return false;
 
-        const rect = htmlEl.getBoundingClientRect();
-        return rect.width > 0 || rect.height > 0;
+        return true;
+    }
+
+    function isVisible(el: Element): boolean {
+        if (!isElementStyleVisible(el)) return false;
+
+        if (hasNonZeroRect(el)) return true;
+
+        const tag = el.tagName.toLowerCase();
+        const type = (getAttr(el, "type") || "").toLowerCase();
+
+        // Custom radios/checkboxes are often visually hidden while their label is visible and clickable.
+        if (tag === "input" && (type === "radio" || type === "checkbox")) {
+            const explicitLabel = getAssociatedLabel(el);
+            if (explicitLabel && isElementStyleVisible(explicitLabel) && hasNonZeroRect(explicitLabel)) {
+                return true;
+            }
+
+            const wrappedLabel = el.closest("label");
+            if (wrappedLabel && isElementStyleVisible(wrappedLabel) && hasNonZeroRect(wrappedLabel)) {
+                return true;
+            }
+
+            const customControl =
+                el.closest(".custom-control") ||
+                el.closest(".falcon-custom-radio") ||
+                el.closest(".input-group");
+
+            if (customControl && isElementStyleVisible(customControl) && hasNonZeroRect(customControl)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     function isInteractive(el: Element): boolean {

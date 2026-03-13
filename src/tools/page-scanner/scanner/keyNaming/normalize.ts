@@ -23,6 +23,31 @@ export function isWeakValue(value?: string | null): boolean {
     return false;
 }
 
+function isAllCapsToken(value: string): boolean {
+    return /^[A-Z0-9]+$/.test(value) && /[A-Z]/.test(value);
+}
+
+function normalizeToken(part: string, idx: number): string {
+    if (!part) return part;
+
+    // Preserve fully-capitalized acronyms like UK, EU, FAQ, ID
+    if (isAllCapsToken(part)) {
+        return idx === 0 ? part.charAt(0).toLowerCase() + part.slice(1) : part;
+    }
+
+    // Preserve already camel/pascal identifier-like tokens
+    if (/^[A-Za-z][A-Za-z0-9]*$/.test(part)) {
+        if (idx === 0) {
+            return part.charAt(0).toLowerCase() + part.slice(1);
+        }
+        return part.charAt(0).toUpperCase() + part.slice(1);
+    }
+
+    return idx === 0
+        ? part.charAt(0).toLowerCase() + part.slice(1).toLowerCase()
+        : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+}
+
 export function toKeyPreservingIdentifiers(value?: string | null): string | undefined {
     const v = clean(value);
     if (!v) return undefined;
@@ -38,12 +63,7 @@ export function toKeyPreservingIdentifiers(value?: string | null): string | unde
 
     if (!parts.length) return undefined;
 
-    return parts
-        .map((part, idx) => {
-            if (idx === 0) return part.charAt(0).toLowerCase() + part.slice(1);
-            return part.charAt(0).toUpperCase() + part.slice(1);
-        })
-        .join("");
+    return parts.map((part, idx) => normalizeToken(part, idx)).join("");
 }
 
 export function upperFirst(value?: string): string | undefined {

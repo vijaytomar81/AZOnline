@@ -8,13 +8,12 @@ import {
 } from "./keyNaming/strategies";
 import { buildSemanticKey } from "./keyNaming/semantic";
 
-/**
- * Map element type → key prefix
- */
 function prefixForType(el: ScannedElement): string | null {
     const tag = (el.tag || "").toLowerCase();
     const role = (el.role || "").toLowerCase();
     const typeAttr = (el.typeAttr || "").toLowerCase();
+
+    if (el.isFrameworkSearchInput) return "searchSelect";
 
     if (tag === "select" || role === "combobox") return "select";
     if (tag === "textarea") return "textarea";
@@ -36,24 +35,14 @@ function prefixForType(el: ScannedElement): string | null {
     return null;
 }
 
-/**
- * Capitalize first letter
- */
 function capitalize(s: string): string {
     if (!s) return s;
     return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-/**
- * Adds type prefix to semantic key
- */
 function applyTypePrefix(el: ScannedElement, baseKey: string): string {
     const prefix = prefixForType(el);
-
     if (!prefix) return baseKey;
-
-    // avoid duplicate prefixes like inputFirstName → inputInputFirstName
-    if (baseKey.startsWith(prefix)) return baseKey;
 
     return `${prefix}${capitalize(baseKey)}`;
 }
@@ -62,15 +51,15 @@ export function getSmartElementKey(
     el: ScannedElement,
     indexHint: number
 ): string {
-    const radioOrCheckboxKey = buildRadioCheckboxKey(el);
-    if (radioOrCheckboxKey) return applyTypePrefix(el, radioOrCheckboxKey);
+    const radioOrCheckboxBase = buildRadioCheckboxKey(el);
+    if (radioOrCheckboxBase) return applyTypePrefix(el, radioOrCheckboxBase);
 
-    const frameworkSearchKey = buildFrameworkSearchKey(el);
-    if (frameworkSearchKey) return applyTypePrefix(el, frameworkSearchKey);
+    const frameworkSearchBase = buildFrameworkSearchKey(el);
+    if (frameworkSearchBase) return applyTypePrefix(el, frameworkSearchBase);
 
-    const semanticKey = buildSemanticKey(el);
-    if (semanticKey) return applyTypePrefix(el, semanticKey);
+    const semanticBase = buildSemanticKey(el);
+    if (semanticBase) return applyTypePrefix(el, semanticBase);
 
-    const genericKey = buildGenericKey(el, indexHint);
-    return applyTypePrefix(el, genericKey);
+    const genericBase = buildGenericKey(el, indexHint);
+    return applyTypePrefix(el, genericBase);
 }

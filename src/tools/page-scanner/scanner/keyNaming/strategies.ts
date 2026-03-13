@@ -9,14 +9,6 @@ function normalizeKeyPart(value?: string | null): string | undefined {
     return key || undefined;
 }
 
-function getControlPrefix(el: ScannedElement): string {
-    const type = (el.typeAttr || "").toLowerCase();
-    if (type === "radio") return "radio";
-    if (type === "checkbox") return "checkbox";
-    if (el.isFrameworkSearchInput) return "searchSelect";
-    return "input";
-}
-
 function buildChoiceGroupBase(el: ScannedElement): string | undefined {
     return (
         normalizeKeyPart(el.inputName) ||
@@ -55,34 +47,26 @@ export function buildRadioCheckboxKey(el: ScannedElement): string | undefined {
     const type = (el.typeAttr || "").toLowerCase();
     if (type !== "radio" && type !== "checkbox") return undefined;
 
-    const prefix = getControlPrefix(el);
     const groupBase = buildChoiceGroupBase(el);
     const optionBase = buildChoiceOptionBase(el);
 
-    const finalBase = joinWithoutDup(groupBase, optionBase);
-    if (!finalBase) return undefined;
-
-    return `${prefix}${finalBase}`;
+    return joinWithoutDup(groupBase, optionBase);
 }
 
 export function buildFrameworkSearchKey(el: ScannedElement): string | undefined {
     if (!el.isFrameworkSearchInput) return undefined;
 
-    const base =
+    return (
         normalizeKeyPart(el.ownerLabelText) ||
         normalizeKeyPart(el.ownerAriaLabel) ||
         normalizeKeyPart(el.ownerId) ||
         normalizeKeyPart(el.id) ||
-        normalizeKeyPart(el.name);
-
-    if (!base) return undefined;
-    return `searchSelect${base}`;
+        normalizeKeyPart(el.name)
+    );
 }
 
 export function buildGenericKey(el: ScannedElement, indexHint: number): string {
-    const prefix = getControlPrefix(el);
-
-    const base =
+    return (
         normalizeKeyPart(el.id) ||
         normalizeKeyPart(el.name) ||
         normalizeKeyPart(el.labelText) ||
@@ -90,7 +74,6 @@ export function buildGenericKey(el: ScannedElement, indexHint: number): string {
         normalizeKeyPart(el.placeholder) ||
         normalizeKeyPart(el.text) ||
         normalizeKeyPart(el.tag) ||
-        `Element${indexHint}`;
-
-    return `${prefix}${base}`;
+        `Element${indexHint}`
+    );
 }
