@@ -1,3 +1,5 @@
+// src/tools/page-scanner/scanner/keyNaming/strategies.ts
+
 import type { ScannedElement } from "../types";
 import { normalizeBusinessPhrase, toKeyPreservingIdentifiers } from "./normalize";
 

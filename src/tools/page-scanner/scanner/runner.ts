@@ -3,8 +3,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { ensureDir, safeReadJson } from "../../../utils/fs";
-import { PAGE_SCANNER_MAPS_DIR } from "../../../utils/paths";
+import { ensureDir, safeReadJson } from "@/utils/fs";
+import { PAGE_SCANNER_MAPS_DIR } from "@/utils/paths";
 import type { PageMap, ScanPageOptions } from "./types";
 import { connectAndGetPage } from "./browser";
 import { extractDomElements } from "./domExtract";

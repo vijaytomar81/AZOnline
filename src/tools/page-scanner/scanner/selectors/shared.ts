@@ -1,3 +1,5 @@
+// src/tools/page-scanner/scanner/selectors/shared.ts
+
 import type { ScannedElement } from "../types";
 
 export function scoreCss(base: number): number {

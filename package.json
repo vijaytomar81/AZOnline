@@ -67,6 +67,7 @@
     "allure-playwright": "^3.5.0",
     "ts-node": "^10.9.2",
     "ts-prune": "^0.10.3",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {

@@ -1,4 +1,4 @@
-// \src\tools\page-scanner\scanner\domExtractors\browserExtract.ts
+// src/tools/page-scanner/scanner/domExtractors/browserExtract.ts
 
 type BrowserExtractArgs = {
     selector: string;

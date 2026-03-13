@@ -1,3 +1,5 @@
+// src/tools/page-scanner/scanner/selectors/roleStrategy.ts
+
 import type { ScannedElement, SelectorCandidate } from "../types";
 import { escapeForRegex } from "@/utils/regex";
 import { normalizeSpaces } from "@/utils/text";

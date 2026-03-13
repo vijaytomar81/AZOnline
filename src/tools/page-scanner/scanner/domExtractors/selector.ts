@@ -1,5 +1,4 @@
 // src/tools/page-scanner/scanner/domExtractors/selector.ts
-// \src\tools\page-scanner\scanner\domExtractors\selector.ts
 
 export const SCAN_SELECTOR = [
     "input",
