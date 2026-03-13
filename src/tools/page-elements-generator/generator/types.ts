@@ -1,6 +1,6 @@
 // src/tools/page-elements-generator/generator/types.ts
 
-import type { Logger } from "../../../utils/logger";
+import type { Logger } from "@/utils/logger";
 
 export type PageMap = {
     pageKey: string; // e.g. "motor.car-details"

@@ -2,8 +2,8 @@
 import fs from "node:fs";
 
 import type { PageMap } from "./types";
-import { isValidTsIdentifier } from "../../../utils/ts";
-import { stripLineComments } from "../../../utils/text";
+import { isValidTsIdentifier } from "@/utils/ts";
+import { stripLineComments } from "@/utils/text";
 
 type SyncLog = {
     info: (s: string) => void;

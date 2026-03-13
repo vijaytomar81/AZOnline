@@ -10,7 +10,7 @@ import {
 } from "./paths";
 
 import { safeWriteText, safeWriteTextIfMissing } from "./state";
-import { ensureDir } from "../../../utils/fs";
+import { ensureDir } from "@/utils/fs";
 import { buildAliasesGeneratedTs } from "../builders/buildAliasesGeneratedTs";
 import { buildAliasesHumanTs } from "../builders/buildAliasesHumanTs";
 import { buildPageTsStub } from "../builders/buildPageTsStub";

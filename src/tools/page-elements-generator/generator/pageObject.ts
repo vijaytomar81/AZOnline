@@ -2,7 +2,7 @@
 
 import fs from "node:fs";
 import type { PageMap } from "./types";
-import { stripLineComments } from "../../../utils/text";
+import { stripLineComments } from "@/utils/text";
 
 type AliasPair = { aliasKey: string; elementKey: string };
 

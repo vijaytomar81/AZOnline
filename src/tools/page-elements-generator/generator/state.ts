@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 
-import { ensureDir, safeReadJson } from "../../../utils/fs";
+import { ensureDir, safeReadJson } from "@/utils/fs";
 
 export type StateFile = Record<string, string>;
 

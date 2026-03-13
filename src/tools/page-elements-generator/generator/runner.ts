@@ -7,7 +7,7 @@ import type { GenOptions, PageMap } from "./types";
 import { buildElementsTs } from "../builders/buildElementsTs";
 import { syncPageRegistry } from "./syncPageRegistry";
 import type { PageRegistryEntry } from "./syncPageRegistry";
-import { toPascal } from "../../../utils/ts";
+import { toPascal } from "@/utils/ts";
 
 import {
     mapPageKeyToAliasesHumanPath,
@@ -16,7 +16,7 @@ import {
 } from "./paths";
 import { ensureScaffoldFiles, hasMissingGeneratedOutputs } from "./scaffold";
 import { hashContent, loadState, saveState } from "./state";
-import { ensureDir } from "../../../utils/fs";
+import { ensureDir } from "@/utils/fs";
 
 export type RepairPageReport = {
     pageKey: string;
