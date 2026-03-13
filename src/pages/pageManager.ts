@@ -1,5 +1,8 @@
 // src/pages/pageManager.ts
 import type { Page } from "@playwright/test";
+import { InsuranceTypeSelectionPage } from "@page-objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage";
+import { LoginOrRegistrationPage } from "@page-objects/athena/common/login-or-registration/LoginOrRegistrationPage";
+import { PhDrivingLicenceDetailsPage } from "@page-objects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage";
 
 
 
@@ -25,6 +28,14 @@ export class PageManager {
             this.cache.set(key, factory());
         }
         return this.cache.get(key) as T;
+    }
+
+    get athena() {
+        return {
+            insuranceTypeSelection: this.get("athena.insuranceTypeSelection", () => new InsuranceTypeSelectionPage(this.page)),
+            loginOrRegistration: this.get("athena.loginOrRegistration", () => new LoginOrRegistrationPage(this.page)),
+            phDrivingLicenceDetails: this.get("athena.phDrivingLicenceDetails", () => new PhDrivingLicenceDetailsPage(this.page)),
+        };
     }
 
 }

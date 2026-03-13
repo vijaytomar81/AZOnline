@@ -3,12 +3,12 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { createLogger } from "../../../utils/logger";
-import { normalizeArgv, hasFlag, getArg } from "../../../utils/argv";
-import { safeReadJson, listFiles } from "../../../utils/fs";
-import { PAGE_SCANNER_MAPS_DIR, PAGES_DIR } from "../../../utils/paths";
-import { ICONS } from "../../../utils/icons";
-import { printTree } from "../../../utils/cliTree";
+import { createLogger } from "@/utils/logger";
+import { normalizeArgv, hasFlag, getArg } from "@/utils/argv";
+import { safeReadJson, listFiles } from "@/utils/fs";
+import { PAGE_MAPS_DIR, PAGES_DIR } from "@/utils/paths";
+import { ICONS } from "@/utils/icons";
+import { printTree } from "@/utils/cliTree";
 
 import {
     printSection,
@@ -20,7 +20,7 @@ import {
     failure,
     info,
     strong,
-} from "../../../utils/cliFormat";
+} from "@/utils/cliFormat";
 
 import { validateOnePage } from "../validators/pageChain";
 import { checkPagesModuleHygiene } from "../validators/moduleHygiene";
@@ -63,7 +63,7 @@ export async function runValidateCommand(args: string[]) {
 
     log.info("Command: validate");
 
-    const mapsDir = getArg(argv, "--mapsDir") ?? PAGE_SCANNER_MAPS_DIR;
+    const mapsDir = getArg(argv, "--mapsDir") ?? PAGE_MAPS_DIR;
     const pagesDir = getArg(argv, "--pagesDir") ?? PAGES_DIR;
 
     printSection("Environment");

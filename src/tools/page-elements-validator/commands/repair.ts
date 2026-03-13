@@ -1,13 +1,13 @@
 // src/tools/page-elements-validator/commands/repair.ts
 
-import { createLogger } from "../../../utils/logger";
-import { normalizeArgv, hasFlag, getArg } from "../../../utils/argv";
+import { createLogger } from "@/utils/logger";
+import { normalizeArgv, hasFlag, getArg } from "@/utils/argv";
 import {
-    PAGE_ELEMENTS_GENERATOR_STATE_DIR,
-    PAGE_ELEMENTS_GENERATOR_STATE_FILE,
-    PAGE_SCANNER_MAPS_DIR,
     PAGES_DIR,
-} from "../../../utils/paths";
+    PAGE_MAPS_DIR,
+    PAGE_MAP_STATE_DIR,
+    PAGE_MAP_STATE_FILE
+} from "@/utils/paths";
 import {
     printSection,
     printKeyValue,
@@ -15,7 +15,7 @@ import {
     printIndented,
     printSummary,
     success,
-} from "../../../utils/cliFormat";
+} from "@/utils/cliFormat";
 
 import { runElementsGenerator } from "../../page-elements-generator/generator/runner";
 
@@ -32,16 +32,16 @@ export async function runRepairCommand(args: string[]) {
     log.info("Command: repair");
 
     const mapsDir =
-        getArg(argv, "--mapsDir") ?? PAGE_SCANNER_MAPS_DIR;
+        getArg(argv, "--mapsDir") ?? PAGE_MAPS_DIR;
 
     const pagesDir =
         getArg(argv, "--pagesDir") ?? PAGES_DIR;
 
     const stateDir =
-        getArg(argv, "--stateDir") ?? PAGE_ELEMENTS_GENERATOR_STATE_DIR;
+        getArg(argv, "--stateDir") ?? PAGE_MAP_STATE_DIR;
 
     const stateFile =
-        getArg(argv, "--stateFile") ?? PAGE_ELEMENTS_GENERATOR_STATE_FILE;
+        getArg(argv, "--stateFile") ?? PAGE_MAP_STATE_FILE;
 
     const merge = hasFlag(argv, "--merge");
     const changedOnly = hasFlag(argv, "--changedOnly");

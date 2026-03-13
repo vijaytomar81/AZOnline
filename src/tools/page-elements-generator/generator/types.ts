@@ -27,14 +27,18 @@ export type PageMap = {
 
 export type GenOptions = {
     mapsDir: string;
-    pagesDir: string;
+
+    // Where page objects are generated
+    pageObjectsDir: string;
+
+    // Where index.ts and pageManager.ts live
+    pageRegistryDir: string;
 
     // state is stored outside page-maps
     stateDir?: string;
     stateFile?: string;
 
     merge?: boolean;
-    verbose?: boolean;
     changedOnly?: boolean;
     stateOnly?: boolean;
 
@@ -48,6 +52,7 @@ export type GenOptions = {
      */
     scaffoldIfMissing?: boolean;
 
+    verbose?: boolean;
     log: Logger;
 };
 

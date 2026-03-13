@@ -2,9 +2,9 @@
 
 import path from "node:path";
 
-import { safeReadText, safeWriteText } from "../../../utils/fs";
-import { PAGES_DIR } from "../../../utils/paths";
-import { toCamelFromText } from "../../../utils/text";
+import { safeReadText, safeWriteText } from "@/utils/fs";
+import { PAGES_DIR } from "@/utils/paths";
+import { toCamelFromText } from "@/utils/text";
 
 export type PageRegistryEntry = {
     pageKey: string;   // e.g. "motor.car-details"
@@ -60,11 +60,11 @@ function lastSegment(pageKey: string): string {
 }
 
 function buildIndexExportLine(entry: PageRegistryEntry): string {
-    return `export * from "./${pageKeyToFolderPath(entry.pageKey)}/${entry.className}";`;
+    return `export * from "@page-objects/${pageKeyToFolderPath(entry.pageKey)}/${entry.className}";`;
 }
 
 function buildPageImportLine(entry: PageRegistryEntry): string {
-    return `import { ${entry.className} } from "./${pageKeyToFolderPath(entry.pageKey)}/${entry.className}";`;
+    return `import { ${entry.className} } from "@page-objects/${pageKeyToFolderPath(entry.pageKey)}/${entry.className}";`;
 }
 
 function buildPageManagerEntryLine(entry: PageRegistryEntry): string {

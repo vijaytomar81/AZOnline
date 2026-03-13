@@ -1,7 +1,5 @@
 // src/tools/page-elements-generator/cli.ts
 
-import path from "node:path";
-
 import { createLogger } from "../../utils/logger";
 import { normalizeArgv, hasFlag, getArg } from "../../utils/argv";
 import { usage } from "./elementGeneratorHelp";
@@ -9,9 +7,11 @@ import { printCommandTitle } from "../../utils/cliFormat";
 import { runElementsGenerator } from "./generator/runner";
 
 import {
-    PAGE_SCANNER_MAPS_DIR,
-    PAGES_DIR,
-    PAGE_ELEMENTS_GENERATOR_STATE_DIR,
+    PAGE_MAPS_DIR,
+    PAGE_OBJECTS_DIR,
+    PAGE_REGISTRY_DIR,
+    PAGE_MAP_STATE_DIR,
+    PAGE_MAP_STATE_FILE,
     PAGE_ELEMENTS_GENERATOR_LOG_FILE,
 } from "../../utils/paths";
 
@@ -23,6 +23,7 @@ let log = createLogger({
 
 function isHelp(argv: string[]) {
     const args = normalizeArgv(argv);
+
     return (
         args.length === 0 ||
         args[0] === "help" ||
@@ -33,11 +34,12 @@ function isHelp(argv: string[]) {
 
 async function main() {
     printCommandTitle("PAGE ELEMENTS GENERATOR", "elementsGeneratorIcon");
+
     const argv = normalizeArgv(process.argv.slice(2));
 
-    // Allow either:
-    //   node .../cli.ts --merge
-    //   node .../cli.ts generate --merge
+    // Allow:
+    // node cli.ts generate
+    // node cli.ts --merge
     const args = argv[0] === "generate" ? argv.slice(1) : argv;
 
     if (isHelp(args)) {
@@ -48,8 +50,10 @@ async function main() {
     const verbose = hasFlag(args, "--verbose");
 
     const logToFile = hasFlag(args, "--logToFile");
+
     const logFilePath =
-        getArg(args, "--logFilePath") ?? PAGE_ELEMENTS_GENERATOR_LOG_FILE
+        getArg(args, "--logFilePath") ??
+        PAGE_ELEMENTS_GENERATOR_LOG_FILE;
 
     log = createLogger({
         prefix: "[page-elements-generator]",
@@ -62,16 +66,24 @@ async function main() {
     log.info("Command: generate");
 
     const mapsDir =
-        getArg(args, "--mapsDir") ?? PAGE_SCANNER_MAPS_DIR
+        getArg(args, "--mapsDir") ??
+        PAGE_MAPS_DIR;
 
-    const pagesDir =
-        getArg(args, "--pagesDir") ?? PAGES_DIR;
+    const pageObjectsDir =
+        getArg(args, "--pageObjectsDir") ??
+        PAGE_OBJECTS_DIR;
+
+    const pageRegistryDir =
+        getArg(args, "--pageRegistryDir") ??
+        PAGE_REGISTRY_DIR;
 
     const stateDir =
-        getArg(args, "--stateDir") ?? PAGE_ELEMENTS_GENERATOR_STATE_DIR
+        getArg(args, "--stateDir") ??
+        PAGE_MAP_STATE_DIR;
 
     const stateFile =
-        getArg(args, "--stateFile") ?? path.join(stateDir, "page-maps-state.json");
+        getArg(args, "--stateFile") ??
+        PAGE_MAP_STATE_FILE;
 
     const merge = hasFlag(args, "--merge");
     const changedOnly = hasFlag(args, "--changedOnly");
@@ -80,13 +92,23 @@ async function main() {
 
     if (verbose) {
         log.debug(
-            `Args: mapsDir=${mapsDir} pagesDir=${pagesDir} stateDir=${stateDir} stateFile=${stateFile} merge=${merge} changedOnly=${changedOnly} stateOnly=${stateOnly} scaffold=${scaffold}`
+            `Args:
+mapsDir=${mapsDir}
+pageObjectsDir=${pageObjectsDir}
+pageRegistryDir=${pageRegistryDir}
+stateDir=${stateDir}
+stateFile=${stateFile}
+merge=${merge}
+changedOnly=${changedOnly}
+stateOnly=${stateOnly}
+scaffold=${scaffold}`
         );
     }
 
     await runElementsGenerator({
         mapsDir,
-        pagesDir,
+        pageObjectsDir,
+        pageRegistryDir,
         stateDir,
         stateFile,
         merge,

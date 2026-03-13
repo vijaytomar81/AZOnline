@@ -21,6 +21,15 @@
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "@pages/*": [
+        "src/pages/*"
+      ],
+      "@page-maps/*": [
+        "src/pages/maps/*"
+      ],
+      "@page-objects/*": [
+        "src/pages/objects/*"
       ]
     }
   },

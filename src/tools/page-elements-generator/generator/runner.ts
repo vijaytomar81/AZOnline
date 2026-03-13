@@ -55,11 +55,11 @@ function mtimeMsSafe(p: string): number {
     }
 }
 
-function needsAliasSync(params: { pagesDir: string; pageKey: string }): boolean {
-    const { pagesDir, pageKey } = params;
+function needsAliasSync(params: { pageObjectsDir: string; pageKey: string }): boolean {
+    const { pageObjectsDir, pageKey } = params;
 
-    const aliasesHumanPath = mapPageKeyToAliasesHumanPath(pagesDir, pageKey);
-    const pageTsPath = mapPageKeyToPageTsPath(pagesDir, pageKey);
+    const aliasesHumanPath = mapPageKeyToAliasesHumanPath(pageObjectsDir, pageKey);
+    const pageTsPath = mapPageKeyToPageTsPath(pageObjectsDir, pageKey);
 
     if (!fs.existsSync(aliasesHumanPath) || !fs.existsSync(pageTsPath)) return false;
 
@@ -119,7 +119,7 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
         registryEntries.push(buildRegistryEntry(pageMap.pageKey));
 
         const missingOutputs = hasMissingGeneratedOutputs({
-            pagesDir: opts.pagesDir,
+            pagesDir: opts.pageObjectsDir,
             pageKey: pageMap.pageKey,
         });
 
@@ -128,7 +128,7 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
         const aliasSyncNeeded =
             shouldScaffold &&
             needsAliasSync({
-                pagesDir: opts.pagesDir,
+                pageObjectsDir: opts.pageObjectsDir,
                 pageKey: pageMap.pageKey,
             });
 
@@ -151,7 +151,7 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
 
         if (shouldScaffold) {
             ensureScaffoldFiles({
-                pagesDir: opts.pagesDir,
+                pagesDir: opts.pageObjectsDir,
                 pageMap,
                 verbose: opts.verbose,
                 log: scaffoldLog,
@@ -166,7 +166,7 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
             continue;
         }
 
-        const elementsPath = mapPageKeyToElementsPath(opts.pagesDir, pageMap.pageKey);
+        const elementsPath = mapPageKeyToElementsPath(opts.pageObjectsDir, pageMap.pageKey);
         const ts = buildElementsTs(pageMap);
 
         if (opts.merge && fs.existsSync(elementsPath)) {
@@ -184,7 +184,7 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
     }
 
     const endRegistrySync = registryLog.time("sync-page-registry");
-    const syncRes = syncPageRegistry(registryEntries, opts.pagesDir);
+    const syncRes = syncPageRegistry(registryEntries, opts.pageRegistryDir);
     endRegistrySync();
 
     const addedIndexPaths = new Set(
@@ -218,6 +218,7 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
                     : part.charAt(0).toUpperCase() + part.slice(1)
             )
             .join("");
+
         const group = report.pageKey.split(".")[0] || "common";
         const entrySnippet = `${memberCamel}: this.get("${group}.${memberCamel}"`;
 
@@ -249,6 +250,7 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
     log.info(`Processed pages: ${processed}`);
 
     const pagesChanged = pageReports.filter((r) => r.changed).length;
+
     const filesGenerated = pageReports.reduce((sum, r) => {
         let count = 0;
         if (r.elementsStatus === "generated") count++;
