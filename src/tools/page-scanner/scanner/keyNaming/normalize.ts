@@ -27,25 +27,40 @@ function isAllCapsToken(value: string): boolean {
     return /^[A-Z0-9]+$/.test(value) && /[A-Z]/.test(value);
 }
 
-function normalizeToken(part: string, idx: number): string {
-    if (!part) return part;
+function isCamelOrPascalToken(value: string): boolean {
+    return /^[A-Za-z][A-Za-z0-9]*$/.test(value);
+}
 
-    // Preserve fully-capitalized acronyms like UK, EU, FAQ, ID
-    if (isAllCapsToken(part)) {
-        return idx === 0 ? part.charAt(0).toLowerCase() + part.slice(1) : part;
+function normalizeAcronymToken(part: string, idx: number): string {
+    if (idx === 0) {
+        return part.toLowerCase();
+    }
+    return part;
+}
+
+function normalizeWordToken(part: string, idx: number): string {
+    const lower = part.toLowerCase();
+
+    if (idx === 0) {
+        return lower.charAt(0).toLowerCase() + lower.slice(1);
     }
 
-    // Preserve already camel/pascal identifier-like tokens
-    if (/^[A-Za-z][A-Za-z0-9]*$/.test(part)) {
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+}
+
+function normalizeIdentifierToken(part: string, idx: number): string {
+    if (isAllCapsToken(part)) {
+        return normalizeAcronymToken(part, idx);
+    }
+
+    if (isCamelOrPascalToken(part)) {
         if (idx === 0) {
             return part.charAt(0).toLowerCase() + part.slice(1);
         }
         return part.charAt(0).toUpperCase() + part.slice(1);
     }
 
-    return idx === 0
-        ? part.charAt(0).toLowerCase() + part.slice(1).toLowerCase()
-        : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+    return normalizeWordToken(part, idx);
 }
 
 export function toKeyPreservingIdentifiers(value?: string | null): string | undefined {
@@ -53,7 +68,7 @@ export function toKeyPreservingIdentifiers(value?: string | null): string | unde
     if (!v) return undefined;
 
     if (/^[A-Za-z][A-Za-z0-9]*$/.test(v)) {
-        return v;
+        return v.charAt(0).toLowerCase() + v.slice(1);
     }
 
     const parts = v
@@ -63,7 +78,7 @@ export function toKeyPreservingIdentifiers(value?: string | null): string | unde
 
     if (!parts.length) return undefined;
 
-    return parts.map((part, idx) => normalizeToken(part, idx)).join("");
+    return parts.map((part, idx) => normalizeIdentifierToken(part, idx)).join("");
 }
 
 export function upperFirst(value?: string): string | undefined {

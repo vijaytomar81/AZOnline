@@ -44,14 +44,18 @@ function getGroupId(el: ScannedElement): string | undefined {
     );
 }
 
-function getGroupKeyPrefix(type: string): "radio" | "checkbox" | undefined {
-    if (type === "radio") return "radio";
-    if (type === "checkbox") return "checkbox";
+function getGroupKeyPrefix(type: string): "groupRadio" | "groupCheckbox" | undefined {
+    if (type === "radio") return "groupRadio";
+    if (type === "checkbox") return "groupCheckbox";
     return undefined;
 }
 
 function getOptionLabel(el: ScannedElement): string | undefined {
     return clean(el.labelText) || clean(el.name) || clean(el.text);
+}
+
+function stripLeadingGroupControlWord(value: string): string {
+    return value.replace(/^(groupRadio|groupCheckbox|radio|checkbox)/i, "");
 }
 
 function buildGroupKey(type: string, el: ScannedElement): string | undefined {
@@ -60,7 +64,8 @@ function buildGroupKey(type: string, el: ScannedElement): string | undefined {
 
     if (!prefix || !groupId) return undefined;
 
-    return `${prefix}${toPascalFromText(groupId)}`;
+    const base = stripLeadingGroupControlWord(toPascalFromText(groupId));
+    return `${prefix}${base}`;
 }
 
 export function appendGroupedRadioCheckboxEntries(

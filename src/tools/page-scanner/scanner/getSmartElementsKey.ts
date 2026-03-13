@@ -40,11 +40,19 @@ function capitalize(s: string): string {
     return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+function stripLeadingTypePrefix(baseKey: string): string {
+    return baseKey.replace(
+        /^(searchSelect|select|textarea|radio|checkbox|input|button|link|alert|dialog|message)/i,
+        ""
+    );
+}
+
 function applyTypePrefix(el: ScannedElement, baseKey: string): string {
     const prefix = prefixForType(el);
     if (!prefix) return baseKey;
 
-    return `${prefix}${capitalize(baseKey)}`;
+    const cleaned = stripLeadingTypePrefix(baseKey);
+    return `${prefix}${capitalize(cleaned)}`;
 }
 
 export function getSmartElementKey(
