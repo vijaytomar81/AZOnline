@@ -1,4 +1,4 @@
-// src/pages/athena/common/login-or-registration/LoginOrRegistrationPage.ts
+// src/pages/objects/athena/common/login-or-registration/LoginOrRegistrationPage.ts
 // AUTO-SCAFFOLDED (create-only) by src/tools/page-elements-generator/builders/buildPageTsStub.ts
 // pageKey: athena.common.login-or-registration
 

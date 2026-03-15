@@ -1,4 +1,4 @@
-// src/pages/athena/common/login-or-registration/aliases.ts
+// src/pages/objects/athena/common/login-or-registration/aliases.ts
 // HUMAN-MAINTAINED FILE
 // pageKey: athena.common.login-or-registration
 //

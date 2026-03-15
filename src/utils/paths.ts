@@ -20,20 +20,40 @@ export const PAGE_OBJECTS_DIR = path.join(PAGES_DIR, "objects");
 export const PAGE_REGISTRY_DIR = PAGES_DIR;
 
 /**
+ * Page manifest
+ */
+export const PAGE_MANIFEST_DIR = path.join(PAGES_DIR, ".manifest");
+export const PAGE_OBJECTS_MANIFEST_FILE = path.join(
+    PAGE_MANIFEST_DIR,
+    "page-objects.manifest.json"
+);
+
+/**
  * Page generator state
  */
 export const PAGE_MAP_STATE_DIR = path.join(PAGES_DIR, ".state");
-export const PAGE_MAP_STATE_FILE = path.join(PAGE_MAP_STATE_DIR, "page-maps-state.json");
+export const PAGE_MAP_STATE_FILE = path.join(
+    PAGE_MAP_STATE_DIR,
+    "page-maps-state.json"
+);
 
 /**
  * Page Scanner
  */
-export const PAGE_SCANNER_DIR = path.join(SRC_DIR, "tools", "page-scanner");
+export const PAGE_SCANNER_DIR = path.join(
+    SRC_DIR,
+    "tools",
+    "page-scanner"
+);
 
 /**
  * Page Elements Generator
  */
-export const PAGE_ELEMENTS_GENERATOR_DIR = path.join(SRC_DIR, "tools", "page-elements-generator");
+export const PAGE_ELEMENTS_GENERATOR_DIR = path.join(
+    SRC_DIR,
+    "tools",
+    "page-elements-generator"
+);
 
 /**
  * Data Builder
@@ -46,6 +66,12 @@ export const DATA_GENERATED_DIR = path.join(SRC_DIR, "data", "generated");
  * Log files
  */
 export const PAGE_SCANNER_LOG_FILE = path.join(ROOT, "page-scanner.log");
-export const PAGE_ELEMENTS_GENERATOR_LOG_FILE = path.join(ROOT, "page-elements-generator.log");
-export const PAGE_ELEMENTS_VALIDATOR_LOG_FILE = path.join(ROOT, "page-elements-validator.log");
+export const PAGE_ELEMENTS_GENERATOR_LOG_FILE = path.join(
+    ROOT,
+    "page-elements-generator.log"
+);
+export const PAGE_ELEMENTS_VALIDATOR_LOG_FILE = path.join(
+    ROOT,
+    "page-elements-validator.log"
+);
 export const DATA_BUILDER_LOG_FILE = path.join(ROOT, "data-builder.log");

@@ -1,4 +1,4 @@
-// src/pages/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage.ts
+// src/pages/objects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage.ts
 // AUTO-SCAFFOLDED (create-only) by src/tools/page-elements-generator/builders/buildPageTsStub.ts
 // pageKey: athena.motor.ph-driving-licence-details
 

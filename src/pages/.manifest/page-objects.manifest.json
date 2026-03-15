@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "generatedAt": "2026-03-15T17:23:26.414Z",
+  "pages": {
+    "athena.common.insurance-type-selection": {
+      "pageKey": "athena.common.insurance-type-selection-one",
+      "product": "athena",
+      "group": "common",
+      "name": "insurance-type-selection",
+      "className": "InsuranceTypeSelectionPage",
+      "pageObjectImportPath": "@page-objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage",
+      "pageObjectFile": "src/pages/objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage.ts",
+      "elementsFile": "src/pages/objects/athena/common/insurance-type-selection/elements.ts",
+      "aliasesGeneratedFile": "src/pages/objects/athena/common/insurance-type-selection/aliases.generated.ts",
+      "aliasesFile": "src/pages/objects/athena/common/insurance-type-selection/aliases.ts",
+      "pageMapFile": "src/pages/maps/athena.common.insurance-type-selection.json",
+      "urlPath": "/products",
+      "title": "Get a new quote or view saved quotes",
+      "elementCount": 7,
+      "scannedAt": "2026-03-13T10:57:20.737Z",
+      "mapHash": "de91ed4f664ab9fffe3c265c7a7eef258bbf0384"
+    },
+    "athena.common.login-or-registration": {
+      "pageKey": "athena.common.login-or-registration",
+      "product": "athena",
+      "group": "common",
+      "name": "login-or-registration",
+      "className": "LoginOrRegistrationPage",
+      "pageObjectImportPath": "@page-objects/athena/common/login-or-registration/LoginOrRegistrationPage",
+      "pageObjectFile": "src/pages/objects/athena/common/login-or-registration/LoginOrRegistrationPage.ts",
+      "elementsFile": "src/pages/objects/athena/common/login-or-registration/elements.ts",
+      "aliasesGeneratedFile": "src/pages/objects/athena/common/login-or-registration/aliases.generated.ts",
+      "aliasesFile": "src/pages/objects/athena/common/login-or-registration/aliases.ts",
+      "pageMapFile": "src/pages/maps/athena.common.login-or-registration.json",
+      "urlPath": "/",
+      "title": "Allianz login page",
+      "elementCount": 4,
+      "scannedAt": "2026-03-09T12:48:41.552Z",
+      "mapHash": "d60d02f85e7d3ff086d61bc68dc00ddd97c06a8b"
+    },
+    "athena.motor.ph-driving-licence-details": {
+      "pageKey": "athena.motor.ph-driving-licence-details",
+      "product": "athena",
+      "group": "motor",
+      "name": "ph-driving-licence-details",
+      "className": "PhDrivingLicenceDetailsPage",
+      "pageObjectImportPath": "@page-objects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage",
+      "pageObjectFile": "src/pages/objects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage.ts",
+      "elementsFile": "src/pages/objects/athena/motor/ph-driving-licence-details/elements.ts",
+      "aliasesGeneratedFile": "src/pages/objects/athena/motor/ph-driving-licence-details/aliases.generated.ts",
+      "aliasesFile": "src/pages/objects/athena/motor/ph-driving-licence-details/aliases.ts",
+      "pageMapFile": "src/pages/maps/athena.motor.ph-driving-licence-details.json",
+      "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/drivingLicenceScan/69b442a3e1389c2e75667e1d",
+      "title": "Driving licence details",
+      "elementCount": 49,
+      "scannedAt": "2026-03-13T17:03:49.922Z",
+      "mapHash": "29e2db3b2ad32629add1d91d329d8ed12bad38a6"
+    }
+  }
+}

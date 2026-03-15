@@ -1,4 +1,4 @@
-// src/pages/athena/common/insurance-type-selection/InsuranceTypeSelectionPage.ts
+// src/pages/objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage.ts
 // AUTO-SCAFFOLDED (create-only) by src/tools/page-elements-generator/builders/buildPageTsStub.ts
 // pageKey: athena.common.insurance-type-selection
 

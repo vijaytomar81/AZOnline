@@ -1,0 +1,17 @@
+// src/tools/page-object-validator/validate/shared/pagePaths.ts
+
+import path from "node:path";
+
+import { buildPageArtifact } from "@/tools/page-object-generator/generator/pageArtifact";
+
+export function getPageArtifactPaths(pageObjectsDir: string, pageKey: string) {
+    return buildPageArtifact(pageObjectsDir, pageKey);
+}
+
+export function getIndexFile(pageRegistryDir: string): string {
+    return path.join(pageRegistryDir, "index.ts");
+}
+
+export function getPageManagerFile(pageRegistryDir: string): string {
+    return path.join(pageRegistryDir, "pageManager.ts");
+}
