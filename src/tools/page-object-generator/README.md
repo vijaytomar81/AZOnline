@@ -539,3 +539,46 @@ flowchart LR
 This process transforms page metadata into fully usable automation code while shared utilities handle file parsing, path resolution, and CLI helpers.
 
 ---
+
+# 18. Detailed End-to-End Flow
+
+```mermaid
+flowchart TD
+
+    A["page-map.json"] --> B["generator CLI"]
+    B --> C["generate command"]
+
+    C --> D["generator runner"]
+
+    subgraph Artifact Builders
+    D --> E["build elements"]
+    D --> F["build generated aliases"]
+    D --> G["sync human aliases"]
+    D --> H["build page object"]
+    end
+
+    E --> I["elements.ts"]
+    F --> J["aliases.generated.ts"]
+    G --> K["aliases.ts"]
+    H --> L["PageObject.ts"]
+
+    D --> M["sync page registry"]
+
+    M --> N["pages/index.ts"]
+    M --> O["pages/pageManager.ts"]
+
+    D --> P["update manifest"]
+
+    P --> Q[".manifest/index.json"]
+    P --> R[".manifest/pages/*.json"]
+
+    subgraph Shared Utilities
+    U1["page-object-common"]
+    U2["src/utils"]
+    end
+
+    U1 --> D
+    U2 --> D
+
+```
+---

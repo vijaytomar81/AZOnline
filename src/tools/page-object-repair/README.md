@@ -400,3 +400,144 @@ flowchart LR
 ```
 
 The repair process restores framework consistency by rebuilding metadata from the existing artifact structure.
+
+---
+
+# 18. Example End-to-End Flow v1
+
+```mermaid
+
+flowchart TD
+
+        A["repair CLI"] --> B["repair command"]
+        B --> C["repair runner"]
+
+        subgraph Rule Groups
+        C --> D["pageChain repair rules"]
+        C --> E["manifest repair rules"]
+        C --> F["registry repair rules"]
+        end
+
+        subgraph Page Chain Repairs
+        D --> G["repair elements -> generated aliases"]
+        D --> H["repair generated aliases -> business aliases"]
+        D --> I["repair business aliases -> PageObject"]
+        end
+
+        G --> J["aliases.generated.ts"]
+        H --> K["aliases.ts"]
+        I --> L["PageObject.ts"]
+
+        subgraph Manifest Repairs
+        E --> M["rebuild manifest metadata"]
+        end
+
+        M --> N[".manifest/index.json"]
+        M --> O[".manifest/pages/*.json"]
+
+        subgraph Registry Repairs
+        F --> P["repair pages/index.ts"]
+        F --> Q["repair pages/pageManager.ts"]
+        end
+
+        P --> R["pages/index.ts"]
+        Q --> S["pages/pageManager.ts"]
+
+        subgraph Repair Inputs
+        RI1["elements.ts"]
+        RI2["aliases.generated.ts"]
+        RI3["aliases.ts"]
+        RI4["PageObject.ts"]
+        RI5["existing manifest"]
+        RI6["existing registry"]
+        end
+
+        RI1 --> D
+        RI2 --> D
+        RI3 --> D
+        RI4 --> D
+        RI5 --> E
+        RI6 --> F
+
+        subgraph Shared Utilities
+        U1["page-object-common"]
+        U2["src/utils"]
+        end
+
+        U1 --> C
+        U2 --> C
+
+```
+
+---
+
+# 19. Example End-to-End Flow v2
+
+```mermaid
+
+flowchart TD
+
+        A["repair CLI"] --> B["repair command"]
+        B --> C["runRepairPipeline"]
+
+        subgraph Repair Rules
+        C --> R1["repairElementsToGeneratedAliases"]
+        C --> R2["repairGeneratedToBusinessAliases"]
+        C --> R3["repairBusinessAliasesToPageObject"]
+        C --> R4["repairManifest"]
+        C --> R5["repairIndexExports"]
+        C --> R6["repairPageManager"]
+        end
+
+        subgraph Page Chain Repairs
+        R1 --> A1["update aliases.generated.ts"]
+        R2 --> A2["update aliases.ts"]
+        R3 --> A3["update PageObject.ts"]
+        end
+
+        subgraph Manifest Repair
+        R4 --> M1["rebuild manifest entries"]
+        end
+
+        subgraph Registry Repair
+        R5 --> G1["repair pages/index.ts"]
+        R6 --> G2["repair pages/pageManager.ts"]
+        end
+
+        A1 --> O1["aliases.generated.ts"]
+        A2 --> O2["aliases.ts"]
+        A3 --> O3["PageObject.ts"]
+
+        M1 --> O4[".manifest/index.json"]
+        M1 --> O5[".manifest/pages/*.json"]
+
+        G1 --> O6["pages/index.ts"]
+        G2 --> O7["pages/pageManager.ts"]
+
+        subgraph Repair Inputs
+        I1["elements.ts"]
+        I2["aliases.generated.ts"]
+        I3["aliases.ts"]
+        I4["PageObject.ts"]
+        I5["manifest metadata"]
+        I6["registry files"]
+        end
+
+        I1 --> R1
+        I2 --> R2
+        I3 --> R3
+        I4 --> R3
+        I5 --> R4
+        I6 --> R5
+        I6 --> R6
+
+        subgraph Shared Utilities
+        U1["page-object-common"]
+        U2["src/utils"]
+        end
+
+        U1 --> C
+        U2 --> C
+
+```
+---

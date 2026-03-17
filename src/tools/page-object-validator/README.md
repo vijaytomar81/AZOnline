@@ -533,3 +533,82 @@ flowchart LR
 The validator runs these rule groups and produces a structured validation report highlighting warnings, errors, and structural issues.
 
 ---
+
+# 17. Detailed End-to-End Flow
+
+```mermaid
+
+        flowchart TD
+
+        A["validator CLI"] --> B["validate command"]
+        B --> C["validation runner"]
+
+        subgraph Rule Groups
+        C --> D["environment rules"]
+        C --> E["source rules"]
+        C --> F["outputs rules"]
+        C --> G["pageChain rules"]
+        C --> H["manifest rules"]
+        C --> I["registry rules"]
+        C --> J["hygiene rules"]
+        C --> K["conventions rules"]
+        end
+
+        D --> L["environment report"]
+        E --> M["source report"]
+        F --> N["outputs report"]
+        G --> O["pageChain report"]
+        H --> P["manifest report"]
+        I --> Q["registry report"]
+        J --> R["hygiene report"]
+        K --> S["conventions report"]
+
+        L --> T["validation summary"]
+        M --> T
+        N --> T
+        O --> T
+        P --> T
+        Q --> T
+        R --> T
+        S --> T
+
+        subgraph Page Chain Inputs
+        PC1["elements.ts"]
+        PC2["aliases.generated.ts"]
+        PC3["aliases.ts"]
+        PC4["PageObject.ts"]
+        end
+
+        PC1 --> G
+        PC2 --> G
+        PC3 --> G
+        PC4 --> G
+
+        subgraph Manifest Inputs
+        MI1[".manifest/index.json"]
+        MI2[".manifest/pages/*.json"]
+        MI3["page-map metadata"]
+        end
+
+        MI1 --> H
+        MI2 --> H
+        MI3 --> H
+
+        subgraph Registry Inputs
+        RI1["pages/index.ts"]
+        RI2["pages/pageManager.ts"]
+        end
+
+        RI1 --> I
+        RI2 --> I
+
+        subgraph Shared Utilities
+        U1["page-object-common"]
+        U2["src/utils"]
+        end
+
+        U1 --> C
+        U2 --> C
+
+```
+---
