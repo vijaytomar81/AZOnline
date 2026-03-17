@@ -1,38 +1,72 @@
 // src/utils/cliTree.ts
 import { success, warning, failure } from "./cliFormat";
+import { ICONS } from "./icons";
 
-export type TreeStep = {
-    icon: string;
+export type TreeSeverity = "success" | "warning" | "error" | "info";
+
+export type TreeNode = {
+    severity?: TreeSeverity;
     title: string;
     summary?: string;
+    children?: TreeNode[];
 };
 
-function formatIcon(icon: string): string {
-    if (icon === "✔") {
-        return `${success(icon)} `;
+function formatIcon(severity?: TreeSeverity): string {
+    if (!severity) return "";
+
+    if (severity === "success") {
+        return `${success(ICONS.successIcon)} `;
     }
 
-    if (icon === "⚠") {
-        return `${warning(icon)} `;
+    if (severity === "warning") {
+        return `${warning(ICONS.warningIcon)} `;
     }
 
-    if (icon === "✖") {
-        return `${failure(icon)} `;
+    if (severity === "error") {
+        return `${failure(ICONS.failIcon)} `;
     }
 
-    return `${icon} `;
+    return `${ICONS.hintIcon} `;
 }
 
-export function printTree(steps: TreeStep[]) {
-    steps.forEach((step, i) => {
-        const last = i === steps.length - 1;
-        const branch = last ? "└─" : "├─";
-        const icon = formatIcon(step.icon);
+function printNode(
+    node: TreeNode,
+    prefix = "",
+    isLast = true,
+    isRoot = false
+) {
+    const icon = formatIcon(node.severity);
 
-        if (step.summary) {
-            console.log(`${branch} ${icon}${step.title} : ${step.summary}`);
+    if (isRoot) {
+        if (node.summary) {
+            console.log(`${icon}${node.title}  ${node.summary}`);
         } else {
-            console.log(`${branch} ${icon}${step.title}`);
+            console.log(`${icon}${node.title}`);
         }
+    } else {
+        const branch = isLast ? "└─" : "├─";
+
+        if (node.summary) {
+            console.log(`${prefix}${branch} ${icon}${node.title}  ${node.summary}`);
+        } else {
+            console.log(`${prefix}${branch} ${icon}${node.title}`);
+        }
+    }
+
+    const children = node.children ?? [];
+    if (children.length === 0) return;
+
+    const nextPrefix = isRoot
+        ? ""
+        : prefix + (isLast ? "   " : "│  ");
+
+    children.forEach((child, index) => {
+        printNode(child, nextPrefix, index === children.length - 1, false);
+    });
+}
+
+export function printTree(nodes: TreeNode[]) {
+    nodes.forEach((node, index) => {
+        printNode(node, "", index === nodes.length - 1, true);
     });
 }

@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { createLogger } from "../utils/logger";
 import type { Logger } from "../utils/logger";
-import { PAGE_SCANNER_MAPS_DIR } from "../utils/paths";
+import { PAGE_MAPS_DIR } from "../utils/paths";
 
 type PageMap = {
     pageKey: string;
@@ -40,7 +40,7 @@ export class SelfHealWriter {
     private events: HealEvent[] = [];
 
     constructor(opts: SelfHealWriterOptions = {}) {
-        this.dir = opts.pageMapsDir ?? PAGE_SCANNER_MAPS_DIR;
+        this.dir = opts.pageMapsDir ?? PAGE_MAPS_DIR;
         this.enabled = !!opts.enabled;
         this.prefix = opts.prefix ?? "[self-heal]";
 

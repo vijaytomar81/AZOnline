@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { ensureDir, safeReadJson } from "@/utils/fs";
-import { PAGE_SCANNER_MAPS_DIR } from "@/utils/paths";
+import { PAGE_MAPS_DIR } from "@/utils/paths";
 import type { PageMap, ScanPageOptions } from "./types";
 import { connectAndGetPage } from "./browser";
 import { extractDomElements } from "./domExtract";
@@ -15,7 +15,7 @@ import { diffPageMaps } from "./pageMap/diffPageMaps";
 export async function scanPage(opts: ScanPageOptions): Promise<void> {
     const log = opts.log;
 
-    const outDir = opts.outDir ?? PAGE_SCANNER_MAPS_DIR;
+    const outDir = opts.outDir ?? PAGE_MAPS_DIR;
     ensureDir(outDir);
 
     const outFile = path.join(outDir, `${opts.pageKey}.json`);
