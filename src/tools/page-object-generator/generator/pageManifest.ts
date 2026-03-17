@@ -7,18 +7,22 @@ import { ensureDir } from "@/utils/fs";
 import type { PageMap } from "./types";
 import type { PageArtifact } from "./pageArtifact";
 
+export type PageManifestPaths = {
+    pageObjectImport: string;
+    pageObjectFile: string;
+    elementsFile: string;
+    aliasesGeneratedFile: string;
+    aliasesFile: string;
+    pageMapFile: string;
+};
+
 export type PageManifestEntry = {
     pageKey: string;
     product: string;
     group: string;
     name: string;
     className: string;
-    pageObjectImportPath: string;
-    pageObjectFile: string;
-    elementsFile: string;
-    aliasesGeneratedFile: string;
-    aliasesFile: string;
-    pageMapFile: string;
+    paths: PageManifestPaths;
     urlPath?: string;
     title?: string;
     elementCount: number;
@@ -29,7 +33,7 @@ export type PageManifestEntry = {
 export type ManifestIndex = {
     version: 1;
     generatedAt: string;
-    pageKeys: string[];
+    pages: Record<string, string>;
 };
 
 export type PageObjectsManifest = {
@@ -52,7 +56,7 @@ function splitPageKey(pageKey: string) {
 }
 
 function emptyIndex(): ManifestIndex {
-    return { version: 1, generatedAt: new Date().toISOString(), pageKeys: [] };
+    return { version: 1, generatedAt: new Date().toISOString(), pages: {} };
 }
 
 function emptyManifest(): PageObjectsManifest {
@@ -60,17 +64,9 @@ function emptyManifest(): PageObjectsManifest {
 }
 
 function manifestPaths(inputPath: string): { indexFile: string; pagesDir: string } {
-    if (inputPath.endsWith(".json")) {
-        return {
-            indexFile: inputPath,
-            pagesDir: path.join(path.dirname(inputPath), "pages"),
-        };
-    }
-
-    return {
-        indexFile: path.join(inputPath, "index.json"),
-        pagesDir: path.join(inputPath, "pages"),
-    };
+    return inputPath.endsWith(".json")
+        ? { indexFile: inputPath, pagesDir: path.join(path.dirname(inputPath), "pages") }
+        : { indexFile: path.join(inputPath, "index.json"), pagesDir: path.join(inputPath, "pages") };
 }
 
 export function pageKeyToManifestFile(manifestPagesDir: string, pageKey: string): string {
@@ -78,16 +74,16 @@ export function pageKeyToManifestFile(manifestPagesDir: string, pageKey: string)
 }
 
 export function loadManifestIndex(indexFile: string): ManifestIndex {
-    if (!fs.existsSync(indexFile)) {
-        return emptyIndex();
-    }
+    if (!fs.existsSync(indexFile)) return emptyIndex();
 
     try {
         const parsed = JSON.parse(fs.readFileSync(indexFile, "utf8")) as Partial<ManifestIndex>;
         return {
             version: 1,
             generatedAt: typeof parsed.generatedAt === "string" ? parsed.generatedAt : new Date().toISOString(),
-            pageKeys: Array.isArray(parsed.pageKeys) ? [...parsed.pageKeys] : [],
+            pages: parsed.pages && typeof parsed.pages === "object"
+                ? parsed.pages as Record<string, string>
+                : {},
         };
     } catch {
         return emptyIndex();
@@ -97,10 +93,16 @@ export function loadManifestIndex(indexFile: string): ManifestIndex {
 export function saveManifestIndex(indexFile: string, pageKeys: string[]): void {
     ensureDir(path.dirname(indexFile));
 
+    const pages = Object.fromEntries(
+        [...pageKeys]
+            .sort((a, b) => a.localeCompare(b))
+            .map((pageKey) => [pageKey, `${pageKey}.json`])
+    );
+
     const next: ManifestIndex = {
         version: 1,
         generatedAt: new Date().toISOString(),
-        pageKeys: [...pageKeys].sort((a, b) => a.localeCompare(b)),
+        pages,
     };
 
     fs.writeFileSync(indexFile, JSON.stringify(next, null, 2), "utf8");
@@ -121,11 +123,9 @@ export function loadPageManifest(inputPath: string): PageObjectsManifest {
     const index = loadManifestIndex(indexFile);
     const pages: Record<string, PageManifestEntry> = {};
 
-    for (const pageKey of index.pageKeys) {
-        const entry = loadPageManifestEntry(pageKeyToManifestFile(pagesDir, pageKey));
-        if (entry) {
-            pages[pageKey] = entry;
-        }
+    for (const [pageKey, fileName] of Object.entries(index.pages)) {
+        const entry = loadPageManifestEntry(path.join(pagesDir, fileName));
+        if (entry) pages[pageKey] = entry;
     }
 
     return {
@@ -173,12 +173,14 @@ export function buildPageManifestEntry(params: {
         group,
         name,
         className: artifact.className,
-        pageObjectImportPath: artifact.registryImportPath,
-        pageObjectFile: toRelative(artifact.pageObjectPath),
-        elementsFile: toRelative(artifact.elementsPath),
-        aliasesGeneratedFile: toRelative(artifact.aliasesGeneratedPath),
-        aliasesFile: toRelative(artifact.aliasesHumanPath),
-        pageMapFile: toRelative(pageMapFilePath),
+        paths: {
+            pageObjectImport: artifact.registryImportPath,
+            pageObjectFile: toRelative(artifact.pageObjectPath),
+            elementsFile: toRelative(artifact.elementsPath),
+            aliasesGeneratedFile: toRelative(artifact.aliasesGeneratedPath),
+            aliasesFile: toRelative(artifact.aliasesHumanPath),
+            pageMapFile: toRelative(pageMapFilePath),
+        },
         urlPath: pageMap.urlPath?.trim() || undefined,
         title: pageMap.title?.trim() || undefined,
         elementCount: Object.keys(pageMap.elements ?? {}).length,

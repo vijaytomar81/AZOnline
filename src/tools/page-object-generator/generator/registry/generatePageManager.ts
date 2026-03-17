@@ -22,7 +22,7 @@ function lastSegment(pageKey: string): string {
 }
 
 function buildImportLine(entry: PageManifestEntry): string {
-    return `import { ${entry.className} } from "${entry.pageObjectImportPath}";`;
+    return `import { ${entry.className} } from "${entry.paths.pageObjectImport}";`;
 }
 
 function buildEntryLine(entry: PageManifestEntry): string {

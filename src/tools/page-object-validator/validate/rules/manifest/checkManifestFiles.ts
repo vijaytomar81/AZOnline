@@ -29,28 +29,26 @@ export const checkManifestFiles: ValidationRule = {
     run(ctx) {
         const issues: ValidationIssue[] = [];
         const reportNodes: TreeNode[] = [];
-
         const manifest = loadPageManifest(ctx.manifestFile);
 
         for (const entry of Object.values(manifest.pages)) {
             const missingItems: string[] = [];
 
             const fileFields: Array<[ManifestFileField, string | undefined]> = [
-                ["pageObjectFile", entry.pageObjectFile],
-                ["elementsFile", entry.elementsFile],
-                ["aliasesGeneratedFile", entry.aliasesGeneratedFile],
-                ["aliasesFile", entry.aliasesFile],
-                ["pageMapFile", entry.pageMapFile],
+                ["pageObjectFile", entry.paths.pageObjectFile],
+                ["elementsFile", entry.paths.elementsFile],
+                ["aliasesGeneratedFile", entry.paths.aliasesGeneratedFile],
+                ["aliasesFile", entry.paths.aliasesFile],
+                ["pageMapFile", entry.paths.pageMapFile],
             ];
 
             for (const [fieldName, relPath] of fileFields) {
-                if (!relPath || typeof relPath !== "string" || !relPath.trim()) {
+                if (!relPath?.trim()) {
                     missingItems.push(fieldName);
                     continue;
                 }
 
-                const absPath = path.join(process.cwd(), relPath);
-                if (!fs.existsSync(absPath)) {
+                if (!fs.existsSync(path.join(process.cwd(), relPath))) {
                     missingItems.push(fieldName);
                 }
             }

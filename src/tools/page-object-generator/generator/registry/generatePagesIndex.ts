@@ -25,7 +25,7 @@ export function generatePagesIndexFromEntries(
         `export * from "./pageManager";`,
         ...[...entries]
             .sort((a, b) => a.pageKey.localeCompare(b.pageKey))
-            .map((entry) => `export * from "${entry.pageObjectImportPath}";`),
+            .map((entry) => `export * from "${entry.paths.pageObjectImport}";`),
     ];
 
     const lines: string[] = [];

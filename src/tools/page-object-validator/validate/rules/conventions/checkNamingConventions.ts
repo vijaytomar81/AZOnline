@@ -95,7 +95,7 @@ export const checkNamingConventions: ValidationRule = {
                     title: entry.pageKey,
                     children: [
                         {
-                            title: "page-objects.manifest.json",
+                            title: `${entry.pageKey}.json`,
                             children: [
                                 {
                                     severity: "warning",

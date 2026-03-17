@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "generatedAt": "2026-03-17T12:04:41.166Z",
-  "pageKeys": [
-    "athena.common.insurance-type-selection",
-    "athena.common.login-or-registration",
-    "athena.motor.ph-driving-licence-details"
-  ]
+  "generatedAt": "2026-03-17T12:27:13.689Z",
+  "pages": {
+    "athena.common.insurance-type-selection": "athena.common.insurance-type-selection.json",
+    "athena.common.login-or-registration": "athena.common.login-or-registration.json",
+    "athena.motor.ph-driving-licence-details": "athena.motor.ph-driving-licence-details.json"
+  }
 }

@@ -3,11 +3,7 @@
 import type { TreeNode } from "@/utils/cliTree";
 import type { RepairRule } from "../../pipeline/types";
 import type { ManifestPageEntry, PageObjectsManifest } from "../../shared/manifest";
-import {
-    buildManifest,
-    readManifest,
-    writeManifest,
-} from "../../shared/manifest";
+import { buildManifest, readManifest, writeManifest } from "../../shared/manifest";
 
 type RenamePair = {
     oldOuterKey: string;
@@ -23,7 +19,7 @@ function isSameLogicalEntry(
     return (
         oldEntry.pageKey === newEntry.pageKey &&
         oldEntry.className === newEntry.className &&
-        oldEntry.pageMapFile === newEntry.pageMapFile
+        oldEntry.paths.pageMapFile === newEntry.paths.pageMapFile
     );
 }
 
@@ -39,7 +35,6 @@ function findRenamePairs(
     for (const oldOuterKey of removedKeys) {
         for (const newOuterKey of addedKeys) {
             if (usedAdded.has(newOuterKey)) continue;
-
             if (isSameLogicalEntry(oldPages[oldOuterKey], newPages[newOuterKey])) {
                 usedAdded.add(newOuterKey);
                 pairs.push({ oldOuterKey, newOuterKey });
@@ -53,7 +48,7 @@ function findRenamePairs(
 
 function buildRenameNodes(renamePairs: RenamePair[]): TreeNode[] {
     return renamePairs.map((pair) => ({
-        title: "page-objects.manifest.json",
+        title: "index.json",
         children: [
             {
                 title: pair.newOuterKey,
@@ -90,7 +85,7 @@ function buildChangedEntryNodes(
         if (JSON.stringify(oldEntry) === JSON.stringify(newEntry)) continue;
 
         nodes.push({
-            title: "page-objects.manifest.json",
+            title: `${pageKey}.json`,
             children: [
                 {
                     title: pageKey,
@@ -127,9 +122,10 @@ function buildManifestRepairReport(
         ...renamePairs.map((x) => x.newOuterKey),
     ]);
 
-    const renameNodes = buildRenameNodes(renamePairs);
-    const changedNodes = buildChangedEntryNodes(oldPages, newPages, consumed);
-    const reportNodes = [...renameNodes, ...changedNodes];
+    const reportNodes = [
+        ...buildRenameNodes(renamePairs),
+        ...buildChangedEntryNodes(oldPages, newPages, consumed),
+    ];
 
     return {
         repairedPages: reportNodes.length,
@@ -139,7 +135,7 @@ function buildManifestRepairReport(
 
 export const repairManifest: RepairRule = {
     id: "repair.manifest",
-    description: "Repair page-objects.manifest.json from page maps and generated artifacts",
+    description: "Repair manifest from page maps and generated artifacts",
     run(ctx) {
         const oldManifest = readManifest(ctx.manifestFile);
         const newManifest = buildManifest(ctx.pageObjectsDir, ctx.mapsDir);

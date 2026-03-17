@@ -24,8 +24,7 @@ function manifestFileName(manifestFile: string): string {
 function normalizeValue(value: unknown): string {
     if (value === undefined) return "undefined";
     if (value === null) return "null";
-    if (typeof value === "string") return value;
-    return JSON.stringify(value);
+    return typeof value === "string" ? value : JSON.stringify(value);
 }
 
 function mismatchText(field: string, actualValue: unknown, expectedValue: unknown): string {
@@ -38,7 +37,6 @@ export const checkManifestAgainstPageMap: ValidationRule = {
     run(ctx) {
         const issues: ValidationIssue[] = [];
         const reportNodes: TreeNode[] = [];
-
         const manifest = loadPageManifest(ctx.manifestFile);
         const validPageKeys = new Set<string>();
 
@@ -47,7 +45,6 @@ export const checkManifestAgainstPageMap: ValidationRule = {
 
             const entry = manifest.pages[item.pageMap.pageKey];
             const artifact = getPageArtifactPaths(ctx.pageObjectsDir, item.pageMap.pageKey);
-
             const missingItems: string[] = [];
             const mismatchItems: string[] = [];
 
@@ -63,49 +60,49 @@ export const checkManifestAgainstPageMap: ValidationRule = {
                 });
             } else {
                 if (entry.className !== artifact.className) {
+                    mismatchItems.push(mismatchText("className", entry.className, artifact.className));
+                }
+
+                if (entry.paths.pageObjectImport !== `@page-objects/${item.pageMap.pageKey.split(".").join("/")}/${artifact.className}`) {
                     mismatchItems.push(
-                        mismatchText("className", entry.className, artifact.className)
+                        mismatchText(
+                            "paths.pageObjectImport",
+                            entry.paths.pageObjectImport,
+                            `@page-objects/${item.pageMap.pageKey.split(".").join("/")}/${artifact.className}`
+                        )
                     );
                 }
 
                 const expectedElementCount = Object.keys(item.pageMap.elements ?? {}).length;
                 if (entry.elementCount !== expectedElementCount) {
-                    mismatchItems.push(
-                        mismatchText("elementCount", entry.elementCount, expectedElementCount)
-                    );
+                    mismatchItems.push(mismatchText("elementCount", entry.elementCount, expectedElementCount));
                 }
 
-                const expectedUrlPath = item.pageMap.urlPath ?? undefined;
-                if ((entry.urlPath ?? undefined) !== expectedUrlPath) {
-                    mismatchItems.push(
-                        mismatchText("urlPath", entry.urlPath, expectedUrlPath)
-                    );
+                if ((entry.urlPath ?? undefined) !== (item.pageMap.urlPath ?? undefined)) {
+                    mismatchItems.push(mismatchText("urlPath", entry.urlPath, item.pageMap.urlPath));
                 }
 
-                const expectedTitle = item.pageMap.title ?? undefined;
-                if ((entry.title ?? undefined) !== expectedTitle) {
-                    mismatchItems.push(
-                        mismatchText("title", entry.title, expectedTitle)
-                    );
-                }
-
-                if (mismatchItems.length > 0) {
-                    issues.push({
-                        ruleId: this.id,
-                        severity: "WARN",
-                        issueLabel: "Mismatch",
-                        message: formatMismatchList(mismatchItems),
-                        pageKey: item.pageMap.pageKey,
-                        filePath: ctx.manifestFile,
-                    });
+                if ((entry.title ?? undefined) !== (item.pageMap.title ?? undefined)) {
+                    mismatchItems.push(mismatchText("title", entry.title, item.pageMap.title));
                 }
             }
 
+            if (mismatchItems.length > 0) {
+                issues.push({
+                    ruleId: this.id,
+                    severity: "WARN",
+                    issueLabel: "Mismatch",
+                    message: formatMismatchList(mismatchItems),
+                    pageKey: item.pageMap.pageKey,
+                    filePath: ctx.manifestFile,
+                });
+            }
+
             if (missingItems.length > 0 || mismatchItems.length > 0) {
-                const issueChildren: TreeNode[] = [];
+                const children: TreeNode[] = [];
 
                 if (missingItems.length > 0) {
-                    issueChildren.push({
+                    children.push({
                         severity: "warning",
                         title: "Missing",
                         summary: formatKeyList(missingItems),
@@ -113,7 +110,7 @@ export const checkManifestAgainstPageMap: ValidationRule = {
                 }
 
                 if (mismatchItems.length > 0) {
-                    issueChildren.push({
+                    children.push({
                         severity: "warning",
                         title: "Mismatch",
                         summary: formatMismatchList(mismatchItems),
@@ -125,17 +122,14 @@ export const checkManifestAgainstPageMap: ValidationRule = {
                     children: [
                         {
                             title: manifestFileName(ctx.manifestFile),
-                            children: issueChildren,
+                            children,
                         },
                     ],
                 });
             }
         }
 
-        const extraManifestKeys = Object.keys(manifest.pages).filter(
-            (pageKey) => !validPageKeys.has(pageKey)
-        );
-
+        const extraManifestKeys = Object.keys(manifest.pages).filter((pageKey) => !validPageKeys.has(pageKey));
         for (const pageKey of extraManifestKeys) {
             issues.push({
                 ruleId: this.id,
