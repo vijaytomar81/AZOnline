@@ -10,16 +10,15 @@ ${strong("Usage")}
 
 ${strong("Commands")}
   validate           Run validation pipeline for all page objects
-  repair             Attempt to repair generator outputs (re-run generator)
+  repair             Attempt to repair generator outputs
 
 ${strong("Options")}
-  --verbose          Show detailed rule output
-  --strict           Treat warnings as errors
-  --mapsDir <path>   Override page maps directory
-  --pageObjectsDir <path> Override page objects directory
+  --verbose                Show detailed rule output
+  --strict                 Treat warnings as errors
+  --mapsDir <path>         Override page maps directory
+  --pageObjectsDir <path>  Override page objects directory
   --pageRegistryDir <path> Override page registry directory
-  --manifestFile <path> Override page manifest file
-  --stateFile <path> Override page map state file
+  --manifestFile <path>    Override page manifest directory or index file
 
 ${strong("Examples")}
   ${info("# run validator")}
@@ -30,9 +29,6 @@ ${strong("Examples")}
 
   ${info("# strict mode (warnings fail build)")}
   npm run validator -- validate --strict
-
-  ${info("# repair generator outputs")}
-  npm run validator -- repair --merge --verbose
 
 ${strong("Validation checks")}
   ${ICONS.successIcon} Environment

@@ -30,6 +30,9 @@
       ],
       "@page-objects/*": [
         "src/pages/objects/*"
+      ],
+      "@page-manifest/*": [
+        "src/pages/.manifest/*"
       ]
     }
   },

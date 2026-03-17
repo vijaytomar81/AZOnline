@@ -51,7 +51,7 @@ function extractPageManagerImports(tsText: string): Map<string, string> {
     while ((match = re.exec(tsText))) {
         const className = match[1];
         const importPath = match[2];
-        if (className && importPath.startsWith("@page-objects/")) {
+        if (className && importPath?.startsWith("@page-objects/")) {
             imports.set(importPath, className);
         }
     }

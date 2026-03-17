@@ -8,23 +8,15 @@ import {
     PAGE_MAPS_DIR,
     PAGE_OBJECTS_DIR,
     PAGE_REGISTRY_DIR,
-    PAGE_OBJECTS_MANIFEST_FILE,
-    PAGE_MAP_STATE_FILE,
+    PAGE_MANIFEST_DIR,
 } from "@/utils/paths";
-import {
-    printKeyValue,
-    printSection,
-} from "@/utils/cliFormat";
+import { printKeyValue, printSection } from "@/utils/cliFormat";
 
 import { runValidationPipeline } from "../validate/pipeline/runner";
-import {
-    printValidationExecution,
-    printValidationSummary,
-} from "../validate/report";
+import { printValidationExecution, printValidationSummary } from "../validate/report";
 
 export async function runValidateCommand(args: string[]) {
     const argv = normalizeArgv(args);
-
     const verbose = hasFlag(argv, "--verbose");
     const strict = hasFlag(argv, "--strict");
 
@@ -37,15 +29,13 @@ export async function runValidateCommand(args: string[]) {
     const mapsDir = getArg(argv, "--mapsDir") ?? PAGE_MAPS_DIR;
     const pageObjectsDir = getArg(argv, "--pageObjectsDir") ?? PAGE_OBJECTS_DIR;
     const pageRegistryDir = getArg(argv, "--pageRegistryDir") ?? PAGE_REGISTRY_DIR;
-    const manifestFile = getArg(argv, "--manifestFile") ?? PAGE_OBJECTS_MANIFEST_FILE;
-    const stateFile = getArg(argv, "--stateFile") ?? PAGE_MAP_STATE_FILE;
+    const manifestFile = getArg(argv, "--manifestFile") ?? PAGE_MANIFEST_DIR;
 
     printSection("Environment");
     printKeyValue("mapsDir", mapsDir);
     printKeyValue("pageObjectsDir", pageObjectsDir);
     printKeyValue("pageRegistryDir", pageRegistryDir);
     printKeyValue("manifestFile", manifestFile);
-    printKeyValue("stateFile", stateFile);
     printKeyValue("strict", strict);
     printKeyValue("verbose", verbose);
 
@@ -69,7 +59,6 @@ export async function runValidateCommand(args: string[]) {
         pageObjectsDir,
         pageRegistryDir,
         manifestFile,
-        stateFile,
         verbose,
         strict,
         log,

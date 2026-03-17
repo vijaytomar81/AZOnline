@@ -1,29 +1,25 @@
+<!-- src/tools/page-object-generator/README.md -->
+
 # Page Elements Generator
 
-The generator converts page-map JSON files into automation-ready page objects.
+The generator converts page-map JSON files into automation-ready page objects and keeps the page chain aligned incrementally.
 
----
-
-# Generated Files
+## Generated Files
 
 | File | Purpose |
-|----|----|
-| elements.ts | selectors |
-| aliases.generated.ts | generated aliases |
-| aliases.ts | business aliases |
-| PageObject.ts | page methods |
+|---|---|
+| elements.ts | selectors and stableKey-aware element definitions |
+| aliases.generated.ts | generated alias layer from elements.ts |
+| aliases.ts | business alias layer, safe to edit |
+| PageObject.ts | page methods synced from aliases.ts |
 
----
-
-# Generation Flow
+## Generation Flow
 
 ```mermaid
 flowchart TD
-
-PageMap --> Elements
-PageMap --> GeneratedAliases
-PageMap --> BusinessAliases
-PageMap --> PageObject
-
-BusinessAliases --> PageObject
-GeneratedAliases --> BusinessAliases
+    PageMap --> Elements
+    Elements --> GeneratedAliases
+    GeneratedAliases --> BusinessAliases
+    BusinessAliases --> PageObject
+    Manifest --> ChangedOnly
+    PageMap --> Manifest

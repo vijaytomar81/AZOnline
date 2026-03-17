@@ -1,10 +1,38 @@
 // src/tools/page-object-generator/builders/buildElementsTs.ts
 
-import type { PageMap } from "../generator/types";
+import type { PageMap, PageMapElement } from "../generator/types";
 import { escapeTsString, isValidTsIdentifier } from "../../../utils/ts";
 
+type ElementEntry = {
+    key: string;
+    value: PageMapElement;
+};
+
+function prop(key: string): string {
+    return isValidTsIdentifier(key) ? key : JSON.stringify(key);
+}
+
+function renderEntry(entry: ElementEntry): string[] {
+    const { key, value } = entry;
+    const fallbacks = Array.isArray(value.fallbacks) ? value.fallbacks : [];
+    const items = fallbacks.map((f) => `"${escapeTsString(f)}"`).join(", ");
+    const lines: string[] = [];
+
+    lines.push(`  ${prop(key)}: {`);
+    lines.push(`    type: "${escapeTsString(value.type)}",`);
+    lines.push(`    preferred: "${escapeTsString(value.preferred)}",`);
+    lines.push(`    fallbacks: [${items}],`);
+
+    if (value.stableKey) {
+        lines.push(`    stableKey: "${escapeTsString(value.stableKey)}",`);
+    }
+
+    lines.push(`  },`);
+    return lines;
+}
+
 export function buildElementsTs(pageMap: PageMap): string {
-    
+    const entries = Object.entries(pageMap.elements).map(([key, value]) => ({ key, value }));
     const lines: string[] = [];
 
     lines.push(`// src/pages/objects/${pageMap.pageKey.split(".").join("/")}/elements.ts`);
@@ -16,29 +44,13 @@ export function buildElementsTs(pageMap: PageMap): string {
     lines.push(`  type: string;`);
     lines.push(`  preferred: string;`);
     lines.push(`  fallbacks: readonly string[];`);
+    lines.push(`  stableKey?: string;`);
     lines.push(`};`);
     lines.push(``);
     lines.push(`export const elements = {`);
 
-    // Stable order (nice diffs)
-    const entries = Object.entries(pageMap.elements).sort(([a], [b]) => a.localeCompare(b));
-
-    for (const [key, v] of entries) {
-        const prop = isValidTsIdentifier(key) ? key : JSON.stringify(key);
-
-        lines.push(`  ${prop}: {`);
-        lines.push(`    type: "${escapeTsString(v.type)}",`);
-        lines.push(`    preferred: "${escapeTsString(v.preferred)}",`);
-
-        const fallbacks = Array.isArray(v.fallbacks) ? v.fallbacks : [];
-        if (fallbacks.length) {
-            const items = fallbacks.map((f) => `"${escapeTsString(f)}"`).join(", ");
-            lines.push(`    fallbacks: [${items}],`);
-        } else {
-            lines.push(`    fallbacks: [],`);
-        }
-
-        lines.push(`  },`);
+    for (const entry of entries) {
+        lines.push(...renderEntry(entry));
     }
 
     lines.push(`} as const;`);

@@ -24,10 +24,6 @@
     "generator:elements:verbose": "npm run generator -- generate --merge --verbose",
     "generator:elements:changed": "npm run generator -- generate --changedOnly --merge",
     "generator:elements:changed:verbose": "npm run generator -- generate --changedOnly --merge --verbose",
-    "generator:elements:noScaffold": "npm run generator -- generate --merge --noScaffold",
-    "generator:elements:changed:noScaffold": "npm run generator -- generate --changedOnly --merge --noScaffold",
-    "generator:hashes": "npm run generator -- generate --stateOnly --verbose",
-    "generator:hashes:changed": "npm run generator -- generate --changedOnly --stateOnly --verbose",
     "generator:help": "npm run generator -- help",
 
     "validator": "node -r ts-node/register -r tsconfig-paths/register src/tools/page-object-validator/cli.ts",

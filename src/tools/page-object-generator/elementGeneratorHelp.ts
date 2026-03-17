@@ -1,84 +1,56 @@
 // src/tools/page-object-generator/elementGeneratorHelp.ts
 
 export function usage(): string {
-    return `
+  return `
 Page Elements Generator CLI
 
 Usage:
-  npm run generate -- [options]
-  node -r ts-node/register src/page-elements-generator/cli.ts [options]
+  npm run generator -- generate [options]
 
 Description:
-  Generates:
+  Generates and incrementally syncs:
     - elements.ts
     - aliases.generated.ts
-    - aliases.ts (create-only)
-    - <PageName>Page.ts (create-only stub)
+    - aliases.ts
+    - <PageName>Page.ts
   from page-map JSON files.
 
-------------------------------------------------------------
 Options
 
-  --mapsDir <path>       Page-maps directory
-                         (default: src/page-scanner/page-maps)
+  --mapsDir <path>         Page-maps directory
+                           (default: src/pages/maps)
 
-  --pagesDir <path>      Pages output directory
-                         (default: src/pages)
+  --pageObjectsDir <path>  Page objects output directory
+                           (default: src/pages/objects)
 
-  --stateDir <path>      State directory (hash cache)
-                         (default: src/page-elements-generator/.state)
+  --pageRegistryDir <path> Page registry directory
+                           (default: src/pages)
 
-  --stateFile <path>     State file path
-                         (default: <stateDir>/page-maps-state.json)
+  --merge                  Incremental merge/update mode
 
-  --merge                Overwrite-safe generation (normal mode)
+  --changedOnly            Only process page-maps whose hash differs
+                           from src/pages/.manifest/pages/<pageKey>.json
 
-  --changedOnly          Only process page-maps whose JSON changed
-                         (still repairs missing outputs & resyncs)
+  --verbose                Enable debug logging
 
-  --stateOnly            Only update state hashes (no elements.ts writes)
+  --logToFile              Write logs to file
 
-  --noScaffold           Do NOT create create-only files
-                         (aliases.ts / Page.ts stubs)
+  --logFilePath <path>     Custom log file path
 
-  --verbose              Enable debug logging
+  --help, -h               Show this help
 
-  --logToFile            Write logs to file
-
-  --logFilePath <path>   Custom log file path
-                         (default: page-elements-generator.log)
-
-  --help, -h             Show this help
-
-------------------------------------------------------------
 Examples
 
-  # Normal generation
-  npm run generate -- --merge
+  npm run generator:elements
+  npm run generator:elements:verbose
+  npm run generator:elements:changed
+  npm run generator:elements:changed:verbose
 
-  # Verbose
-  npm run generate -- --merge --verbose
-
-  # Only changed page-maps
-  npm run generate -- --changedOnly --merge --verbose
-
-  # Only update hash state
-  npm run generate -- --stateOnly --verbose
-
-  # Custom directories
-  npm run generate -- --mapsDir ./custom-maps --pagesDir ./custom-pages
-
-------------------------------------------------------------
 Notes
 
-  - Default page-maps location:
-      src/page-scanner/page-maps
-
-  - State (hash cache) is stored in:
-      src/page-elements-generator/.state
-
-  - --changedOnly still recreates missing outputs and
-    resyncs page objects if aliases.ts changed.
-
+  - Change detection uses manifest page files, not a state file.
+  - elements.ts includes stableKey when present in page-map.
+  - aliases.ts preserves business-friendly LHS alias names.
+  - PageObject.ts syncs managed methods from aliases.ts.
 `.trim();
 }

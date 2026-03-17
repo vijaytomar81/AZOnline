@@ -23,56 +23,64 @@ export const PAGE_REGISTRY_DIR = PAGES_DIR;
  * Page manifest
  */
 export const PAGE_MANIFEST_DIR = path.join(PAGES_DIR, ".manifest");
-export const PAGE_OBJECTS_MANIFEST_FILE = path.join(
+export const PAGE_MANIFEST_INDEX_FILE = path.join(
     PAGE_MANIFEST_DIR,
-    "page-objects.manifest.json"
+    "index.json"
+);
+export const PAGE_MANIFEST_PAGES_DIR = path.join(
+    PAGE_MANIFEST_DIR,
+    "pages"
 );
 
 /**
- * Page generator state
- */
-export const PAGE_MAP_STATE_DIR = path.join(PAGES_DIR, ".state");
-export const PAGE_MAP_STATE_FILE = path.join(
-    PAGE_MAP_STATE_DIR,
-    "page-maps-state.json"
-);
-
-/**
- * Page Scanner
+ * Tool directories
  */
 export const PAGE_SCANNER_DIR = path.join(
     SRC_DIR,
     "tools",
     "page-scanner"
 );
-
-/**
- * Page Elements Generator
- */
-export const PAGE_ELEMENTS_GENERATOR_DIR = path.join(
+export const PAGE_OBJECT_GENERATOR_DIR = path.join(
     SRC_DIR,
     "tools",
-    "page-elements-generator"
+    "page-object-generator"
+);
+export const PAGE_OBJECT_VALIDATOR_DIR = path.join(
+    SRC_DIR,
+    "tools",
+    "page-object-validator"
+);
+export const PAGE_OBJECT_REPAIR_DIR = path.join(
+    SRC_DIR,
+    "tools",
+    "page-object-repair"
 );
 
 /**
  * Data Builder
  */
 export const DATA_BUILDER_DIR = path.join(SRC_DIR, "data", "data-builder");
-export const DATA_BUILDER_PLUGINS_DIR = path.join(DATA_BUILDER_DIR, "plugins");
+export const DATA_BUILDER_PLUGINS_DIR = path.join(
+    DATA_BUILDER_DIR,
+    "plugins"
+);
 export const DATA_GENERATED_DIR = path.join(SRC_DIR, "data", "generated");
 
 /**
  * Log files
  */
 export const PAGE_SCANNER_LOG_FILE = path.join(ROOT, "page-scanner.log");
-export const PAGE_ELEMENTS_GENERATOR_LOG_FILE = path.join(
+export const PAGE_OBJECT_GENERATOR_LOG_FILE = path.join(
     ROOT,
-    "page-elements-generator.log"
+    "page-object-generator.log"
 );
-export const PAGE_ELEMENTS_VALIDATOR_LOG_FILE = path.join(
+export const PAGE_OBJECT_VALIDATOR_LOG_FILE = path.join(
     ROOT,
-    "page-elements-validator.log"
+    "page-object-validator.log"
+);
+export const PAGE_OBJECT_REPAIR_LOG_FILE = path.join(
+    ROOT,
+    "page-object-repair.log"
 );
 export const DATA_BUILDER_LOG_FILE = path.join(ROOT, "data-builder.log");
 
@@ -84,9 +92,5 @@ export const DATA_BUILDER_LOG_FILE = path.join(ROOT, "data-builder.log");
  * → src/pages/a.ts
  */
 export function toRepoRelative(filePath: string): string {
-    const cwd = process.cwd();
-
-    const relative = path.relative(cwd, filePath);
-
-    return relative.replace(/\\/g, "/");
+    return path.relative(ROOT, filePath).replace(/\\/g, "/");
 }

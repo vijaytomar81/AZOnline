@@ -1,9 +1,7 @@
 // src/pages/index.ts
-export { PageManager } from "./pageManager";
+// AUTO-GENERATED from src/pages/.manifest/
 
-// Export individual pages too (optional, but useful sometimes)
-
-
+export * from "./pageManager";
 export * from "@page-objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage";
 export * from "@page-objects/athena/common/login-or-registration/LoginOrRegistrationPage";
 export * from "@page-objects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage";

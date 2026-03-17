@@ -1,13 +1,15 @@
 // src/tools/page-object-generator/generator/registry/index.ts
 
-import { PAGE_OBJECTS_MANIFEST_FILE } from "@/utils/paths";
-import { loadPageManifest, type PageObjectsManifest } from "../pageManifest";
+import path from "node:path";
+
+import type { PageManifestEntry } from "../pageManifest";
+import { loadManifestIndex, loadPageManifestEntry } from "../pageManifest";
 import {
-    generatePagesIndexFromManifest,
+    generatePagesIndexFromEntries,
     type GeneratePagesIndexResult,
 } from "./generatePagesIndex";
 import {
-    generatePageManagerFromManifest,
+    generatePageManagerFromEntries,
     type GeneratePageManagerResult,
 } from "./generatePageManager";
 
@@ -21,15 +23,25 @@ export type SyncPageRegistryResult = {
     pageManager: GeneratePageManagerResult;
 };
 
+function loadManifestEntries(manifestDir: string): PageManifestEntry[] {
+    const index = loadManifestIndex(path.join(manifestDir, "index.json"));
+    const pagesDir = path.join(manifestDir, "pages");
+
+    return index.pageKeys
+        .map((pageKey) => loadPageManifestEntry(path.join(pagesDir, `${pageKey}.json`)))
+        .filter((entry): entry is PageManifestEntry => Boolean(entry))
+        .sort((a, b) => a.pageKey.localeCompare(b.pageKey));
+}
+
 export function generatePageRegistryFromManifest(
-    manifestFilePath = PAGE_OBJECTS_MANIFEST_FILE,
+    manifestDir: string,
     pagesDir?: string
 ): SyncPageRegistryResult {
-    const manifest: PageObjectsManifest = loadPageManifest(manifestFilePath);
+    const entries = loadManifestEntries(manifestDir);
 
     return {
-        index: generatePagesIndexFromManifest(manifest, pagesDir),
-        pageManager: generatePageManagerFromManifest(manifest, pagesDir),
+        index: generatePagesIndexFromEntries(entries, pagesDir),
+        pageManager: generatePageManagerFromEntries(entries, pagesDir),
     };
 }
 

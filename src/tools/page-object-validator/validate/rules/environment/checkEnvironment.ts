@@ -74,32 +74,6 @@ export const checkEnvironment: ValidationRule = {
             });
         }
 
-        if (ctx.stateFile && !fs.existsSync(ctx.stateFile)) {
-            issues.push({
-                ruleId: this.id,
-                severity: "WARN",
-                issueLabel: "Missing",
-                message: "[stateFile]",
-                filePath: ctx.stateFile,
-            });
-
-            reportNodes.push({
-                title: "state",
-                children: [
-                    {
-                        title: ctx.stateFile,
-                        children: [
-                            {
-                                severity: "warning",
-                                title: "Missing",
-                                summary: "[stateFile]",
-                            },
-                        ],
-                    },
-                ],
-            });
-        }
-
         if (fs.existsSync(ctx.mapsDir) && listPageMapFiles(ctx.mapsDir).length === 0) {
             issues.push({
                 ruleId: this.id,

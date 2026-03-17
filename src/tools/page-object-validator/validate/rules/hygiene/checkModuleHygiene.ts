@@ -7,6 +7,20 @@ import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
 import { getIndexFile, getPageManagerFile } from "../../../../page-object-common/pagePaths";
 
+function hasPageManagerExport(indexTs: string): boolean {
+    return (
+        indexTs.includes(`export { PageManager } from "./pageManager";`) ||
+        indexTs.includes(`export * from "./pageManager";`)
+    );
+}
+
+function hasPageObjectExport(indexTs: string): boolean {
+    return (
+        indexTs.includes(`export * from "@page-objects/`) ||
+        indexTs.includes(`export * from "./objects/`)
+    );
+}
+
 export const checkModuleHygiene: ValidationRule = {
     id: "hygiene.checkModuleHygiene",
     description: "Validate registry module hygiene and expected structure",
@@ -20,7 +34,7 @@ export const checkModuleHygiene: ValidationRule = {
             const indexTs = fs.readFileSync(indexFile, "utf8");
             const missingItems: string[] = [];
 
-            if (!indexTs.includes(`export { PageManager } from "./pageManager";`)) {
+            if (!hasPageManagerExport(indexTs)) {
                 missingItems.push("PageManagerExport");
                 issues.push({
                     ruleId: this.id,
@@ -31,7 +45,7 @@ export const checkModuleHygiene: ValidationRule = {
                 });
             }
 
-            if (!indexTs.includes(`export * from "@page-objects/`)) {
+            if (!hasPageObjectExport(indexTs)) {
                 missingItems.push("PageObjectExport");
                 issues.push({
                     ruleId: this.id,

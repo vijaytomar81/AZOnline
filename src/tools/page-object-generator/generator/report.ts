@@ -20,7 +20,6 @@ export type RepairRunReport = {
     pagesChanged: number;
     filesGenerated: number;
     registryUpdates: number;
-    stateUpdated: boolean;
     pageReports: RepairPageReport[];
 };
 
@@ -62,13 +61,13 @@ export function applyRegistryStatusToReports(
     for (const report of pageReports) {
         const pagePath = report.pageKey.split(".").join("/");
         const memberCamel = toMemberCamel(report.pageKey);
-        const group = report.pageKey.split(".")[0] || "common";
-        const entrySnippet = `${memberCamel}: this.get("${group}.${memberCamel}"`;
+        const product = report.pageKey.split(".")[0] || "common";
+        const entrySnippet = `${memberCamel}: this.get("${product}.${memberCamel}"`;
 
         const addedToIndex = addedIndexPaths.has(pagePath);
         const addedToManager =
             addedManagerImports.has(pagePath) ||
-            Array.from(addedManagerEntries).some((line) => line.includes(entrySnippet));
+            [...addedManagerEntries].some((line) => line.includes(entrySnippet));
 
         if (addedToIndex && addedToManager) {
             report.registryStatus = "added-to-both";
@@ -90,7 +89,7 @@ export function buildRunSummary(params: {
     pagesScanned: number;
     pageReports: RepairPageReport[];
     syncRes: SyncPageRegistryResult;
-}): Omit<RepairRunReport, "stateUpdated"> {
+}): RepairRunReport {
     const { pagesScanned, pageReports, syncRes } = params;
 
     const pagesChanged = pageReports.filter((r) => r.changed).length;

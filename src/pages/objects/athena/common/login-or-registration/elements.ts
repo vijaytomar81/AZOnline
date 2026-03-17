@@ -7,6 +7,7 @@ export type ElementDef = {
   type: string;
   preferred: string;
   fallbacks: readonly string[];
+  stableKey?: string;
 };
 
 export const elements = {

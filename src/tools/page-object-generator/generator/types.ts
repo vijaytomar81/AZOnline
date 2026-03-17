@@ -1,5 +1,15 @@
 // src/tools/page-object-generator/generator/types.ts
+
 import type { Logger } from "@/utils/logger";
+
+export type PageMapElement = {
+    type: string;
+    preferred: string;
+    fallbacks: string[];
+    meta?: unknown;
+    stableKey?: string;
+    options?: Record<string, string>;
+};
 
 export type PageMap = {
     pageKey: string;
@@ -7,30 +17,15 @@ export type PageMap = {
     url?: string;
     urlPath?: string;
     title?: string;
-    elements: Record<
-        string,
-        {
-            type: string;
-            preferred: string;
-            fallbacks: string[];
-            meta?: any;
-        }
-    >;
+    elements: Record<string, PageMapElement>;
 };
 
 export type GenOptions = {
     mapsDir: string;
     pageObjectsDir: string;
     pageRegistryDir: string;
-    stateDir?: string;
-    stateFile?: string;
     merge?: boolean;
     changedOnly?: boolean;
-    stateOnly?: boolean;
-    scaffold?: boolean;
-    scaffoldIfMissing?: boolean;
     verbose?: boolean;
     log: Logger;
 };
-
-export type StateFile = Record<string, string>;

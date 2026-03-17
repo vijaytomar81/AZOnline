@@ -13,19 +13,23 @@ export type PageManifestEntry = {
     group: string;
     name: string;
     className: string;
-
     pageObjectImportPath: string;
     pageObjectFile: string;
     elementsFile: string;
     aliasesGeneratedFile: string;
     aliasesFile: string;
     pageMapFile: string;
-
     urlPath?: string;
     title?: string;
     elementCount: number;
     scannedAt?: string;
     mapHash: string;
+};
+
+export type ManifestIndex = {
+    version: 1;
+    generatedAt: string;
+    pageKeys: string[];
 };
 
 export type PageObjectsManifest = {
@@ -34,55 +38,124 @@ export type PageObjectsManifest = {
     pages: Record<string, PageManifestEntry>;
 };
 
-function relativeToRepo(absPath: string): string {
+function toRelative(absPath: string): string {
     return path.relative(process.cwd(), absPath).replace(/\\/g, "/");
 }
 
-function splitPageKey(pageKey: string): {
-    product: string;
-    group: string;
-    name: string;
-} {
+function splitPageKey(pageKey: string) {
     const parts = pageKey.split(".");
-
     return {
         product: parts[0] || "unknown",
         group: parts[1] || "common",
-        name: parts.slice(2).join(".") || parts.slice(-1)[0] || "page",
+        name: parts.slice(2).join(".") || "page",
     };
 }
 
-export function createEmptyPageManifest(): PageObjectsManifest {
+function emptyIndex(): ManifestIndex {
+    return { version: 1, generatedAt: new Date().toISOString(), pageKeys: [] };
+}
+
+function emptyManifest(): PageObjectsManifest {
+    return { version: 1, generatedAt: new Date().toISOString(), pages: {} };
+}
+
+function manifestPaths(inputPath: string): { indexFile: string; pagesDir: string } {
+    if (inputPath.endsWith(".json")) {
+        return {
+            indexFile: inputPath,
+            pagesDir: path.join(path.dirname(inputPath), "pages"),
+        };
+    }
+
     return {
-        version: 1,
-        generatedAt: new Date().toISOString(),
-        pages: {},
+        indexFile: path.join(inputPath, "index.json"),
+        pagesDir: path.join(inputPath, "pages"),
     };
 }
 
-export function loadPageManifest(filePath: string): PageObjectsManifest {
-    if (!fs.existsSync(filePath)) {
-        return createEmptyPageManifest();
+export function pageKeyToManifestFile(manifestPagesDir: string, pageKey: string): string {
+    return path.join(manifestPagesDir, `${pageKey}.json`);
+}
+
+export function loadManifestIndex(indexFile: string): ManifestIndex {
+    if (!fs.existsSync(indexFile)) {
+        return emptyIndex();
     }
 
     try {
-        const raw = fs.readFileSync(filePath, "utf8");
-        const parsed = JSON.parse(raw) as Partial<PageObjectsManifest>;
-
+        const parsed = JSON.parse(fs.readFileSync(indexFile, "utf8")) as Partial<ManifestIndex>;
         return {
             version: 1,
-            generatedAt:
-                typeof parsed.generatedAt === "string"
-                    ? parsed.generatedAt
-                    : new Date().toISOString(),
-            pages:
-                parsed.pages && typeof parsed.pages === "object"
-                    ? (parsed.pages as Record<string, PageManifestEntry>)
-                    : {},
+            generatedAt: typeof parsed.generatedAt === "string" ? parsed.generatedAt : new Date().toISOString(),
+            pageKeys: Array.isArray(parsed.pageKeys) ? [...parsed.pageKeys] : [],
         };
     } catch {
-        return createEmptyPageManifest();
+        return emptyIndex();
     }
+}
+
+export function saveManifestIndex(indexFile: string, pageKeys: string[]): void {
+    ensureDir(path.dirname(indexFile));
+
+    const next: ManifestIndex = {
+        version: 1,
+        generatedAt: new Date().toISOString(),
+        pageKeys: [...pageKeys].sort((a, b) => a.localeCompare(b)),
+    };
+
+    fs.writeFileSync(indexFile, JSON.stringify(next, null, 2), "utf8");
+}
+
+export function loadPageManifestEntry(filePath: string): PageManifestEntry | null {
+    if (!fs.existsSync(filePath)) return null;
+
+    try {
+        return JSON.parse(fs.readFileSync(filePath, "utf8")) as PageManifestEntry;
+    } catch {
+        return null;
+    }
+}
+
+export function loadPageManifest(inputPath: string): PageObjectsManifest {
+    const { indexFile, pagesDir } = manifestPaths(inputPath);
+    const index = loadManifestIndex(indexFile);
+    const pages: Record<string, PageManifestEntry> = {};
+
+    for (const pageKey of index.pageKeys) {
+        const entry = loadPageManifestEntry(pageKeyToManifestFile(pagesDir, pageKey));
+        if (entry) {
+            pages[pageKey] = entry;
+        }
+    }
+
+    return {
+        version: 1,
+        generatedAt: index.generatedAt,
+        pages,
+    };
+}
+
+export function savePageManifestEntry(filePath: string, entry: PageManifestEntry): void {
+    ensureDir(path.dirname(filePath));
+    fs.writeFileSync(filePath, JSON.stringify(entry, null, 2), "utf8");
+}
+
+export function removeMissingPageManifestEntries(manifestPagesDir: string, validPageKeys: string[]): number {
+    ensureDir(manifestPagesDir);
+    const valid = new Set(validPageKeys);
+    let removed = 0;
+
+    for (const file of fs.readdirSync(manifestPagesDir)) {
+        if (!file.endsWith(".json")) continue;
+        const pageKey = file.slice(0, -5);
+
+        if (!valid.has(pageKey)) {
+            fs.unlinkSync(path.join(manifestPagesDir, file));
+            removed++;
+        }
+    }
+
+    return removed;
 }
 
 export function buildPageManifestEntry(params: {
@@ -100,77 +173,16 @@ export function buildPageManifestEntry(params: {
         group,
         name,
         className: artifact.className,
-
         pageObjectImportPath: artifact.registryImportPath,
-        pageObjectFile: relativeToRepo(artifact.pageObjectPath),
-        elementsFile: relativeToRepo(artifact.elementsPath),
-        aliasesGeneratedFile: relativeToRepo(artifact.aliasesGeneratedPath),
-        aliasesFile: relativeToRepo(artifact.aliasesHumanPath),
-        pageMapFile: relativeToRepo(pageMapFilePath),
-
-        urlPath:
-            typeof pageMap.urlPath === "string" && pageMap.urlPath.trim()
-                ? pageMap.urlPath.trim()
-                : undefined,
-
-        title:
-            typeof pageMap.title === "string" && pageMap.title.trim()
-                ? pageMap.title.trim()
-                : undefined,
-
+        pageObjectFile: toRelative(artifact.pageObjectPath),
+        elementsFile: toRelative(artifact.elementsPath),
+        aliasesGeneratedFile: toRelative(artifact.aliasesGeneratedPath),
+        aliasesFile: toRelative(artifact.aliasesHumanPath),
+        pageMapFile: toRelative(pageMapFilePath),
+        urlPath: pageMap.urlPath?.trim() || undefined,
+        title: pageMap.title?.trim() || undefined,
         elementCount: Object.keys(pageMap.elements ?? {}).length,
-
-        scannedAt:
-            typeof pageMap.scannedAt === "string" && pageMap.scannedAt.trim()
-                ? pageMap.scannedAt.trim()
-                : undefined,
-
+        scannedAt: pageMap.scannedAt?.trim() || undefined,
         mapHash,
     };
-}
-
-export function upsertPageManifestEntry(params: {
-    manifest: PageObjectsManifest;
-    entry: PageManifestEntry;
-}): void {
-    const { manifest, entry } = params;
-    manifest.pages[entry.pageKey] = entry;
-}
-
-export function removeMissingPagesFromManifest(params: {
-    manifest: PageObjectsManifest;
-    validPageKeys: string[];
-}): number {
-    const { manifest, validPageKeys } = params;
-    const valid = new Set(validPageKeys);
-
-    let removed = 0;
-
-    for (const existingKey of Object.keys(manifest.pages)) {
-        if (!valid.has(existingKey)) {
-            delete manifest.pages[existingKey];
-            removed++;
-        }
-    }
-
-    return removed;
-}
-
-export function savePageManifest(
-    filePath: string,
-    manifest: PageObjectsManifest
-): void {
-    ensureDir(path.dirname(filePath));
-
-    const sortedPages = Object.fromEntries(
-        Object.entries(manifest.pages).sort(([a], [b]) => a.localeCompare(b))
-    );
-
-    const next: PageObjectsManifest = {
-        version: 1,
-        generatedAt: new Date().toISOString(),
-        pages: sortedPages,
-    };
-
-    fs.writeFileSync(filePath, JSON.stringify(next, null, 2), "utf8");
 }

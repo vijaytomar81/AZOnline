@@ -1,4 +1,5 @@
 // src/tools/page-object-generator/generator/pageArtifact.ts
+
 import path from "node:path";
 
 import { toPascal } from "@/utils/ts";
@@ -7,12 +8,10 @@ export type PageArtifact = {
     pageKey: string;
     className: string;
     folderPath: string;
-
     elementsPath: string;
     aliasesGeneratedPath: string;
     aliasesHumanPath: string;
     pageObjectPath: string;
-
     registryImportPath: string;
 };
 
@@ -32,12 +31,10 @@ export function buildPageArtifact(pageObjectsDir: string, pageKey: string): Page
         pageKey,
         className,
         folderPath,
-
         elementsPath: path.join(folderPath, "elements.ts"),
         aliasesGeneratedPath: path.join(folderPath, "aliases.generated.ts"),
         aliasesHumanPath: path.join(folderPath, "aliases.ts"),
         pageObjectPath: path.join(folderPath, `${className}.ts`),
-
         registryImportPath: `@page-objects/${pageKey.split(".").join("/")}/${className}`,
     };
 }

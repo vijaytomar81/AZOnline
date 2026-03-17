@@ -14,7 +14,6 @@ export type ValidationContext = {
     pageObjectsDir: string;
     pageRegistryDir: string;
     manifestFile: string;
-    stateFile?: string;
     verbose?: boolean;
     strict?: boolean;
     profile?: ValidationProfile;

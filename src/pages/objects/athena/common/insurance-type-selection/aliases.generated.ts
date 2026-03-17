@@ -5,16 +5,14 @@
 
 import type { ElementKey } from "./elements";
 
-// Page metadata (used for waitForURL / assertions)
 export const pageMeta = {
   pageKey: "athena.common.insurance-type-selection",
   urlPath: "/products",
-  urlRe: /\/[a-z0-9]+/i,
+  urlRe: /^\/products$/i,
   title: "Get a new quote or view saved quotes",
   titleRe: new RegExp("Get a new quote or view saved quotes", "i"),
 } as const;
 
-// Default alias mapping: alias key == element key
 export const aliasesGenerated = {
   buttonInputBack: "buttonInputBack" as ElementKey,
   linkCarQuote: "linkCarQuote" as ElementKey,

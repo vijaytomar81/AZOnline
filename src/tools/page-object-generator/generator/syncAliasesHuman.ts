@@ -3,140 +3,60 @@
 import fs from "node:fs";
 
 import type { Logger } from "@/utils/logger";
-import type { PageMap } from "./types";
-import { isValidTsIdentifier } from "@/utils/ts";
-import {
-    extractAliasKeysFromAliasesTs,
-    extractAliasesObjectBody,
-    extractMappedElementKeysFromAliasesTs,
-    parseAliasEntryLine,
-    toPropertyAccess,
-} from "./aliasParser/shared";
+import { toPropertyAccess } from "./aliasParser/shared";
 
-function removeStaleAliases(params: {
-    aliasesHumanPath: string;
-    pageMap: PageMap;
-    verbose?: boolean;
-    log: Logger;
-}): boolean {
-    const { aliasesHumanPath, pageMap, verbose, log } = params;
+function replaceGeneratedRhs(line: string, oldKey: string, newKey: string): string {
+    const dot = new RegExp(`\\baliasesGenerated\\.${oldKey}\\b`, "g");
+    const bracket = new RegExp(`\\baliasesGenerated\$begin:math:display$\(\?\:\"\$\{oldKey\}\"\|\'\$\{oldKey\}\'\)\\$end:math:display$`, "g");
+    return line.replace(dot, toPropertyAccess("aliasesGenerated", newKey)).replace(bracket, toPropertyAccess("aliasesGenerated", newKey));
+}
 
-    if (!fs.existsSync(aliasesHumanPath)) return false;
+function rewriteRenamedMappings(filePath: string, renameMap: Record<string, string>): boolean {
+    if (!fs.existsSync(filePath) || Object.keys(renameMap).length === 0) return false;
 
-    const txt = fs.readFileSync(aliasesHumanPath, "utf8");
-    const obj = extractAliasesObjectBody(txt);
+    const before = fs.readFileSync(filePath, "utf8");
+    const after = before
+        .split("\n")
+        .map((line) => Object.entries(renameMap).reduce((acc, [oldKey, newKey]) => replaceGeneratedRhs(acc, oldKey, newKey), line))
+        .join("\n");
 
-    if (!obj) {
-        log.info(`WARN: Could not parse aliases.ts to remove stale keys: ${aliasesHumanPath}`);
-        return false;
-    }
-
-    const validGeneratedKeys = new Set(Object.keys(pageMap.elements));
-    const lines = obj.body.split("\n");
-
-    let removedCount = 0;
-    const keptLines: string[] = [];
-
-    for (const line of lines) {
-        const parsed = parseAliasEntryLine(line);
-
-        // Keep blank lines / comments / anything that is not a direct aliasesGenerated mapping
-        if (!parsed.generatedKey) {
-            keptLines.push(line);
-            continue;
-        }
-
-        // Remove only mappings whose RHS generated key no longer exists
-        if (!validGeneratedKeys.has(parsed.generatedKey)) {
-            removedCount++;
-
-            if (verbose) {
-                log.debug(
-                    `Removing stale alias mapping: ${parsed.aliasKey ?? "<unknown>"} -> ${parsed.generatedKey}`
-                );
-            }
-            continue;
-        }
-
-        keptLines.push(line);
-    }
-
-    if (removedCount === 0) {
-        return false;
-    }
-
-    const newBody = keptLines.join("\n");
-    const updated =
-        txt.slice(0, obj.bodyStartIndex) +
-        newBody +
-        txt.slice(obj.bodyEndIndex);
-
-    fs.writeFileSync(aliasesHumanPath, updated, "utf8");
-    log.info(`Updated aliases.ts (removed ${removedCount} stale mapping(s)): ${aliasesHumanPath}`);
-
+    if (before === after) return false;
+    fs.writeFileSync(filePath, after, "utf8");
     return true;
 }
 
-function appendNewAliases(params: {
-    aliasesHumanPath: string;
-    pageMap: PageMap;
-    verbose?: boolean;
-    log: Logger;
-}) {
-    const { aliasesHumanPath, pageMap, verbose, log } = params;
+function appendMissingAliases(filePath: string, newGeneratedKeys: string[], log: Logger): boolean {
+    if (!fs.existsSync(filePath) || newGeneratedKeys.length === 0) return false;
 
-    if (!fs.existsSync(aliasesHumanPath)) return;
-
-    const txt = fs.readFileSync(aliasesHumanPath, "utf8");
-    const mapped = extractMappedElementKeysFromAliasesTs(txt);
-    const existingAliasKeys = extractAliasKeysFromAliasesTs(txt);
-
-    const elementKeys = Object.keys(pageMap.elements).sort((a, b) => a.localeCompare(b));
-    const missing = elementKeys.filter(
-        (key) => !mapped.has(key) && !existingAliasKeys.has(key)
+    const txt = fs.readFileSync(filePath, "utf8");
+    const used = new Set(
+        [...txt.matchAll(/\baliasesGenerated(?:\.([A-Za-z_$][A-Za-z0-9_$]*)|\[(?:"([^"]+)"|'([^']+)')\])/g)]
+            .map((m) => m[1] ?? m[2] ?? m[3] ?? "")
+            .filter(Boolean)
     );
 
-    if (missing.length === 0) {
-        if (verbose) {
-            log.debug(`aliases.ts up-to-date: ${aliasesHumanPath}`);
-        }
-        return;
+    const missing = newGeneratedKeys.filter((key) => !used.has(key));
+    if (missing.length === 0) return false;
+
+    const insertAt = txt.lastIndexOf("} as const satisfies");
+    if (insertAt < 0) {
+        log.info(`WARN: Could not append new aliases: ${filePath}`);
+        return false;
     }
 
-    const obj = extractAliasesObjectBody(txt);
-    if (!obj) {
-        log.info(`WARN: Could not parse aliases.ts to append new keys: ${aliasesHumanPath}`);
-        return;
-    }
-
-    const insertAt = obj.bodyEndIndex;
-
-    const lines: string[] = [];
-    lines.push(``);
-
-    for (const key of missing) {
-        const prop = isValidTsIdentifier(key) ? key : JSON.stringify(key);
-        const rhs = toPropertyAccess("aliasesGenerated", key);
-        lines.push(`  ${prop}: ${rhs},`);
-    }
-
-    const updated =
-        txt.slice(0, insertAt) +
-        lines.join("\n") +
-        txt.slice(insertAt);
-
-    fs.writeFileSync(aliasesHumanPath, updated, "utf8");
-    log.info(`Updated aliases.ts (appended ${missing.length} new mapping(s)): ${aliasesHumanPath}`);
+    const lines = missing.map((key) => `  ${key}: ${toPropertyAccess("aliasesGenerated", key)},`);
+    const updated = txt.slice(0, insertAt) + lines.join("\n") + "\n" + txt.slice(insertAt);
+    fs.writeFileSync(filePath, updated, "utf8");
+    return true;
 }
 
 export function syncAliasesHumanFile(params: {
     aliasesHumanPath: string;
-    pageMap: PageMap;
-    verbose?: boolean;
+    renameMap?: Record<string, string>;
+    newGeneratedKeys?: string[];
     log: Logger;
 }) {
-    const { aliasesHumanPath, pageMap, verbose, log } = params;
-
-    removeStaleAliases({ aliasesHumanPath, pageMap, verbose, log });
-    appendNewAliases({ aliasesHumanPath, pageMap, verbose, log });
+    const { aliasesHumanPath, renameMap = {}, newGeneratedKeys = [], log } = params;
+    rewriteRenamedMappings(aliasesHumanPath, renameMap);
+    appendMissingAliases(aliasesHumanPath, newGeneratedKeys, log);
 }

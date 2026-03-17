@@ -12,10 +12,6 @@ function formatKeyList(keys: string[]): string {
     return `[${keys.sort((a, b) => a.localeCompare(b)).join(", ")}]`;
 }
 
-function expectedImportPath(pageKey: string, className: string): string {
-    return `@page-objects/${pageKey.split(".").join("/")}/${className}`;
-}
-
 function expectedClassName(pageKey: string): string {
     const last = pageKey.split(".").slice(-1)[0] || "Page";
     const parts = last
@@ -24,6 +20,10 @@ function expectedClassName(pageKey: string): string {
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1));
 
     return `${parts.join("")}Page`;
+}
+
+function expectedImportPath(pageKey: string, className: string): string {
+    return `@page-objects/${pageKey.split(".").join("/")}/${className}`;
 }
 
 function extractExportPaths(tsText: string): Set<string> {
@@ -39,6 +39,10 @@ function extractExportPaths(tsText: string): Set<string> {
 }
 
 function pageKeyFromImportPath(importPath: string): string {
+    if (importPath === "./pageManager") {
+        return "registry.pageManager";
+    }
+
     const match = importPath.match(/^@page-objects\/(.+)\/[^/]+$/);
     return match?.[1]?.replace(/\//g, ".") ?? importPath;
 }
@@ -112,7 +116,11 @@ export const checkIndexExports: ValidationRule = {
             }
         }
 
-        const expectedPaths = new Set(expectedByPageKey.values());
+        const expectedPaths = new Set<string>([
+            "./pageManager",
+            ...expectedByPageKey.values(),
+        ]);
+
         for (const actualPath of actualExportPaths) {
             if (!expectedPaths.has(actualPath)) {
                 const pageKey = pageKeyFromImportPath(actualPath);
