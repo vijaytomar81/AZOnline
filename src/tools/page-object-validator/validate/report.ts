@@ -47,7 +47,10 @@ function statusIcon(hasErrors: boolean, hasWarnings: boolean): string {
     return success(ICONS.successIcon);
 }
 
-function ruleSeverity(hasErrors: boolean, hasWarnings: boolean): "error" | "warning" | "success" {
+function ruleSeverity(
+    hasErrors: boolean,
+    hasWarnings: boolean
+): "error" | "warning" | "success" {
     if (hasErrors) return "error";
     if (hasWarnings) return "warning";
     return "success";
@@ -180,6 +183,21 @@ function buildGroupNode(group: RuleGroupBucket, verbose: boolean): TreeNode {
     };
 }
 
+function printSuggestedAction(summary: ValidationRunResult["summary"]): void {
+    if (summary.totalErrors === 0) {
+        return;
+    }
+
+    printSection("Suggested action");
+    console.log(`${info(ICONS.hintIcon)} Run automatic repair to synchronize generated artifacts.`);
+    console.log("");
+    console.log(`    ${strong("npm run repair:run")}`);
+    console.log("");
+    console.log(`${info(ICONS.hintIcon)} For detailed output use:`);
+    console.log("");
+    console.log(`    ${strong("npm run repair:run:verbose")}`);
+}
+
 export function printValidationExecution(
     result: ValidationRunResult,
     verbose = false
@@ -216,4 +234,6 @@ export function printValidationSummary(result: ValidationRunResult): void {
         ],
         resultText
     );
+
+    printSuggestedAction(summary);
 }

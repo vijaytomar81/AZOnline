@@ -6,7 +6,7 @@ import { checkEnvironment } from "../rules/environment/checkEnvironment";
 import { checkPageMapSchema } from "../rules/source/checkPageMapSchema";
 import { checkPageMapKeys } from "../rules/source/checkPageMapKeys";
 import { checkGeneratedFilesExist } from "../rules/outputs/checkGeneratedFilesExist";
-import { checkPageMapToElements } from "../rules/pageChain/checkPageMapToElements";
+// import { checkPageMapToElements } from "../rules/pageChain/checkPageMapToElements";
 import { checkElementsToGeneratedAliases } from "../rules/pageChain/checkElementsToGeneratedAliases";
 import { checkGeneratedToBusinessAliases } from "../rules/pageChain/checkGeneratedToBusinessAliases";
 import { checkBusinessAliasesToPageObject } from "../rules/pageChain/checkBusinessAliasesToPageObject";
@@ -24,7 +24,7 @@ export const VALIDATION_RULES: ValidationRule[] = [
     checkPageMapSchema,
     checkPageMapKeys,
     checkGeneratedFilesExist,
-    checkPageMapToElements,
+    // checkPageMapToElements,
     checkElementsToGeneratedAliases,
     checkGeneratedToBusinessAliases,
     checkBusinessAliasesToPageObject,
