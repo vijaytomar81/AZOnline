@@ -7,7 +7,7 @@ import { safeReadJson } from "@/utils/fs";
 import type { PageMap } from "@/tools/page-object-generator/generator/types";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
-import { listPageMapFiles } from "../../shared/readPageMap";
+import { listPageMapFiles } from "../../../../page-object-common/readPageMap";
 
 export const checkPageMapSchema: ValidationRule = {
     id: "source.checkPageMapSchema",

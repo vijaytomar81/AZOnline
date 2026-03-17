@@ -1,24 +1,41 @@
-// src/tools/page-object-validator/validate/shared/readPageMap.ts
+// src/tools/page-object-common/readPageMap.ts
 
 import path from "node:path";
 
 import { listFiles, safeReadJson } from "@/utils/fs";
 import type { PageMap } from "@/tools/page-object-generator/generator/types";
-import type { LoadedPageMap } from "./types";
+
+/**
+ * Represents a loaded page-map file.
+ */
+export type LoadedPageMap = {
+    fileName: string;
+    absPath: string;
+    pageMap: PageMap;
+};
+
+function isValidPageMap(pageMap: PageMap | null | undefined): pageMap is PageMap {
+    return Boolean(
+        pageMap &&
+        typeof pageMap.pageKey === "string" &&
+        pageMap.pageKey.trim() &&
+        pageMap.elements &&
+        typeof pageMap.elements === "object"
+    );
+}
 
 export function listPageMapFiles(mapsDir: string): string[] {
     return listFiles(mapsDir, { ext: ".json" }).filter((f) => !f.startsWith("."));
 }
 
 export function loadAllPageMaps(mapsDir: string): LoadedPageMap[] {
-    const files = listPageMapFiles(mapsDir);
     const loaded: LoadedPageMap[] = [];
 
-    for (const fileName of files) {
+    for (const fileName of listPageMapFiles(mapsDir)) {
         const absPath = path.join(mapsDir, fileName);
         const pageMap = safeReadJson<PageMap>(absPath);
 
-        if (!pageMap?.pageKey || !pageMap?.elements || typeof pageMap.elements !== "object") {
+        if (!isValidPageMap(pageMap)) {
             continue;
         }
 

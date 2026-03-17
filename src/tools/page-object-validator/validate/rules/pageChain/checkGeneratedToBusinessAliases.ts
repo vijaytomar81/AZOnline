@@ -8,9 +8,9 @@ import type { ValidationIssue } from "../../types";
 import {
     extractExportedObjectKeys,
     extractReferencedObjectKeys,
-} from "../../shared/extractTsObjectKeys";
-import { getPageArtifactPaths } from "../../shared/pagePaths";
-import { loadAllPageMaps } from "../../shared/readPageMap";
+} from "../../../../page-object-common/extractTsObjectKeys";
+import { getPageArtifactPaths } from "../../../../page-object-common/pagePaths";
+import { loadAllPageMaps } from "../../../../page-object-common/readPageMap";
 
 function formatKeyList(keys: string[]): string {
     return `[${keys.sort((a, b) => a.localeCompare(b)).join(", ")}]`;

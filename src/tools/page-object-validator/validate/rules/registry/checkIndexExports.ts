@@ -5,8 +5,8 @@ import fs from "node:fs";
 import type { TreeNode } from "@/utils/cliTree";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
-import { getIndexFile } from "../../shared/pagePaths";
-import { loadAllPageMaps } from "../../shared/readPageMap";
+import { getIndexFile } from "../../../../page-object-common/pagePaths";
+import { loadAllPageMaps } from "../../../../page-object-common/readPageMap";
 
 function formatKeyList(keys: string[]): string {
     return `[${keys.sort((a, b) => a.localeCompare(b)).join(", ")}]`;

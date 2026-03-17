@@ -75,3 +75,18 @@ export const PAGE_ELEMENTS_VALIDATOR_LOG_FILE = path.join(
     "page-elements-validator.log"
 );
 export const DATA_BUILDER_LOG_FILE = path.join(ROOT, "data-builder.log");
+
+/**
+ * Convert absolute path to repo-relative path.
+ *
+ * Example:
+ * /Users/x/project/src/pages/a.ts
+ * → src/pages/a.ts
+ */
+export function toRepoRelative(filePath: string): string {
+    const cwd = process.cwd();
+
+    const relative = path.relative(cwd, filePath);
+
+    return relative.replace(/\\/g, "/");
+}

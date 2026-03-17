@@ -5,7 +5,7 @@ import fs from "node:fs";
 import type { TreeNode } from "@/utils/cliTree";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
-import { listPageMapFiles } from "../../shared/readPageMap";
+import { listPageMapFiles } from "../../../../page-object-common/readPageMap";
 
 export const checkEnvironment: ValidationRule = {
     id: "environment.checkEnvironment",

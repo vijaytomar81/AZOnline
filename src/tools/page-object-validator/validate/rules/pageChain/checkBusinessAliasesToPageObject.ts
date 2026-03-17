@@ -8,9 +8,9 @@ import type { ValidationIssue } from "../../types";
 import {
     extractExportedObjectKeys,
     extractMethodNames,
-} from "../../shared/extractTsObjectKeys";
-import { getPageArtifactPaths } from "../../shared/pagePaths";
-import { loadAllPageMaps } from "../../shared/readPageMap";
+} from "../../../../page-object-common/extractTsObjectKeys";
+import { getPageArtifactPaths } from "../../../../page-object-common/pagePaths";
+import { loadAllPageMaps } from "../../../../page-object-common/readPageMap";
 
 function extractManagedRegion(pageObjectTs: string): string {
     const startToken = "// <scanner:aliases>";

@@ -1,9 +1,9 @@
 // src/tools/page-object-generator/generator/pageMapLoader.ts
 
 import fs from "node:fs";
-import path from "node:path";
 
 import type { PageMap } from "./types";
+import { listPageMapFiles, loadAllPageMaps } from "@/tools/page-object-common/readPageMap";
 
 export type LoadedPageMapFile = {
     file: string;
@@ -12,30 +12,29 @@ export type LoadedPageMapFile = {
     pageMap: PageMap;
 };
 
+/**
+ * Returns sorted list of page-map filenames.
+ */
 export function readAllPageMapFiles(mapsDir: string): string[] {
-    return fs
-        .readdirSync(mapsDir)
-        .filter((f) => f.endsWith(".json") && !f.startsWith("."))
-        .sort((a, b) => a.localeCompare(b));
+    return listPageMapFiles(mapsDir);
 }
 
+/**
+ * Loads a single page-map file including its raw JSON text.
+ */
 export function loadPageMapFile(mapsDir: string, file: string): LoadedPageMapFile {
-    const absPath = path.join(mapsDir, file);
-    const raw = fs.readFileSync(absPath, "utf8");
-    const pageMap = JSON.parse(raw) as PageMap;
+    const loaded = loadAllPageMaps(mapsDir).find((m) => m.fileName === file);
 
-    if (!pageMap?.pageKey) {
-        throw new Error(`Invalid page-map (missing pageKey): ${file}`);
+    if (!loaded) {
+        throw new Error(`Page-map not found or invalid: ${file}`);
     }
 
-    if (!pageMap?.elements || typeof pageMap.elements !== "object") {
-        throw new Error(`Invalid page-map (missing elements): ${file}`);
-    }
+    const raw = fs.readFileSync(loaded.absPath, "utf8");
 
     return {
         file,
-        absPath,
+        absPath: loaded.absPath,
         raw,
-        pageMap,
+        pageMap: loaded.pageMap,
     };
 }

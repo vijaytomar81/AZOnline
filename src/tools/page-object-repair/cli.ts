@@ -1,14 +1,14 @@
-// src/tools/page-object-validator/cli.ts
+// src/tools/page-object-repair/cli.ts
 
 import { normalizeArgv } from "@/utils/argv";
 import { printCommandTitle } from "@/utils/cliFormat";
 import { createLogger } from "@/utils/logger";
 
-import { usage } from "./validatorHelp";
-import { runValidateCommand } from "./commands/validate";
+import { usage } from "./repairHelp";
+import { runRepairCommand } from "./commands/repair";
 
 let log = createLogger({
-    prefix: "[page-object-validator]",
+    prefix: "[page-object-repair]",
     logLevel: "info",
     withTimestamp: true,
 });
@@ -25,7 +25,7 @@ function isHelp(argv: string[]): boolean {
 }
 
 async function main() {
-    printCommandTitle("PAGE OBJECT VALIDATOR", "validateIcon");
+    printCommandTitle("PAGE OBJECT REPAIR", "repairIcon");
 
     const argv = normalizeArgv(process.argv.slice(2));
 
@@ -38,8 +38,8 @@ async function main() {
     const args = argv.slice(1);
 
     switch (command) {
-        case "validate":
-            await runValidateCommand(args);
+        case "repair":
+            await runRepairCommand(args);
             return;
 
         default:

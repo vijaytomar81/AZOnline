@@ -6,8 +6,8 @@ import type { TreeNode } from "@/utils/cliTree";
 import { loadPageManifest } from "@/tools/page-object-generator/generator/pageManifest";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
-import { getPageArtifactPaths } from "../../shared/pagePaths";
-import { loadAllPageMaps } from "../../shared/readPageMap";
+import { getPageArtifactPaths } from "../../../../page-object-common/pagePaths";
+import { loadAllPageMaps } from "../../../../page-object-common/readPageMap";
 
 function formatKeyList(keys: string[]): string {
     return `[${keys.sort((a, b) => a.localeCompare(b)).join(", ")}]`;

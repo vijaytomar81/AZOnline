@@ -6,8 +6,8 @@ import type { TreeNode } from "@/utils/cliTree";
 import { toCamelFromText } from "@/utils/text";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
-import { getPageManagerFile } from "../../shared/pagePaths";
-import { loadAllPageMaps } from "../../shared/readPageMap";
+import { getPageManagerFile } from "../../../../page-object-common/pagePaths";
+import { loadAllPageMaps } from "../../../../page-object-common/readPageMap";
 
 function lastSegment(pageKey: string): string {
     return pageKey.split(".").slice(-1)[0] || "page";

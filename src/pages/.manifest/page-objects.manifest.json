@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "generatedAt": "2026-03-15T17:23:26.414Z",
+  "generatedAt": "2026-03-16T17:53:35.191Z",
   "pages": {
     "athena.common.insurance-type-selection": {
-      "pageKey": "athena.common.insurance-type-selection-one",
+      "pageKey": "athena.common.insurance-type-selection",
       "product": "athena",
       "group": "common",
       "name": "insurance-type-selection",
@@ -54,7 +54,7 @@
       "title": "Driving licence details",
       "elementCount": 49,
       "scannedAt": "2026-03-13T17:03:49.922Z",
-      "mapHash": "29e2db3b2ad32629add1d91d329d8ed12bad38a6"
+      "mapHash": "94a12ef39af95bde87276dacb845942b6fd6ddba"
     }
   }
 }

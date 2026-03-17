@@ -1,4 +1,4 @@
-// src/tools/page-object-validator/validate/shared/extractTsObjectKeys.ts
+// src/tools/page-object-common/extractTsObjectKeys.ts
 
 import {
     extractExportedObjectBody,

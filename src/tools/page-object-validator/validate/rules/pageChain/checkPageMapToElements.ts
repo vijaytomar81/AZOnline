@@ -5,9 +5,9 @@ import fs from "node:fs";
 import type { TreeNode } from "@/utils/cliTree";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
-import { extractExportedObjectKeys } from "../../shared/extractTsObjectKeys";
-import { getPageArtifactPaths } from "../../shared/pagePaths";
-import { loadAllPageMaps } from "../../shared/readPageMap";
+import { extractExportedObjectKeys } from "../../../../page-object-common/extractTsObjectKeys";
+import { getPageArtifactPaths } from "../../../../page-object-common/pagePaths";
+import { loadAllPageMaps } from "../../../../page-object-common/readPageMap";
 
 function formatKeyList(keys: string[]): string {
     return `[${keys.sort((a, b) => a.localeCompare(b)).join(", ")}]`;

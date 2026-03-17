@@ -1,4 +1,4 @@
-// src/tools/page-object-validator/validate/shared/pagePaths.ts
+// src/tools/page-object-common/pagePaths.ts
 
 import path from "node:path";
 

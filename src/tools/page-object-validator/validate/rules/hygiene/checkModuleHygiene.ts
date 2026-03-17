@@ -5,7 +5,7 @@ import fs from "node:fs";
 import type { TreeNode } from "@/utils/cliTree";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
-import { getIndexFile, getPageManagerFile } from "../../shared/pagePaths";
+import { getIndexFile, getPageManagerFile } from "../../../../page-object-common/pagePaths";
 
 export const checkModuleHygiene: ValidationRule = {
     id: "hygiene.checkModuleHygiene",

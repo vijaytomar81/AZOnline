@@ -1,4 +1,4 @@
-// src/tools/page-object-validator/validate/shared/tsObjectParser.ts
+// src/tools/page-object-common/tsObjectParser.ts
 
 import { stripLineComments } from "@/utils/text";
 
