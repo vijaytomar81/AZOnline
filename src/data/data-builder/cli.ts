@@ -1,6 +1,5 @@
 // src/data/data-builder/cli.ts
 import path from "node:path";
-
 import type { DataBuilderBaseArgs } from "./types";
 import { normalizeArgv, getArg, hasFlag } from "../../utils/argv";
 import { createLogger } from "../../utils/logger";
@@ -17,17 +16,16 @@ export function createDataBuilderLogger(verbose = false) {
 }
 
 function parseBoolean(v?: string) {
-  if (!v) return false;
-  return ["true", "1", "yes", "y"].includes(v.toLowerCase());
+  return ["true", "1", "yes", "y"].includes(String(v ?? "").toLowerCase());
+}
+
+function safeSheetFilename(name: string) {
+  return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
 }
 
 export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
   const argv = normalizeArgv(process.argv.slice(2));
-
-  const verbose =
-    hasFlag(argv, "--verbose") ||
-    (process.env.VERBOSE ?? "").toLowerCase() === "true";
-
+  const verbose = hasFlag(argv, "--verbose") || parseBoolean(process.env.VERBOSE);
   const log = createDataBuilderLogger(verbose);
 
   if (hasFlag(argv, "--help") || hasFlag(argv, "-h")) {
@@ -36,33 +34,29 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
     process.exit(0);
   }
 
-  const sheetName = (getArg(argv, "--sheet") ?? process.env.SHEET ?? "").trim();
-  const excelPath = (getArg(argv, "--excel") ?? process.env.EXCEL_PATH ?? "").trim();
+  const excelPath = String(getArg(argv, "--excel") ?? process.env.EXCEL_PATH ?? "").trim();
+  const sheetName = String(getArg(argv, "--sheet") ?? process.env.SHEET ?? "").trim();
+  const schemaName = String(getArg(argv, "--schema") ?? process.env.SCHEMA ?? "master").trim();
+  const scriptIdFilter = String(getArg(argv, "--ids") ?? process.env.SCRIPT_IDS ?? "").trim();
 
-  const includeEmptyChildFields = parseBoolean(
-    getArg(argv, "--includeEmptyChildFields") ?? process.env.INCLUDE_EMPTY_CHILD_FIELDS
-  );
-
-  const scriptIdFilter = (getArg(argv, "--ids") ?? process.env.SCRIPT_IDS ?? "").trim();
+  const excludeEmptyFields =
+    hasFlag(argv, "--excludeEmptyFields") ||
+    (process.env.EXCLUDE_EMPTY_FIELDS ?? "").toLowerCase() === "true";
 
   if (!excelPath) throw new Error("❌ EXCEL_PATH is required (or use --excel).");
   if (!sheetName) throw new Error("❌ SHEET is required (or use --sheet).");
 
-  const outRaw = (getArg(argv, "--out") ?? process.env.OUT_PATH ?? "").trim();
-  const outputPath = outRaw
-    ? outRaw
-    : path.join("src", "data", "generated", `${safeSheetFilename(sheetName)}.json`);
+  const outRaw = String(getArg(argv, "--out") ?? process.env.OUT_PATH ?? "").trim();
+  const outputPath =
+    outRaw || path.join("src", "data", "generated", `${safeSheetFilename(sheetName)}.json`);
 
   return {
     excelPath,
     sheetName,
+    schemaName,
     outputPath,
     scriptIdFilter,
-    includeEmptyChildFields,
+    excludeEmptyFields,
     verbose,
   };
-}
-
-function safeSheetFilename(name: string) {
-  return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
 }

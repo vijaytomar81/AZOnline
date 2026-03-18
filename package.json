@@ -6,11 +6,12 @@
     "test:e2e": "playwright test",
     "e2e": "npm run data:build -- && npm run test:e2e",
 
-    "data:build": "ts-node src/data/data-builder/index.ts",
-    "data:build:verbose": "npm run data:build -- --verbose",
-    "data:build:withEmptyFields": "npm run data:build -- --includeEmptyChildFields true",
-    "data:build:withEmptyFields:verbose": "npm run data:build -- --includeEmptyChildFields true --verbose",
-    "data:help": "npm run data:build -- --help",
+    "data": "ts-node src/data/data-builder/index.ts",
+    "data:build": "npm run data",
+    "data:build:verbose": "npm run data -- --verbose",
+    "data:build:noEmpty": "npm run data -- --excludeEmptyFields",
+    "data:build:noEmpty:verbose": "npm run data -- --excludeEmptyFields --verbose",
+    "data:help": "npm run data -- --help",
 
     "scan": "node -r ts-node/register -r tsconfig-paths/register src/tools/page-scanner/cli.ts",
     "scan:page": "npm run scan -- scan",

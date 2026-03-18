@@ -1,21 +1,18 @@
 // src/data/data-builder/types.ts
-
 import type { Logger } from "../../utils/logger";
 
-export type ScriptIdFilter = string; // e.g. "1-10,15"
+export type ScriptIdFilter = string;
 
 export type DataBuilderBaseArgs = {
     excelPath: string;
     sheetName: string;
+    schemaName: string;
     outputPath: string;
     scriptIdFilter: ScriptIdFilter;
-    includeEmptyChildFields: boolean;
+    excludeEmptyFields: boolean;
     verbose: boolean;
 };
 
-/**
- * One test case in a normalized, test-friendly shape.
- */
 export type BuiltCase = {
     caseIndex: number;
     scriptName: string;
@@ -36,18 +33,19 @@ export type DataBuilderData = DataBuilderBaseArgs & {
     workbook?: any;
     sheet?: any;
     absExcel?: string;
-
     meta?: {
         sheet: string;
         scriptIdRow?: number;
         scriptNameRow?: number;
+        fieldCol: number;
+        caseStartCol: number;
+        dataStartRow: number;
         caseMetas: Array<{
             col: number;
             scriptId: string;
             scriptName: string;
         }>;
     };
-
     casesFile?: CasesFile;
     absOut?: string;
 };
