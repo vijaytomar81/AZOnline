@@ -82,8 +82,8 @@ async function main() {
             ["Test Data Output file", absOut || "(not set)"],
             ["Validation - Report", validationPath],
             ["Validation - Total errors", errorCount],
-            ["Validation - Schema → Excel missing (Schema mapping fields missing in Excel)", schemaMissing],
-            ["Validation - Excel → Schema missing (Excel fields missing in Schema)", excelMissing],
+            ["Validation - Warnings - Schema mapping fields missing in Excel", schemaMissing],
+            ["Validation - Warnings - Excel fields missing in Schema", excelMissing],
             ["Total time", timer.elapsedSecondsText()],
         ],
         success("COMPLETED")
