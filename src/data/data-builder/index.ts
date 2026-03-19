@@ -80,9 +80,10 @@ async function main() {
             ["Plugins executed", ranNames.length],
             ["Cases generated", caseCount],
             ["Output file", absOut || "(not set)"],
-            ["Validation errors", errorCount],
-            ["Schema → Excel missing (Schema mapping fields missing in Excel)", schemaMissing],
-            ["Excel → Schema missing (Excel fields missing in Schema)", excelMissing],
+            ["Validation - Total errors", errorCount],
+            ["Validation report", validationPath],
+            ["Validation - Schema → Excel missing (Schema mapping fields missing in Excel)", schemaMissing],
+            ["Validation - Excel → Schema missing (Excel fields missing in Schema)", excelMissing],
             ["Total time", timer.elapsedSecondsText()],
         ],
         success("COMPLETED")
