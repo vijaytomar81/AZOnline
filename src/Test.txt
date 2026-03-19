@@ -26,6 +26,12 @@ https://tableconvert.com/excel-to-markdown
 
 $env:EXCEL_PATH="C:\Users\tp70707\OneDrive - Allianz\My Documents\01_Regression\Test Data\Direct\Flow_NB_v4_06022026.xlsx"
 $env:SHEET="FlowNB"
+npm run data:build:verbose
+
+or
+
+$env:EXCEL_PATH="C:\Users\tp70707\OneDrive - Allianz\My Documents\01_Regression\Test Data\Direct\Flow_NB_v4_06022026.xlsx"
+$env:SHEET="FlowNB"
 $env:SCHEMA="direct"
 npm run data:build:verbose
 
