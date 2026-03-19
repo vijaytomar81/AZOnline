@@ -1,4 +1,6 @@
 // src/config/execution.config.ts
+import { envBool, envNumber, envString } from "../utils/env";
+
 export type ExecutionConfig = {
   browser: {
     name: 'chromium' | 'firefox' | 'webkit';
@@ -22,24 +24,24 @@ export type ExecutionConfig = {
 
 export const executionConfig: ExecutionConfig = {
   browser: {
-    name: ((process.env.BROWSER_NAME as any) || 'chromium'),
-    channel: ((process.env.BROWSER as any) || 'msedge'),
-    headless: process.env.HEADLESS === 'false' ? false : true,
+    name: (envString("BROWSER_NAME", "chromium") as any),
+    channel: (envString("BROWSER", "msedge") as any),
+    headless: envBool("HEADLESS", true),
   },
 
   timeouts: {
-    test: Number(process.env.TEST_TIMEOUT || 60_000),
-    expect: Number(process.env.EXPECT_TIMEOUT || 10_000),
+    test: envNumber("TEST_TIMEOUT", 60_000),
+    expect: envNumber("EXPECT_TIMEOUT", 10_000),
   },
 
   artifacts: {
-    screenshot: ((process.env.SCREENSHOT as any) || 'only-on-failure'),
-    video: ((process.env.VIDEO as any) || 'retain-on-failure'),
-    trace: ((process.env.TRACE as any) || 'retain-on-failure'),
+    screenshot: (envString("SCREENSHOT", "only-on-failure") as any),
+    video: (envString("VIDEO", "retain-on-failure") as any),
+    trace: (envString("TRACE", "retain-on-failure") as any),
   },
 
   generatedArtifacts: {
-    withTimestamp: String(process.env.ARTIFACTS_WITH_TIMESTAMP).toLowerCase() === 'false',
-    maxToKeep: Number(process.env.MAX_ARTIFACTS_TO_KEEP || 30),
+    withTimestamp: envBool("ARTIFACTS_WITH_TIMESTAMP", false),
+    maxToKeep: envNumber("MAX_ARTIFACTS_TO_KEEP", 30),
   },
 };
