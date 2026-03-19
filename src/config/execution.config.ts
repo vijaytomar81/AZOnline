@@ -39,7 +39,7 @@ export const executionConfig: ExecutionConfig = {
   },
 
   generatedArtifacts: {
-    withTimestamp: process.env.ARTIFACTS_WITH_TIMESTAMP === 'false',
+    withTimestamp: String(process.env.ARTIFACTS_WITH_TIMESTAMP).toLowerCase() === 'false',
     maxToKeep: Number(process.env.MAX_ARTIFACTS_TO_KEEP || 30),
   },
 };
