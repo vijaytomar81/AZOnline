@@ -1,5 +1,4 @@
 // src/data/data-builder/plugins/70-write-json.ts
-
 import fs from "node:fs";
 import path from "node:path";
 import type { PipelinePlugin } from "../core/pipeline";
@@ -10,18 +9,16 @@ function safeSheetFilename(name: string) {
 }
 
 function isLikelyDir(p: string): boolean {
-  const norm = p.replace(/\\/g, "/").trim();
-  if (!norm) return true;                 // treat empty as dir (we'll default)
-  if (norm.endsWith("/")) return true;    // explicit dir
-  if (norm.endsWith("\\")) return true;   // explicit dir
-  // If it has no extension, treat as directory
-  return path.extname(norm) === "";
+  const normalized = p.replace(/\\/g, "/").trim();
+  if (!normalized) return true;
+  if (normalized.endsWith("/")) return true;
+  if (normalized.endsWith("\\")) return true;
+  return path.extname(normalized) === "";
 }
 
 const plugin: PipelinePlugin = {
   name: "write-json",
   order: 70,
-
   requires: ["casesFile", "external:sheetName", "external:outputPath"],
   provides: ["absOut"],
 
@@ -32,17 +29,16 @@ const plugin: PipelinePlugin = {
     }
 
     const sheetName = String(casesFile.sheet ?? ctx.data.sheetName ?? "").trim();
-    if (!sheetName) throw new Error("sheetName missing.");
+    if (!sheetName) {
+      throw new Error("sheetName missing.");
+    }
 
-    // outputPath is already defaulted in args.ts (src/data/generated/<sheet>.json)
     const outRaw = String(ctx.data.outputPath ?? "").trim();
     if (!outRaw) {
       throw new Error("outputPath missing. Ensure args.ts sets default or pass --out.");
     }
 
     let targetPath = outRaw;
-
-    // If user gives a folder -> create <Sheet>.json inside it
     if (isLikelyDir(outRaw)) {
       targetPath = path.join(outRaw, `${safeSheetFilename(sheetName)}.json`);
     }
@@ -52,8 +48,13 @@ const plugin: PipelinePlugin = {
       : path.join(process.cwd(), targetPath);
 
     fs.mkdirSync(path.dirname(absOut), { recursive: true });
-
     fs.writeFileSync(absOut, JSON.stringify(casesFile, null, 2), "utf-8");
+
+    if (ctx.data.validationReport) {
+      const reportPath = absOut.replace(/\.json$/i, ".validation.json");
+      fs.writeFileSync(reportPath, JSON.stringify(ctx.data.validationReport, null, 2), "utf-8");
+      ctx.log.info(`Validation report written: ${reportPath}`);
+    }
 
     ctx.data.absOut = absOut;
 

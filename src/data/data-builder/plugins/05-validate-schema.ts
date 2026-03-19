@@ -1,8 +1,16 @@
 // src/data/data-builder/plugins/05-validate-schema.ts
+
 import type ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
+import type { ValidationReport } from "../types";
 import { getSchema } from "../../input-data-schema";
-import { buildRowIndex, cellToString, detectLayout, norm, normKey } from "../core/excelRuntime";
+import {
+    buildRowIndex,
+    cellToString,
+    detectLayout,
+    norm,
+    normKey,
+} from "../core/excelRuntime";
 
 function collectSchemaFields(obj: any, out: Set<string>) {
     if (!obj || typeof obj !== "object") return;
@@ -33,61 +41,25 @@ function missingFields(rows: Map<string, number>, fields: Iterable<string>) {
     return [...fields].filter((f) => !rows.has(normKey(f)));
 }
 
-function validateRepeatedCounts(
-    ws: ExcelJS.Worksheet,
-    rowIndex: Map<string, number>,
-    caseStartCol: number,
-    strict: boolean
-): string[] {
-    const issues: string[] = [];
-    const maxCol = ws.columnCount || ws.actualColumnCount || 0;
-    const adCountRow = rowIndex.get(normKey("AdditionalDriversCount"));
-
-    if (!strict || !adCountRow) return issues;
-
-    for (let c = caseStartCol; c <= maxCol; c++) {
-        const raw = norm(cellToString(ws.getCell(adCountRow, c).value));
-        if (!raw) break;
-
-        const count = Number(raw || 0);
-        if (!Number.isFinite(count)) {
-            issues.push(`Invalid AdditionalDriversCount "${raw}" at column ${c}`);
-            continue;
-        }
-
-        for (let i = 1; i <= 5; i++) {
-            const key = normKey(`AD${i}FirstName`);
-            const row = rowIndex.get(key);
-            const hasDriverData = row ? norm(cellToString(ws.getCell(row, c).value)) !== "" : false;
-
-            if (i <= count && !hasDriverData) {
-                issues.push(`AD${i} missing while AdditionalDriversCount=${count} at column ${c}`);
-            }
-            if (i > count && hasDriverData) {
-                issues.push(`AD${i} has data beyond AdditionalDriversCount=${count} at column ${c}`);
-            }
-        }
-    }
-
-    return issues;
-}
-
 const plugin: PipelinePlugin = {
     name: "validate-schema",
     order: 5,
     requires: ["sheet", "external:schemaName", "external:strictValidation"],
-    provides: [],
+    provides: ["validationReport"],
 
     run: async (ctx) => {
-        const ws = ctx.data.sheet as ExcelJS.Worksheet | undefined;
-        if (!ws) throw new Error("Sheet not loaded.");
-        if (!ctx.data.schemaName) throw new Error("schemaName is required.");
-
+        const ws = ctx.data.sheet as ExcelJS.Worksheet;
         const strict = !!ctx.data.strictValidation;
         const schema = getSchema(ctx.data.schemaName);
-        const layout = detectLayout(ws);
-        const { rows, duplicates } = collectExcelFields(ws, layout.fieldCol, layout.dataStartRow);
 
+        const layout = detectLayout(ws);
+        const { rows, duplicates } = collectExcelFields(
+            ws,
+            layout.fieldCol,
+            layout.dataStartRow
+        );
+
+        // ---- Schema fields
         const schemaFields = new Set<string>();
         collectSchemaFields(schema.groups, schemaFields);
 
@@ -96,27 +68,97 @@ const plugin: PipelinePlugin = {
             collectSchemaFields(rep.groups, schemaFields);
         }
 
+        // ---- Validation buckets
         const requiredMissing = missingFields(rows, schema.requiredFields ?? []);
         const mappedMissing = missingFields(rows, schemaFields);
-        const strictIssues = validateRepeatedCounts(ws, rows, layout.caseStartCol, strict);
 
-        const errors = [
-            ...requiredMissing.map((f) => `Missing required field: ${f}`),
-            ...mappedMissing.map((f) => `Missing mapped field: ${f}`),
-            ...(strict ? duplicates.map((f) => `Duplicate Excel field: ${f}`) : []),
-            ...strictIssues,
-        ];
+        const excelFields = new Set([...rows.keys()]);
+        const schemaFieldKeys = new Set([...schemaFields].map(normKey));
 
-        ctx.log.info(`Validating schema "${ctx.data.schemaName}" (${strict ? "strict" : "normal"})`);
-        ctx.log.debug?.(`Excel fields detected=${rows.size}`);
-        ctx.log.debug?.(`Schema fields checked=${schemaFields.size}`);
+        const unmappedExcel = [...excelFields].filter((f) => !schemaFieldKeys.has(f));
+
+        // ---- Build report
+        const errors: string[] = [];
+        const warnings: string[] = [];
+        const info: string[] = [];
+
+        // Errors (ONLY critical)
+        requiredMissing.forEach((f) =>
+            errors.push(`Missing required field: ${f}`)
+        );
+
+        if (strict) {
+            duplicates.forEach((f) =>
+                errors.push(`Duplicate Excel field: ${f}`)
+            );
+        }
+
+        // Warnings
+        mappedMissing.forEach((f) =>
+            warnings.push(`Missing mapped field: ${f}`)
+        );
+
+        // Info
+        unmappedExcel.forEach((f) =>
+            info.push(`Unused Excel field: ${f}`)
+        );
+
+        // ✅ FIX: properly typed mode
+        const mode: "normal" | "strict" = strict ? "strict" : "normal";
+
+        const report: ValidationReport = {
+            schemaName: ctx.data.schemaName,
+            sheetName: ctx.data.sheetName,
+            mode,
+
+            errors,
+            warnings,
+            info,
+
+            schemaToExcel: {
+                requiredMissing,
+                mappedMissing,
+            },
+
+            excelToSchema: {
+                unmappedFields: unmappedExcel,
+            },
+
+            summary: {
+                errorCount: errors.length,
+                warningCount: warnings.length,
+                requiredMissingCount: requiredMissing.length,
+                mappedMissingCount: mappedMissing.length,
+                unmappedFieldCount: unmappedExcel.length,
+            },
+        };
+
+        ctx.data.validationReport = report;
+
+        // ---- Console output
+        ctx.log.info(`Validation Summary`);
+        ctx.log.info(`Schema: ${report.schemaName}`);
+        ctx.log.info(`Sheet: ${report.sheetName}`);
+        ctx.log.info(`Errors: ${report.summary.errorCount}`);
+        ctx.log.info(`Warnings: ${report.summary.warningCount}`);
+
+        ctx.log.info(`Schema → Excel`);
+        ctx.log.info(`  Required missing: ${report.summary.requiredMissingCount}`);
+        ctx.log.info(`  Mapped missing: ${report.summary.mappedMissingCount}`);
+
+        ctx.log.info(`Excel → Schema`);
+        ctx.log.info(`  Unmapped fields: ${report.summary.unmappedFieldCount}`);
 
         if (errors.length) {
             errors.slice(0, 20).forEach((e) => ctx.log.error(e));
-            throw new Error(`Schema validation failed with ${errors.length} issue(s).`);
+            throw new Error(`Schema validation failed.`);
         }
 
-        ctx.log.info("Schema validation passed ✅");
+        if (warnings.length) {
+            warnings.slice(0, 20).forEach((w) => ctx.log.warn(w));
+        }
+
+        ctx.log.info("Validation completed ✅");
     },
 };
 

@@ -30,6 +30,33 @@ export type CasesFile = {
     cases: BuiltCase[];
 };
 
+export type ValidationReport = {
+    schemaName: string;
+    sheetName: string;
+    mode: "normal" | "strict";
+
+    errors: string[];
+    warnings: string[];
+    info: string[];
+
+    schemaToExcel: {
+        requiredMissing: string[];
+        mappedMissing: string[];
+    };
+
+    excelToSchema: {
+        unmappedFields: string[];
+    };
+
+    summary: {
+        errorCount: number;
+        warningCount: number;
+        requiredMissingCount: number;
+        mappedMissingCount: number;
+        unmappedFieldCount: number;
+    };
+};
+
 export type DataBuilderData = DataBuilderBaseArgs & {
     workbook?: any;
     sheet?: any;
@@ -48,6 +75,7 @@ export type DataBuilderData = DataBuilderBaseArgs & {
         }>;
     };
     casesFile?: CasesFile;
+    validationReport?: ValidationReport;
     absOut?: string;
 };
 
