@@ -19,9 +19,25 @@ const plugin: PipelinePlugin = {
         if (!ws) throw new Error("Sheet not loaded. Ensure load-excel ran.");
 
         const layout = detectLayout(ws);
-        const scriptIdRow = findRowByField(ws, layout.fieldCol, layout.dataStartRow, ["ScriptId", "Script ID"]);
-        const scriptNameRow = findRowByField(ws, layout.fieldCol, layout.dataStartRow, ["ScriptName"]);
+        const scriptIdRow = findRowByField(
+            ws,
+            layout.fieldCol,
+            layout.dataStartRow,
+            ["ScriptId", "Script ID"]
+        );
+        const scriptNameRow = findRowByField(
+            ws,
+            layout.fieldCol,
+            layout.dataStartRow,
+            ["ScriptName"]
+        );
         const caseCols = detectCaseColumns(ws, scriptIdRow, layout.caseStartCol);
+
+        const caseMetas = caseCols.map((col) => ({
+            col,
+            scriptId: norm(cellToString(ws.getCell(scriptIdRow, col).value)),
+            scriptName: norm(cellToString(ws.getCell(scriptNameRow, col).value)),
+        }));
 
         ctx.data.meta = {
             sheet: String(ctx.data.sheetName ?? ws.name ?? "").trim() || "Sheet",
@@ -30,14 +46,22 @@ const plugin: PipelinePlugin = {
             fieldCol: layout.fieldCol,
             caseStartCol: layout.caseStartCol,
             dataStartRow: layout.dataStartRow,
-            caseMetas: caseCols.map((col) => ({
-                col,
-                scriptId: norm(cellToString(ws.getCell(scriptIdRow, col).value)),
-                scriptName: norm(cellToString(ws.getCell(scriptNameRow, col).value)),
-            })),
+            caseMetas,
         };
 
-        ctx.log.info(`Metadata extracted. Cases detected: ${ctx.data.meta.caseMetas.length}`);
+        ctx.log.info(`Metadata extracted. Cases detected: ${caseMetas.length}`);
+        ctx.log.debug?.(`Detected layout -> dataStartRow=${layout.dataStartRow}`);
+        ctx.log.debug?.(`Detected layout -> fieldCol=${layout.fieldCol}`);
+        ctx.log.debug?.(`Detected layout -> caseStartCol=${layout.caseStartCol}`);
+        ctx.log.debug?.(`ScriptId row=${scriptIdRow}`);
+        ctx.log.debug?.(`ScriptName row=${scriptNameRow}`);
+        ctx.log.debug?.(`Case columns detected=${caseCols.length}`);
+
+        caseMetas.forEach((m) => {
+            ctx.log.debug?.(
+                `Case meta -> col=${m.col}, scriptId=${m.scriptId}, scriptName=${m.scriptName}`
+            );
+        });
     },
 };
 

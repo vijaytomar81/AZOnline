@@ -29,8 +29,8 @@ Optional:
                         1-10
                         1,3-10,15
 
-  --excludeEmptyFields     Remove empty Excel fields from JSON
-  
+  --excludeEmptyFields  Remove empty mapped fields from JSON
+  --strictValidation    Enable strict validation checks
   --verbose             Enable debug logs
   --help, -h            Show help
 
@@ -40,7 +40,8 @@ Environment variable equivalents:
   SCHEMA
   OUT_PATH
   SCRIPT_IDS
-  INCLUDE_EMPTY_CHILD_FIELDS
+  EXCLUDE_EMPTY_FIELDS
+  STRICT_VALIDATION
   VERBOSE
 `.trim();
 }

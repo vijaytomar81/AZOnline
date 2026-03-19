@@ -15,17 +15,12 @@ function isLeaf(node: unknown): node is Record<string, string> {
 }
 
 function readValue(opts: BuildOpts, field: string, prefix = ""): string {
-    const fullKey = normKey(`${prefix}${field}`);
-    const row = opts.rowIndex.get(fullKey);
+    const row = opts.rowIndex.get(normKey(`${prefix}${field}`));
     if (!row) return "";
     return norm(cellToString(opts.ws.getCell(row, opts.col).value));
 }
 
-function assignLeaf(
-    mapping: Record<string, string>,
-    opts: BuildOpts,
-    prefix: string
-): Record<string, any> {
+function buildLeaf(mapping: Record<string, string>, opts: BuildOpts, prefix: string) {
     const out: Record<string, any> = {};
     for (const [jsonKey, excelField] of Object.entries(mapping)) {
         const value = readValue(opts, excelField, prefix);
@@ -40,7 +35,7 @@ function buildGroup(node: SchemaGroupMap, opts: BuildOpts, prefix = ""): Record<
 
     for (const [key, child] of Object.entries(node)) {
         if (isLeaf(child)) {
-            const leaf = assignLeaf(child, opts, prefix);
+            const leaf = buildLeaf(child, opts, prefix);
             if (Object.keys(leaf).length) out[key] = leaf;
             continue;
         }
@@ -52,31 +47,51 @@ function buildGroup(node: SchemaGroupMap, opts: BuildOpts, prefix = ""): Record<
     return out;
 }
 
-function buildRepeat(rep: RepeatedGroup, opts: BuildOpts, itemBase: string, outerPrefix = "") {
+function buildRepeat(rep: RepeatedGroup, opts: BuildOpts, itemKeyPrefix: string, outerPrefix = "") {
     const count = Number(readValue(opts, rep.countField, outerPrefix) || 0);
     const safeCount = Number.isFinite(count) ? Math.max(0, Math.min(count, rep.max)) : 0;
-    const out: Record<string, any> = { count: safeCount };
 
+    const out: Record<string, any> = { count: safeCount };
     for (let i = 1; i <= safeCount; i++) {
-        const prefix = `${outerPrefix}${rep.prefixBase}${i}`;
-        out[`${itemBase}${i}`] = buildGroup(rep.groups, opts, prefix);
+        const itemPrefix = `${outerPrefix}${rep.prefixBase}${i}`;
+        out[`${itemKeyPrefix}${i}`] = buildGroup(rep.groups, opts, itemPrefix);
     }
 
     return out;
 }
 
-function buildDriverChildren(
-    driverKey: string,
-    driverValue: Record<string, any>,
+function attachAdditionalDriverChildren(
+    additionalDrivers: Record<string, any>,
     schema: DataSchema,
     opts: BuildOpts
 ) {
-    const driverPrefix = driverKey.replace(/^driver/i, "AD");
-    const claimRep = schema.repeatedGroups?.additionalDriverClaims;
-    const convictionRep = schema.repeatedGroups?.additionalDriverConvictions;
+    const claimTemplate = schema.repeatedGroups?.additionalDriverClaims;
+    const convictionTemplate = schema.repeatedGroups?.additionalDriverConvictions;
 
-    if (claimRep) driverValue.claims = buildRepeat(claimRep, opts, "claim", driverPrefix);
-    if (convictionRep) driverValue.convictions = buildRepeat(convictionRep, opts, "conviction", driverPrefix);
+    for (const [driverKey, driverValue] of Object.entries(additionalDrivers)) {
+        if (!driverKey.startsWith("driver") || !driverValue || typeof driverValue !== "object") continue;
+
+        const driverIndex = driverKey.replace("driver", "");
+        const driverPrefix = `AD${driverIndex}`;
+
+        if (claimTemplate) {
+            (driverValue as Record<string, any>).claims = buildRepeat(
+                claimTemplate,
+                opts,
+                "claim",
+                driverPrefix
+            );
+        }
+
+        if (convictionTemplate) {
+            (driverValue as Record<string, any>).convictions = buildRepeat(
+                convictionTemplate,
+                opts,
+                "conviction",
+                driverPrefix
+            );
+        }
+    }
 }
 
 export function buildPayload(schema: DataSchema, opts: BuildOpts): Record<string, any> {
@@ -92,13 +107,8 @@ export function buildPayload(schema: DataSchema, opts: BuildOpts): Record<string
     }
 
     if (reps.additionalDrivers) {
-        const drivers = buildRepeat(reps.additionalDrivers, opts, "driver");
-        for (const [key, value] of Object.entries(drivers)) {
-            if (key.startsWith("driver") && value && typeof value === "object") {
-                buildDriverChildren(key, value as Record<string, any>, schema, opts);
-            }
-        }
-        payload.additionalDrivers = drivers;
+        payload.additionalDrivers = buildRepeat(reps.additionalDrivers, opts, "driver");
+        attachAdditionalDriverChildren(payload.additionalDrivers, schema, opts);
     }
 
     return payload;

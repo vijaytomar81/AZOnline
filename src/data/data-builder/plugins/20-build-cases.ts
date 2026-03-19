@@ -9,17 +9,25 @@ import { getSchema } from "../../input-data-schema";
 const plugin: PipelinePlugin = {
     name: "build-cases",
     order: 20,
-    requires: ["sheet", "meta", "external:includeEmptyChildFields", "external:schemaName"],
+    requires: ["sheet", "meta", "external:excludeEmptyFields", "external:schemaName"],
     provides: ["casesFile"],
 
     run: async (ctx: DataBuilderContext) => {
         const ws = ctx.data.sheet as ExcelJS.Worksheet | undefined;
         const meta = ctx.data.meta;
-        if (!ws || !meta?.caseMetas?.length) throw new Error("Sheet/meta missing. Ensure prior plugins ran.");
+
+        if (!ws || !meta?.caseMetas?.length) {
+            throw new Error("Sheet/meta missing. Ensure prior plugins ran.");
+        }
 
         const schema = getSchema(ctx.data.schemaName);
         const includeEmpty = !ctx.data.excludeEmptyFields;
         const rowIndex = buildRowIndex(ws, meta.fieldCol, meta.dataStartRow);
+
+        ctx.log.info(`Building cases with schema "${ctx.data.schemaName}"...`);
+        ctx.log.debug?.(`includeEmpty=${includeEmpty}`);
+        ctx.log.debug?.(`rowIndex size=${rowIndex.size}`);
+        ctx.log.debug?.(`cases to build=${meta.caseMetas.length}`);
 
         const cases: BuiltCase[] = meta.caseMetas.map((m, idx) => {
             const data = buildPayload(schema, {
@@ -30,13 +38,34 @@ const plugin: PipelinePlugin = {
             });
 
             const description = String(data.meta?.description ?? "").trim() || undefined;
-            return {
+
+            const builtCase: BuiltCase = {
                 caseIndex: idx + 1,
                 scriptName: m.scriptName,
                 scriptId: m.scriptId,
                 description,
                 data,
             };
+
+            const additionalDriversCount =
+                Number(data.additionalDrivers?.count ?? 0) || 0;
+            const policyHolderClaimsCount =
+                Number(data.policyHolderClaims?.count ?? 0) || 0;
+            const policyHolderConvictionsCount =
+                Number(data.policyHolderConvictions?.count ?? 0) || 0;
+
+            ctx.log.debug?.(
+                [
+                    `Built case -> index=${builtCase.caseIndex}`,
+                    `scriptId=${builtCase.scriptId ?? ""}`,
+                    `scriptName=${builtCase.scriptName}`,
+                    `policyHolderClaims=${policyHolderClaimsCount}`,
+                    `policyHolderConvictions=${policyHolderConvictionsCount}`,
+                    `additionalDrivers=${additionalDriversCount}`,
+                ].join(", ")
+            );
+
+            return builtCase;
         });
 
         const casesFile: CasesFile = {

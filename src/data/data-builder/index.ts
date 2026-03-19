@@ -16,7 +16,6 @@ import type { DataBuilderContext } from "./types";
 async function main() {
     printCommandTitle("DATA BUILDER", "dataBuilderIcon");
     const timer = startTimer();
-
     const args = parseBuildArgs();
     const log = createDataBuilderLogger(args.verbose);
 
@@ -29,6 +28,7 @@ async function main() {
             outputPath: args.outputPath,
             scriptIdFilter: args.scriptIdFilter,
             excludeEmptyFields: args.excludeEmptyFields,
+            strictValidation: args.strictValidation,
             verbose: args.verbose,
         },
     };
@@ -40,6 +40,7 @@ async function main() {
     printKeyValue("outputPath", args.outputPath);
     printKeyValue("scriptIdFilter", args.scriptIdFilter || "(all)");
     printKeyValue("excludeEmptyFields", args.excludeEmptyFields);
+    printKeyValue("strictValidation", args.strictValidation);
     printKeyValue("verbose", args.verbose);
 
     printSection("Available Schemas");
@@ -60,7 +61,6 @@ async function main() {
     console.log(plugins.map((p) => p.name).join(" -> "));
 
     log.info("Starting schema-driven Data Builder...");
-
     const ranNames = await runDiscoveredPlugins(ctx, plugins);
     const absOut = ctx.data.absOut ?? "";
     const caseCount = ctx.data.casesFile?.caseCount ?? 0;
@@ -69,6 +69,7 @@ async function main() {
         "DATA BUILDER SUMMARY",
         [
             ["Schema", args.schemaName],
+            ["Strict validation", args.strictValidation ? "true" : "false"],
             ["Plugins executed", ranNames.length],
             ["Cases generated", caseCount],
             ["Output file", absOut || "(not set)"],

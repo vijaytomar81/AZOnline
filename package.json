@@ -9,8 +9,13 @@
     "data": "ts-node src/data/data-builder/index.ts",
     "data:build": "npm run data",
     "data:build:verbose": "npm run data -- --verbose",
+    "data:build:strict": "npm run data -- --strictValidation",
+    "data:build:strict:verbose": "npm run data -- --strictValidation --verbose",
     "data:build:noEmpty": "npm run data -- --excludeEmptyFields",
     "data:build:noEmpty:verbose": "npm run data -- --excludeEmptyFields --verbose",
+    "data:build:noEmpty:strict": "npm run data -- --excludeEmptyFields --strictValidation",
+    "data:build:noEmpty:strict:verbose": "npm run data -- --excludeEmptyFields --strictValidation --verbose",
+    "data:build:schema": "npm run data -- --schema",
     "data:help": "npm run data -- --help",
 
     "scan": "node -r ts-node/register -r tsconfig-paths/register src/tools/page-scanner/cli.ts",

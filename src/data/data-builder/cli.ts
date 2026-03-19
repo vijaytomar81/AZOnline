@@ -38,10 +38,10 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
   const sheetName = String(getArg(argv, "--sheet") ?? process.env.SHEET ?? "").trim();
   const schemaName = String(getArg(argv, "--schema") ?? process.env.SCHEMA ?? "master").trim();
   const scriptIdFilter = String(getArg(argv, "--ids") ?? process.env.SCRIPT_IDS ?? "").trim();
-
   const excludeEmptyFields =
-    hasFlag(argv, "--excludeEmptyFields") ||
-    (process.env.EXCLUDE_EMPTY_FIELDS ?? "").toLowerCase() === "true";
+    hasFlag(argv, "--excludeEmptyFields") || parseBoolean(process.env.EXCLUDE_EMPTY_FIELDS);
+  const strictValidation =
+    hasFlag(argv, "--strictValidation") || parseBoolean(process.env.STRICT_VALIDATION);
 
   if (!excelPath) throw new Error("❌ EXCEL_PATH is required (or use --excel).");
   if (!sheetName) throw new Error("❌ SHEET is required (or use --sheet).");
@@ -57,6 +57,7 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
     outputPath,
     scriptIdFilter,
     excludeEmptyFields,
+    strictValidation,
     verbose,
   };
 }

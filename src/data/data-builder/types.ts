@@ -10,6 +10,7 @@ export type DataBuilderBaseArgs = {
     outputPath: string;
     scriptIdFilter: ScriptIdFilter;
     excludeEmptyFields: boolean;
+    strictValidation: boolean;
     verbose: boolean;
 };
 
