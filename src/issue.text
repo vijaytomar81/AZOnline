@@ -1,926 +1,370 @@
-Yes/No buttons are not there for "Did the conviction result in a disqualification?" question in below.
+Script ID
+Description
+Data Specification
+Script
+ScriptName
 
-{
-  "pageKey": "athena.motor.ph-driving-licence-details",
-  "url": "https://customer-portal-lv-test.athenapaas.com/journey/show/product/AnnualMotorInsurance/process/nb/drivingLicenceScan/69b3085919f0b1757f6ac83e",
-  "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/drivingLicenceScan/69b3085919f0b1757f6ac83e",
-  "scannedAt": "2026-03-12T18:44:08.792Z",
-  "title": "Driving licence details",
-  "elements": {
-    "linkToAllianzHomePage": {
-      "type": "link",
-      "preferred": "css=#goToAllianzHomePage",
-      "fallbacks": [
-        "css=a[aria-label=\"Link to Allianz home page\"]",
-        "role=link[name=/Link to Allianz home page/i]"
-      ],
-      "meta": {
-        "tag": "a",
-        "role": null,
-        "id": "goToAllianzHomePage",
-        "name": "Link to Allianz home page",
-        "text": null,
-        "labelText": null,
-        "ariaLabel": "Link to Allianz home page",
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": "https://www.allianz.co.uk",
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": null,
-        "isFrameworkSearchInput": false
-      }
-    },
-    "selectTitleQuestion": {
-      "type": "select",
-      "preferred": "css=#titleQuestion",
-      "fallbacks": [
-        "role=combobox[name=/Title/i]"
-      ],
-      "meta": {
-        "tag": "select",
-        "role": null,
-        "id": "titleQuestion",
-        "name": "Title",
-        "text": null,
-        "labelText": "Title",
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": "Title",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "titleQuestion",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputFirstName": {
-      "type": "input",
-      "preferred": "css=#firstName",
-      "fallbacks": [
-        "role=textbox[name=/First name/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "firstName",
-        "name": "First name",
-        "text": null,
-        "labelText": "First name",
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": "First name",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "firstName",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputLastName": {
-      "type": "input",
-      "preferred": "css=#lastName",
-      "fallbacks": [
-        "role=textbox[name=/Last name/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "lastName",
-        "name": "Last name",
-        "text": null,
-        "labelText": "Last name",
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": "Last name",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "lastName",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputDateOfBirthDay": {
-      "type": "input",
-      "preferred": "css=#dateOfBirth-day",
-      "fallbacks": [
-        "css=input[aria-label=\"day\"]",
-        "css=input[placeholder=\"DD\"]",
-        "role=textbox[name=/day/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "dateOfBirth-day",
-        "name": "day",
-        "text": null,
-        "labelText": "Day",
-        "ariaLabel": "day",
-        "placeholder": "DD",
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "dateOfBirth",
-        "ownerLabelText": "Date of birth",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "dateOfBirth",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputDateOfBirthMonth": {
-      "type": "input",
-      "preferred": "css=#dateOfBirth-month",
-      "fallbacks": [
-        "css=input[aria-label=\"month\"]",
-        "css=input[placeholder=\"MM\"]",
-        "role=textbox[name=/month/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "dateOfBirth-month",
-        "name": "month",
-        "text": null,
-        "labelText": "Month",
-        "ariaLabel": "month",
-        "placeholder": "MM",
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "dateOfBirth",
-        "ownerLabelText": "Date of birth",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "dateOfBirth",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputDateOfBirthYear": {
-      "type": "input",
-      "preferred": "css=#dateOfBirth-year",
-      "fallbacks": [
-        "css=input[aria-label=\"year\"]",
-        "css=input[placeholder=\"YYYY\"]",
-        "role=textbox[name=/year/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "dateOfBirth-year",
-        "name": "year",
-        "text": null,
-        "labelText": "Year",
-        "ariaLabel": "year",
-        "placeholder": "YYYY",
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "dateOfBirth",
-        "ownerLabelText": "Date of birth",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "dateOfBirth",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputAddressLookupWidgetAddressLookupQuestionInputBuilding": {
-      "type": "input",
-      "preferred": "css=#addressLookupWidget-addressLookupQuestionInput-building",
-      "fallbacks": [
-        "role=textbox[name=/addressLookupWidget-addressLookupQuestionInput-building/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "addressLookupWidget-addressLookupQuestionInput-building",
-        "name": "addressLookupWidget-addressLookupQuestionInput-building",
-        "text": null,
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "addressLookupQuestionInput",
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": null,
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputAddressLookupWidgetAddressLookupQuestionInputPostcode": {
-      "type": "input",
-      "preferred": "css=#addressLookupWidget-addressLookupQuestionInput-postcode",
-      "fallbacks": [
-        "role=textbox[name=/addressLookupWidget-addressLookupQuestionInput-postcode/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "addressLookupWidget-addressLookupQuestionInput-postcode",
-        "name": "addressLookupWidget-addressLookupQuestionInput-postcode",
-        "text": null,
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "addressLookupQuestionInput",
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": null,
-        "isFrameworkSearchInput": false
-      }
-    },
-    "buttonFindAddress": {
-      "type": "button",
-      "preferred": "css=#find-address",
-      "fallbacks": [
-        "role=button[name=/Find address/i]",
-        "text=/Find address/i"
-      ],
-      "meta": {
-        "tag": "button",
-        "role": null,
-        "id": "find-address",
-        "name": "Find address",
-        "text": "Find address",
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "addressLookupQuestionInput",
-        "ownerLabelText": "Address",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "addressLookupQuestionInput",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "radioDrivingLicenceTypesUKFull": {
-      "type": "radio",
-      "preferred": "css=#drivingLicenceTypes1",
-      "fallbacks": [
-        "css=input[name=\"drivingLicenceTypes\"]",
-        "role=textbox[name=/UK Full/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "drivingLicenceTypes1",
-        "name": "UK Full",
-        "text": null,
-        "labelText": "UK Full",
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": "drivingLicenceTypes",
-        "typeAttr": "radio",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": "What type of driving licence do you have?",
-        "ownerAriaLabel": "What type of driving licence do you have?",
-        "ownerGroupLabelFor": "drivingLicenceTypes",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "radioDrivingLicenceTypesUKFullToAutomaticOnly": {
-      "type": "radio",
-      "preferred": "css=#drivingLicenceTypes2",
-      "fallbacks": [
-        "css=input[name=\"drivingLicenceTypes\"]",
-        "role=textbox[name=/UK Full - Automatic only/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "drivingLicenceTypes2",
-        "name": "UK Full - Automatic only",
-        "text": null,
-        "labelText": "UK Full - Automatic only",
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": "drivingLicenceTypes",
-        "typeAttr": "radio",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": "What type of driving licence do you have?",
-        "ownerAriaLabel": "What type of driving licence do you have?",
-        "ownerGroupLabelFor": "drivingLicenceTypes",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "radioDrivingLicenceTypesUKProvisional": {
-      "type": "radio",
-      "preferred": "css=#drivingLicenceTypes3",
-      "fallbacks": [
-        "css=input[name=\"drivingLicenceTypes\"]",
-        "role=textbox[name=/UK Provisional/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "drivingLicenceTypes3",
-        "name": "UK Provisional",
-        "text": null,
-        "labelText": "UK Provisional",
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": "drivingLicenceTypes",
-        "typeAttr": "radio",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": "What type of driving licence do you have?",
-        "ownerAriaLabel": "What type of driving licence do you have?",
-        "ownerGroupLabelFor": "drivingLicenceTypes",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "radioDrivingLicenceTypesEUFull": {
-      "type": "radio",
-      "preferred": "css=#drivingLicenceTypes4",
-      "fallbacks": [
-        "css=input[name=\"drivingLicenceTypes\"]",
-        "role=textbox[name=/EU Full/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "drivingLicenceTypes4",
-        "name": "EU Full",
-        "text": null,
-        "labelText": "EU Full",
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": "drivingLicenceTypes",
-        "typeAttr": "radio",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": "What type of driving licence do you have?",
-        "ownerAriaLabel": "What type of driving licence do you have?",
-        "ownerGroupLabelFor": "drivingLicenceTypes",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "radioDrivingLicenceTypesEUProvisional": {
-      "type": "radio",
-      "preferred": "css=#drivingLicenceTypes5",
-      "fallbacks": [
-        "css=input[name=\"drivingLicenceTypes\"]",
-        "role=textbox[name=/EU Provisional/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "drivingLicenceTypes5",
-        "name": "EU Provisional",
-        "text": null,
-        "labelText": "EU Provisional",
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": "drivingLicenceTypes",
-        "typeAttr": "radio",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": "What type of driving licence do you have?",
-        "ownerAriaLabel": "What type of driving licence do you have?",
-        "ownerGroupLabelFor": "drivingLicenceTypes",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "radioDrivingLicenceTypesOther": {
-      "type": "radio",
-      "preferred": "css=#drivingLicenceTypes6",
-      "fallbacks": [
-        "css=input[name=\"drivingLicenceTypes\"]",
-        "role=textbox[name=/Other/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "drivingLicenceTypes6",
-        "name": "Other",
-        "text": null,
-        "labelText": "Other",
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": "drivingLicenceTypes",
-        "typeAttr": "radio",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": "What type of driving licence do you have?",
-        "ownerAriaLabel": "What type of driving licence do you have?",
-        "ownerGroupLabelFor": "drivingLicenceTypes",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "selectDrivingExpirience": {
-      "type": "select",
-      "preferred": "css=#drivingExpirience",
-      "fallbacks": [
-        "role=combobox[name=/How long have you held your licence for\\?/i]"
-      ],
-      "meta": {
-        "tag": "select",
-        "role": null,
-        "id": "drivingExpirience",
-        "name": "How long have you held your licence for?",
-        "text": null,
-        "labelText": "How long have you held your licence for?",
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": "How long have you held your licence for?",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "drivingExpirience",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputConviction1DateMonth": {
-      "type": "input",
-      "preferred": "css=#conviction_1_date-month",
-      "fallbacks": [
-        "css=input[aria-label=\"Month input field\"]",
-        "css=input[placeholder=\"MM\"]",
-        "role=textbox[name=/Month input field/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "conviction_1_date-month",
-        "name": "Month input field",
-        "text": null,
-        "labelText": "Month",
-        "ariaLabel": "Month input field",
-        "placeholder": "MM",
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "conviction_1_date",
-        "ownerLabelText": "Date of conviction",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "conviction_1_date",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputConviction1DateYear": {
-      "type": "input",
-      "preferred": "css=#conviction_1_date-year",
-      "fallbacks": [
-        "css=input[aria-label=\"Year input field\"]",
-        "css=input[placeholder=\"YYYY\"]",
-        "role=textbox[name=/Year input field/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "conviction_1_date-year",
-        "name": "Year input field",
-        "text": null,
-        "labelText": "Year",
-        "ariaLabel": "Year input field",
-        "placeholder": "YYYY",
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "conviction_1_date",
-        "ownerLabelText": "Date of conviction",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "conviction_1_date",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputConviction1DescriptionSearchInput": {
-      "type": "input",
-      "preferred": "css=#react-select-2-input",
-      "fallbacks": [
-        "role=textbox[name=/react-select-2-input/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "react-select-2-input",
-        "name": "react-select-2-input",
-        "text": null,
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "conviction_1_description",
-        "ownerLabelText": "Select the conviction code",
-        "ownerAriaLabel": "Select the conviction code",
-        "ownerGroupLabelFor": "conviction_1_description",
-        "isFrameworkSearchInput": true
-      }
-    },
-    "linkRemoveConviction": {
-      "type": "link",
-      "preferred": "role=link[name=/Remove conviction/i]",
-      "fallbacks": [
-        "text=/Remove conviction/i"
-      ],
-      "meta": {
-        "tag": "a",
-        "role": null,
-        "id": null,
-        "name": "Remove conviction",
-        "text": "Remove conviction",
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": "javascript:void(0)",
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": null,
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputConviction2DateMonth": {
-      "type": "input",
-      "preferred": "css=#conviction_2_date-month",
-      "fallbacks": [
-        "css=input[aria-label=\"Month input field\"]",
-        "css=input[placeholder=\"MM\"]",
-        "role=textbox[name=/Month input field/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "conviction_2_date-month",
-        "name": "Month input field",
-        "text": null,
-        "labelText": "Month",
-        "ariaLabel": "Month input field",
-        "placeholder": "MM",
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "conviction_2_date",
-        "ownerLabelText": "Date of conviction",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "conviction_2_date",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputConviction2DateYear": {
-      "type": "input",
-      "preferred": "css=#conviction_2_date-year",
-      "fallbacks": [
-        "css=input[aria-label=\"Year input field\"]",
-        "css=input[placeholder=\"YYYY\"]",
-        "role=textbox[name=/Year input field/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "conviction_2_date-year",
-        "name": "Year input field",
-        "text": null,
-        "labelText": "Year",
-        "ariaLabel": "Year input field",
-        "placeholder": "YYYY",
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "conviction_2_date",
-        "ownerLabelText": "Date of conviction",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "conviction_2_date",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputConviction2DescriptionSearchInput": {
-      "type": "input",
-      "preferred": "css=#react-select-3-input",
-      "fallbacks": [
-        "role=textbox[name=/react-select-3-input/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "react-select-3-input",
-        "name": "react-select-3-input",
-        "text": null,
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "conviction_2_description",
-        "ownerLabelText": "Select the conviction code",
-        "ownerAriaLabel": "Select the conviction code",
-        "ownerGroupLabelFor": "conviction_2_description",
-        "isFrameworkSearchInput": true
-      }
-    },
-    "linkRemoveConviction2": {
-      "type": "link",
-      "preferred": "role=link[name=/Remove conviction/i]",
-      "fallbacks": [
-        "text=/Remove conviction/i"
-      ],
-      "meta": {
-        "tag": "a",
-        "role": null,
-        "id": null,
-        "name": "Remove conviction",
-        "text": "Remove conviction",
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": "javascript:void(0)",
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": null,
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputConviction3DateMonth": {
-      "type": "input",
-      "preferred": "css=#conviction_3_date-month",
-      "fallbacks": [
-        "css=input[aria-label=\"Month input field\"]",
-        "css=input[placeholder=\"MM\"]",
-        "role=textbox[name=/Month input field/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "conviction_3_date-month",
-        "name": "Month input field",
-        "text": null,
-        "labelText": "Month",
-        "ariaLabel": "Month input field",
-        "placeholder": "MM",
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "conviction_3_date",
-        "ownerLabelText": "Date of conviction",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "conviction_3_date",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputConviction3DateYear": {
-      "type": "input",
-      "preferred": "css=#conviction_3_date-year",
-      "fallbacks": [
-        "css=input[aria-label=\"Year input field\"]",
-        "css=input[placeholder=\"YYYY\"]",
-        "role=textbox[name=/Year input field/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "conviction_3_date-year",
-        "name": "Year input field",
-        "text": null,
-        "labelText": "Year",
-        "ariaLabel": "Year input field",
-        "placeholder": "YYYY",
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "conviction_3_date",
-        "ownerLabelText": "Date of conviction",
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": "conviction_3_date",
-        "isFrameworkSearchInput": false
-      }
-    },
-    "inputConviction3DescriptionSearchInput": {
-      "type": "input",
-      "preferred": "css=#react-select-5-input",
-      "fallbacks": [
-        "role=textbox[name=/react-select-5-input/i]"
-      ],
-      "meta": {
-        "tag": "input",
-        "role": null,
-        "id": "react-select-5-input",
-        "name": "react-select-5-input",
-        "text": null,
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": "text",
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": "conviction_3_description",
-        "ownerLabelText": "Select the conviction code",
-        "ownerAriaLabel": "Select the conviction code",
-        "ownerGroupLabelFor": "conviction_3_description",
-        "isFrameworkSearchInput": true
-      }
-    },
-    "linkRemoveConviction3": {
-      "type": "link",
-      "preferred": "role=link[name=/Remove conviction/i]",
-      "fallbacks": [
-        "text=/Remove conviction/i"
-      ],
-      "meta": {
-        "tag": "a",
-        "role": null,
-        "id": null,
-        "name": "Remove conviction",
-        "text": "Remove conviction",
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": "javascript:void(0)",
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": null,
-        "isFrameworkSearchInput": false
-      }
-    },
-    "buttonNavigatorNext": {
-      "type": "button",
-      "preferred": "css=#navigatorNext",
-      "fallbacks": [
-        "role=button[name=/Next/i]",
-        "text=/Next/i"
-      ],
-      "meta": {
-        "tag": "button",
-        "role": null,
-        "id": "navigatorNext",
-        "name": "Next",
-        "text": "Next",
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": null,
-        "isFrameworkSearchInput": false
-      }
-    },
-    "buttonNavigatorBack": {
-      "type": "button",
-      "preferred": "css=#navigatorBack",
-      "fallbacks": [
-        "role=link[name=/Back/i]",
-        "text=/Back/i"
-      ],
-      "meta": {
-        "tag": "button",
-        "role": "link",
-        "id": "navigatorBack",
-        "name": "Back",
-        "text": "Back",
-        "labelText": null,
-        "ariaLabel": null,
-        "placeholder": null,
-        "inputName": null,
-        "typeAttr": null,
-        "href": null,
-        "dataTestId": null,
-        "dataTest": null,
-        "dataQa": null,
-        "ownerId": null,
-        "ownerLabelText": null,
-        "ownerAriaLabel": null,
-        "ownerGroupLabelFor": null,
-        "isFrameworkSearchInput": false
-      }
-    },
-    "radioDrivingLicenceTypes": {
-      "type": "radio-group",
-      "preferred": "",
-      "fallbacks": [],
-      "options": {
-        "UK Full": "radioDrivingLicenceTypesUKFull",
-        "UK Full - Automatic only": "radioDrivingLicenceTypesUKFullToAutomaticOnly",
-        "UK Provisional": "radioDrivingLicenceTypesUKProvisional",
-        "EU Full": "radioDrivingLicenceTypesEUFull",
-        "EU Provisional": "radioDrivingLicenceTypesEUProvisional",
-        "Other": "radioDrivingLicenceTypesOther"
-      },
-      "meta": {
-        "inputName": "drivingLicenceTypes",
-        "ownerLabelText": "What type of driving licence do you have?",
-        "ownerAriaLabel": "What type of driving licence do you have?",
-        "ownerId": null
-      }
-    }
-  }
-}
+P__Account Information
+Account Id
+Password
+gmailPassword
+P__Vehicle
+KnowRegNo
+VRN
+Make
+YearOfManufacture
+PurchaseDate
+HasTheCarBeenBought
+Transmission
+FuelType
+Service
+BodyType
+Model
+SelectTheCar
+RegisterNumber
+HaveTrackingDevice
+DoesCarHaveModifications
+P__Licence details
+EnterDriverDetailsManually
+HaveDrivingLicenceHandy
+Title
+Firstname
+Lastname
+FullName
+PHDoB Derivation
+DOB
+LicencePart1
+LicencePart2
+LicenceNumber
+HouseNo
+Postcode
+Address
+LicenceType
+LicenceHeldYears 
+HaveMotoringConvictions
+Conviction1Date
+Conviction1Code
+DidConviction1ResultInDisqualification
+Conviction1BanLength
+Conviction2Date
+Conviction2Code
+DidConviction2ResultInDisqualification
+Conviction2BanLength
+Conviction3Date
+Conviction3Code
+DidConviction3ResultInDisqualification
+Conviction3BanLength
+P__Personal details
+EmploymentStatus
+Occupation
+Industry
+HaveSecondaryOccupation
+MaritalStatus
+Phone
+DoYouOwnYourHome
+UKRresidentForMoreThan3Years
+UKResidentYears
+LVMemberAnswer
+P__Claims details
+HadClaimsAnswer
+HaveNonMotoringConviction
+ClaimsCount
+Claim1Date
+Claim1Reason
+Claim2Date
+Claim2Reason
+Claim3Date
+Claim3Reason
+NCDYears
+HowWasNCDEarned
+WantToProtectNCD
+P__AdditionalDrivers
+AdditionalDriversCount
+P__AdditionalDriver1
+AD1EnterDriverDetailsManually
+AD1HaveDrivingLicenceHandy
+AD1Title
+AD1Firstname
+AD1Lastname
+AD1DoB Derivation
+AD1DOB
+AD1LicenceNumber
+AD1LicencePart1
+AD1LicencePart2
+AD1LicenceType
+AD1LicenceExperience
+AD1HouseNo
+AD1Postcode
+AD1ConvictionsCount
+AD1HaveMotoringConvictions
+AD1Conviction1Date
+AD1Conviction1Code
+AD1DidConviction1ResultInDisqualification
+AD1Conviction1BanLength
+AD1Conviction2Date
+AD1Conviction2Code
+AD1DidConviction2ResultInDisqualification
+AD1Conviction2BanLength
+AD1Conviction3Date
+AD1Conviction3Code
+AD1DidConviction3ResultInDisqualification
+AD1Conviction3BanLength
+AD1EmploymentStatus
+AD1Occupation
+AD1Industry
+AD1MaritalStatus
+AD1HaveSecOccupation
+AD1RelationToPH
+AD1IsUKResident
+AD1UKResidentYears
+AD1DoYouOwnYourHome
+AD1DoesDriverOwnAnotherVehicle
+AD1LVMemberAnswer
+AD1HadClaimsAnswer
+AD1ClaimsCount
+AD1Claim1Date
+AD1Claim1Reason
+AD1Claim2Date
+AD1Claim2Reason
+AD1Claim3Date
+AD1Claim3Reason
+AD1NCDYears
+AD1HowWasNCDEarned
+AD1DoYouWantToProctectNCD
+
+P__AdditionalDriver2
+AD2EnterDriverDetailsManually
+AD2HaveDrivingLicenceHandy
+AD2Title
+AD2Firstname
+AD2Lastname
+AD2DOB
+AD2LicenceNumber
+AD2LicencePart1
+AD2LicencePart2
+AD2LicenceType
+AD2LicenceExperience
+AD2HouseNo
+AD2Postcode
+AD2ConvictionsCount
+AD2HaveMotoringConvictions
+AD2Conviction1Date
+AD2Conviction1Code
+AD2DidConviction1ResultInDisqualification
+AD2Conviction1BanLength
+AD2Conviction2Date
+AD2Conviction2Code
+AD2DidConviction2ResultInDisqualification
+AD2Conviction2BanLength
+AD2Conviction3Date
+AD2Conviction3Code
+AD2DidConviction3ResultInDisqualification
+AD2Conviction3BanLength
+AD2EmploymentStatus
+AD2Occupation
+AD2Industry
+AD2MaritalStatus
+AD2HaveSecOccupation
+AD2RelationToPH
+AD2IsUKResident
+AD2UKResidentYears
+AD2DoYouOwnYourHome
+AD2DoesDriverOwnAnotherVehicle
+AD2LVMemberAnswer
+AD2HadClaimsAnswer
+AD2ClaimsCount
+AD2Claim1Date
+AD2Claim1Reason
+AD2Claim2Date
+AD2Claim2Reason
+AD2Claim3Date
+AD2Claim3Reason
+AD2NCDYears
+AD2HowWasNCDEarned
+AD2DoYouWantToProctectNCD
+AD2NCDYears
+AD2HowWasNCDEarned
+AD2DoYouWantToProctectNCD
+
+P__AdditionalDriver3
+AD3EnterDriverDetailsManually
+AD3HaveDrivingLicenceHandy
+AD3Title
+AD3Firstname
+AD3Lastname
+AD3DOB
+AD3LicenceNumber
+AD3LicencePart1
+AD3LicencePart2
+AD3LicenceType
+AD3LicenceExperience
+AD3ConvictionsCount
+AD3HaveMotoringConvictions
+AD3Conviction1Date
+AD3Conviction1Code
+AD3DidConviction1ResultInDisqualification
+AD3Conviction1BanLength
+AD3Conviction2Date
+AD3Conviction2Code
+AD3DidConviction2ResultInDisqualification
+AD3Conviction2BanLength
+AD3Conviction3Date
+AD3Conviction3Code
+AD3DidConviction3ResultInDisqualification
+AD3Conviction3BanLength
+AD3HouseNo
+AD3Postcode
+AD3EmploymentStatus
+AD3Occupation
+AD3Industry
+AD3MaritalStatus
+AD3HaveSecOccupation
+AD3RelationToPH
+AD3IsUKResident
+AD3UKResidentYears
+AD3DoYouOwnYourHome
+AD3DoesDriverOwnAnotherVehicle
+AD3LVMemberAnswer
+AD3HadClaimsAnswer
+AD3ClaimsCount
+AD3Claim1Date
+AD3Claim1Reason
+AD3Claim2Date
+AD3Claim2Reason
+AD3Claim3Date
+AD3Claim3Reason
+AD3NCDYears
+AD3HowWasNCDEarned
+AD3DoYouWantToProctectNCD
+
+P__AdditionalDriver4
+AD4EnterDriverDetailsManually
+AD4HaveDrivingLicenceHandy
+AD4Title
+AD4Firstname
+AD4Lastname
+AD4DOB
+AD4LicenceNumber
+AD4LicencePart1
+AD4LicencePart2
+AD4LicenceType
+AD4LicenceExperience
+AD4ConvictionsCount
+AD4HaveMotoringConvictions
+AD4Conviction1Date
+AD4Conviction1Code
+AD4DidConviction1ResultInDisqualification
+AD4Conviction1BanLength
+AD4Conviction2Date
+AD4Conviction2Code
+AD4DidConviction2ResultInDisqualification
+AD4Conviction2BanLength
+AD4Conviction3Date
+AD4Conviction3Code
+AD4DidConviction3ResultInDisqualification
+AD4Conviction3BanLength
+AD4HouseNo
+AD4Postcode
+AD4EmploymentStatus
+AD4Occupation
+AD4Industry
+AD4MaritalStatus
+AD4HaveSecOccupation
+AD4RelationToPH
+AD4IsUKResident
+AD4UKResidentYears
+AD4DoYouOwnYourHome
+AD4DoesDriverOwnAnotherVehicle
+AD4LVMemberAnswer
+AD4HadClaimsAnswer
+AD4NCDYears
+AD4HowWasNCDEarned
+AD4DoYouWantToProctectNCD
+
+P__AdditionalDriver5
+AD5EnterDriverDetailsManually
+AD5HaveDrivingLicenceHandy
+AD5Title
+AD5Firstname
+AD5Lastname
+AD5DOB
+AD5LicenceNumber
+AD5LicencePart1
+AD5LicencePart2
+AD5LicenceType
+AD5LicenceExperience
+AD5ConvictionsCount
+AD5HaveMotoringConvictions
+AD5Conviction1Date
+AD5Conviction1Code
+AD5DidConviction1ResultInDisqualification
+AD5Conviction1BanLength
+AD5Conviction2Date
+AD5Conviction2Code
+AD5DidConviction2ResultInDisqualification
+AD5Conviction2BanLength
+AD5Conviction3Date
+AD5Conviction3Code
+AD5DidConviction3ResultInDisqualification
+AD5Conviction3BanLength
+AD5HouseNo
+AD5Postcode
+AD5EmploymentStatus
+AD5Occupation
+AD5Industry
+AD5MaritalStatus
+AD5HaveSecOccupation
+AD5RelationToPH
+AD5IsUKResident
+AD5UKResidentYears
+AD5DoYouOwnYourHome
+AD5DoesDriverOwnAnotherVehicle
+AD5LVMemberAnswer
+AD5HadClaimsAnswer
+AD5NCDYears
+AD5HowWasNCDEarned
+AD5DoYouWantToProctectNCD
+
+P__CarUsageDetails
+whoIsMainDriver
+IsPHRegKeeperLegalOwner
+RegKeeper
+LegalOwner
+Mileage
+IsVehicleStoredAtHomeAddress
+CarStoredPlace
+CarStoredOvernightLocation
+NoOfCarsAtHome
+CarUsageType
+P__CoverDetails
+CoverStartDay
+CoverStartFullDate
+VoluntaryExcess
+breakDownOption
+RR
+PNCD
+GuaranteedHireCar
+MotorLegalExpenses
+Product
+DeclineMessage
+AthenaUWRuleID
+AthenaUWMessage
+ProceedToBuy
+P__Direct Debit Details
+BankCheckService
+AccountHolderName
+AccountNumber
+SortCode
+PaymentDay
+P__PaymentDetails
+PaymentGatewayService
+PaymentMode
+LowRange
+HighRange
+PaymentDate
+CardName
+CardNumber
+ExpiryMM
+ExpiryYYYY
+SecurityCode
+MonthlyCardCase

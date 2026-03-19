@@ -1,0 +1,408 @@
+| Script ID                             | 1                                              |
+|---------------------------------------|------------------------------------------------|
+| Description                           | Confused Test Case                             |
+| Data Specification                    | Should give Flow Quote                         |
+| ScriptName                            | CNF_GOL_NB001                                  |
+| Account Information                   |                                                |
+| AccountEmail                          | falconautotest                                 |
+| Today'sDate                           | 18/03/2026                                     |
+| Formatted Date                        | 18Mar26                                        |
+| Formatted AccountId                   | falconautotest+CNF_GOL_NB001.18Mar26@gmail.com |
+| Account Id                            | lv.test+AprilCTM001@knowledgeprice.com         |
+| Password                              | Test@12345                                     |
+| gmailPassword                         | Test@321                                       |
+| Title                                 | Dr Male                                        |
+| Firstname                             | Steve                                          |
+| Lastname                              | Martin                                         |
+| FullName                              | Steve Martin                                   |
+| Vehicle/Car Usage                     |                                                |
+| KnowRegNo                             | Yes                                            |
+| VRN                                   | KS18XCP                                        |
+| Make                                  |                                                |
+| Model                                 |                                                |
+| YearOfManufacture                     |                                                |
+| Doors                                 |                                                |
+| Transmission                          |                                                |
+| FuelType                              |                                                |
+| EngineSize                            |                                                |
+| Trim                                  |                                                |
+| HowMuchIsTheCarWorth                  |                                                |
+| RegisterNumber                        |                                                |
+| HasTheCarBeenImported                 | No                                             |
+| IsTheCarRighthandOrLefthandDrive      | Right                                          |
+| HowManySeatsDoesVehicleHave           | 5                                              |
+| DoesCarHaveAlarmOrImmobiliser         | Manufacturer fitted                            |
+| DoesCarHaveTracker                    | No                                             |
+| DoesCarHaveModifications              | No                                             |
+| DoesCarHaveDashcamFitted              | No                                             |
+| RegKeeper                             | Policy Holder                                  |
+| CarUsageReasonConfused                | Social & commuting                             |
+| CarUsageReasonFlow&CTM                | Social, Domestic, Pleasure and Commuting       |
+| PurchaseDate                          | January-2021                                   |
+| FlowMileage                           |                                                |
+| ConfusedAndCTMMileage                 | 6,000 miles                                    |
+| IsVehicleStoredAtSameLocation         | Yes                                            |
+| CarStoredDaytimeLocation              | At home                                        |
+| CarStoredOvernightLocation            | Road                                           |
+| CarParkPlace                          | At home                                        |
+| NoOfCarsAtHome                        | 1                                              |
+| VehicleHaveAnyModifications           | No                                             |
+| Licence details                       |                                                |
+| EnterDriverDetailsManually            |                                                |
+| confusedenterDriverLicenceNo          | No                                             |
+| DOB                                   | 12-05-1991                                     |
+| LicenceForManualOrAutomatic           |                                                |
+| LicenceIssuedLocation                 |                                                |
+| LicenceType                           | Full UK-manual                                 |
+| LicenceNumber                         | No License                                     |
+| LicencePart1                          |                                                |
+| LicencePart2                          |                                                |
+| ConfusedLicencePart3                  |                                                |
+| ConfusedLicencePart4                  |                                                |
+| LicenceHeldYears                      | 10 years                                       |
+| HouseNo                               | 199                                            |
+| Postcode                              | ST44LF                                         |
+| Address                               |                                                |
+| Personal details                      |                                                |
+| EmploymentStatus                      | Employed                                       |
+| Occupation                            | Doctor                                         |
+| Industry                              | NHS                                            |
+| MaritalStatus                         | Married                                        |
+| DoYouOwnYourHome                      | Yes                                            |
+| DoYouUseAnotherVehicle                | No                                             |
+| HowDoYouUseTheOtherVehicle            |                                                |
+| UKResidentSince                       | Birth                                          |
+| HaveChildrenUnder16                   | No                                             |
+| Phone                                 | 07777777889                                    |
+| LVMemberAnswer                        | Yes                                            |
+| PassedAdditionalDrivingQualifications |                                                |
+| HaveYouHeldCarInsuranceInLast2Years   | Yes                                            |
+| HasRegularlyDrivenCarNotInsured       | No                                             |
+| Claims details                        |                                                |
+| HadClaimsAnswer                       | No                                             |
+| howManyClaims                         |                                                |
+| whatTypeOfIncidentWasIt1              |                                                |
+| ClaimMoreOption1                      |                                                |
+| wasItSettled1                         |                                                |
+| wasAnyBodyInjured1                    |                                                |
+| whoWasAtFault1                        |                                                |
+| wasItSingleVehicleAccident1           |                                                |
+| DateOfIncident1                       |                                                |
+| whereWasTheVehicle1                   |                                                |
+| whatWasStolen1                        |                                                |
+| wasTheVehicleRecovered1               |                                                |
+| TotalClaimCost1                       |                                                |
+| whatTypeOfIncidentWasIt2              |                                                |
+| ClaimMoreOption2                      |                                                |
+| wasItSettled2                         |                                                |
+| wasAnyBodyInjured2                    |                                                |
+| whoWasAtFault2                        |                                                |
+| wasItSingleVehicleAccident2           |                                                |
+| DateOfIncident2                       |                                                |
+| whereWasTheVehicle2                   |                                                |
+| whatWasStolen2                        |                                                |
+| wasTheVehicleRecovered2               |                                                |
+| TotalClaimCost2                       |                                                |
+| whatTypeOfIncidentWasIt3              |                                                |
+| ClaimMoreOption3                      |                                                |
+| wasItSettled3                         |                                                |
+| wasAnyBodyInjured3                    |                                                |
+| whoWasAtFault3                        |                                                |
+| wasItSingleVehicleAccident3           |                                                |
+| DateOfIncident3                       |                                                |
+| whereWasTheVehicle3                   |                                                |
+| whatWasStolen3                        |                                                |
+| wasTheVehicleRecovered3               |                                                |
+| TotalClaimCost3                       |                                                |
+| HadConvictionAnswer                   | No                                             |
+| howManyConvictions                    |                                                |
+| convictionDate1                       |                                                |
+| DVLAConvictionCode1                   |                                                |
+| DVLAConvictionCodeOtherOption1        |                                                |
+| pointsIncurred1                       |                                                |
+| fineIncurredAmount1                   |                                                |
+| banLengthInMonths1                    |                                                |
+| wasTheDriverBreathalysed1             |                                                |
+| whatWasTheBreathalyserReading1        |                                                |
+| wasTheOffenceAccidentRelated1         |                                                |
+| convictionDate2                       |                                                |
+| DVLAConvictionCode2                   |                                                |
+| DVLAConvictionCodeOtherOption2        |                                                |
+| pointsIncurred2                       |                                                |
+| fineIncurredAmount2                   |                                                |
+| banLengthInMonths2                    |                                                |
+| wasTheDriverBreathalysed2             |                                                |
+| whatWasTheBreathalyserReading2        |                                                |
+| wasTheOffenceAccidentRelated2         |                                                |
+| convictionDate3                       |                                                |
+| DVLAConvictionCode3                   |                                                |
+| DVLAConvictionCodeOtherOption3        |                                                |
+| pointsIncurred3                       |                                                |
+| fineIncurredAmount3                   |                                                |
+| banLengthInMonths3                    |                                                |
+| wasTheDriverBreathalysed3             |                                                |
+| whatWasTheBreathalyserReading3        |                                                |
+| wasTheOffenceAccidentRelated3         |                                                |
+| NCDYears                              | 9 years                                        |
+| HowWasNCDEarned                       | With this car or previous                      |
+| DoYouWantToProctectNCD                | No                                             |
+| IsNCDProtected                        | No                                             |
+| AdditionalDrivers                     |                                                |
+| AdditionalDriversCount                | 0                                              |
+| AdditionalDriver1                     |                                                |
+| AD1EnterDriverDetailsManually         |                                                |
+| AD1Title                              |                                                |
+| AD1Firstname                          |                                                |
+| AD1Lastname                           |                                                |
+| AD1DOB                                |                                                |
+| AD1LicenceType                        |                                                |
+| AD1LicenceNumber                      |                                                |
+| AD1LicencePart1                       |                                                |
+| AD1LicencePart2                       |                                                |
+| AD1LicenceHeldYears                   |                                                |
+| AD1HouseNo                            |                                                |
+| AD1Postcode                           |                                                |
+| AD1EmploymentStatus                   |                                                |
+| AD1Occupation                         |                                                |
+| AD1Industry                           |                                                |
+| AD1MaritalStatus                      |                                                |
+| AD1HaveSecOccupation                  |                                                |
+| AD1RelationToPH                       |                                                |
+| AD1RelationToPHOthersOption           |                                                |
+| AD1IsUKResident                       |                                                |
+| AD1UKResidentYears                    |                                                |
+| AD1DoYouOwnYourHome                   |                                                |
+| AD1DoesDriverOwnAnotherVehicle        |                                                |
+| AD1Phone                              |                                                |
+| AD1LVMemberAnswer                     |                                                |
+| AD1HadClaimsAnswer                    |                                                |
+| AD1howManyClaims                      |                                                |
+| AD1whatTypeOfIncidentWasIt1           |                                                |
+| AD1ClaimMoreOption1                   |                                                |
+| AD1wasItSettled1                      |                                                |
+| AD1wasAnyBodyInjured1                 |                                                |
+| AD1whoWasAtFault1                     |                                                |
+| AD1wasItSingleVehicleAccident1        |                                                |
+| AD1DateOfIncident1                    |                                                |
+| AD1whereWasTheVehicle1                |                                                |
+| AD1whatWasStolen1                     |                                                |
+| AD1wasTheVehicleRecovered1            |                                                |
+| AD1TotalClaimCost1                    |                                                |
+| AD1whatTypeOfIncidentWasIt2           |                                                |
+| AD1ClaimMoreOption2                   |                                                |
+| AD1wasItSettled2                      |                                                |
+| AD1wasAnyBodyInjured2                 |                                                |
+| AD1whoWasAtFault2                     |                                                |
+| AD1wasItSingleVehicleAccident2        |                                                |
+| AD1DateOfIncident2                    |                                                |
+| AD1whereWasTheVehicle2                |                                                |
+| AD1whatWasStolen2                     |                                                |
+| AD1wasTheVehicleRecovered2            |                                                |
+| AD1TotalClaimCost2                    |                                                |
+| AD1whatTypeOfIncidentWasIt3           |                                                |
+| AD1ClaimMoreOption3                   |                                                |
+| AD1wasItSettled3                      |                                                |
+| AD1wasAnyBodyInjured3                 |                                                |
+| AD1whoWasAtFault3                     |                                                |
+| AD1wasItSingleVehicleAccident3        |                                                |
+| AD1DateOfIncident3                    |                                                |
+| AD1whereWasTheVehicle3                |                                                |
+| AD1whatWasStolen3                     |                                                |
+| AD1wasTheVehicleRecovered3            |                                                |
+| AD1TotalClaimCost3                    |                                                |
+| AD1HadConvictionsAnswer               |                                                |
+| AD1convictionDate1                    |                                                |
+| AD1DVLAConvictionCode1                |                                                |
+| AD1DVLAConvictionCodeOtherOption1     |                                                |
+| AD1pointsIncurred1                    |                                                |
+| AD1fineIncurredAmount1                |                                                |
+| AD1banLengthInMonths1                 |                                                |
+| AD1wasTheDriverBreathalysed1          |                                                |
+| AD1whatWasTheBreathalyserReading1     |                                                |
+| AD1wasTheOffenceAccidentRelated1      |                                                |
+| AD1convictionDate2                    |                                                |
+| AD1DVLAConvictionCode2                |                                                |
+| AD1DVLAConvictionCodeOtherOption2     |                                                |
+| AD1pointsIncurred2                    |                                                |
+| AD1fineIncurredAmount2                |                                                |
+| AD1banLengthInMonths2                 |                                                |
+| AD1wasTheDriverBreathalysed2          |                                                |
+| AD1whatWasTheBreathalyserReading2     |                                                |
+| AD1wasTheOffenceAccidentRelated2      |                                                |
+| AD1DconvictionDate3                   |                                                |
+| AD1DVLAConvictionCode3                |                                                |
+| AD1DVLAConvictionCodeOtherOption3     |                                                |
+| AD1pointsIncurred3                    |                                                |
+| AD1fineIncurredAmount3                |                                                |
+| AD1banLengthInMonths3                 |                                                |
+| AD1wasTheDriverBreathalysed3          |                                                |
+| AD1whatWasTheBreathalyserReading3     |                                                |
+| AD1wasTheOffenceAccidentRelated3      |                                                |
+| AD1HadNonMotoringConvictionAnswer     |                                                |
+| AD1NCDYears                           |                                                |
+| AD1HowWasNCDEarned                    |                                                |
+| AD1DoYouWantToProctectNCD             |                                                |
+|                                       |                                                |
+| AdditionalDriver2                     |                                                |
+| AD2EnterDriverDetailsManually         |                                                |
+| AD2Title                              |                                                |
+| AD2Firstname                          |                                                |
+| AD2Lastname                           |                                                |
+| AD2DOB                                |                                                |
+| AD2LicenceType                        |                                                |
+| AD2LicenceNumber                      |                                                |
+| AD2LicencePart1                       |                                                |
+| AD2LicencePart2                       |                                                |
+| AD2LicenceHeldYears                   |                                                |
+| AD2HouseNo                            |                                                |
+| AD2Postcode                           |                                                |
+| AD2EmploymentStatus                   |                                                |
+| AD2Occupation                         |                                                |
+| AD2Industry                           |                                                |
+| AD2MaritalStatus                      |                                                |
+| AD2HaveSecOccupation                  |                                                |
+| AD2RelationToPH                       |                                                |
+| AD2RelationToPHOthersOption           |                                                |
+| AD2IsUKResident                       |                                                |
+| AD2UKResidentYears                    |                                                |
+| AD2DoYouOwnYourHome                   |                                                |
+| AD2DoesDriverOwnAnotherVehicle        |                                                |
+| AD2Phone                              |                                                |
+| AD2LVMemberAnswer                     |                                                |
+| AD2HadClaimsAnswer                    |                                                |
+| AD2HadConvictionsAnswer               |                                                |
+| AD2HadNonMotoringConvictionAnswer     |                                                |
+| AD2NCDYears                           |                                                |
+| AD2HowWasNCDEarned                    |                                                |
+| AD2DoYouWantToProctectNCD             |                                                |
+|                                       |                                                |
+| AdditionalDriver3                     |                                                |
+| AD3EnterDriverDetailsManually         |                                                |
+| AD3Title                              |                                                |
+| AD3Firstname                          |                                                |
+| AD3Lastname                           |                                                |
+| AD3DOB                                |                                                |
+| AD3LicenceType                        |                                                |
+| AD3LicenceNumber                      |                                                |
+| AD3LicencePart1                       |                                                |
+| AD3LicencePart2                       |                                                |
+| AD3LicenceHeldYears                   |                                                |
+| AD3HouseNo                            |                                                |
+| AD3Postcode                           |                                                |
+| AD3EmploymentStatus                   |                                                |
+| AD3Occupation                         |                                                |
+| AD3Industry                           |                                                |
+| AD3MaritalStatus                      |                                                |
+| AD3HaveSecOccupation                  |                                                |
+| AD3RelationToPH                       |                                                |
+| AD3RelationToPHOthersOption           |                                                |
+| AD3IsUKResident                       |                                                |
+| AD3UKResidentYears                    |                                                |
+| AD3DoYouOwnYourHome                   |                                                |
+| AD3DoesDriverOwnAnotherVehicle        |                                                |
+| AD3Phone                              |                                                |
+| AD3LVMemberAnswer                     |                                                |
+| AD3HadClaimsAnswer                    |                                                |
+| AD3HadConvictionsAnswer               |                                                |
+| AD3HadNonMotoringConvictionAnswer     |                                                |
+| AD3NCDYears                           |                                                |
+| AD3HowWasNCDEarned                    |                                                |
+| AD3DoYouWantToProctectNCD             |                                                |
+|                                       |                                                |
+| AdditionalDriver4                     |                                                |
+| AD4EnterDriverDetailsManually         |                                                |
+| AD4Title                              |                                                |
+| AD4Firstname                          |                                                |
+| AD4Lastname                           |                                                |
+| AD4DOB                                |                                                |
+| AD4LicenceType                        |                                                |
+| AD4LicenceNumber                      |                                                |
+| AD4LicencePart1                       |                                                |
+| AD4LicencePart2                       |                                                |
+| AD4LicenceHeldYears                   |                                                |
+| AD4HouseNo                            |                                                |
+| AD4Postcode                           |                                                |
+| AD4EmploymentStatus                   |                                                |
+| AD4Occupation                         |                                                |
+| AD4Industry                           |                                                |
+| AD4MaritalStatus                      |                                                |
+| AD4HaveSecOccupation                  |                                                |
+| AD4RelationToPH                       |                                                |
+| AD4RelationToPHOthersOption           |                                                |
+| AD4IsUKResident                       |                                                |
+| AD4UKResidentYears                    |                                                |
+| AD4DoYouOwnYourHome                   |                                                |
+| AD4DoesDriverOwnAnotherVehicle        |                                                |
+| AD4Phone                              |                                                |
+| AD4LVMemberAnswer                     |                                                |
+| AD4HadClaimsAnswer                    |                                                |
+| AD4HadConvictionsAnswer               |                                                |
+| AD4HadNonMotoringConvictionAnswer     |                                                |
+| AD4NCDYears                           |                                                |
+| AD4HowWasNCDEarned                    |                                                |
+| AD4DoYouWantToProctectNCD             |                                                |
+|                                       |                                                |
+| AdditionalDriver5                     |                                                |
+| AD5EnterDriverDetailsManually         |                                                |
+| AD5Title                              |                                                |
+| AD5Firstname                          |                                                |
+| AD5Lastname                           |                                                |
+| AD5DOB                                |                                                |
+| AD5LicenceType                        |                                                |
+| AD5LicenceNumber                      |                                                |
+| AD5LicencePart1                       |                                                |
+| AD5LicencePart2                       |                                                |
+| AD5LicenceHeldYears                   |                                                |
+| AD5HouseNo                            |                                                |
+| AD5Postcode                           |                                                |
+| AD5EmploymentStatus                   |                                                |
+| AD5Occupation                         |                                                |
+| AD5Industry                           |                                                |
+| AD5MaritalStatus                      |                                                |
+| AD5HaveSecOccupation                  |                                                |
+| AD5RelationToPH                       |                                                |
+| AD5RelationToPHOthersOption           |                                                |
+| AD5IsUKResident                       |                                                |
+| AD5UKResidentYears                    |                                                |
+| AD5DoYouOwnYourHome                   |                                                |
+| AD5DoesDriverOwnAnotherVehicle        |                                                |
+| AD5Phone                              |                                                |
+| AD5LVMemberAnswer                     |                                                |
+| AD5HadClaimsAnswer                    |                                                |
+| AD5HadConvictionsAnswer               |                                                |
+| AD5HadNonMotoringConvictionAnswer     |                                                |
+| AD5NCDYears                           |                                                |
+| AD5HowWasNCDEarned                    |                                                |
+| AD5DoYouWantToProctectNCD             |                                                |
+|                                       |                                                |
+| CoverDetails                          | 1                                              |
+| CoverStartDay                         | 19/03/2026                                     |
+| CoverStartFullDate                    | Tomorrow, Wed 12 Feb 2025                      |
+| CoverType                             | Comprehensive                                  |
+| VoluntaryExcess                       | £150                                           |
+| breakDownOption                       |                                                |
+| RR                                    | No                                             |
+| PNCD                                  |                                                |
+| GuaranteedHireCar                     |                                                |
+| MotorLegalExpenses                    |                                                |
+| Product                               | Allianz                                        |
+| DeclineMessage                        | NA                                             |
+| ProceedToBuy                          | Yes                                            |
+| Direct Debit Details                  |                                                |
+| BankCheckService                      | Real                                           |
+| AccountHolderName                     | Sample                                         |
+| AccountNumber                         | 12345677                                       |
+| SortCode                              | 000004                                         |
+| PaymentDay                            | 15th                                           |
+| PaymentDetails                        |                                                |
+| PaymentGatewayService                 | Real                                           |
+| PaymentMode                           | Annual                                         |
+| LowRange                              | 616                                            |
+| HighRange                             | 924                                            |
+| PaymentDate                           | 1st                                            |
+| CardName                              | Cardholder Name                                |
+| CardNumber                            | 4819000000000151                               |
+| ExpiryMM                              | 8                                              |
+| ExpiryYYYY                            | 2026                                           |
+| SecurityCode                          | 242                                            |
+| ConvertToMonthlyCard                  |                                                |
