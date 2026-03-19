@@ -36,8 +36,6 @@ export type ValidationReport = {
     mode: "normal" | "strict";
 
     errors: string[];
-    warnings: string[];
-    info: string[];
 
     schemaToExcel: {
         requiredMissing: string[];
@@ -50,8 +48,6 @@ export type ValidationReport = {
 
     summary: {
         errorCount: number;
-        warningCount: number;
-        requiredMissingCount: number;
         mappedMissingCount: number;
         unmappedFieldCount: number;
     };

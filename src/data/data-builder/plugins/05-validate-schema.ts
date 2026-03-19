@@ -79,8 +79,6 @@ const plugin: PipelinePlugin = {
 
         // ---- Build report
         const errors: string[] = [];
-        const warnings: string[] = [];
-        const info: string[] = [];
 
         // Errors (ONLY critical)
         requiredMissing.forEach((f) =>
@@ -93,16 +91,6 @@ const plugin: PipelinePlugin = {
             );
         }
 
-        // Warnings
-        mappedMissing.forEach((f) =>
-            warnings.push(`Missing mapped field: ${f}`)
-        );
-
-        // Info
-        unmappedExcel.forEach((f) =>
-            info.push(`Unused Excel field: ${f}`)
-        );
-
         // ✅ FIX: properly typed mode
         const mode: "normal" | "strict" = strict ? "strict" : "normal";
 
@@ -112,8 +100,6 @@ const plugin: PipelinePlugin = {
             mode,
 
             errors,
-            warnings,
-            info,
 
             schemaToExcel: {
                 requiredMissing,
@@ -126,8 +112,6 @@ const plugin: PipelinePlugin = {
 
             summary: {
                 errorCount: errors.length,
-                warningCount: warnings.length,
-                requiredMissingCount: requiredMissing.length,
                 mappedMissingCount: mappedMissing.length,
                 unmappedFieldCount: unmappedExcel.length,
             },
@@ -140,10 +124,8 @@ const plugin: PipelinePlugin = {
         ctx.log.info(`Schema: ${report.schemaName}`);
         ctx.log.info(`Sheet: ${report.sheetName}`);
         ctx.log.info(`Errors: ${report.summary.errorCount}`);
-        ctx.log.info(`Warnings: ${report.summary.warningCount}`);
 
         ctx.log.info(`Schema → Excel`);
-        ctx.log.info(`  Required missing: ${report.summary.requiredMissingCount}`);
         ctx.log.info(`  Mapped missing: ${report.summary.mappedMissingCount}`);
 
         ctx.log.info(`Excel → Schema`);
@@ -152,10 +134,6 @@ const plugin: PipelinePlugin = {
         if (errors.length) {
             errors.slice(0, 20).forEach((e) => ctx.log.error(e));
             throw new Error(`Schema validation failed.`);
-        }
-
-        if (warnings.length) {
-            warnings.slice(0, 20).forEach((w) => ctx.log.warn(w));
         }
 
         ctx.log.info("Validation completed ✅");
