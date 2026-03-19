@@ -1,8 +1,9 @@
 // src/data/data-builder/plugins/70-write-json.ts
-import fs from "node:fs";
 import path from "node:path";
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
+import { executionConfig } from "../../../config/execution.config";
+import { writeArtifactJson } from "../../../utils/artifacts";
 
 function safeSheetFilename(name: string) {
   return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
@@ -29,9 +30,7 @@ const plugin: PipelinePlugin = {
     }
 
     const sheetName = String(casesFile.sheet ?? ctx.data.sheetName ?? "").trim();
-    if (!sheetName) {
-      throw new Error("sheetName missing.");
-    }
+    if (!sheetName) throw new Error("sheetName missing.");
 
     const outRaw = String(ctx.data.outputPath ?? "").trim();
     if (!outRaw) {
@@ -43,24 +42,36 @@ const plugin: PipelinePlugin = {
       targetPath = path.join(outRaw, `${safeSheetFilename(sheetName)}.json`);
     }
 
-    const absOut = path.isAbsolute(targetPath)
+    const absBaseOut = path.isAbsolute(targetPath)
       ? targetPath
       : path.join(process.cwd(), targetPath);
 
-    fs.mkdirSync(path.dirname(absOut), { recursive: true });
-    fs.writeFileSync(absOut, JSON.stringify(casesFile, null, 2), "utf-8");
+    const artifactOpts = {
+      withTimestamp: executionConfig.generatedArtifacts.withTimestamp,
+      maxToKeep: executionConfig.generatedArtifacts.maxToKeep,
+      pretty: true,
+    };
+
+    const writtenJsonPath = writeArtifactJson(absBaseOut, casesFile, artifactOpts);
+    ctx.data.absOut = writtenJsonPath;
 
     if (ctx.data.validationReport) {
-      const reportPath = absOut.replace(/\.json$/i, ".validation.json");
-      ctx.data.validationReport.reportPath = reportPath;
-      fs.writeFileSync(reportPath, JSON.stringify(ctx.data.validationReport, null, 2), "utf-8");
-      ctx.log.info(`Validation report written: ${reportPath}`);
+      const baseReportPath = absBaseOut.replace(/\.json$/i, ".validation.json");
+      const writtenReportPath = writeArtifactJson(
+        baseReportPath,
+        ctx.data.validationReport,
+        artifactOpts
+      );
+
+      ctx.data.validationReport.reportPath = writtenReportPath;
+      ctx.log.info(`Validation report written: ${writtenReportPath}`);
     }
 
-    ctx.data.absOut = absOut;
-
-    ctx.log.info(`JSON written: ${absOut}`);
+    ctx.log.info(`JSON written: ${writtenJsonPath}`);
     ctx.log.debug?.(`cases=${casesFile.caseCount}`);
+    ctx.log.debug?.(
+      `generatedArtifacts.withTimestamp=${executionConfig.generatedArtifacts.withTimestamp}, maxToKeep=${executionConfig.generatedArtifacts.maxToKeep}`
+    );
   },
 };
 

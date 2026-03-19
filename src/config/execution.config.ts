@@ -14,6 +14,10 @@ export type ExecutionConfig = {
     video: 'on' | 'off' | 'retain-on-failure';
     trace: 'on' | 'off' | 'retain-on-failure';
   };
+  generatedArtifacts: {
+    withTimestamp: boolean;
+    maxToKeep: number;
+  };
 };
 
 export const executionConfig: ExecutionConfig = {
@@ -32,5 +36,10 @@ export const executionConfig: ExecutionConfig = {
     screenshot: ((process.env.SCREENSHOT as any) || 'only-on-failure'),
     video: ((process.env.VIDEO as any) || 'retain-on-failure'),
     trace: ((process.env.TRACE as any) || 'retain-on-failure'),
+  },
+
+  generatedArtifacts: {
+    withTimestamp: process.env.ARTIFACTS_WITH_TIMESTAMP === 'false',
+    maxToKeep: Number(process.env.MAX_ARTIFACTS_TO_KEEP || 30),
   },
 };
