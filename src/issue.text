@@ -1,15 +1,11 @@
 PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run data:build:verbose -- --excel "C:\Users\tp70707\OneDrive - Allianz\My Documents\01_Regression\Test Data\Direct\Flow_NB_v4_06022026.xlsx" --sheet "FlowNB"
 
 > azonline@1.0.0 data:build:verbose
-> npm run data -- --verbose C:\Users\tp70707\OneDrive - Allianz\My Documents\01_Regression\Test Data\Direct\Flow_NB_v4_06022026.xlsx FlowNB
-
-
-> azonline@1.0.0 data
 > ts-node src/data/data-builder/index.ts --verbose C:\Users\tp70707\OneDrive - Allianz\My Documents\01_Regression\Test Data\Direct\Flow_NB_v4_06022026.xlsx FlowNB
 
 
 ********************************
 🧾 DATA BUILDER
 ********************************
-2026-03-19T11:50:29.853Z [data-builder] ERROR: ❌ EXCEL_PATH is required (or use --excel).
+2026-03-19T11:55:37.566Z [data-builder] ERROR: ❌ EXCEL_PATH is required (or use --excel).
 PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
