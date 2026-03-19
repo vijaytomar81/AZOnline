@@ -3,7 +3,7 @@ import path from "node:path";
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
 import { executionConfig } from "../../../config/execution.config";
-import { writeArtifactJson } from "../../../utils/artifacts";
+import { ensureArtifactsArchive, writeArtifactJson } from "../../../utils/artifacts";
 
 function safeSheetFilename(name: string) {
   return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
@@ -45,6 +45,8 @@ const plugin: PipelinePlugin = {
     const absBaseOut = path.isAbsolute(targetPath)
       ? targetPath
       : path.join(process.cwd(), targetPath);
+
+    ensureArtifactsArchive(path.dirname(absBaseOut));
 
     const artifactOpts = {
       withTimestamp: executionConfig.generatedArtifacts.withTimestamp,

@@ -1,7 +1,7 @@
 // src/utils/artifacts.ts
 import fs from "node:fs";
 import path from "node:path";
-import { ensureParentDir } from "./fs";
+import { ensureDir, ensureParentDir } from "./fs";
 
 export type ArtifactWriteOptions = {
     withTimestamp?: boolean;
@@ -23,31 +23,61 @@ function escapeRegex(value: string) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function buildTimestampedPath(baseFilePath: string, date = new Date()): string {
-    const dir = path.dirname(baseFilePath);
-    const ext = path.extname(baseFilePath);
-    const base = path.basename(baseFilePath, ext);
-    return path.join(dir, `${base}_${formatArtifactTimestamp(date)}${ext}`);
+function buildArchivedPath(filePath: string, withTimestamp: boolean, date = new Date()) {
+    const dir = path.dirname(filePath);
+    const ext = path.extname(filePath);
+    const base = path.basename(filePath, ext);
+    const archiveDir = path.join(dir, "archive");
+
+    if (!withTimestamp) {
+        return path.join(archiveDir, `${base}${ext}`);
+    }
+
+    const timestamp = formatArtifactTimestamp(date);
+    return path.join(archiveDir, `${base}_${timestamp}${ext}`);
 }
 
-function listArtifactFamily(baseFilePath: string): string[] {
-    const dir = path.dirname(baseFilePath);
-    const ext = path.extname(baseFilePath);
-    const base = path.basename(baseFilePath, ext);
-    if (!fs.existsSync(dir)) return [];
+function listArchivedFamily(filePath: string) {
+    const dir = path.dirname(filePath);
+    const ext = path.extname(filePath);
+    const base = path.basename(filePath, ext);
+    const archiveDir = path.join(dir, "archive");
+    if (!fs.existsSync(archiveDir)) return [];
 
-    const pattern = new RegExp(`^${escapeRegex(base)}_\\d{8}_\\d{6}${escapeRegex(ext)}$`);
+    const plainName = `${base}${ext}`;
+    const stamped = new RegExp(`^${escapeRegex(base)}_\\d{8}_\\d{6}${escapeRegex(ext)}$`);
 
-    return fs.readdirSync(dir)
-        .filter((name) => pattern.test(name))
-        .sort((a, b) => b.localeCompare(a))
-        .map((name) => path.join(dir, name));
+    return fs.readdirSync(archiveDir)
+        .filter((name) => name === plainName || stamped.test(name))
+        .sort((a, b) => {
+            const aPath = path.join(archiveDir, a);
+            const bPath = path.join(archiveDir, b);
+            return fs.statSync(bPath).mtimeMs - fs.statSync(aPath).mtimeMs;
+        })
+        .map((name) => path.join(archiveDir, name));
 }
 
-function trimArtifactFamily(baseFilePath: string, maxToKeep: number) {
-    const keep = Math.max(1, Math.floor(maxToKeep || 1));
-    const files = listArtifactFamily(baseFilePath);
-    files.slice(keep).forEach((filePath) => fs.unlinkSync(filePath));
+function trimArchivedFamily(filePath: string, maxToKeep: number) {
+    const keep = Math.max(0, Math.floor(maxToKeep || 0));
+    const files = listArchivedFamily(filePath);
+    files.slice(keep).forEach((oldPath) => fs.unlinkSync(oldPath));
+}
+
+function moveExistingFileToArchive(filePath: string, withTimestamp: boolean) {
+    if (!fs.existsSync(filePath)) return;
+
+    const archivePath = buildArchivedPath(filePath, withTimestamp);
+    ensureParentDir(archivePath);
+
+    if (fs.existsSync(archivePath)) {
+        fs.unlinkSync(archivePath);
+    }
+
+    fs.renameSync(filePath, archivePath);
+}
+
+export function ensureArtifactsArchive(dirPath: string) {
+    ensureDir(path.join(dirPath, "archive"));
 }
 
 export function writeArtifactFile(
@@ -60,16 +90,11 @@ export function writeArtifactFile(
     const withTimestamp = !!opts?.withTimestamp;
     const maxToKeep = opts?.maxToKeep ?? 30;
 
-    if (!withTimestamp) {
-        fs.writeFileSync(baseFilePath, contents, "utf8");
-        return baseFilePath;
-    }
+    moveExistingFileToArchive(baseFilePath, withTimestamp);
+    trimArchivedFamily(baseFilePath, maxToKeep);
 
-    const targetPath = buildTimestampedPath(baseFilePath);
-    fs.writeFileSync(targetPath, contents, "utf8");
-    trimArtifactFamily(baseFilePath, maxToKeep);
-
-    return targetPath;
+    fs.writeFileSync(baseFilePath, contents, "utf8");
+    return baseFilePath;
 }
 
 export function writeArtifactJson(
