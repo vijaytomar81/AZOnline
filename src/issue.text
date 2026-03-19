@@ -1,11 +1,109 @@
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> npm run data:build:verbose -- --excel "C:\Users\tp70707\OneDrive - Allianz\My Documents\01_Regression\Test Data\Direct\Flow_NB_v4_06022026.xlsx" --sheet "FlowNB"
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> $env:EXCEL_PATH="C:\Users\tp70707\OneDrive - Allianz\My Documents\01_Regression\Test Data\Direct\Flow_NB_v4_06022026.xlsx"
+>> $env:SHEET="FlowNB"
+>> npm run data:build:verbose
 
 > azonline@1.0.0 data:build:verbose
-> ts-node src/data/data-builder/index.ts --verbose C:\Users\tp70707\OneDrive - Allianz\My Documents\01_Regression\Test Data\Direct\Flow_NB_v4_06022026.xlsx FlowNB
+> ts-node src/data/data-builder/index.ts --verbose
 
 
 ********************************
 🧾 DATA BUILDER
 ********************************
-2026-03-19T11:55:37.566Z [data-builder] ERROR: ❌ EXCEL_PATH is required (or use --excel).
-PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline> 
+
+Environment
+-----------
+excelPath : C:\Users\tp70707\OneDrive - Allianz\My Documents\01_Regression\Test Data\Direct\Flow_NB_v4_06022026.xlsx
+sheetName : FlowNB
+schemaName: master
+outputPath: src\data\generated\FlowNB.json
+scriptIdFilter: (all)
+excludeEmptyFields: false
+strictValidation: false
+verbose   : true
+
+Available Schemas
+-----------------
+master, direct, cnf, ctm, goco, msm
+
+Scanning plugins
+----------------
+2026-03-19T12:04:26.981Z [data-builder:plugin-loader] DEBUG: Discovered plugins (7):
+2026-03-19T12:04:26.981Z [data-builder:plugin-loader] DEBUG: - name=load-excel file=00-load-excel.ts
+2026-03-19T12:04:26.982Z [data-builder:plugin-loader] DEBUG: - name=validate-schema file=05-validate-schema.ts
+2026-03-19T12:04:26.982Z [data-builder:plugin-loader] DEBUG: - name=extract-meta file=10-extract-meta.ts
+2026-03-19T12:04:26.982Z [data-builder:plugin-loader] DEBUG: - name=build-cases file=20-build-cases.ts
+2026-03-19T12:04:26.982Z [data-builder:plugin-loader] DEBUG: - name=filter-scriptIds file=30-filter-scriptIds.ts
+2026-03-19T12:04:26.982Z [data-builder:plugin-loader] DEBUG: - name=transform-values file=50-transform-values.ts
+2026-03-19T12:04:26.982Z [data-builder:plugin-loader] DEBUG: - name=write-json file=70-write-json.ts
+
+Pipeline order
+--------------
+load-excel -> validate-schema -> extract-meta -> build-cases -> filter-scriptIds -> transform-values -> write-json
+2026-03-19T12:04:26.984Z [data-builder] INFO: Starting schema-driven Data Builder...
+2026-03-19T12:04:26.985Z [data-builder] INFO: Run order: load-excel -> extract-meta -> validate-schema -> build-cases -> filter-scriptIds -> transform-values -> write-json
+2026-03-19T12:04:26.985Z [data-builder:plugin:load-excel] INFO: Plugin start: load-excel
+2026-03-19T12:04:26.986Z [data-builder:plugin:load-excel] INFO: Loading workbook: C:\Users\tp70707\OneDrive - Allianz\My Documents\01_Regression\Test Data\Direct\Flow_NB_v4_06022026.xlsx
+2026-03-19T12:04:27.522Z [data-builder:plugin:load-excel] INFO: Loaded sheet: FlowNB
+2026-03-19T12:04:27.523Z [data-builder:plugin:load-excel] DEBUG: Workbook sheets: AgentPortal_DriveAwayPlusAnnual, AgentPortal_DriveAwayOnly, AgentPortal_Annual, FerryDriveAwayOnlyNB, FerryDriveAwayAnnualNB, FlowNB, FerryNB, FerryDriveAwayAnnualNB_Old, FerryDriveAwayOnlyNB_Old, Motor_MultiPolicy
+2026-03-19T12:04:27.523Z [data-builder:plugin:load-excel] INFO: Plugin done: load-excel (0.54s)
+2026-03-19T12:04:27.524Z [data-builder:plugin:extract-meta] INFO: Plugin start: extract-meta
+2026-03-19T12:04:27.526Z [data-builder:plugin:extract-meta] INFO: Metadata extracted. Cases detected: 26
+2026-03-19T12:04:27.541Z [data-builder:plugin:extract-meta] DEBUG: Detected layout -> dataStartRow=1
+2026-03-19T12:04:27.541Z [data-builder:plugin:extract-meta] DEBUG: Detected layout -> fieldCol=1
+2026-03-19T12:04:27.542Z [data-builder:plugin:extract-meta] DEBUG: Detected layout -> caseStartCol=2
+2026-03-19T12:04:27.542Z [data-builder:plugin:extract-meta] DEBUG: ScriptId row=1
+2026-03-19T12:04:27.543Z [data-builder:plugin:extract-meta] DEBUG: ScriptName row=5
+2026-03-19T12:04:27.543Z [data-builder:plugin:extract-meta] DEBUG: Case columns detected=26
+2026-03-19T12:04:27.544Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=2, scriptId=1, scriptName=DJ_GOL_NB001
+2026-03-19T12:04:27.544Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=3, scriptId=2, scriptName=DJ_GOL_NB002
+2026-03-19T12:04:27.544Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=4, scriptId=3, scriptName=DJ_GOL_NB003
+2026-03-19T12:04:27.544Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=5, scriptId=4, scriptName=DJ_GOL_NB004
+2026-03-19T12:04:27.544Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=6, scriptId=5, scriptName=DJ_GOL_NB005
+2026-03-19T12:04:27.545Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=7, scriptId=6, scriptName=DJ_GOL_NB006
+2026-03-19T12:04:27.545Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=8, scriptId=7, scriptName=DJ_GOL_NB007
+2026-03-19T12:04:27.545Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=9, scriptId=8, scriptName=DJ_GOL_NB008
+2026-03-19T12:04:27.545Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=10, scriptId=9, scriptName=DJ_GOL_NB009
+2026-03-19T12:04:27.546Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=11, scriptId=10, scriptName=DJ_GOL_NB010
+2026-03-19T12:04:27.546Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=12, scriptId=11, scriptName=DJ_GOL_NB011
+2026-03-19T12:04:27.546Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=13, scriptId=12, scriptName=DJ_GOL_NB012
+2026-03-19T12:04:27.547Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=14, scriptId=13, scriptName=DJ_GOL_NB013
+2026-03-19T12:04:27.547Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=15, scriptId=14, scriptName=DJ_GOL_NB014
+2026-03-19T12:04:27.547Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=16, scriptId=15, scriptName=DJ_BRO_NB001
+2026-03-19T12:04:27.547Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=17, scriptId=16, scriptName=DJ_BRO_NB002
+2026-03-19T12:04:27.548Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=18, scriptId=17, scriptName=DJ_BRO_NB003
+2026-03-19T12:04:27.548Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=19, scriptId=18, scriptName=DJ_BRO_NB004
+2026-03-19T12:04:27.548Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=20, scriptId=19, scriptName=DJ_BRO_NB005
+2026-03-19T12:04:27.548Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=21, scriptId=20, scriptName=DJ_BRO_NB006
+2026-03-19T12:04:27.549Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=22, scriptId=21, scriptName=DJ_SIL_NB001
+2026-03-19T12:04:27.549Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=23, scriptId=22, scriptName=DJ_SIL_NB002
+2026-03-19T12:04:27.549Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=24, scriptId=23, scriptName=DJ_SIL_NB003
+2026-03-19T12:04:27.549Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=25, scriptId=24, scriptName=DJ_SIL_NB004
+2026-03-19T12:04:27.549Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=26, scriptId=25, scriptName=DJ_SIL_NB005
+2026-03-19T12:04:27.550Z [data-builder:plugin:extract-meta] DEBUG: Case meta -> col=27, scriptId=26, scriptName=DJ_SIL_NB006
+2026-03-19T12:04:27.550Z [data-builder:plugin:extract-meta] INFO: Plugin done: extract-meta (0.03s)
+2026-03-19T12:04:27.550Z [data-builder:plugin:validate-schema] INFO: Plugin start: validate-schema
+2026-03-19T12:04:27.553Z [data-builder:plugin:validate-schema] INFO: Validating schema "master" (normal)
+2026-03-19T12:04:27.578Z [data-builder:plugin:validate-schema] DEBUG: Excel fields detected=361
+2026-03-19T12:04:27.578Z [data-builder:plugin:validate-schema] DEBUG: Schema fields checked=184
+2026-03-19T12:04:27.579Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: Result
+2026-03-19T12:04:27.580Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: AccountEmail
+2026-03-19T12:04:27.580Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: TodaysDate
+2026-03-19T12:04:27.581Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: FormattedDate
+2026-03-19T12:04:27.581Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: FormattedAccountId
+2026-03-19T12:04:27.581Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: RegistrationKnown
+2026-03-19T12:04:27.581Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: RegistrationNumber
+2026-03-19T12:04:27.582Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: Doors
+2026-03-19T12:04:27.582Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: EngineSize
+2026-03-19T12:04:27.582Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: Trim
+2026-03-19T12:04:27.582Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: VehicleType
+2026-03-19T12:04:27.583Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: SelectedCar
+2026-03-19T12:04:27.583Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: MarketValue
+2026-03-19T12:04:27.583Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: Imported
+2026-03-19T12:04:27.583Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: DriveSide
+2026-03-19T12:04:27.583Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: SeatCount
+2026-03-19T12:04:27.584Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: AlarmOrImmobiliser
+2026-03-19T12:04:27.584Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: Tracker
+2026-03-19T12:04:27.584Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: DashcamFitted
+2026-03-19T12:04:27.584Z [data-builder:plugin:validate-schema] ERROR: Missing mapped field: HasModifications
+2026-03-19T12:04:27.585Z [data-builder] ERROR: Schema validation failed with 120 issue(s).
+PS C:\Users\tp70707\OneDrive - Allianz\My Documents\Automation\AZOnline>
