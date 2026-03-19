@@ -65,6 +65,13 @@ async function main() {
     const absOut = ctx.data.absOut ?? "";
     const caseCount = ctx.data.casesFile?.caseCount ?? 0;
 
+    const validation = ctx.data.validationReport;
+
+    const validationPath = validation?.reportPath ?? "(not generated)";
+    const errorCount = validation?.summary.errorCount ?? 0;
+    const schemaMissing = validation?.summary.missingSchemaFieldsInExcelCount ?? 0;
+    const excelMissing = validation?.summary.missingExcelFieldsInSchemaCount ?? 0;
+
     printSummary(
         "DATA BUILDER SUMMARY",
         [
@@ -73,6 +80,9 @@ async function main() {
             ["Plugins executed", ranNames.length],
             ["Cases generated", caseCount],
             ["Output file", absOut || "(not set)"],
+            ["Validation errors", errorCount],
+            ["Schema → Excel missing (Schema mapping fields missing in Excel)", schemaMissing],
+            ["Excel → Schema missing (Excel fields missing in Schema)", excelMissing],
             ["Total time", timer.elapsedSecondsText()],
         ],
         success("COMPLETED")

@@ -13,6 +13,7 @@ import {
 
 function collectSchemaFields(obj: any, out: Set<string>) {
     if (!obj || typeof obj !== "object") return;
+
     for (const value of Object.values(obj)) {
         if (typeof value === "string") out.add(value);
         else if (typeof value === "object") collectSchemaFields(value, out);
@@ -25,6 +26,7 @@ function collectSchemaFieldsBySection(
     section: string
 ) {
     if (!obj || typeof obj !== "object") return;
+
     out[section] ??= new Set<string>();
 
     for (const value of Object.values(obj)) {
@@ -42,6 +44,7 @@ function collectExcelFields(ws: ExcelJS.Worksheet, fieldCol: number, dataStartRo
     for (let r = dataStartRow; r <= maxRow; r++) {
         const raw = norm(cellToString(ws.getCell(r, fieldCol).value));
         if (!raw) continue;
+
         const key = normKey(raw);
         if (seen.has(key)) duplicates.push(raw);
         seen.add(key);
@@ -51,7 +54,7 @@ function collectExcelFields(ws: ExcelJS.Worksheet, fieldCol: number, dataStartRo
 }
 
 function missingFields(rows: Map<string, number>, fields: Iterable<string>) {
-    return [...fields].filter((f) => !rows.has(normKey(f)));
+    return [...fields].filter((field) => !rows.has(normKey(field)));
 }
 
 function buildSectionBuckets(
@@ -68,16 +71,26 @@ function buildSectionBuckets(
 
         for (const field of fields) {
             if (rows.has(normKey(field))) continue;
+
             if (requiredSet.has(normKey(field))) requiredMissing.push(field);
             else mappedMissing.push(field);
         }
 
         if (requiredMissing.length || mappedMissing.length) {
-            out[section] = { requiredFields: requiredMissing, schemaMappingFields: mappedMissing };
+            out[section] = {
+                requiredFields: requiredMissing,
+                schemaMappingFields: mappedMissing,
+            };
         }
     }
 
     return out;
+}
+
+function countMissingSchemaFields(bySection: Record<string, SectionFieldGroup>) {
+    return Object.values(bySection).reduce((sum, group) => {
+        return sum + group.requiredFields.length + group.schemaMappingFields.length;
+    }, 0);
 }
 
 const plugin: PipelinePlugin = {
@@ -88,9 +101,10 @@ const plugin: PipelinePlugin = {
 
     run: async (ctx) => {
         const ws = ctx.data.sheet as ExcelJS.Worksheet;
+        if (!ws) throw new Error("Sheet not loaded.");
+
         const strict = !!ctx.data.strictValidation;
         const schema = getSchema(ctx.data.schemaName);
-
         const layout = detectLayout(ws);
         const { rows, duplicates } = collectExcelFields(ws, layout.fieldCol, layout.dataStartRow);
 
@@ -112,19 +126,19 @@ const plugin: PipelinePlugin = {
         }
 
         const requiredMissing = missingFields(rows, schema.requiredFields ?? []);
-        const mappedMissing = missingFields(rows, schemaFields);
-
         const excelFields = new Set([...rows.keys()]);
         const schemaFieldKeys = new Set([...schemaFields].map(normKey));
-        const unmappedExcel = [...excelFields].filter((f) => !schemaFieldKeys.has(f));
+        const unmappedExcel = [...excelFields].filter((field) => !schemaFieldKeys.has(field));
 
         const errors: string[] = [];
-        requiredMissing.forEach((f) => errors.push(`Missing required field: ${f}`));
+        requiredMissing.forEach((field) => errors.push(`Missing required field: ${field}`));
+
         if (strict) {
-            duplicates.forEach((f) => errors.push(`Duplicate Excel field: ${f}`));
+            duplicates.forEach((field) => errors.push(`Duplicate Excel field: ${field}`));
         }
 
         const bySection = buildSectionBuckets(rows, sectionFields, schema.requiredFields ?? []);
+        const missingSchemaFieldsInExcelCount = countMissingSchemaFields(bySection);
         const mode: "normal" | "strict" = strict ? "strict" : "normal";
 
         const report: ValidationReport = {
@@ -132,18 +146,21 @@ const plugin: PipelinePlugin = {
             sheetName: ctx.data.sheetName,
             mode,
             generatedAt: new Date().toISOString(),
+
             errors,
+
             missingSchemaFieldsInExcel: {
                 requiredFields: requiredMissing,
-                schemaMappingFields: mappedMissing,
                 bySection,
             },
+
             missingExcelFieldsInSchema: {
                 unusedExcelFields: unmappedExcel,
             },
+
             summary: {
                 errorCount: errors.length,
-                missingSchemaFieldsInExcelCount: mappedMissing.length + requiredMissing.length,
+                missingSchemaFieldsInExcelCount,
                 missingExcelFieldsInSchemaCount: unmappedExcel.length,
             },
         };
@@ -155,9 +172,13 @@ const plugin: PipelinePlugin = {
         ctx.log.info(`Sheet: ${report.sheetName}`);
         ctx.log.info(`Errors: ${report.summary.errorCount}`);
 
-        ctx.log.info("Missing Schema Mapping Fields in Excel");
-        ctx.log.info(`  Required fields missing: ${report.missingSchemaFieldsInExcel.requiredFields.length}`);
-        ctx.log.info(`  Schema Mapping fields missing: ${report.missingSchemaFieldsInExcel.schemaMappingFields.length}`);
+        ctx.log.info("Missing Schema Fields in Excel");
+        ctx.log.info(
+            `  Required fields missing: ${report.missingSchemaFieldsInExcel.requiredFields.length}`
+        );
+        ctx.log.info(
+            `  Total missing fields: ${report.summary.missingSchemaFieldsInExcelCount}`
+        );
 
         const sections = Object.entries(report.missingSchemaFieldsInExcel.bySection);
         if (sections.length) {
@@ -169,20 +190,28 @@ const plugin: PipelinePlugin = {
         }
 
         ctx.log.info("Missing Excel Fields in Schema");
-        ctx.log.info(`  Unused Excel field: ${report.summary.missingExcelFieldsInSchemaCount}`);
+        ctx.log.info(
+            `  Unmapped fields: ${report.summary.missingExcelFieldsInSchemaCount}`
+        );
 
         if (errors.length) {
-            errors.slice(0, 20).forEach((e) => ctx.log.error(e));
+            errors.slice(0, 20).forEach((error) => ctx.log.error(error));
             throw new Error("Schema validation failed.");
         }
 
-        report.missingSchemaFieldsInExcel.schemaMappingFields
-            .slice(0, 20)
-            .forEach((f) => ctx.log.warn(`Missing Schema mapping field: ${f}`));
+        sections.forEach(([section, data]) => {
+            data.requiredFields
+                .slice(0, 20)
+                .forEach((field) => ctx.log.warn(`[${section}] Missing required field: ${field}`));
+
+            data.schemaMappingFields
+                .slice(0, 20)
+                .forEach((field) => ctx.log.warn(`[${section}] Missing mapped field: ${field}`));
+        });
 
         report.missingExcelFieldsInSchema.unusedExcelFields
             .slice(0, 20)
-            .forEach((f) => ctx.log.info(`Unused Excel field: ${f}`));
+            .forEach((field) => ctx.log.info(`Unused Excel field: ${field}`));
 
         ctx.log.info("Validation completed ✅");
     },

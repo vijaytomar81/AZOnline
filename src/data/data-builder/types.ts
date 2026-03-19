@@ -39,15 +39,13 @@ export type ValidationReport = {
     schemaName: string;
     sheetName: string;
     mode: "normal" | "strict";
-
     generatedAt: string;
-    validationReportPath?: string;
+    reportPath?: string;
 
     errors: string[];
 
     missingSchemaFieldsInExcel: {
         requiredFields: string[];
-        schemaMappingFields: string[];
         bySection: Record<string, SectionFieldGroup>;
     };
 
