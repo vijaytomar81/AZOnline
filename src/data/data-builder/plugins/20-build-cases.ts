@@ -1,158 +1,83 @@
 // src/data/data-builder/plugins/20-build-cases.ts
-
 import type ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
-import type { DataBuilderContext, BuiltCase, CasesFile } from "../types";
-
-type CaseMeta = {
-    col: number;
-    scriptId: string;    // from "Script ID" row
-    scriptName: string;  // from "ScriptName" row
-};
-
-type ExtractedMeta = {
-    scriptIdRow: number;
-    scriptNameRow: number;
-    caseMetas: CaseMeta[];
-};
-
-function cellToString(v: any): string {
-    if (v === null || v === undefined) return "";
-    if (typeof v === "object") {
-        // exceljs formula cell
-        if ("result" in v) return cellToString((v as any).result);
-        // rich text
-        if ("richText" in v && Array.isArray((v as any).richText)) {
-            return (v as any).richText.map((x: any) => x.text ?? "").join("");
-        }
-        // hyperlink/text
-        if ("text" in v) return String((v as any).text ?? "");
-    }
-    return String(v);
-}
-
-function norm(s: string): string {
-    return (s ?? "").trim();
-}
-
-function isParentField(label: string): boolean {
-    // Your latest rule: parent fields always start with "P__"
-    return norm(label).startsWith("P__");
-}
-
-function parentName(label: string): string {
-    return norm(label).replace(/^P__/, "").trim();
-}
-
-function safeSheetFilename(name: string) {
-    // safe across Windows/mac/linux
-    return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
-}
+import type { BuiltCase, CasesFile, DataBuilderContext } from "../types";
+import { buildRowIndex } from "../core/excelRuntime";
+import { buildPayload } from "../core/schemaRuntime";
+import { getSchema } from "../../input-data-schema";
 
 const plugin: PipelinePlugin = {
     name: "build-cases",
     order: 20,
-
-    // Graph support (optional, if you are using requires/provides ordering)
-    requires: ["sheet", "meta", "external:includeEmptyChildFields"],
+    requires: ["sheet", "meta", "external:excludeEmptyFields", "external:schemaName"],
     provides: ["casesFile"],
 
     run: async (ctx: DataBuilderContext) => {
         const ws = ctx.data.sheet as ExcelJS.Worksheet | undefined;
-        if (!ws) throw new Error("Sheet missing. Ensure load-excel ran.");
+        const meta = ctx.data.meta;
 
-        const meta = ctx.data.meta as ExtractedMeta | undefined;
-        if (!meta?.caseMetas?.length) {
-            throw new Error("Meta missing/invalid. Ensure extract-meta ran.");
+        if (!ws || !meta?.caseMetas?.length) {
+            throw new Error("Sheet/meta missing. Ensure prior plugins ran.");
         }
 
-        const includeEmpty = !!ctx.data.includeEmptyChildFields;
-        const sheetName = String(ctx.data.sheetName ?? "").trim() || ws.name || "Sheet";
-        const absExcel = String(ctx.data.absExcel ?? ctx.data.excelPath ?? "").trim();
+        const schema = getSchema(ctx.data.schemaName);
+        const includeEmpty = !ctx.data.excludeEmptyFields;
+        const rowIndex = buildRowIndex(ws, meta.fieldCol, meta.dataStartRow);
 
-        ctx.log.info("Building cases from sheet...");
+        ctx.log.info(`Building cases with schema "${ctx.data.schemaName}"...`);
+        ctx.log.debug?.(`includeEmpty=${includeEmpty}`);
+        ctx.log.debug?.(`rowIndex size=${rowIndex.size}`);
+        ctx.log.debug?.(`cases to build=${meta.caseMetas.length}`);
 
-        const maxRow = ws.rowCount || ws.actualRowCount || 0;
+        const cases: BuiltCase[] = meta.caseMetas.map((m, idx) => {
+            const data = buildPayload(schema, {
+                ws,
+                col: m.col,
+                rowIndex,
+                includeEmpty,
+            });
 
-        const built: BuiltCase[] = [];
+            const description = String(data.meta?.description ?? "").trim() || undefined;
 
-        // Build each case column (each script)
-        for (let i = 0; i < meta.caseMetas.length; i++) {
-            const m = meta.caseMetas[i];
-
-            // Level-4 case wrapper
-            const data: Record<string, any> = {};
-
-            let currentParent: string | null = null;
-
-            for (let r = 1; r <= maxRow; r++) {
-                const label = norm(cellToString(ws.getCell(r, 1).value));
-                if (!label) continue;
-
-                // Skip the meta rows themselves so they don't appear in data
-                if (r === meta.scriptIdRow || r === meta.scriptNameRow) continue;
-
-                const rawVal = norm(cellToString(ws.getCell(r, m.col).value));
-
-                // Parent starts
-                if (isParentField(label)) {
-                    currentParent = parentName(label);
-                    if (!currentParent) {
-                        currentParent = null;
-                        continue;
-                    }
-                    if (data[currentParent] === undefined) data[currentParent] = {};
-                    continue;
-                }
-
-                // Child inside current parent
-                if (currentParent) {
-                    if (!includeEmpty && rawVal === "") {
-                        // skip empty child values when includeEmptyChildFields is false
-                        continue;
-                    }
-                    // include child always (with empty too) when includeEmpty=true
-                    (data[currentParent] as Record<string, any>)[label] = rawVal;
-                    continue;
-                }
-
-                // Normal (before first parent)
-                if (!includeEmpty && rawVal === "") continue;
-                data[label] = rawVal;
-            }
-
-            // Optional: lift Description if present
-            const description =
-                typeof data["Description"] === "string" && data["Description"].trim()
-                    ? String(data["Description"]).trim()
-                    : undefined;
-
-            const one: BuiltCase = {
-                caseIndex: i + 1,         // 1-based, left-to-right across case columns
-                scriptName: m.scriptName, // unique script key
-                scriptId: m.scriptId,     // Script ID row value
+            const builtCase: BuiltCase = {
+                caseIndex: idx + 1,
+                scriptName: m.scriptName,
+                scriptId: m.scriptId,
                 description,
                 data,
             };
 
-            built.push(one);
-        }
+            const additionalDriversCount =
+                Number(data.additionalDrivers?.count ?? 0) || 0;
+            const policyHolderClaimsCount =
+                Number(data.policyHolderClaims?.count ?? 0) || 0;
+            const policyHolderConvictionsCount =
+                Number(data.policyHolderConvictions?.count ?? 0) || 0;
 
-        // Level-4 cases file
+            ctx.log.debug?.(
+                [
+                    `Built case -> index=${builtCase.caseIndex}`,
+                    `scriptId=${builtCase.scriptId ?? ""}`,
+                    `scriptName=${builtCase.scriptName}`,
+                    `policyHolderClaims=${policyHolderClaimsCount}`,
+                    `policyHolderConvictions=${policyHolderConvictionsCount}`,
+                    `additionalDrivers=${additionalDriversCount}`,
+                ].join(", ")
+            );
+
+            return builtCase;
+        });
+
         const casesFile: CasesFile = {
-            sheet: sheetName,
-            sourceExcel: absExcel,
+            sheet: String(ctx.data.sheetName ?? ws.name ?? "").trim() || "Sheet",
+            sourceExcel: String(ctx.data.absExcel ?? ctx.data.excelPath ?? "").trim(),
             generatedAt: new Date().toISOString(),
-            caseCount: built.length,
-            cases: built,
+            caseCount: cases.length,
+            cases,
         };
 
         ctx.data.casesFile = casesFile;
-
-        ctx.log.info(`Cases built: ${built.length}`);
-        ctx.log.debug?.(
-            `Built casesFile => sheet=${safeSheetFilename(sheetName)} includeEmptyChildFields=${includeEmpty}`
-        );
+        ctx.log.info(`Cases built with schema "${ctx.data.schemaName}": ${cases.length}`);
     },
 };
 
