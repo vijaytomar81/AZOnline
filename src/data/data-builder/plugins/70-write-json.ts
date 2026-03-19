@@ -52,6 +52,7 @@ const plugin: PipelinePlugin = {
 
     if (ctx.data.validationReport) {
       const reportPath = absOut.replace(/\.json$/i, ".validation.json");
+      ctx.data.validationReport.validationReportPath = reportPath;
       fs.writeFileSync(reportPath, JSON.stringify(ctx.data.validationReport, null, 2), "utf-8");
       ctx.log.info(`Validation report written: ${reportPath}`);
     }

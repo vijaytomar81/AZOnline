@@ -30,26 +30,35 @@ export type CasesFile = {
     cases: BuiltCase[];
 };
 
+export type SectionFieldGroup = {
+    requiredFields: string[];
+    schemaMappingFields: string[];
+};
+
 export type ValidationReport = {
     schemaName: string;
     sheetName: string;
     mode: "normal" | "strict";
 
+    generatedAt: string;
+    validationReportPath?: string;
+
     errors: string[];
 
-    schemaToExcel: {
-        requiredMissing: string[];
-        mappedMissing: string[];
+    missingSchemaFieldsInExcel: {
+        requiredFields: string[];
+        schemaMappingFields: string[];
+        bySection: Record<string, SectionFieldGroup>;
     };
 
-    excelToSchema: {
-        unmappedFields: string[];
+    missingExcelFieldsInSchema: {
+        unusedExcelFields: string[];
     };
 
     summary: {
         errorCount: number;
-        mappedMissingCount: number;
-        unmappedFieldCount: number;
+        missingSchemaFieldsInExcelCount: number;
+        missingExcelFieldsInSchemaCount: number;
     };
 };
 

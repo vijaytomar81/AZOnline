@@ -1,8 +1,7 @@
 // src/data/data-builder/plugins/05-validate-schema.ts
-
 import type ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
-import type { ValidationReport } from "../types";
+import type { SectionFieldGroup, ValidationReport } from "../types";
 import { getSchema } from "../../input-data-schema";
 import {
     buildRowIndex,
@@ -17,6 +16,20 @@ function collectSchemaFields(obj: any, out: Set<string>) {
     for (const value of Object.values(obj)) {
         if (typeof value === "string") out.add(value);
         else if (typeof value === "object") collectSchemaFields(value, out);
+    }
+}
+
+function collectSchemaFieldsBySection(
+    obj: any,
+    out: Record<string, Set<string>>,
+    section: string
+) {
+    if (!obj || typeof obj !== "object") return;
+    out[section] ??= new Set<string>();
+
+    for (const value of Object.values(obj)) {
+        if (typeof value === "string") out[section].add(value);
+        else if (typeof value === "object") collectSchemaFieldsBySection(value, out, section);
     }
 }
 
@@ -41,6 +54,32 @@ function missingFields(rows: Map<string, number>, fields: Iterable<string>) {
     return [...fields].filter((f) => !rows.has(normKey(f)));
 }
 
+function buildSectionBuckets(
+    rows: Map<string, number>,
+    sectionFields: Record<string, Set<string>>,
+    requiredFields: string[]
+): Record<string, SectionFieldGroup> {
+    const requiredSet = new Set(requiredFields.map(normKey));
+    const out: Record<string, SectionFieldGroup> = {};
+
+    for (const [section, fields] of Object.entries(sectionFields)) {
+        const requiredMissing: string[] = [];
+        const mappedMissing: string[] = [];
+
+        for (const field of fields) {
+            if (rows.has(normKey(field))) continue;
+            if (requiredSet.has(normKey(field))) requiredMissing.push(field);
+            else mappedMissing.push(field);
+        }
+
+        if (requiredMissing.length || mappedMissing.length) {
+            out[section] = { requiredFields: requiredMissing, schemaMappingFields: mappedMissing };
+        }
+    }
+
+    return out;
+}
+
 const plugin: PipelinePlugin = {
     name: "validate-schema",
     order: 5,
@@ -53,88 +92,97 @@ const plugin: PipelinePlugin = {
         const schema = getSchema(ctx.data.schemaName);
 
         const layout = detectLayout(ws);
-        const { rows, duplicates } = collectExcelFields(
-            ws,
-            layout.fieldCol,
-            layout.dataStartRow
-        );
+        const { rows, duplicates } = collectExcelFields(ws, layout.fieldCol, layout.dataStartRow);
 
-        // ---- Schema fields
         const schemaFields = new Set<string>();
-        collectSchemaFields(schema.groups, schemaFields);
+        const sectionFields: Record<string, Set<string>> = {};
 
-        for (const rep of Object.values(schema.repeatedGroups ?? {})) {
-            schemaFields.add(rep.countField);
-            collectSchemaFields(rep.groups, schemaFields);
+        for (const [section, value] of Object.entries(schema.groups)) {
+            collectSchemaFields(value, schemaFields);
+            collectSchemaFieldsBySection(value, sectionFields, section);
         }
 
-        // ---- Validation buckets
+        for (const [section, rep] of Object.entries(schema.repeatedGroups ?? {})) {
+            schemaFields.add(rep.countField);
+            collectSchemaFields(rep.groups, schemaFields);
+
+            sectionFields[section] ??= new Set<string>();
+            sectionFields[section].add(rep.countField);
+            collectSchemaFieldsBySection(rep.groups, sectionFields, section);
+        }
+
         const requiredMissing = missingFields(rows, schema.requiredFields ?? []);
         const mappedMissing = missingFields(rows, schemaFields);
 
         const excelFields = new Set([...rows.keys()]);
         const schemaFieldKeys = new Set([...schemaFields].map(normKey));
-
         const unmappedExcel = [...excelFields].filter((f) => !schemaFieldKeys.has(f));
 
-        // ---- Build report
         const errors: string[] = [];
-
-        // Errors (ONLY critical)
-        requiredMissing.forEach((f) =>
-            errors.push(`Missing required field: ${f}`)
-        );
-
+        requiredMissing.forEach((f) => errors.push(`Missing required field: ${f}`));
         if (strict) {
-            duplicates.forEach((f) =>
-                errors.push(`Duplicate Excel field: ${f}`)
-            );
+            duplicates.forEach((f) => errors.push(`Duplicate Excel field: ${f}`));
         }
 
-        // ✅ FIX: properly typed mode
+        const bySection = buildSectionBuckets(rows, sectionFields, schema.requiredFields ?? []);
         const mode: "normal" | "strict" = strict ? "strict" : "normal";
 
         const report: ValidationReport = {
             schemaName: ctx.data.schemaName,
             sheetName: ctx.data.sheetName,
             mode,
-
+            generatedAt: new Date().toISOString(),
             errors,
-
-            schemaToExcel: {
-                requiredMissing,
-                mappedMissing,
+            missingSchemaFieldsInExcel: {
+                requiredFields: requiredMissing,
+                schemaMappingFields: mappedMissing,
+                bySection,
             },
-
-            excelToSchema: {
-                unmappedFields: unmappedExcel,
+            missingExcelFieldsInSchema: {
+                unusedExcelFields: unmappedExcel,
             },
-
             summary: {
                 errorCount: errors.length,
-                mappedMissingCount: mappedMissing.length,
-                unmappedFieldCount: unmappedExcel.length,
+                missingSchemaFieldsInExcelCount: mappedMissing.length + requiredMissing.length,
+                missingExcelFieldsInSchemaCount: unmappedExcel.length,
             },
         };
 
         ctx.data.validationReport = report;
 
-        // ---- Console output
-        ctx.log.info(`Validation Summary`);
+        ctx.log.info("Validation Summary");
         ctx.log.info(`Schema: ${report.schemaName}`);
         ctx.log.info(`Sheet: ${report.sheetName}`);
         ctx.log.info(`Errors: ${report.summary.errorCount}`);
 
-        ctx.log.info(`Schema → Excel`);
-        ctx.log.info(`  Mapped missing: ${report.summary.mappedMissingCount}`);
+        ctx.log.info("Missing Schema Mapping Fields in Excel");
+        ctx.log.info(`  Required fields missing: ${report.missingSchemaFieldsInExcel.requiredFields.length}`);
+        ctx.log.info(`  Schema Mapping fields missing: ${report.missingSchemaFieldsInExcel.schemaMappingFields.length}`);
 
-        ctx.log.info(`Excel → Schema`);
-        ctx.log.info(`  Unmapped fields: ${report.summary.unmappedFieldCount}`);
+        const sections = Object.entries(report.missingSchemaFieldsInExcel.bySection);
+        if (sections.length) {
+            ctx.log.info("  By section:");
+            sections.forEach(([section, data]) => {
+                const total = data.requiredFields.length + data.schemaMappingFields.length;
+                ctx.log.info(`    ${section}: ${total}`);
+            });
+        }
+
+        ctx.log.info("Missing Excel Fields in Schema");
+        ctx.log.info(`  Unused Excel field: ${report.summary.missingExcelFieldsInSchemaCount}`);
 
         if (errors.length) {
             errors.slice(0, 20).forEach((e) => ctx.log.error(e));
-            throw new Error(`Schema validation failed.`);
+            throw new Error("Schema validation failed.");
         }
+
+        report.missingSchemaFieldsInExcel.schemaMappingFields
+            .slice(0, 20)
+            .forEach((f) => ctx.log.warn(`Missing Schema mapping field: ${f}`));
+
+        report.missingExcelFieldsInSchema.unusedExcelFields
+            .slice(0, 20)
+            .forEach((f) => ctx.log.info(`Unused Excel field: ${f}`));
 
         ctx.log.info("Validation completed ✅");
     },
