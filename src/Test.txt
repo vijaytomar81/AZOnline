@@ -1,6 +1,8 @@
 
 # to get tree outcome: tree -L 6 -I "node_modules|.git"
 
+# to get only folders: tree -d -I "node_modules|.git"
+
 npx ts-prune | grep -v "used in module" | grep page-scanner
 
 
