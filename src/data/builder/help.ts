@@ -1,5 +1,5 @@
 // src/data/data-builder/dataBuilderHelp.ts
-import { listSchemas } from "../input-data-schema";
+import { listSchemas } from "../schemas";
 
 export function usage(): string {
     const schemas = listSchemas().join(", ");

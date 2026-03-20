@@ -1,6 +1,6 @@
 // src/data/data-builder/core/schemaRuntime.ts
 import type ExcelJS from "exceljs";
-import type { DataSchema, RepeatedGroup, SchemaGroupMap } from "../../input-data-schema/types";
+import type { DataSchema, RepeatedGroup, SchemaGroupMap } from "../../schemas/types";
 import { cellToString, norm, normKey } from "./excelRuntime";
 
 type BuildOpts = {
