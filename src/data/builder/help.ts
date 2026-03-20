@@ -1,4 +1,5 @@
-// src/data/data-builder/dataBuilderHelp.ts
+// src/data/builder/help.ts
+
 import { listSchemas } from "../schemas";
 
 export function usage(): string {
@@ -8,7 +9,7 @@ export function usage(): string {
 Data Builder CLI
 
 Usage:
-  ts-node src/data/data-builder/index.ts --excel <path> --sheet <name> [options]
+  ts-node src/data/builder/index.ts --excel <path> --sheet <name> [options]
 
 Required:
   --excel <path>        Path to Excel file

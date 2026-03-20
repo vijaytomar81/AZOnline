@@ -1,4 +1,4 @@
-// src/data/data-builder/core/graph.ts
+// src/data/builder/core/graph.ts
 import type { PipelinePlugin } from "./pipeline";
 
 type GraphIssue =

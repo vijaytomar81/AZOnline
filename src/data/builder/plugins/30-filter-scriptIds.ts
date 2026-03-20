@@ -1,4 +1,4 @@
-// src/data/data-builder/plugins/30-filter-scriptIds.ts
+// src/data/builder/plugins/30-filter-scriptIds.ts
 
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";

@@ -1,4 +1,4 @@
-// src/data/input-data-schema/master-journey.schema.ts
+// src/data/schemas/master-journey.schema.ts
 
 import type { DataSchema } from "./types";
 

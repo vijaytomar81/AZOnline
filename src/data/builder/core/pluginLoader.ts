@@ -1,4 +1,4 @@
-// src/data/data-builder/core/pluginLoader.ts
+// src/data/builder/core/pluginLoader.ts
 
 import fs from "node:fs";
 import path from "node:path";

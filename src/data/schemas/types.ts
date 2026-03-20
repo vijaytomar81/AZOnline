@@ -1,4 +1,4 @@
-// src/data/input-data-schema/types.ts
+// src/data/schemas/types.ts
 
 export type ExcelColumnName = string;
 

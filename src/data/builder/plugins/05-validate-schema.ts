@@ -2,6 +2,7 @@
 
 import type ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
+import type { RepeatedGroup, SchemaGroupMap } from "../../schemas/types";
 import type { SectionFieldGroup, ValidationReport } from "../types";
 import { getSchema } from "../../schemas";
 import { buildRowIndex, cellToString, detectLayout, norm, normKey } from "../core/excelRuntime";
@@ -88,6 +89,45 @@ function countMissingSchemaFields(bySection: Record<string, SectionFieldGroup>) 
     }, 0);
 }
 
+function collectLeafExcelFields(node: SchemaGroupMap, out: Set<string>) {
+    if (!node || typeof node !== "object") return;
+
+    for (const value of Object.values(node)) {
+        if (!value || typeof value !== "object") continue;
+
+        const record = value as Record<string, unknown>;
+        const isLeaf = Object.values(record).every((v) => typeof v === "string");
+
+        if (isLeaf) {
+            Object.values(record).forEach((v) => out.add(String(v)));
+            continue;
+        }
+
+        collectLeafExcelFields(value as SchemaGroupMap, out);
+    }
+}
+
+function expandRepeatedGroupFields(rep: RepeatedGroup, outerPrefix = ""): Set<string> {
+    const expanded = new Set<string>();
+    const leafFields = new Set<string>();
+
+    expanded.add(`${outerPrefix}${rep.countField}`);
+    collectLeafExcelFields(rep.groups, leafFields);
+
+    for (let i = 1; i <= rep.max; i++) {
+        const itemPrefix = `${outerPrefix}${rep.prefixBase}${i}`;
+        for (const field of leafFields) {
+            expanded.add(`${itemPrefix}${field}`);
+        }
+    }
+
+    return expanded;
+}
+
+function addFields(target: Set<string>, fields: Iterable<string>) {
+    for (const field of fields) target.add(field);
+}
+
 const plugin: PipelinePlugin = {
     name: "validate-schema",
     order: 5,
@@ -113,12 +153,25 @@ const plugin: PipelinePlugin = {
         }
 
         for (const [section, rep] of Object.entries(schema.repeatedGroups ?? {})) {
-            schemaFields.add(rep.countField);
-            collectSchemaFields(rep.groups, schemaFields);
+            let expanded: Set<string>;
+
+            if (section === "additionalDriverClaims") {
+                expanded = new Set<string>();
+                for (let driverIndex = 1; driverIndex <= 5; driverIndex++) {
+                    addFields(expanded, expandRepeatedGroupFields(rep, `AD${driverIndex}`));
+                }
+            } else if (section === "additionalDriverConvictions") {
+                expanded = new Set<string>();
+                for (let driverIndex = 1; driverIndex <= 5; driverIndex++) {
+                    addFields(expanded, expandRepeatedGroupFields(rep, `AD${driverIndex}`));
+                }
+            } else {
+                expanded = expandRepeatedGroupFields(rep);
+            }
 
             sectionFields[section] ??= new Set<string>();
-            sectionFields[section].add(rep.countField);
-            collectSchemaFieldsBySection(rep.groups, sectionFields, section);
+            addFields(sectionFields[section], expanded);
+            addFields(schemaFields, expanded);
         }
 
         const requiredMissing = missingFields(rows, schema.requiredFields ?? []);
@@ -196,17 +249,17 @@ const plugin: PipelinePlugin = {
 
             sections.forEach(([section, data]) => {
                 data.requiredFields
-                    .slice(0, 20)
+                    .slice(0, 10)
                     .forEach((field) => ctx.log.warn(`[${section}] Missing required field: ${field}`));
 
                 data.schemaMappingFields
-                    .slice(0, 20)
-                    .forEach((field) => ctx.log.warn(`[${section}] Missing mapped field: ${field}`));
+                    .slice(0, 10)
+                    .forEach((field) => ctx.log.debug?.(`[${section}] Missing mapped field: ${field}`));
             });
 
             report.missingExcelFieldsInSchema.unusedExcelFields
-                .slice(0, 20)
-                .forEach((field) => ctx.log.info(`Unused Excel field: ${field}`));
+                .slice(0, 10)
+                .forEach((field) => ctx.log.debug?.(`Unused Excel field: ${field}`));
         }
 
         ctx.log.info("Validation completed ✅");

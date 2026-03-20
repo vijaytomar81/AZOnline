@@ -1,9 +1,9 @@
-// src/data/data-builder/core/pipeline.ts
+// src/data/builder/core/pipeline.ts
 
 import type { DataBuilderContext } from "../types";
 
 /**
- * In data-builder, the pipeline context IS the DataBuilderContext.
+ * In builder, the pipeline context IS the DataBuilderContext.
  * This avoids incompatible ctx typing between core + plugins.
  */
 export type PipelineContext = DataBuilderContext;

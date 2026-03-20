@@ -1,4 +1,4 @@
-// src/data/input-data-schema/sheet-schema.mapping.ts
+// src/data/schemas/sheet-schema.mapping.ts
 
 function normKey(value: string): string {
     return String(value ?? "")
