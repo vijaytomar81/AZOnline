@@ -17,7 +17,9 @@ function formatArtifactTimestamp(date = new Date()): string {
     const hh = String(date.getHours()).padStart(2, "0");
     const min = String(date.getMinutes()).padStart(2, "0");
     const ss = String(date.getSeconds()).padStart(2, "0");
-    return `${yyyy}${mm}${dd}_${hh}${min}${ss}`;
+    const ms = String(date.getMilliseconds()).padStart(3, "0");
+
+    return `${yyyy}${mm}${dd}_${hh}${min}${ss}_${ms}`;
 }
 
 function escapeRegex(value: string) {
@@ -45,7 +47,9 @@ function listActiveFamilyFiles(baseFilePath: string): string[] {
     if (!fs.existsSync(dir)) return [];
 
     const plainName = `${base}${ext}`;
-    const stampedPattern = new RegExp(`^${escapeRegex(base)}_\\d{8}_\\d{6}${escapeRegex(ext)}$`);
+    const stampedPattern = new RegExp(
+        `^${escapeRegex(base)}_\\d{8}_\\d{6}_\\d{3}${escapeRegex(ext)}$`
+    );
 
     return fs.readdirSync(dir)
         .filter((name) => name === plainName || stampedPattern.test(name))
@@ -58,7 +62,9 @@ function listArchivedFamilyFiles(baseFilePath: string, archiveDirPath: string) {
     if (!fs.existsSync(archiveDirPath)) return [];
 
     const plainName = `${base}${ext}`;
-    const stampedPattern = new RegExp(`^${escapeRegex(base)}_\\d{8}_\\d{6}${escapeRegex(ext)}$`);
+    const stampedPattern = new RegExp(
+        `^${escapeRegex(base)}_\\d{8}_\\d{6}_\\d{3}${escapeRegex(ext)}$`
+    );
 
     return fs.readdirSync(archiveDirPath)
         .filter((name) => name === plainName || stampedPattern.test(name))
