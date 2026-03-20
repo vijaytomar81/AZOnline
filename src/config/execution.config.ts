@@ -41,7 +41,7 @@ export const executionConfig: ExecutionConfig = {
   },
 
   generatedArtifacts: {
-    withTimestamp: envBool("ARTIFACTS_WITH_TIMESTAMP", false),
+    withTimestamp: envBool("ARTIFACTS_WITH_TIMESTAMP", true),
     maxToKeep: envNumber("MAX_ARTIFACTS_TO_KEEP", 30),
   },
 };

@@ -1,6 +1,7 @@
-// src/data/data-builder/plugins/10-extract-meta.ts
+// src/data/builder/plugins/10-extract-meta.ts
 import type ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
+import { defaultSheetLayoutConfig } from "../core/sheetLayoutConfig";
 import {
     cellToString,
     detectCaseColumns,
@@ -19,18 +20,22 @@ const plugin: PipelinePlugin = {
         if (!ws) throw new Error("Sheet not loaded. Ensure load-excel ran.");
 
         const layout = detectLayout(ws);
+        const metaAliases = defaultSheetLayoutConfig.metaFieldAliases;
+
         const scriptIdRow = findRowByField(
             ws,
             layout.fieldCol,
             layout.dataStartRow,
-            ["ScriptId", "Script ID"]
+            metaAliases.scriptId
         );
+
         const scriptNameRow = findRowByField(
             ws,
             layout.fieldCol,
             layout.dataStartRow,
-            ["ScriptName"]
+            metaAliases.scriptName
         );
+
         const caseCols = detectCaseColumns(ws, scriptIdRow, layout.caseStartCol);
 
         const caseMetas = caseCols.map((col) => ({

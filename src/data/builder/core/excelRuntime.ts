@@ -1,5 +1,6 @@
-// src/data/data-builder/core/excelRuntime.ts
+// src/data/builder/core/excelRuntime.ts
 import type ExcelJS from "exceljs";
+import { defaultSheetLayoutConfig } from "./sheetLayoutConfig";
 
 export function cellToString(v: any): string {
     if (v === null || v === undefined) return "";
@@ -27,7 +28,45 @@ export type SheetLayout = {
     caseStartCol: number;
 };
 
+function matchesAlias(value: string, aliases: string[]): boolean {
+    const key = normKey(value);
+    return aliases.some((alias) => normKey(alias) === key);
+}
+
+function findHeaderColumn(
+    ws: ExcelJS.Worksheet,
+    headerRow: number,
+    aliases: string[]
+): number | null {
+    const maxCol = ws.columnCount || ws.actualColumnCount || 0;
+
+    for (let c = 1; c <= maxCol; c++) {
+        const value = cellToString(ws.getCell(headerRow, c).value);
+        if (matchesAlias(value, aliases)) return c;
+    }
+
+    return null;
+}
+
 export function detectLayout(ws: ExcelJS.Worksheet): SheetLayout {
+    const cfg = defaultSheetLayoutConfig;
+    const headerRow = cfg.headerRow;
+
+    const sectionCol = findHeaderColumn(ws, headerRow, cfg.sectionHeaderAliases);
+    const fieldCol = findHeaderColumn(ws, headerRow, cfg.fieldHeaderAliases);
+    const appFieldCol = findHeaderColumn(ws, headerRow, cfg.appFieldHeaderAliases);
+    const firstValueCol = findHeaderColumn(ws, headerRow, cfg.valueHeaderAliases);
+
+    if (fieldCol && firstValueCol) {
+        return {
+            dataStartRow: headerRow + 1,
+            fieldCol,
+            caseStartCol: firstValueCol,
+        };
+    }
+
+    // Backward-compatible pattern:
+    // A=Section, B=StandardFieldName, C=ApplicationFieldName, D+=case values
     const a1 = normKey(cellToString(ws.getCell(1, 1).value));
     const b1 = normKey(cellToString(ws.getCell(1, 2).value));
     const c1 = normKey(cellToString(ws.getCell(1, 3).value));
@@ -36,7 +75,30 @@ export function detectLayout(ws: ExcelJS.Worksheet): SheetLayout {
         return { dataStartRow: 2, fieldCol: 2, caseStartCol: 4 };
     }
 
-    return { dataStartRow: 1, fieldCol: 1, caseStartCol: 2 };
+    // Backward-compatible pattern:
+    // A=Section, B=StandardFieldName, C+=case values
+    if (a1 === "section" && b1 === "standardfieldname") {
+        const c1Raw = cellToString(ws.getCell(1, 3).value);
+        const d1Raw = cellToString(ws.getCell(1, 4).value);
+
+        if (
+            matchesAlias(c1Raw, cfg.valueHeaderAliases) ||
+            matchesAlias(d1Raw, cfg.valueHeaderAliases)
+        ) {
+            return { dataStartRow: 2, fieldCol: 2, caseStartCol: 3 };
+        }
+    }
+
+    const knownHeaders = [
+        ...cfg.sectionHeaderAliases,
+        ...cfg.fieldHeaderAliases,
+        ...cfg.appFieldHeaderAliases,
+        ...cfg.valueHeaderAliases,
+    ].join(", ");
+
+    throw new Error(
+        `Unable to detect sheet layout. Expected common template headers like: ${knownHeaders}`
+    );
 }
 
 export function findRowByField(
@@ -58,19 +120,22 @@ export function findRowByField(
 
 export function detectCaseColumns(
     ws: ExcelJS.Worksheet,
-    scriptIdRow: number,
+    anchorRow: number,
     caseStartCol: number
 ): number[] {
     const cols: number[] = [];
     const maxCol = ws.columnCount || ws.actualColumnCount || 0;
 
     for (let c = caseStartCol; c <= maxCol; c++) {
-        const id = norm(cellToString(ws.getCell(scriptIdRow, c).value));
-        if (!id) break;
+        const value = norm(cellToString(ws.getCell(anchorRow, c).value));
+        if (!value) break;
         cols.push(c);
     }
 
-    if (!cols.length) throw new Error("No case columns found on ScriptId row.");
+    if (!cols.length) {
+        throw new Error("No case columns found on anchor row.");
+    }
+
     return cols;
 }
 

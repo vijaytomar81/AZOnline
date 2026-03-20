@@ -37,7 +37,7 @@ export const PAGE_OBJECT_REPAIR_DIR = path.join(SRC_DIR, "tools", "page-object-r
 /**
  * Data Builder
  */
-export const DATA_BUILDER_DIR = path.join(SRC_DIR, "data", "data-builder");
+export const DATA_BUILDER_DIR = path.join(SRC_DIR, "data", "builder");
 export const DATA_BUILDER_PLUGINS_DIR = path.join(DATA_BUILDER_DIR, "plugins");
 export const DATA_GENERATED_DIR = path.join(SRC_DIR, "data", "generated");
 export const DATA_GENERATED_ARCHIVE_DIR = path.join(DATA_GENERATED_DIR, "archive");
