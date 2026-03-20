@@ -7,69 +7,75 @@ import type {
     ScenarioStartFrom,
     ScenarioStep,
 } from "./types";
+import { defaultScenarioTemplateConfig } from "./templateConfig";
 
-const MAX_STEPS = 20;
+function getString(value: unknown): string {
+    return normalizeSpaces(String(value ?? ""));
+}
 
-function getString(value: unknown): string | undefined {
-    if (value === undefined || value === null) return undefined;
-    const text = normalizeSpaces(String(value));
-    return text || undefined;
+function normalizeKey(value: unknown): string {
+    return getString(value).toLowerCase().replace(/\s+/g, "");
 }
 
 function normalizeStartFrom(value: unknown): ScenarioStartFrom {
-    const normalized = getString(value)?.toLowerCase();
-
-    if (normalized === "existingpolicy") {
-        return "ExistingPolicy";
-    }
-
-    return "NewBusiness";
+    return normalizeKey(value) === "existingpolicy"
+        ? "ExistingPolicy"
+        : "NewBusiness";
 }
 
 function normalizeExecute(value: unknown): boolean {
-    const normalized = getString(value)?.toUpperCase();
-    return normalized !== "N";
+    return normalizeKey(value) !== "n";
 }
 
-function getStepField(row: RawScenarioRow, stepNo: number, suffix: string): string | undefined {
+function getTotalSteps(value: unknown): number {
+    const num = Number(getString(value));
+    if (!Number.isInteger(num) || num < 0) return 0;
+    return Math.min(num, defaultScenarioTemplateConfig.maxSteps);
+}
+
+function getStepField(
+    row: RawScenarioRow,
+    stepNo: number,
+    suffix: string
+): string {
     return getString(row[`Step${stepNo}${suffix}`]);
 }
 
-function buildStep(row: RawScenarioRow, stepNo: number): ScenarioStep | null {
-    const action = getStepField(row, stepNo, "Action");
-    if (!action) return null;
-
+function buildStep(row: RawScenarioRow, stepNo: number): ScenarioStep {
     return {
         stepNo,
-        action,
-        subType: getStepField(row, stepNo, "SubType"),
+        action: getStepField(row, stepNo, "Action"),
+        subType: getStepField(row, stepNo, "SubType") || undefined,
         portal: getStepField(row, stepNo, "Portal"),
-        dataRef: getStepField(row, stepNo, "Data"),
+        testCaseId: getStepField(row, stepNo, "TestCaseId"),
     };
 }
 
-function buildSteps(row: RawScenarioRow): ScenarioStep[] {
+function buildSteps(row: RawScenarioRow, totalSteps: number): ScenarioStep[] {
     const steps: ScenarioStep[] = [];
 
-    for (let stepNo = 1; stepNo <= MAX_STEPS; stepNo++) {
-        const step = buildStep(row, stepNo);
-        if (!step) continue;
-        steps.push(step);
+    for (let stepNo = 1; stepNo <= totalSteps; stepNo++) {
+        steps.push(buildStep(row, stepNo));
     }
 
     return steps;
 }
 
 export function normalizeScenario(row: RawScenarioRow): ExecutionScenario {
+    const totalSteps = getTotalSteps(row.TotalSteps);
+
     return {
-        scenarioId: getString(row.ScenarioId) ?? "",
-        scenarioName: getString(row.ScenarioName) ?? "",
-        journey: getString(row.Journey) ?? "",
+        scenarioId: getString(row.ScenarioId),
+        scenarioName: getString(row.ScenarioName),
+        journey: getString(row.Journey),
         startFrom: normalizeStartFrom(row.StartFrom),
-        policyNumber: getString(row.PolicyNumber),
+        policyNumber: getString(row.PolicyNumber) || undefined,
+        loginId: getString(row.LoginId) || undefined,
+        password: getString(row.Password) || undefined,
         description: getString(row.Description),
         execute: normalizeExecute(row.Execute),
-        steps: buildSteps(row),
+        totalSteps,
+        steps: buildSteps(row, totalSteps),
     };
 }
 

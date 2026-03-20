@@ -2,16 +2,17 @@
 
 export type ScenarioStartFrom = "NewBusiness" | "ExistingPolicy";
 
-export type ScenarioExecuteFlag = "Y" | "N";
-
 export type RawScenarioRow = {
     ScenarioId: string;
     ScenarioName?: string;
     Journey?: string;
     StartFrom?: string;
     PolicyNumber?: string;
+    LoginId?: string;
+    Password?: string;
     Description?: string;
     Execute?: string;
+    TotalSteps?: string | number;
     [key: string]: unknown;
 };
 
@@ -19,8 +20,8 @@ export type ScenarioStep = {
     stepNo: number;
     action: string;
     subType?: string;
-    portal?: string;
-    dataRef?: string;
+    portal: string;
+    testCaseId: string;
 };
 
 export type ExecutionScenario = {
@@ -29,8 +30,11 @@ export type ExecutionScenario = {
     journey: string;
     startFrom: ScenarioStartFrom;
     policyNumber?: string;
-    description?: string;
+    loginId?: string;
+    password?: string;
+    description: string;
     execute: boolean;
+    totalSteps: number;
     steps: ScenarioStep[];
 };
 

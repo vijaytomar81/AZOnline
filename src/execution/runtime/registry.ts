@@ -20,14 +20,16 @@ function normalizeKeyPart(value?: string): string {
 
 export function buildExecutorKey(args: {
     action: string;
+    journey?: string;
     portal?: string;
     subType?: string;
 }): string {
     const action = normalizeKeyPart(args.action);
+    const journey = normalizeKeyPart(args.journey);
     const portal = normalizeKeyPart(args.portal);
     const subType = normalizeKeyPart(args.subType);
 
-    return [action, portal, subType].filter(Boolean).join(":");
+    return [action, journey, portal, subType].filter(Boolean).join(":");
 }
 
 export function createExecutorRegistry(): ExecutorRegistry {
@@ -38,6 +40,7 @@ export function registerExecutor(
     registry: ExecutorRegistry,
     args: {
         action: string;
+        journey?: string;
         portal?: string;
         subType?: string;
         executor: StepExecutor;
@@ -49,17 +52,29 @@ export function registerExecutor(
 
 export function getExecutor(
     registry: ExecutorRegistry,
+    context: ExecutionContext,
     step: ScenarioStep
 ): StepExecutor | undefined {
     const keys = [
         buildExecutorKey({
             action: step.action,
+            journey: context.scenario.journey,
             portal: step.portal,
             subType: step.subType,
         }),
         buildExecutorKey({
             action: step.action,
+            journey: context.scenario.journey,
             portal: step.portal,
+        }),
+        buildExecutorKey({
+            action: step.action,
+            journey: context.scenario.journey,
+        }),
+        buildExecutorKey({
+            action: step.action,
+            portal: step.portal,
+            subType: step.subType,
         }),
         buildExecutorKey({
             action: step.action,

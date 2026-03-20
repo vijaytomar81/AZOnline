@@ -1,4 +1,4 @@
-// src/data/data-definitions/sheetName-schema.mapping.ts
+// src/data/data-definitions/sheet-name-schema.mapping.ts
 
 import { normalizeSpaces } from "../../utils/text";
 
