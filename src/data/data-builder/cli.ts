@@ -50,6 +50,10 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
 
   const schemaName = resolveSchemaName(schemaArg, sheetName);
 
+  if (verbose) {
+    log.debug(`Resolved schema "${schemaName}" from sheet "${sheetName}"`);
+  }
+
   const outRaw = String(getArg(argv, "--out") ?? process.env.OUT_PATH ?? "").trim();
   const outputPath =
     outRaw || path.join("src", "data", "generated", `${safeSheetFilename(sheetName)}.json`);
