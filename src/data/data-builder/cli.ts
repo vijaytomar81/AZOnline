@@ -1,10 +1,12 @@
 // src/data/data-builder/cli.ts
+
 import path from "node:path";
 import type { DataBuilderBaseArgs } from "./types";
 import { normalizeArgv, getArg, hasFlag } from "../../utils/argv";
 import { createLogger } from "../../utils/logger";
 import { printSection } from "../../utils/cliFormat";
 import { usage } from "./dataBuilderHelp";
+import { resolveSchemaName } from "../input-data-schema";
 
 export function createDataBuilderLogger(verbose = false) {
   return createLogger({
@@ -36,7 +38,7 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
 
   const excelPath = String(getArg(argv, "--excel") ?? process.env.EXCEL_PATH ?? "").trim();
   const sheetName = String(getArg(argv, "--sheet") ?? process.env.SHEET ?? "").trim();
-  const schemaName = String(getArg(argv, "--schema") ?? process.env.SCHEMA ?? "master").trim();
+  const schemaArg = String(getArg(argv, "--schema") ?? process.env.SCHEMA ?? "").trim();
   const scriptIdFilter = String(getArg(argv, "--ids") ?? process.env.SCRIPT_IDS ?? "").trim();
   const excludeEmptyFields =
     hasFlag(argv, "--excludeEmptyFields") || parseBoolean(process.env.EXCLUDE_EMPTY_FIELDS);
@@ -45,6 +47,8 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
 
   if (!excelPath) throw new Error("❌ EXCEL_PATH is required (or use --excel).");
   if (!sheetName) throw new Error("❌ SHEET is required (or use --sheet).");
+
+  const schemaName = resolveSchemaName(schemaArg, sheetName);
 
   const outRaw = String(getArg(argv, "--out") ?? process.env.OUT_PATH ?? "").trim();
   const outputPath =
