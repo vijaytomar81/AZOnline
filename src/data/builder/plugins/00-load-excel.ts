@@ -1,4 +1,4 @@
-// src/data/data-builder/plugins/00-load-excel.ts
+// src/data/builder/plugins/00-load-excel.ts
 
 import fs from "node:fs";
 import path from "node:path";
@@ -7,11 +7,7 @@ import type { PipelinePlugin } from "../core/pipeline";
 
 const plugin: PipelinePlugin = {
     name: "load-excel",
-
-    // These come from CLI (initial ctx.data), not from other plugins
     requires: ["external:excelPath", "external:sheetName"],
-
-    // These keys will be produced for other plugins
     provides: ["workbook", "sheet", "absExcel"],
 
     run: async (ctx) => {
@@ -34,25 +30,47 @@ const plugin: PipelinePlugin = {
             throw new Error(`Excel file not found: ${absExcel}`);
         }
 
-        // Keep INFO logs minimal; heavy details should go to debug.
-        ctx.log.info(`Loading workbook: ${absExcel}`);
-
-        const wb = new ExcelJS.Workbook();
-        await wb.xlsx.readFile(absExcel);
-
-        const ws = wb.getWorksheet(sheetName);
-        if (!ws) {
-            const available = wb.worksheets.map((w) => w.name).join(", ");
-            throw new Error(`Sheet "${sheetName}" not found. Available: ${available}`);
+        const stat = fs.statSync(absExcel);
+        if (!stat.isFile()) {
+            throw new Error(`Excel path is not a file: ${absExcel}`);
         }
 
-        // Set outputs for downstream plugins
+        ctx.log.info(`Loading workbook: ${absExcel}`);
+        ctx.log.debug?.(`Workbook size: ${stat.size} bytes`);
+
+        const wb = new ExcelJS.Workbook();
+
+        try {
+            await wb.xlsx.readFile(absExcel);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            throw new Error(`Failed to read Excel workbook "${absExcel}": ${message}`);
+        }
+
+        const worksheetNames = Array.isArray(wb.worksheets)
+            ? wb.worksheets.map((w) => w.name)
+            : [];
+
+        ctx.log.debug?.(`Workbook sheets: ${worksheetNames.join(", ") || "(none)"}`);
+
+        if (!worksheetNames.length) {
+            throw new Error(
+                `Workbook loaded but no worksheets were found in: ${absExcel}`
+            );
+        }
+
+        const ws = wb.worksheets.find((w) => w.name === sheetName);
+        if (!ws) {
+            throw new Error(
+                `Sheet "${sheetName}" not found. Available: ${worksheetNames.join(", ")}`
+            );
+        }
+
         ctx.data.workbook = wb;
         ctx.data.sheet = ws;
         ctx.data.absExcel = absExcel;
 
         ctx.log.info(`Loaded sheet: ${ws.name}`);
-        ctx.log.debug?.(`Workbook sheets: ${wb.worksheets.map((w) => w.name).join(", ")}`);
     },
 };
 
