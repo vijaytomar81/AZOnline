@@ -273,3 +273,84 @@ It enables:
 - schema-driven automation
 - consistent test structures
 - scalable testing
+
+# 19. End-to-End Flow
+
+~~~mermaid
+flowchart LR
+
+    subgraph CLI
+        A[index.ts]
+        A1[cli.ts]
+    end
+
+    subgraph Core
+        B1[pluginLoader.ts]
+        B2[pipeline.ts]
+        B3[schemaRuntime.ts]
+        B4[excelRuntime.ts]
+    end
+
+    subgraph Schema
+        C1[input-data-schema/index.ts]
+        C2[sheet-schema.mapping.ts]
+        C3[master-journey.schema.ts]
+        C4[types.ts]
+    end
+
+    subgraph Plugins
+        D1[00-load-excel]
+        D2[05-validate-schema]
+        D3[10-extract-meta]
+        D4[20-build-cases]
+        D5[30-filter-scriptIds]
+        D6[50-transform-values]
+        D7[70-write-json]
+    end
+
+    subgraph Utilities
+        E1[src/utils/fs.ts]
+        E2[src/utils/artifacts.ts]
+        E3[src/utils/paths.ts]
+    end
+
+    subgraph Output
+        F1[src/data/generated/*.json]
+        F2[src/data/generated/*.validation.json]
+        F3[src/data/generated/archive/*]
+    end
+
+    A --> A1
+    A1 --> C1
+    C2 --> C1
+    A1 --> B1
+
+    B1 --> D1
+    D1 --> D2
+    D2 --> D3
+    D3 --> D4
+    D4 --> D5
+    D5 --> D6
+    D6 --> D7
+
+    C1 --> D2
+    C3 --> D2
+    C4 --> D2
+
+    C1 --> D4
+    C3 --> D4
+    C4 --> D4
+
+    B3 --> D4
+    B4 --> D2
+    B4 --> D3
+    B4 --> D4
+
+    E1 --> E2
+    E2 --> D7
+    E3 --> D7
+
+    D7 --> F1
+    D7 --> F2
+    D7 --> F3
+~~~
