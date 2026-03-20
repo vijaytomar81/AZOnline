@@ -1,5 +1,3 @@
-<!-- src/data/data-builder/README.md -->
-
 # Data Builder
 
 ---
@@ -36,12 +34,12 @@ Its primary goals are:
 
 # 3. Toolchain Context
 
-```mermaid
+~~~mermaid
 flowchart LR
     A[Excel Test Data] --> B[Data Builder]
     B --> C[Generated JSON Test Cases]
     C --> D[Test Execution]
-```
+~~~
 
 ---
 
@@ -56,203 +54,206 @@ Each row = **field**
 
 ## Sheet Name
 
-Example:
-Direct, CNF, CTM, GoCo, MSM
+Example:  
+Direct, CNF, CTM, GoCo, MSM, FlowNB
 
 ---
 
-## Schema Name
+## Schema Resolution (IMPORTANT)
 
-Schemas define mapping:
+Schema is auto-resolved from sheet name.
 
-```
-src/data/input-data-schema
-```
+Priority:
+
+1. CLI (--schema)
+2. ENV (SCHEMA)
+3. Sheet → Schema mapping
+
+Example:
+
+| Sheet | Schema |
+|------|--------|
+| FlowNB | direct |
+| Direct | direct |
+| CNF | cnf |
+
+Defined in:
+
+    src/data/input-data-schema/sheet-schema.mapping.ts
 
 ---
 
 # 5. Outputs
 
-```
-src/data/generated/<Sheet>.json
-```
+## Test Data JSON
+
+    src/data/generated/<Sheet>.json
+
+## Validation Report
+
+    src/data/generated/<Sheet>.validation.json
 
 ---
 
-# 6. Schema System
+# 6. Artifact Handling
 
-Schema controls:
+## Modes
+
+### Overwrite Mode (default)
+
+- Existing files moved to archive
+- New file created without timestamp
+
+### Timestamp Mode
+
+    <name>_yyyymmdd_hhmmss.json
+
+---
+
+## Archive Folder
+
+    src/data/generated/archive/
+
+Behavior:
+
+- Existing files moved (no extra timestamp added)
+- Archive auto-created
+- Existing archive files replaced
+- Keeps only latest N files
+
+---
+
+## Config
+
+    executionConfig.generatedArtifacts = {
+      withTimestamp: boolean,
+      maxToKeep: number
+    }
+
+ENV:
+
+    ARTIFACTS_WITH_TIMESTAMP=true
+    MAX_ARTIFACTS_TO_KEEP=30
+
+---
+
+# 7. Schema System
 
 - field mapping
 - nested structure
-- repeated groups (drivers, claims, convictions)
+- repeated groups
 
 ---
 
-# 7. Data Builder Pipeline
+# 8. Data Builder Pipeline
 
-```mermaid
+~~~mermaid
 flowchart TD
-    A[Excel File] --> B[00-load-excel]
-    B --> C[05-validate-schema]
-    C --> D[10-extract-meta]
-    D --> E[20-build-cases]
-    E --> F[30-filter-scriptIds]
-    F --> G[50-transform-values]
-    G --> H[70-write-json]
-    H --> I[src/data/generated/*.json]
-```
+    A[Excel File] --> B[load-excel]
+    B --> C[validate-schema]
+    C --> D[extract-meta]
+    D --> E[build-cases]
+    E --> F[filter-scriptIds]
+    F --> G[transform-values]
+    G --> H[write-json]
+    H --> I[generated JSON]
+~~~
 
 ---
 
-## Plugin Responsibilities
+# 9. Validation System
 
-| Plugin | Responsibility |
-|------|------|
-| 00-load-excel | Load workbook and sheet |
-| 05-validate-schema | Validate Excel (normal + strict mode) |
-| 10-extract-meta | Extract Script IDs and structure |
-| 20-build-cases | Build JSON using schema |
-| 30-filter-scriptIds | Filter test cases |
-| 50-transform-values | Normalize values |
-| 70-write-json | Write JSON output |
+Structure:
+
+    {
+      "errors": [],
+      "missingSchemaFieldsInExcel": {
+        "requiredFields": [],
+        "bySection": {}
+      },
+      "missingExcelFieldsInSchema": {
+        "unusedExcelFields": []
+      },
+      "summary": {
+        "errorCount": 0,
+        "missingSchemaFieldsInExcelCount": 0,
+        "missingExcelFieldsInSchemaCount": 0
+      }
+    }
 
 ---
 
-# 8. CLI Usage
+# 10. CLI Usage
 
-```bash
-npm run data -- --excel file.xlsx --sheet Direct --schema direct
-```
+    npm run data -- --excel file.xlsx --sheet FlowNB
 
 ---
 
-# 9. Required Arguments
+# 11. Required Arguments
 
 | Argument | Description |
-|--------|-------------|
+|----------|------------|
 | --excel | Excel file |
 | --sheet | Sheet name |
-| --schema | Schema name |
 
 ---
 
-# 10. Optional Arguments
+# 12. Optional Arguments
 
 | Argument | Description |
-|--------|-------------|
+|----------|------------|
+| --schema | Override schema |
 | --ids | Filter Script IDs |
 | --excludeEmptyFields | Remove empty values |
 | --strictValidation | Enable strict validation |
-| --out | Custom output path |
+| --out | Custom output |
 | --verbose | Debug logs |
 
 ---
 
-# 11. Strict Validation
+# 13. Strict Validation
 
-## Normal Mode
+Normal:
+- required fields
+- mapping validation
 
-- required fields exist
-- schema mapping is valid
-
-## Strict Mode
-
-Additionally checks:
-
-- duplicate Excel fields
-- AdditionalDriversCount consistency
-- invalid counts
+Strict:
+- duplicates
+- repeated group consistency
 - schema completeness
 
-Example:
+---
 
-```bash
-npm run data -- \
---excel file.xlsx \
---sheet Direct \
---schema direct \
---strictValidation
-```
+# 14. Example Commands
+
+    npm run data -- --excel file.xlsx --sheet FlowNB
+    npm run data:build:strict
+    npm run data:build:noEmpty:strict
 
 ---
 
-# 12. Example Commands
+# 15. Adding New Journeys
 
-### Normal
-```bash
-npm run data -- --excel file.xlsx --sheet Direct --schema direct
-```
-
-### Strict
-```bash
-npm run data:build:strict
-```
-
-### Clean + Strict
-```bash
-npm run data:build:noEmpty:strict
-```
-
----
-
-# 13. Additional Drivers Structure
-
-```mermaid
-flowchart TD
-    A[additionalDrivers] --> B[driver1]
-    A --> C[driver2]
-
-    B --> B1[identity]
-    B --> B2[claims]
-    B --> B3[convictions]
-```
-
----
-
-# 14. Claims Structure
-
-```mermaid
-flowchart TD
-    A[policyHolderClaims] --> B[claim1]
-    A --> C[claim2]
-```
-
----
-
-# 15. Convictions Structure
-
-```mermaid
-flowchart TD
-    A[policyHolderConvictions] --> B[conviction1]
-    A --> C[conviction2]
-```
-
----
-
-# 16. Adding New Journeys
-
-1. Create schema  
-2. Register schema  
+1. Add schema  
+2. Add sheet mapping  
 3. Run builder  
 
 ---
 
-# 17. Shared Utilities
+# 16. Utilities
 
-```
-src/utils
-```
+    src/utils
 
 Includes:
+
 - logging
 - CLI parsing
-- formatting
 - timers
+- artifact handling
 
 ---
 
-# 18. Design Principles
+# 17. Design Principles
 
 - schema-driven
 - plugin-based
@@ -262,88 +263,13 @@ Includes:
 
 ---
 
-# 19. End-to-End Flow
+# 18. Summary
 
-```mermaid
-flowchart LR
-
-    subgraph CLI
-        A[index.ts]
-        A1[cli.ts]
-    end
-
-    subgraph Core
-        B1[pluginLoader.ts]
-        B2[pipeline.ts]
-        B3[graph.ts]
-        B4[schemaRuntime.ts]
-        B5[excelRuntime.ts]
-    end
-
-    subgraph Schema
-        C1[input-data-schema/index.ts]
-        C2[master-journey.schema.ts]
-        C3[types.ts]
-    end
-
-    subgraph Plugins
-        D1[00-load-excel]
-        D2[05-validate-schema]
-        D3[10-extract-meta]
-        D4[20-build-cases]
-        D5[30-filter-scriptIds]
-        D6[50-transform-values]
-        D7[70-write-json]
-    end
-
-    subgraph Output
-        E[src/data/generated/*.json]
-    end
-
-    A --> A1
-    A1 --> B1
-    B1 --> B3
-    B3 --> D1
-
-    D1 --> D2
-    D2 --> D3
-    D3 --> D4
-    D4 --> D5
-    D5 --> D6
-    D6 --> D7
-    D7 --> E
-
-    C1 --> D2
-    C2 --> D2
-    C3 --> D2
-
-    C1 --> D4
-    C2 --> D4
-    C3 --> D4
-
-    B4 --> D4
-    B5 --> D2
-    B5 --> D3
-    B5 --> D4
-```
-
----
-
-# 20. Troubleshooting
-
-Excel file not found → check `--excel`  
-Sheet not found → check `--sheet`  
-Schema not found → run `npm run data -- --help`
-
----
-
-# 21. Summary
-
-The **Data Builder** provides a scalable pipeline for converting Excel test data into structured JSON used by the automation framework.
+The Data Builder provides a scalable pipeline for converting Excel test data into structured JSON.
 
 It enables:
 
-- business-friendly test data management
+- business-friendly test data
 - schema-driven automation
-- consistent test case structures
-- scalable multi-journey testing
+- consistent test structures
+- scalable testing
