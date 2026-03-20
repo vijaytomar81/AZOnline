@@ -5,8 +5,9 @@ import { ensureDir, ensureParentDir } from "./fs";
 
 export type ArtifactWriteOptions = {
     withTimestamp?: boolean;
-    maxToKeep?: number;
     pretty?: boolean;
+    archiveDirPath: string;
+    maxToKeep?: number;
 };
 
 function formatArtifactTimestamp(date = new Date()): string {
@@ -23,86 +24,98 @@ function escapeRegex(value: string) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function buildArchivedPath(filePath: string, withTimestamp: boolean, date = new Date()) {
-    const dir = path.dirname(filePath);
-    const ext = path.extname(filePath);
-    const base = path.basename(filePath, ext);
-    const archiveDir = path.join(dir, "archive");
+function buildActiveArtifactPath(baseFilePath: string, withTimestamp: boolean, date = new Date()) {
+    if (!withTimestamp) return baseFilePath;
 
-    if (!withTimestamp) {
-        return path.join(archiveDir, `${base}${ext}`);
-    }
+    const dir = path.dirname(baseFilePath);
+    const ext = path.extname(baseFilePath);
+    const base = path.basename(baseFilePath, ext);
 
-    const timestamp = formatArtifactTimestamp(date);
-    return path.join(archiveDir, `${base}_${timestamp}${ext}`);
+    return path.join(dir, `${base}_${formatArtifactTimestamp(date)}${ext}`);
 }
 
-function listArchivedFamily(filePath: string) {
-    const dir = path.dirname(filePath);
-    const ext = path.extname(filePath);
-    const base = path.basename(filePath, ext);
-    const archiveDir = path.join(dir, "archive");
-    if (!fs.existsSync(archiveDir)) return [];
+function buildArchivedArtifactPath(sourceFilePath: string, archiveDirPath: string, date = new Date()) {
+    const ext = path.extname(sourceFilePath);
+    const base = path.basename(sourceFilePath, ext);
+    return path.join(archiveDirPath, `${base}_${formatArtifactTimestamp(date)}${ext}`);
+}
+
+function listActiveFamilyFiles(baseFilePath: string): string[] {
+    const dir = path.dirname(baseFilePath);
+    const ext = path.extname(baseFilePath);
+    const base = path.basename(baseFilePath, ext);
+    if (!fs.existsSync(dir)) return [];
 
     const plainName = `${base}${ext}`;
-    const stamped = new RegExp(`^${escapeRegex(base)}_\\d{8}_\\d{6}${escapeRegex(ext)}$`);
+    const stampedPattern = new RegExp(`^${escapeRegex(base)}_\\d{8}_\\d{6}${escapeRegex(ext)}$`);
 
-    return fs.readdirSync(archiveDir)
-        .filter((name) => name === plainName || stamped.test(name))
-        .sort((a, b) => {
-            const aPath = path.join(archiveDir, a);
-            const bPath = path.join(archiveDir, b);
-            return fs.statSync(bPath).mtimeMs - fs.statSync(aPath).mtimeMs;
-        })
-        .map((name) => path.join(archiveDir, name));
+    return fs.readdirSync(dir)
+        .filter((name) => name === plainName || stampedPattern.test(name))
+        .map((name) => path.join(dir, name));
 }
 
-function trimArchivedFamily(filePath: string, maxToKeep: number) {
+function listArchivedFamilyFiles(baseFilePath: string, archiveDirPath: string): string[] {
+    const ext = path.extname(baseFilePath);
+    const base = path.basename(baseFilePath, ext);
+    if (!fs.existsSync(archiveDirPath)) return [];
+
+    const stampedPattern = new RegExp(`^${escapeRegex(base)}(?:_\\d{8}_\\d{6})+${escapeRegex(ext)}$`);
+
+    return fs.readdirSync(archiveDirPath)
+        .filter((name) => stampedPattern.test(name))
+        .sort((a, b) => b.localeCompare(a))
+        .map((name) => path.join(archiveDirPath, name));
+}
+
+function trimArchivedFamily(baseFilePath: string, archiveDirPath: string, maxToKeep: number) {
     const keep = Math.max(0, Math.floor(maxToKeep || 0));
-    const files = listArchivedFamily(filePath);
+    const files = listArchivedFamilyFiles(baseFilePath, archiveDirPath);
     files.slice(keep).forEach((oldPath) => fs.unlinkSync(oldPath));
 }
 
-function moveExistingFileToArchive(filePath: string, withTimestamp: boolean) {
-    if (!fs.existsSync(filePath)) return;
+function archiveActiveFamily(baseFilePath: string, archiveDirPath: string, maxToKeep: number) {
+    const activeFiles = listActiveFamilyFiles(baseFilePath);
+    ensureDir(archiveDirPath);
 
-    const archivePath = buildArchivedPath(filePath, withTimestamp);
-    ensureParentDir(archivePath);
+    activeFiles.forEach((activePath) => {
+        const archivedPath = buildArchivedArtifactPath(activePath, archiveDirPath);
+        ensureParentDir(archivedPath);
 
-    if (fs.existsSync(archivePath)) {
-        fs.unlinkSync(archivePath);
-    }
+        if (fs.existsSync(archivedPath)) {
+            fs.unlinkSync(archivedPath);
+        }
 
-    fs.renameSync(filePath, archivePath);
-}
+        fs.renameSync(activePath, archivedPath);
+    });
 
-export function ensureArtifactsArchive(dirPath: string) {
-    ensureDir(path.join(dirPath, "archive"));
+    trimArchivedFamily(baseFilePath, archiveDirPath, maxToKeep);
 }
 
 export function writeArtifactFile(
     baseFilePath: string,
     contents: string,
-    opts?: ArtifactWriteOptions
+    opts: ArtifactWriteOptions
 ): string {
     ensureParentDir(baseFilePath);
 
-    const withTimestamp = !!opts?.withTimestamp;
-    const maxToKeep = opts?.maxToKeep ?? 30;
+    const withTimestamp = !!opts.withTimestamp;
+    const archiveDirPath = opts.archiveDirPath;
+    const maxToKeep = opts.maxToKeep ?? 30;
 
-    moveExistingFileToArchive(baseFilePath, withTimestamp);
-    trimArchivedFamily(baseFilePath, maxToKeep);
+    archiveActiveFamily(baseFilePath, archiveDirPath, maxToKeep);
 
-    fs.writeFileSync(baseFilePath, contents, "utf8");
-    return baseFilePath;
+    const targetPath = buildActiveArtifactPath(baseFilePath, withTimestamp);
+    fs.writeFileSync(targetPath, contents, "utf8");
+
+    return targetPath;
 }
 
 export function writeArtifactJson(
     baseFilePath: string,
     data: unknown,
-    opts?: ArtifactWriteOptions
+    opts: ArtifactWriteOptions
 ): string {
-    const pretty = opts?.pretty ?? true;
+    const pretty = opts.pretty ?? true;
     const raw = pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data);
     return writeArtifactFile(baseFilePath, raw, opts);
 }

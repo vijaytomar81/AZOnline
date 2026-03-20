@@ -3,7 +3,8 @@ import path from "node:path";
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
 import { executionConfig } from "../../../config/execution.config";
-import { ensureArtifactsArchive, writeArtifactJson } from "../../../utils/artifacts";
+import { writeArtifactJson } from "../../../utils/artifacts";
+import { DATA_GENERATED_ARCHIVE_DIR } from "../../../utils/paths";
 
 function safeSheetFilename(name: string) {
   return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
@@ -46,10 +47,9 @@ const plugin: PipelinePlugin = {
       ? targetPath
       : path.join(process.cwd(), targetPath);
 
-    ensureArtifactsArchive(path.dirname(absBaseOut));
-
     const artifactOpts = {
       withTimestamp: executionConfig.generatedArtifacts.withTimestamp,
+      archiveDirPath: DATA_GENERATED_ARCHIVE_DIR,
       maxToKeep: executionConfig.generatedArtifacts.maxToKeep,
       pretty: true,
     };
@@ -72,7 +72,7 @@ const plugin: PipelinePlugin = {
     ctx.log.info(`JSON written: ${writtenJsonPath}`);
     ctx.log.debug?.(`cases=${casesFile.caseCount}`);
     ctx.log.debug?.(
-      `generatedArtifacts.withTimestamp=${executionConfig.generatedArtifacts.withTimestamp}, maxToKeep=${executionConfig.generatedArtifacts.maxToKeep}`
+      `generatedArtifacts.withTimestamp=${executionConfig.generatedArtifacts.withTimestamp}, archiveDir=${DATA_GENERATED_ARCHIVE_DIR}, maxToKeep=${executionConfig.generatedArtifacts.maxToKeep}`
     );
   },
 };
