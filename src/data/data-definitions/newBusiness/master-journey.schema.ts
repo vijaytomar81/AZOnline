@@ -1,10 +1,11 @@
-// src/data/schemas/master-journey.schema.ts
+// src/data/data-definitions/newBusiness/master-journey.schema.ts
 
-import type { DataSchema } from "./types";
+import type { DataSchema } from "../types";
 
 export const masterJourneySchema: DataSchema = {
     sheetName: "Master_Template",
     outputFile: "MasterJourney.json",
+    dataDefinitionGroup: "newBusiness",
 
     groups: {
         meta: {

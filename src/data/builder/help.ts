@@ -1,6 +1,6 @@
 // src/data/builder/help.ts
 
-import { listSchemas } from "../schemas";
+import { listSchemas } from "../data-definitions";
 
 export function usage(): string {
     const schemas = listSchemas().join(", ");

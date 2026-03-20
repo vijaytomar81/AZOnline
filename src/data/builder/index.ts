@@ -11,7 +11,7 @@ import {
     success,
     printCommandTitle,
 } from "../../utils/cliFormat";
-import { listSchemas } from "../schemas";
+import { listSchemas } from "../data-definitions";
 import type { DataBuilderContext } from "./types";
 
 async function main() {

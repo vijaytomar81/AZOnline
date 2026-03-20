@@ -6,7 +6,7 @@ import { normalizeArgv, getArg, hasFlag } from "../../utils/argv";
 import { createLogger } from "../../utils/logger";
 import { printSection } from "../../utils/cliFormat";
 import { usage } from "./help";
-import { resolveSchemaName } from "../schemas";
+import { resolveSchemaName } from "../data-definitions";
 
 export function createDataBuilderLogger(verbose = false) {
   return createLogger({

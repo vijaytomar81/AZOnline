@@ -1,8 +1,9 @@
-// src/data/schemas/sheet-schema.mapping.ts
+// src/data/data-definitions/sheetName-schema.mapping.ts
+
+import { normalizeSpaces } from "../../utils/text";
 
 function normKey(value: string): string {
-    return String(value ?? "")
-        .trim()
+    return normalizeSpaces(String(value ?? ""))
         .toLowerCase()
         .replace(/[^\w]+/g, "_")
         .replace(/^_+|_+$/g, "");
@@ -35,5 +36,8 @@ export function resolveSchemaFromSheet(sheetName: string): string | null {
 }
 
 export function listSheetSchemaMappings(): Array<{ sheet: string; schema: string }> {
-    return Object.entries(sheetToSchema).map(([sheet, schema]) => ({ sheet, schema }));
+    return Object.entries(sheetToSchema).map(([sheet, schema]) => ({
+        sheet,
+        schema,
+    }));
 }

@@ -3,7 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { CasesFile } from "../builder/types";
-import { resolveSchemaName } from "../schemas";
+import { resolveSchemaName } from "../data-definitions";
 
 function safeSheetFilename(name: string) {
     return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";

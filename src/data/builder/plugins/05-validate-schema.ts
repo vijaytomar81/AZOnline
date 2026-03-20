@@ -2,9 +2,12 @@
 
 import type ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
-import type { RepeatedGroup, SchemaGroupMap } from "../../schemas/types";
+import type {
+    RepeatedGroup,
+    SchemaGroupMap,
+} from "../../data-definitions/types";
+import { getSchema } from "../../data-definitions";
 import type { SectionFieldGroup, ValidationReport } from "../types";
-import { getSchema } from "../../schemas";
 import { buildRowIndex, cellToString, detectLayout, norm, normKey } from "../core/excelRuntime";
 
 function collectSchemaFields(obj: unknown, out: Set<string>) {

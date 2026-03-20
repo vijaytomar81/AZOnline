@@ -5,7 +5,7 @@ import type { PipelinePlugin } from "../core/pipeline";
 import type { BuiltCase, CasesFile, DataBuilderContext } from "../types";
 import { buildRowIndex } from "../core/excelRuntime";
 import { buildPayload } from "../core/schemaRuntime";
-import { getSchema } from "../../schemas";
+import { getSchema } from "../../data-definitions";
 
 const plugin: PipelinePlugin = {
     name: "build-cases",
