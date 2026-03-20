@@ -1,4 +1,5 @@
-// src/data/data-builder/plugins/70-write-json.ts
+// src/data/builder/plugins/70-write-json.ts
+
 import path from "node:path";
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
@@ -18,10 +19,21 @@ function isLikelyDir(p: string): boolean {
   return path.extname(normalized) === "";
 }
 
+function getDefaultOutputPath(schemaName: string, sheetName: string): string {
+  return path.join(
+    "src",
+    "data",
+    "generated",
+    "new-business",
+    schemaName,
+    `${safeSheetFilename(sheetName)}.json`
+  );
+}
+
 const plugin: PipelinePlugin = {
   name: "write-json",
   order: 70,
-  requires: ["casesFile", "external:sheetName", "external:outputPath"],
+  requires: ["casesFile", "external:sheetName", "external:outputPath", "external:schemaName"],
   provides: ["absOut"],
 
   run: async (ctx: DataBuilderContext) => {
@@ -33,14 +45,17 @@ const plugin: PipelinePlugin = {
     const sheetName = String(casesFile.sheet ?? ctx.data.sheetName ?? "").trim();
     if (!sheetName) throw new Error("sheetName missing.");
 
-    const outRaw = String(ctx.data.outputPath ?? "").trim();
-    if (!outRaw) {
-      throw new Error("outputPath missing. Ensure args.ts sets default or pass --out.");
+    const schemaName = String(ctx.data.schemaName ?? "").trim();
+    if (!schemaName) {
+      throw new Error("schemaName missing. Ensure schema is resolved before write-json.");
     }
 
-    let targetPath = outRaw;
-    if (isLikelyDir(outRaw)) {
-      targetPath = path.join(outRaw, `${safeSheetFilename(sheetName)}.json`);
+    const outRaw = String(ctx.data.outputPath ?? "").trim();
+    const configuredPath = outRaw || getDefaultOutputPath(schemaName, sheetName);
+
+    let targetPath = configuredPath;
+    if (isLikelyDir(configuredPath)) {
+      targetPath = path.join(configuredPath, `${safeSheetFilename(sheetName)}.json`);
     }
 
     const absBaseOut = path.isAbsolute(targetPath)

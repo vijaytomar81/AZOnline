@@ -1,10 +1,11 @@
-// src/data/data-builder/plugins/20-build-cases.ts
+// src/data/builder/plugins/20-build-cases.ts
+
 import type ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
 import type { BuiltCase, CasesFile, DataBuilderContext } from "../types";
 import { buildRowIndex } from "../core/excelRuntime";
 import { buildPayload } from "../core/schemaRuntime";
-import { getSchema } from "../../input-data-schema";
+import { getSchema } from "../../schemas";
 
 const plugin: PipelinePlugin = {
     name: "build-cases",
@@ -20,7 +21,7 @@ const plugin: PipelinePlugin = {
             throw new Error("Sheet/meta missing. Ensure prior plugins ran.");
         }
 
-        const schema = getSchema(ctx.data.schemaName);
+        const schema = getSchema(ctx.data.schemaName, ctx.data.sheetName);
         const includeEmpty = !ctx.data.excludeEmptyFields;
         const rowIndex = buildRowIndex(ws, meta.fieldCol, meta.dataStartRow);
 
@@ -37,7 +38,7 @@ const plugin: PipelinePlugin = {
                 includeEmpty,
             });
 
-            const description = String(data.meta?.description ?? "").trim() || undefined;
+            const description = String((data as Record<string, any>).meta?.description ?? "").trim() || undefined;
 
             const builtCase: BuiltCase = {
                 caseIndex: idx + 1,
@@ -47,12 +48,11 @@ const plugin: PipelinePlugin = {
                 data,
             };
 
-            const additionalDriversCount =
-                Number(data.additionalDrivers?.count ?? 0) || 0;
+            const additionalDriversCount = Number((data as Record<string, any>).additionalDrivers?.count ?? 0) || 0;
             const policyHolderClaimsCount =
-                Number(data.policyHolderClaims?.count ?? 0) || 0;
+                Number((data as Record<string, any>).policyHolderClaims?.count ?? 0) || 0;
             const policyHolderConvictionsCount =
-                Number(data.policyHolderConvictions?.count ?? 0) || 0;
+                Number((data as Record<string, any>).policyHolderConvictions?.count ?? 0) || 0;
 
             ctx.log.debug?.(
                 [

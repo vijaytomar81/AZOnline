@@ -1,4 +1,5 @@
-// src/data/data-builder/index.ts
+// src/data/builder/index.ts
+
 import path from "node:path";
 import { parseBuildArgs, createDataBuilderLogger } from "./cli";
 import { startTimer } from "../../utils/time";
@@ -10,7 +11,7 @@ import {
     success,
     printCommandTitle,
 } from "../../utils/cliFormat";
-import { listSchemas } from "../input-data-schema";
+import { listSchemas } from "../schemas";
 import type { DataBuilderContext } from "./types";
 
 async function main() {
@@ -37,6 +38,7 @@ async function main() {
     printKeyValue("excelPath", args.excelPath);
     printKeyValue("sheetName", args.sheetName);
     printKeyValue("schemaName", args.schemaName);
+    printKeyValue("outputPath", args.outputPath);
     printKeyValue("scriptIdFilter", args.scriptIdFilter || "(all)");
     printKeyValue("excludeEmptyFields", args.excludeEmptyFields);
     printKeyValue("strictValidation", args.strictValidation);
@@ -45,7 +47,7 @@ async function main() {
     printSection("Available Schemas");
     console.log(listSchemas().join(", "));
 
-    const pluginsDirAbs = path.join(process.cwd(), "src", "data", "data-builder", "plugins");
+    const pluginsDirAbs = path.join(process.cwd(), "src", "data", "builder", "plugins");
 
     printSection("Scanning plugins");
     const discovered = await loadPluginsFromFolder({
@@ -61,6 +63,7 @@ async function main() {
 
     log.info("Starting schema-driven Data Builder...");
     const ranNames = await runDiscoveredPlugins(ctx, plugins);
+
     const absOut = ctx.data.absOut ?? "";
     const caseCount = ctx.data.casesFile?.caseCount ?? 0;
 
@@ -88,8 +91,9 @@ async function main() {
     );
 }
 
-main().catch((e: any) => {
+main().catch((e: unknown) => {
     const log = createDataBuilderLogger(true);
-    log.error(e?.message ?? String(e));
+    const message = e instanceof Error ? e.message : String(e);
+    log.error(message);
     process.exit(1);
 });

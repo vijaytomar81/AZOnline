@@ -1,12 +1,12 @@
-// src/data/data-builder/cli.ts
+// src/data/builder/cli.ts
 
 import path from "node:path";
 import type { DataBuilderBaseArgs } from "./types";
 import { normalizeArgv, getArg, hasFlag } from "../../utils/argv";
 import { createLogger } from "../../utils/logger";
 import { printSection } from "../../utils/cliFormat";
-import { usage } from "./dataBuilderHelp";
-import { resolveSchemaName } from "../input-data-schema";
+import { usage } from "./help";
+import { resolveSchemaName } from "../schemas";
 
 export function createDataBuilderLogger(verbose = false) {
   return createLogger({
@@ -55,8 +55,17 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
   }
 
   const outRaw = String(getArg(argv, "--out") ?? process.env.OUT_PATH ?? "").trim();
+
   const outputPath =
-    outRaw || path.join("src", "data", "generated", `${safeSheetFilename(sheetName)}.json`);
+    outRaw ||
+    path.join(
+      "src",
+      "data",
+      "generated",
+      "new-business",
+      schemaName,
+      `${safeSheetFilename(sheetName)}.json`
+    );
 
   return {
     excelPath,

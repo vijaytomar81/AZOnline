@@ -1,4 +1,4 @@
-// src/data/input-data-schema/index.ts
+// src/data/schemas/index.ts
 
 import type { DataSchema } from "./types";
 import { masterJourneySchema } from "./master-journey.schema";
@@ -22,7 +22,7 @@ export function resolveSchemaName(name?: string, sheetName?: string): string {
 
     throw new Error(
         `Unable to resolve schema from sheet "${sheetName}". ` +
-        `Pass --schema explicitly or add mapping in sheet-schema.mapping.ts`
+        `Pass --schema explicitly or add mapping in src/data/schemas/sheet-schema.mapping.ts`
     );
 }
 

@@ -1,27 +1,22 @@
-// src/data/data-builder/plugins/05-validate-schema.ts
+// src/data/builder/plugins/05-validate-schema.ts
+
 import type ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
 import type { SectionFieldGroup, ValidationReport } from "../types";
-import { getSchema } from "../../input-data-schema";
-import {
-    buildRowIndex,
-    cellToString,
-    detectLayout,
-    norm,
-    normKey,
-} from "../core/excelRuntime";
+import { getSchema } from "../../schemas";
+import { buildRowIndex, cellToString, detectLayout, norm, normKey } from "../core/excelRuntime";
 
-function collectSchemaFields(obj: any, out: Set<string>) {
+function collectSchemaFields(obj: unknown, out: Set<string>) {
     if (!obj || typeof obj !== "object") return;
 
-    for (const value of Object.values(obj)) {
+    for (const value of Object.values(obj as Record<string, unknown>)) {
         if (typeof value === "string") out.add(value);
         else if (typeof value === "object") collectSchemaFields(value, out);
     }
 }
 
 function collectSchemaFieldsBySection(
-    obj: any,
+    obj: unknown,
     out: Record<string, Set<string>>,
     section: string
 ) {
@@ -29,7 +24,7 @@ function collectSchemaFieldsBySection(
 
     out[section] ??= new Set<string>();
 
-    for (const value of Object.values(obj)) {
+    for (const value of Object.values(obj as Record<string, unknown>)) {
         if (typeof value === "string") out[section].add(value);
         else if (typeof value === "object") collectSchemaFieldsBySection(value, out, section);
     }
@@ -105,7 +100,7 @@ const plugin: PipelinePlugin = {
 
         const strict = !!ctx.data.strictValidation;
         const verbose = !!ctx.data.verbose;
-        const schema = getSchema(ctx.data.schemaName);
+        const schema = getSchema(ctx.data.schemaName, ctx.data.sheetName);
         const layout = detectLayout(ws);
         const { rows, duplicates } = collectExcelFields(ws, layout.fieldCol, layout.dataStartRow);
 
@@ -176,13 +171,9 @@ const plugin: PipelinePlugin = {
         ctx.log.info(
             `  Required fields missing: ${report.missingSchemaFieldsInExcel.requiredFields.length}`
         );
-        ctx.log.info(
-            `  Total missing fields: ${report.summary.missingSchemaFieldsInExcelCount}`
-        );
+        ctx.log.info(`  Total missing fields: ${report.summary.missingSchemaFieldsInExcelCount}`);
         ctx.log.info("Missing Excel Fields in Schema");
-        ctx.log.info(
-            `  Unmapped fields: ${report.summary.missingExcelFieldsInSchemaCount}`
-        );
+        ctx.log.info(`  Unmapped fields: ${report.summary.missingExcelFieldsInSchemaCount}`);
 
         if (verbose) {
             const sections = Object.entries(report.missingSchemaFieldsInExcel.bySection);
