@@ -13,18 +13,10 @@ type DiscoveredPlugin = {
     plugin: PipelinePlugin;
 };
 
-/**
- * Helper: is a file a JS/TS plugin candidate?
- */
 function isTsOrJs(file: string) {
     return file.endsWith(".ts") || file.endsWith(".js");
 }
 
-/**
- * Pick plugin export from a module:
- * - default export preferred
- * - else any named export that looks like a plugin object
- */
 function pickPluginExport(mod: any): PipelinePlugin | null {
     const candidateDefault = mod?.default;
     if (isPipelinePlugin(candidateDefault)) return candidateDefault;
@@ -45,10 +37,6 @@ function isPipelinePlugin(v: any): v is PipelinePlugin {
     );
 }
 
-/**
- * Loads plugins from a folder (no execution here).
- * Uses logger so timestamps/prefix are consistent.
- */
 export async function loadPluginsFromFolder(opts: {
     pluginsDirAbs: string;
     verbose?: boolean;
@@ -67,7 +55,6 @@ export async function loadPluginsFromFolder(opts: {
         .map((f) => path.join(pluginsDirAbs, f));
 
     const discovered: DiscoveredPlugin[] = [];
-
     const requireFromProject = createRequire(path.join(process.cwd(), "package.json"));
 
     for (const fileAbs of files) {
@@ -119,16 +106,16 @@ export async function loadPluginsFromFolder(opts: {
     return discovered;
 }
 
-/**
- * Executes plugins in the correct order.
- */
 export async function runDiscoveredPlugins(
     ctx: PipelineContext,
     plugins: PipelinePlugin[]
 ) {
     const ordered = resolveRunOrderOrThrow(plugins);
+    const verbose = !!ctx.data.verbose;
 
-    ctx.log.info(`Run order: ${ordered.map((p) => p.name).join(" -> ")}`);
+    if (verbose) {
+        ctx.log.info(`Run order: ${ordered.map((p) => p.name).join(" -> ")}`);
+    }
 
     for (const p of ordered) {
         const pluginLog = ctx.log.child(`plugin:${p.name}`);
@@ -137,19 +124,22 @@ export async function runDiscoveredPlugins(
             log: pluginLog,
         };
 
-        pluginLog.info(`Plugin start: ${p.name}`);
         const started = Date.now();
+
+        if (verbose) {
+            pluginLog.info(`Plugin start: ${p.name}`);
+        }
 
         await p.run(pluginCtx);
 
-        const ms = Date.now() - started;
-        pluginLog.info(`Plugin done: ${p.name} (${(ms / 1000).toFixed(2)}s)`);
+        if (verbose) {
+            const ms = Date.now() - started;
+            pluginLog.info(`Plugin done: ${p.name} (${(ms / 1000).toFixed(2)}s)`);
+        }
     }
 
     return ordered.map((p) => p.name);
 }
-
-/* -------------------- ORDER RESOLUTION (graph) -------------------- */
 
 function isExternal(req: string) {
     return req.startsWith("external:");
@@ -194,10 +184,14 @@ function resolveRunOrderOrThrow(all: PipelinePlugin[]): PipelinePlugin[] {
     }
 
     const indeg = new Map<string, number>();
-    for (const [name, incoming] of deps.entries()) indeg.set(name, incoming.size);
+    for (const [name, incoming] of deps.entries()) {
+        indeg.set(name, incoming.size);
+    }
 
     const available: string[] = [];
-    for (const [name, d] of indeg.entries()) if (d === 0) available.push(name);
+    for (const [name, d] of indeg.entries()) {
+        if (d === 0) available.push(name);
+    }
 
     const result: string[] = [];
 

@@ -10,6 +10,8 @@ export type ArtifactWriteOptions = {
     maxToKeep?: number;
 };
 
+const TIMESTAMP_SUFFIX = /_\d{8}_\d{6}$/;
+
 function formatArtifactTimestamp(date = new Date()): string {
     const yyyy = String(date.getFullYear());
     const mm = String(date.getMonth() + 1).padStart(2, "0");
@@ -37,6 +39,11 @@ function buildActiveArtifactPath(baseFilePath: string, withTimestamp: boolean, d
 function buildArchivedArtifactPath(sourceFilePath: string, archiveDirPath: string, date = new Date()) {
     const ext = path.extname(sourceFilePath);
     const base = path.basename(sourceFilePath, ext);
+
+    if (TIMESTAMP_SUFFIX.test(base)) {
+        return path.join(archiveDirPath, `${base}${ext}`);
+    }
+
     return path.join(archiveDirPath, `${base}_${formatArtifactTimestamp(date)}${ext}`);
 }
 
@@ -59,7 +66,7 @@ function listArchivedFamilyFiles(baseFilePath: string, archiveDirPath: string): 
     const base = path.basename(baseFilePath, ext);
     if (!fs.existsSync(archiveDirPath)) return [];
 
-    const stampedPattern = new RegExp(`^${escapeRegex(base)}(?:_\\d{8}_\\d{6})+${escapeRegex(ext)}$`);
+    const stampedPattern = new RegExp(`^${escapeRegex(base)}_\\d{8}_\\d{6}${escapeRegex(ext)}$`);
 
     return fs.readdirSync(archiveDirPath)
         .filter((name) => stampedPattern.test(name))

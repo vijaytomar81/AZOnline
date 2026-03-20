@@ -104,6 +104,7 @@ const plugin: PipelinePlugin = {
         if (!ws) throw new Error("Sheet not loaded.");
 
         const strict = !!ctx.data.strictValidation;
+        const verbose = !!ctx.data.verbose;
         const schema = getSchema(ctx.data.schemaName);
         const layout = detectLayout(ws);
         const { rows, duplicates } = collectExcelFields(ws, layout.fieldCol, layout.dataStartRow);
@@ -171,7 +172,6 @@ const plugin: PipelinePlugin = {
         ctx.log.info(`Schema: ${report.schemaName}`);
         ctx.log.info(`Sheet: ${report.sheetName}`);
         ctx.log.info(`Errors: ${report.summary.errorCount}`);
-
         ctx.log.info("Missing Schema Fields in Excel");
         ctx.log.info(
             `  Required fields missing: ${report.missingSchemaFieldsInExcel.requiredFields.length}`
@@ -179,39 +179,44 @@ const plugin: PipelinePlugin = {
         ctx.log.info(
             `  Total missing fields: ${report.summary.missingSchemaFieldsInExcelCount}`
         );
-
-        const sections = Object.entries(report.missingSchemaFieldsInExcel.bySection);
-        if (sections.length) {
-            ctx.log.info("  By section:");
-            sections.forEach(([section, data]) => {
-                const total = data.requiredFields.length + data.schemaMappingFields.length;
-                ctx.log.info(`    ${section}: ${total}`);
-            });
-        }
-
         ctx.log.info("Missing Excel Fields in Schema");
         ctx.log.info(
             `  Unmapped fields: ${report.summary.missingExcelFieldsInSchemaCount}`
         );
+
+        if (verbose) {
+            const sections = Object.entries(report.missingSchemaFieldsInExcel.bySection);
+            if (sections.length) {
+                ctx.log.info("  By section:");
+                sections.forEach(([section, data]) => {
+                    const total = data.requiredFields.length + data.schemaMappingFields.length;
+                    ctx.log.info(`    ${section}: ${total}`);
+                });
+            }
+        }
 
         if (errors.length) {
             errors.slice(0, 20).forEach((error) => ctx.log.error(error));
             throw new Error("Schema validation failed.");
         }
 
-        sections.forEach(([section, data]) => {
-            data.requiredFields
-                .slice(0, 20)
-                .forEach((field) => ctx.log.warn(`[${section}] Missing required field: ${field}`));
+        if (verbose) {
+            const sections = Object.entries(report.missingSchemaFieldsInExcel.bySection);
 
-            data.schemaMappingFields
-                .slice(0, 20)
-                .forEach((field) => ctx.log.warn(`[${section}] Missing mapped field: ${field}`));
-        });
+            sections.forEach(([section, data]) => {
+                data.requiredFields
+                    .slice(0, 20)
+                    .forEach((field) => ctx.log.warn(`[${section}] Missing required field: ${field}`));
 
-        report.missingExcelFieldsInSchema.unusedExcelFields
-            .slice(0, 20)
-            .forEach((field) => ctx.log.info(`Unused Excel field: ${field}`));
+                data.schemaMappingFields
+                    .slice(0, 20)
+                    .forEach((field) => ctx.log.warn(`[${section}] Missing mapped field: ${field}`));
+            });
+
+            report.missingExcelFieldsInSchema.unusedExcelFields
+                .slice(0, 20)
+                .forEach((field) => ctx.log.info(`Unused Excel field: ${field}`));
+        }
 
         ctx.log.info("Validation completed ✅");
     },

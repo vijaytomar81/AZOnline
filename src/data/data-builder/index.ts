@@ -37,7 +37,6 @@ async function main() {
     printKeyValue("excelPath", args.excelPath);
     printKeyValue("sheetName", args.sheetName);
     printKeyValue("schemaName", args.schemaName);
-    printKeyValue("outputPath", args.outputPath);
     printKeyValue("scriptIdFilter", args.scriptIdFilter || "(all)");
     printKeyValue("excludeEmptyFields", args.excludeEmptyFields);
     printKeyValue("strictValidation", args.strictValidation);
@@ -66,7 +65,6 @@ async function main() {
     const caseCount = ctx.data.casesFile?.caseCount ?? 0;
 
     const validation = ctx.data.validationReport;
-
     const validationPath = validation?.reportPath ?? "(not generated)";
     const errorCount = validation?.summary.errorCount ?? 0;
     const schemaMissing = validation?.summary.missingSchemaFieldsInExcelCount ?? 0;
