@@ -3,9 +3,10 @@
 import { normalizeSpaces } from "../../../utils/text";
 import { nowIso } from "../../../utils/time";
 import { setContextOutput } from "../../runtime/executionContext";
-import { resolveNewBusinessStartUrl } from "../../runtime/newBusinessUrlResolver";
 import type { NewBusinessHandler, NewBusinessStartFrom } from "./types";
 import { runNewBusinessPcwTool } from "./pcwTool";
+
+const SMOKE_URL = "https://www.google.com";
 
 function normalizeKey(value?: string): string {
     return normalizeSpaces(String(value ?? ""))
@@ -23,15 +24,16 @@ function buildQuoteNumber(): string {
     return `Q${stamp}`;
 }
 
-async function openStartUrl(context: Parameters<NewBusinessHandler>[0]["context"]): Promise<string> {
+async function openSmokeUrl(
+    context: Parameters<NewBusinessHandler>[0]["context"]
+): Promise<string> {
     const page = context.page;
     if (!page) {
         throw new Error("Playwright page is not attached to execution context.");
     }
 
-    const url = resolveNewBusinessStartUrl(context.scenario);
-    await page.goto(url, { waitUntil: "domcontentloaded" });
-    return url;
+    await page.goto(SMOKE_URL, { waitUntil: "domcontentloaded" });
+    return SMOKE_URL;
 }
 
 const runDirect: NewBusinessHandler = async ({
@@ -42,14 +44,14 @@ const runDirect: NewBusinessHandler = async ({
     const payload = stepData ?? {};
     const quoteNumber = buildQuoteNumber();
     const policyNumber = buildPolicyNumber();
-    const openedUrl = await openStartUrl(context);
+    const openedUrl = await openSmokeUrl(context);
 
     context.currentQuoteNumber = quoteNumber;
     context.currentPolicyNumber = policyNumber;
 
     setContextOutput(context, "lastAction", step.action);
     setContextOutput(context, "lastJourney", context.scenario.journey);
-    setContextOutput(context, "newBusiness.startFrom", "Direct");
+    setContextOutput(context, "newBusiness.startFrom", context.scenario.entryPoint ?? "Direct");
     setContextOutput(context, "newBusiness.openedUrl", openedUrl);
     setContextOutput(context, "newBusiness.quoteNumber", quoteNumber);
     setContextOutput(context, "newBusiness.policyNumber", policyNumber);
@@ -59,13 +61,22 @@ const runDirect: NewBusinessHandler = async ({
         context.scenario.policyNumber = policyNumber;
     }
 
-    console.log(
-        `[NB-SMOKE] scenario=${context.scenario.scenarioId} ` +
-        `entryPoint=${context.scenario.entryPoint ?? "Direct"} ` +
-        `journey=${context.scenario.journey} ` +
-        `step=${step.stepNo} testCaseId=${step.testCaseId} url=${openedUrl}`
-    );
-};
+    console.log("========================================");
+    console.log("[NB-SMOKE] NewBusiness step executed");
+    console.log(`ScenarioId      : ${context.scenario.scenarioId}`);
+    console.log(`ScenarioName    : ${context.scenario.scenarioName}`);
+    console.log(`Journey         : ${context.scenario.journey}`);
+    console.log(`PolicyContext   : ${context.scenario.policyContext}`);
+    console.log(`EntryPoint      : ${context.scenario.entryPoint ?? "Direct"}`);
+    console.log(`StepNo          : ${step.stepNo}`);
+    console.log(`Action          : ${step.action}`);
+    console.log(`TestCaseId      : ${step.testCaseId}`);
+    console.log(`OpenedUrl       : ${openedUrl}`);
+    console.log(`QuoteNumber     : ${quoteNumber}`);
+    console.log(`PolicyNumber    : ${policyNumber}`);
+    console.log(`PayloadKeys     : ${Object.keys(payload).join(", ")}`);
+    console.log("========================================");
+}
 
 const runPcw: NewBusinessHandler = async (args) => {
     await runDirect(args);

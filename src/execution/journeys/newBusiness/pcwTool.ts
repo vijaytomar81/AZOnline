@@ -6,8 +6,9 @@ import {
     getContextOutput,
     setContextOutput,
 } from "../../runtime/executionContext";
-import { resolveNewBusinessStartUrl } from "../../runtime/newBusinessUrlResolver";
 import type { StepExecutorArgs } from "../../runtime/registry";
+
+const SMOKE_URL = "https://www.google.com";
 
 function normalizeKey(value?: string): string {
     return normalizeSpaces(String(value ?? ""))
@@ -97,13 +98,12 @@ export async function runNewBusinessPcwTool(
         CalculatedEmailId: calculatedEmailId,
     });
 
-    const openedUrl = resolveNewBusinessStartUrl(args.context.scenario);
-    await page.goto(openedUrl, { waitUntil: "domcontentloaded" });
+    await page.goto(SMOKE_URL, { waitUntil: "domcontentloaded" });
 
     setContextOutput(args.context, "lastAction", args.step.action);
     setContextOutput(args.context, "lastJourney", args.context.scenario.journey);
     setContextOutput(args.context, "newBusiness.startFrom", "PCWTool");
-    setContextOutput(args.context, "newBusiness.openedUrl", openedUrl);
+    setContextOutput(args.context, "newBusiness.openedUrl", SMOKE_URL);
     setContextOutput(
         args.context,
         "newBusiness.calculatedEmailId",
@@ -145,16 +145,22 @@ export async function runNewBusinessPcwTool(
         args.stepData ?? {}
     );
 
-    console.log(
-        `[NB-SMOKE] scenario=${args.context.scenario.scenarioId} ` +
-        `entryPoint=${args.context.scenario.entryPoint ?? ""} ` +
-        `journey=${args.context.scenario.journey} ` +
-        `step=${args.step.stepNo} testCaseId=${args.step.testCaseId} ` +
-        `portal=${pcwToolPortal} paymentMode=${paymentMode} iql=${iql} ` +
-        `url=${openedUrl}`
-    );
-
-    console.log(
-        `[NB-SMOKE] finalRequestMessagePreview=${finalRequestMessage.slice(0, 200)}`
-    );
+    console.log("========================================");
+    console.log("[NB-SMOKE] PCWTool step executed");
+    console.log(`ScenarioId      : ${args.context.scenario.scenarioId}`);
+    console.log(`ScenarioName    : ${args.context.scenario.scenarioName}`);
+    console.log(`Journey         : ${args.context.scenario.journey}`);
+    console.log(`PolicyContext   : ${args.context.scenario.policyContext}`);
+    console.log(`EntryPoint      : ${args.context.scenario.entryPoint ?? ""}`);
+    console.log(`StepNo          : ${args.step.stepNo}`);
+    console.log(`Action          : ${args.step.action}`);
+    console.log(`TestCaseId      : ${args.step.testCaseId}`);
+    console.log(`OpenedUrl       : ${SMOKE_URL}`);
+    console.log(`PcwToolPortal   : ${pcwToolPortal}`);
+    console.log(`PaymentMode     : ${paymentMode}`);
+    console.log(`IQL             : ${iql}`);
+    console.log(`MonthlyCard     : ${convertToMonthlyCard || "(blank)"}`);
+    console.log(`CalculatedEmail : ${calculatedEmailId}`);
+    console.log(`RequestPreview  : ${finalRequestMessage.slice(0, 200)}`);
+    console.log("========================================");
 }
