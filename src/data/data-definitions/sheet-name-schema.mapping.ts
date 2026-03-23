@@ -1,12 +1,9 @@
 // src/data/data-definitions/sheet-name-schema.mapping.ts
 
-import { normalizeSpaces } from "../../utils/text";
+import { normalizeSpaces, normalizeSheetKey } from "../../utils/text";
 
 function normKey(value: string): string {
-    return normalizeSpaces(String(value ?? ""))
-        .toLowerCase()
-        .replace(/[^\w]+/g, "_")
-        .replace(/^_+|_+$/g, "");
+    return normalizeSheetKey(value);
 }
 
 const sheetToSchema: Record<string, string> = {

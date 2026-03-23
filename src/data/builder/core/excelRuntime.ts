@@ -1,6 +1,7 @@
 // src/data/builder/core/excelRuntime.ts
 import type ExcelJS from "exceljs";
 import { defaultSheetLayoutConfig } from "./sheetLayoutConfig";
+import { normalizeHeaderKey, normalizeSpaces } from "../../../utils/text";
 
 export function cellToString(v: any): string {
     if (v === null || v === undefined) return "";
@@ -15,11 +16,11 @@ export function cellToString(v: any): string {
 }
 
 export function norm(s: string): string {
-    return String(s ?? "").trim();
+    return normalizeSpaces(String(s ?? ""));
 }
 
 export function normKey(s: string): string {
-    return norm(s).toLowerCase().replace(/\s+/g, "");
+    return normalizeHeaderKey(s);
 }
 
 export type SheetLayout = {

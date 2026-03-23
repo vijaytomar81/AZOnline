@@ -3,7 +3,7 @@
 import path from "node:path";
 import ExcelJS from "exceljs";
 import { fileExists } from "../../utils/fs";
-import { normalizeSpaces } from "../../utils/text";
+import { normalizeHeaderKey, normalizeSpaces } from "../../utils/text";
 import type { Logger } from "../../utils/logger";
 import { defaultE2EPipelineTemplateConfig } from "../scenario/e2EPipelineTemplateConfig";
 import { validateE2EPipelineTemplateHeaders } from "../scenario/e2EPipelineTemplateValidator";
@@ -26,9 +26,7 @@ function cellToString(value: unknown): string {
 }
 
 function normKey(value: unknown): string {
-    return normalizeSpaces(String(value ?? ""))
-        .toLowerCase()
-        .replace(/\s+/g, "");
+    return normalizeHeaderKey(value);
 }
 
 function buildCanonicalHeaders(): Map<string, string> {

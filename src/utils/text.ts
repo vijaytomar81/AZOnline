@@ -36,3 +36,20 @@ export function normalizeSpaces(s: string): string {
 export function escapeNewlines(s: string): string {
     return String(s ?? "").replace(/\r?\n/g, " ");
 }
+
+export function normalizeLookupKey(value: unknown): string {
+    return String(value ?? "")
+        .trim()
+        .toLowerCase()
+        .replace(/[\u200B-\u200D\uFEFF]/g, "")
+        .replace(/[\s_-]+/g, "")
+        .replace(/[^\w]/g, "");
+}
+
+export function normalizeHeaderKey(value: unknown): string {
+    return normalizeLookupKey(value);
+}
+
+export function normalizeSheetKey(value: unknown): string {
+    return normalizeLookupKey(value);
+}
