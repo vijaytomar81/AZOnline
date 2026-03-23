@@ -14,11 +14,7 @@ function getString(row: RawScenarioRow, key: string): string {
     return normalizeSpaces(String(row[key] ?? ""));
 }
 
-function getStepValue(
-    row: RawScenarioRow,
-    stepNo: number,
-    suffix: string
-): string {
+function getStepValue(row: RawScenarioRow, stepNo: number, suffix: string): string {
     return getString(row, `Step${stepNo}${suffix}`);
 }
 
@@ -26,6 +22,26 @@ function getTotalSteps(row: RawScenarioRow): number {
     const raw = getString(row, "TotalSteps");
     const num = Number(raw);
     return Number.isInteger(num) ? num : 0;
+}
+
+function missingHeaders(
+    actualHeaders: string[],
+    expectedHeaders: string[]
+): string[] {
+    const actual = new Set(actualHeaders.map(normKey));
+    return expectedHeaders.filter((header) => !actual.has(normKey(header)));
+}
+
+export function validateScenarioTemplateHeaders(headers: string[]): string[] {
+    const cfg = defaultScenarioTemplateConfig;
+    const requiredStep1Headers = cfg.stepFieldSuffixes.map(
+        (suffix) => `Step1${suffix}`
+    );
+
+    return [
+        ...missingHeaders(headers, cfg.requiredBaseHeaders),
+        ...missingHeaders(headers, requiredStep1Headers),
+    ].map((name) => `Missing required header: ${name}`);
 }
 
 function validateBaseFields(row: RawScenarioRow): string[] {
@@ -51,10 +67,7 @@ function validateBaseFields(row: RawScenarioRow): string[] {
     });
 
     const totalSteps = getTotalSteps(row);
-    if (totalSteps <= 0) {
-        errors.push("TotalSteps must be a positive integer");
-    }
-
+    if (totalSteps <= 0) errors.push("TotalSteps must be a positive integer");
     if (totalSteps > cfg.maxSteps) {
         errors.push(`TotalSteps must not exceed ${cfg.maxSteps}`);
     }
@@ -63,21 +76,12 @@ function validateBaseFields(row: RawScenarioRow): string[] {
 }
 
 function validatePortal(stepNo: number, portal: string): string[] {
-    const errors: string[] = [];
     const normalized = normKey(portal);
-
-    if (!normalized) {
-        errors.push(`Step${stepNo}: Portal is required`);
-        return errors;
-    }
-
+    if (!normalized) return [`Step${stepNo}: Portal is required`];
     if (normalized !== "customerportal" && normalized !== "supportportal") {
-        errors.push(
-            `Step${stepNo}: Portal must be CustomerPortal or SupportPortal`
-        );
+        return [`Step${stepNo}: Portal must be CustomerPortal or SupportPortal`];
     }
-
-    return errors;
+    return [];
 }
 
 function validateStep(row: RawScenarioRow, stepNo: number): string[] {
@@ -89,10 +93,7 @@ function validateStep(row: RawScenarioRow, stepNo: number): string[] {
 
     if (!action) errors.push(`Step${stepNo}: Action is required`);
     errors.push(...validatePortal(stepNo, portal));
-
-    if (!testCaseId) {
-        errors.push(`Step${stepNo}: TestCaseId is required`);
-    }
+    if (!testCaseId) errors.push(`Step${stepNo}: TestCaseId is required`);
 
     if (normKey(action) !== "newbusiness" && !subType) {
         errors.push(`Step${stepNo}: SubType is required for action ${action}`);
@@ -102,9 +103,7 @@ function validateStep(row: RawScenarioRow, stepNo: number): string[] {
 }
 
 export function validateScenarioTemplateRow(row: RawScenarioRow): string[] {
-    const errors: string[] = [];
-    errors.push(...validateBaseFields(row));
-
+    const errors = validateBaseFields(row);
     const totalSteps = getTotalSteps(row);
     if (totalSteps <= 0) return errors;
 

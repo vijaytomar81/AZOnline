@@ -28,6 +28,18 @@ const sheetToSchema: Record<string, string> = {
     ctm: "ctm",
     goco: "goco",
     msm: "msm",
+
+    cnf_pcw_testtool: "cnf_pcw_testtool",
+    cnfpcwtesttool: "cnf_pcw_testtool",
+
+    ctm_pcw_testtool: "ctm_pcw_testtool",
+    ctmpcwtesttool: "ctm_pcw_testtool",
+
+    goco_pcw_testtool: "goco_pcw_testtool",
+    gocopcwtesttool: "goco_pcw_testtool",
+
+    msm_pcw_testtool: "msm_pcw_testtool",
+    msmpcwtesttool: "msm_pcw_testtool",
 };
 
 export function resolveSchemaFromSheet(sheetName: string): string | null {

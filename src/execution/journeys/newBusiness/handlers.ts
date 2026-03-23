@@ -3,7 +3,8 @@
 import { normalizeSpaces } from "../../../utils/text";
 import { nowIso } from "../../../utils/time";
 import { setContextOutput } from "../../runtime/executionContext";
-import type { NewBusinessHandler } from "./types";
+import type { NewBusinessHandler, NewBusinessStartFrom } from "./types";
+import { runNewBusinessTestTool } from "./testTool";
 
 function normalizeKey(value?: string): string {
     return normalizeSpaces(String(value ?? ""))
@@ -44,19 +45,31 @@ const runDirect: NewBusinessHandler = async ({
     }
 };
 
-const runFallback: NewBusinessHandler = async (args) => {
+const runPcw: NewBusinessHandler = async (args) => {
     await runDirect(args);
 };
 
-export const newBusinessHandlers: Record<string, NewBusinessHandler> = {
-    direct: runDirect,
-    confused: runFallback,
-    comparethemarket: runFallback,
-    gocompare: runFallback,
-    moneysupermarket: runFallback,
+const startFromHandlers: Record<NewBusinessStartFrom, NewBusinessHandler> = {
+    Direct: runDirect,
+    PCW: runPcw,
+    PCWTestTool: runNewBusinessTestTool,
 };
 
-export function getNewBusinessHandler(journey?: string): NewBusinessHandler {
-    const key = normalizeKey(journey);
-    return newBusinessHandlers[key] ?? runFallback;
+function resolveStartFrom(journey?: string, journeyStartFrom?: string): NewBusinessStartFrom {
+    const normalizedJourney = normalizeKey(journey);
+    const normalizedStartFrom = normalizeKey(journeyStartFrom);
+
+    if (normalizedStartFrom === "pcwtesttool") return "PCWTestTool";
+    if (normalizedStartFrom === "pcw") return "PCW";
+
+    if (normalizedJourney === "direct") return "Direct";
+    return "PCW";
+}
+
+export function getNewBusinessHandler(args: {
+    journey?: string;
+    journeyStartFrom?: string;
+}): NewBusinessHandler {
+    const startFrom = resolveStartFrom(args.journey, args.journeyStartFrom);
+    return startFromHandlers[startFrom];
 }
