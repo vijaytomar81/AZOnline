@@ -5,8 +5,8 @@ import ExcelJS from "exceljs";
 import { fileExists } from "../../utils/fs";
 import { normalizeSpaces } from "../../utils/text";
 import type { Logger } from "../../utils/logger";
-import { defaultScenarioTemplateConfig } from "../scenario/templateConfig";
-import { validateScenarioTemplateHeaders } from "../scenario/templateValidator";
+import { defaultE2EPipelineTemplateConfig } from "../scenario/e2EPipelineTemplateConfig";
+import { validateE2EPipelineTemplateHeaders } from "../scenario/e2EPipelineTemplateValidator";
 import type { RawScenarioRow } from "../scenario/types";
 
 export type LoadScenarioSheetResult = {
@@ -32,7 +32,7 @@ function normKey(value: unknown): string {
 }
 
 function buildCanonicalHeaders(): Map<string, string> {
-    const cfg = defaultScenarioTemplateConfig;
+    const cfg = defaultE2EPipelineTemplateConfig;
     const map = new Map<string, string>();
 
     const baseHeaders = [
@@ -91,9 +91,11 @@ export async function loadScenarioSheet(args: {
     args.log?.debug(`Workbook sheets: ${wb.worksheets.map((item) => item.name).join(", ")}`);
 
     const rawHeaders = getHeaders(ws);
-    const headerErrors = validateScenarioTemplateHeaders(rawHeaders);
+    const headerErrors = validateE2EPipelineTemplateHeaders(rawHeaders);
     if (headerErrors.length) {
-        throw new Error(`Execution sheet header validation failed\n${headerErrors.join("\n")}`);
+        throw new Error(
+            `E2E pipeline sheet header validation failed\n${headerErrors.join("\n")}`
+        );
     }
 
     const canonicalHeaders = buildCanonicalHeaders();

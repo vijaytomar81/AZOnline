@@ -1,5 +1,6 @@
 // src/execution/runtime/executionContext.ts
 
+import type { Browser, BrowserContext, Page } from "@playwright/test";
 import type { ExecutionScenario } from "../scenario/types";
 import type { StepExecutionResult } from "./result";
 
@@ -10,6 +11,9 @@ export type ExecutionContext = {
     currentTransactionId?: string;
     outputs: Record<string, unknown>;
     stepResults: StepExecutionResult[];
+    browser?: Browser;
+    browserContext?: BrowserContext;
+    page?: Page;
 };
 
 export function createExecutionContext(
@@ -22,6 +26,9 @@ export function createExecutionContext(
         currentTransactionId: undefined,
         outputs: {},
         stepResults: [],
+        browser: undefined,
+        browserContext: undefined,
+        page: undefined,
     };
 }
 

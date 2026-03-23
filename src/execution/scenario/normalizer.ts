@@ -4,10 +4,11 @@ import { normalizeSpaces } from "../../utils/text";
 import type {
     ExecutionScenario,
     RawScenarioRow,
-    ScenarioStartFrom,
+    ScenarioEntryPoint,
+    ScenarioPolicyContext,
     ScenarioStep,
 } from "./types";
-import { defaultScenarioTemplateConfig } from "./templateConfig";
+import { defaultE2EPipelineTemplateConfig } from "./e2EPipelineTemplateConfig";
 
 function getString(value: unknown): string {
     return normalizeSpaces(String(value ?? ""));
@@ -17,10 +18,28 @@ function normalizeKey(value: unknown): string {
     return getString(value).toLowerCase().replace(/\s+/g, "");
 }
 
-function normalizeStartFrom(value: unknown): ScenarioStartFrom {
+function normalizePolicyContext(value: unknown): ScenarioPolicyContext {
     return normalizeKey(value) === "existingpolicy"
         ? "ExistingPolicy"
         : "NewBusiness";
+}
+
+function normalizeEntryPoint(row: RawScenarioRow): ScenarioEntryPoint | undefined {
+    const policyContext = normalizePolicyContext(row.PolicyContext);
+    if (policyContext === "ExistingPolicy") {
+        return undefined;
+    }
+
+    const journey = normalizeKey(row.Journey);
+    const entryPoint = normalizeKey(row.EntryPoint);
+
+    if (journey === "direct" && !entryPoint) {
+        return "Direct";
+    }
+
+    if (entryPoint === "pcw") return "PCW";
+    if (entryPoint === "pcwtool") return "PCWTool";
+    return "Direct";
 }
 
 function normalizeExecute(value: unknown): boolean {
@@ -30,7 +49,7 @@ function normalizeExecute(value: unknown): boolean {
 function getTotalSteps(value: unknown): number {
     const num = Number(getString(value));
     if (!Number.isInteger(num) || num < 0) return 0;
-    return Math.min(num, defaultScenarioTemplateConfig.maxSteps);
+    return Math.min(num, defaultE2EPipelineTemplateConfig.maxSteps);
 }
 
 function getStepField(
@@ -68,7 +87,8 @@ export function normalizeScenario(row: RawScenarioRow): ExecutionScenario {
         scenarioId: getString(row.ScenarioId),
         scenarioName: getString(row.ScenarioName),
         journey: getString(row.Journey),
-        startFrom: normalizeStartFrom(row.StartFrom),
+        policyContext: normalizePolicyContext(row.PolicyContext),
+        entryPoint: normalizeEntryPoint(row),
         policyNumber: getString(row.PolicyNumber) || undefined,
         loginId: getString(row.LoginId) || undefined,
         password: getString(row.Password) || undefined,

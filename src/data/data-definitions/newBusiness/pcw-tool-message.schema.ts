@@ -12,12 +12,13 @@ export const pcwToolMessageSchema: DataSchema = {
             testCaseId: "TestCaseId",
         },
 
-        testTool: {
+        pcwTool: {
             sequenceNo: "No",
             requestMessage: "Request Message",
             iql: "IQL",
             pcwToolPortal: "PCW Tool Portal",
             paymentMode: "Payment Mode",
+            convertToMonthlyCard: "ConvertToMonthlyCard",
         },
     },
 
@@ -31,5 +32,6 @@ export const pcwToolMessageSchema: DataSchema = {
 
     optionalFields: [
         "No",
+        "ConvertToMonthlyCard",
     ],
 };

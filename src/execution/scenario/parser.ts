@@ -2,7 +2,7 @@
 
 import { normalizeScenarios } from "./normalizer";
 import { validateScenarios } from "./validator";
-import { validateScenarioTemplateRows } from "./templateValidator";
+import { validateE2EPipelineTemplateRows } from "./e2EPipelineTemplateValidator";
 import type {
     ExecutionScenario,
     RawScenarioRow,
@@ -47,10 +47,12 @@ export function parseScenarios(
     rows: RawScenarioRow[],
     opts: ParseScenariosOptions = {}
 ): ParseScenariosResult {
-    const templateValidation = validateScenarioTemplateRows(rows);
+    const templateValidation = validateE2EPipelineTemplateRows(rows);
 
     if (opts.failOnTemplateErrors && hasErrors(templateValidation)) {
-        throw new Error(formatErrors("Scenario template validation failed", templateValidation));
+        throw new Error(
+            formatErrors("E2E pipeline template validation failed", templateValidation)
+        );
     }
 
     const normalized = normalizeScenarios(rows);

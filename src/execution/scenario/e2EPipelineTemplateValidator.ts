@@ -1,7 +1,7 @@
-// src/execution/scenario/templateValidator.ts
+// src/execution/scenario/e2EPipelineTemplateValidator.ts
 
 import { normalizeSpaces } from "../../utils/text";
-import { defaultScenarioTemplateConfig } from "./templateConfig";
+import { defaultE2EPipelineTemplateConfig } from "./e2EPipelineTemplateConfig";
 import type { RawScenarioRow } from "./types";
 
 function normKey(value: unknown): string {
@@ -32,8 +32,51 @@ function missingHeaders(
     return expectedHeaders.filter((header) => !actual.has(normKey(header)));
 }
 
-export function validateScenarioTemplateHeaders(headers: string[]): string[] {
-    const cfg = defaultScenarioTemplateConfig;
+function isDirectJourney(row: RawScenarioRow): boolean {
+    return normKey(row.Journey) === "direct";
+}
+
+function isExistingPolicy(row: RawScenarioRow): boolean {
+    return normKey(row.PolicyContext) === "existingpolicy";
+}
+
+function isNewBusiness(row: RawScenarioRow): boolean {
+    return normKey(row.PolicyContext) === "newbusiness";
+}
+
+function validateEntryPointValue(row: RawScenarioRow): string[] {
+    const entryPoint = normKey(row.EntryPoint);
+    const journey = normKey(row.Journey);
+
+    if (isExistingPolicy(row)) {
+        return [];
+    }
+
+    if (!isNewBusiness(row)) {
+        return [`Invalid PolicyContext value: ${getString(row, "PolicyContext")}`];
+    }
+
+    if (journey === "direct") {
+        if (!entryPoint || entryPoint === "direct") {
+            return [];
+        }
+
+        return [`EntryPoint must be blank or Direct when Journey is Direct`];
+    }
+
+    if (!entryPoint) {
+        return [`EntryPoint is required when Journey is not Direct for NewBusiness`];
+    }
+
+    if (entryPoint !== "pcw" && entryPoint !== "pcwtool") {
+        return [`EntryPoint must be PCW or PCWTool when Journey is not Direct`];
+    }
+
+    return [];
+}
+
+export function validateE2EPipelineTemplateHeaders(headers: string[]): string[] {
+    const cfg = defaultE2EPipelineTemplateConfig;
     const requiredStep1Headers = cfg.stepFieldSuffixes.map(
         (suffix) => `Step1${suffix}`
     );
@@ -46,25 +89,35 @@ export function validateScenarioTemplateHeaders(headers: string[]): string[] {
 
 function validateBaseFields(row: RawScenarioRow): string[] {
     const errors: string[] = [];
-    const cfg = defaultScenarioTemplateConfig;
+    const cfg = defaultE2EPipelineTemplateConfig;
 
     cfg.requiredBaseHeaders.forEach((header) => {
         if (!getString(row, header)) {
+            if (header === "EntryPoint" && isExistingPolicy(row)) {
+                return;
+            }
+
+            if (header === "EntryPoint" && isNewBusiness(row) && isDirectJourney(row)) {
+                return;
+            }
+
             errors.push(`Missing required field: ${header}`);
         }
     });
 
-    const startFrom = normKey(row.StartFrom);
-    const conditional =
-        startFrom === "existingpolicy"
-            ? cfg.conditionalBaseHeaders.existingPolicy
-            : cfg.conditionalBaseHeaders.newBusiness;
+    const conditional = isExistingPolicy(row)
+        ? cfg.conditionalBaseHeaders.existingPolicy
+        : cfg.conditionalBaseHeaders.newBusiness;
 
     conditional.forEach((header) => {
         if (!getString(row, header)) {
-            errors.push(`Missing required field for StartFrom=${row.StartFrom}: ${header}`);
+            errors.push(
+                `Missing required field for PolicyContext=${row.PolicyContext}: ${header}`
+            );
         }
     });
+
+    errors.push(...validateEntryPointValue(row));
 
     const totalSteps = getTotalSteps(row);
     if (totalSteps <= 0) errors.push("TotalSteps must be a positive integer");
@@ -102,7 +155,7 @@ function validateStep(row: RawScenarioRow, stepNo: number): string[] {
     return errors;
 }
 
-export function validateScenarioTemplateRow(row: RawScenarioRow): string[] {
+export function validateE2EPipelineTemplateRow(row: RawScenarioRow): string[] {
     const errors = validateBaseFields(row);
     const totalSteps = getTotalSteps(row);
     if (totalSteps <= 0) return errors;
@@ -114,11 +167,11 @@ export function validateScenarioTemplateRow(row: RawScenarioRow): string[] {
     return errors;
 }
 
-export function validateScenarioTemplateRows(
+export function validateE2EPipelineTemplateRows(
     rows: RawScenarioRow[]
 ): Array<{ scenarioId: string; errors: string[] }> {
     return rows.map((row) => ({
         scenarioId: getString(row, "ScenarioId") || "(missing)",
-        errors: validateScenarioTemplateRow(row),
+        errors: validateE2EPipelineTemplateRow(row),
     }));
 }

@@ -7,6 +7,11 @@ import {
     type ScenarioExecutionResult,
 } from "../runtime/result";
 import {
+    attachBrowserSession,
+    closeBrowserSession,
+    createBrowserSession,
+} from "../runtime/browserSession";
+import {
     createExecutionContext,
     type ExecutionContext,
 } from "../runtime/executionContext";
@@ -37,43 +42,55 @@ export async function runScenario(
     const log = createScenarioLogger(args.scenario.scenarioId, args.log);
     const context = createExecutionContext(args.scenario);
     const stopOnFailure = args.stopOnFailure !== false;
+    let session;
 
     log.info(
         `Scenario start -> id=${args.scenario.scenarioId}, journey=${args.scenario.journey}, ` +
-        `startFrom=${args.scenario.startFrom}, totalSteps=${args.scenario.totalSteps}`
+        `policyContext=${args.scenario.policyContext}, totalSteps=${args.scenario.totalSteps}`
     );
     log.debug(
         `Scenario details -> execute=${args.scenario.execute}, ` +
         `policyNumber=${args.scenario.policyNumber ?? ""}, ` +
+        `entryPoint=${args.scenario.entryPoint ?? ""}, ` +
         `description=${args.scenario.description}`
     );
 
-    for (const step of args.scenario.steps) {
-        log.info(
-            `Running Step${step.stepNo} -> action=${step.action}, ` +
-            `portal=${step.portal}, testCaseId=${step.testCaseId}`
-        );
-        log.debug(
-            `Step details -> subType=${step.subType ?? ""}, journey=${args.scenario.journey}`
-        );
+    try {
+        session = await createBrowserSession();
+        attachBrowserSession(context, session);
+        log.info("Browser session created for scenario.");
+        log.debug(`Initial page url=${context.page?.url() ?? ""}`);
 
-        const result = await runStep({
-            context,
-            step,
-            registry: args.registry,
-            dataRegistry: args.dataRegistry,
-            log: log.child(`step${step.stepNo}`),
-        });
+        for (const step of args.scenario.steps) {
+            log.info(
+                `Running Step${step.stepNo} -> action=${step.action}, ` +
+                `portal=${step.portal}, testCaseId=${step.testCaseId}`
+            );
+            log.debug(
+                `Step details -> subType=${step.subType ?? ""}, journey=${args.scenario.journey}`
+            );
 
-        log.info(
-            `Step${step.stepNo} finished -> status=${result.status}` +
-            (result.message ? `, message=${result.message}` : "")
-        );
+            const result = await runStep({
+                context,
+                step,
+                registry: args.registry,
+                dataRegistry: args.dataRegistry,
+                log: log.child(`step${step.stepNo}`),
+            });
 
-        if (shouldStop(stopOnFailure, context)) {
-            log.warn(`Scenario stopped after failed step.`);
-            break;
+            log.info(
+                `Step${step.stepNo} finished -> status=${result.status}` +
+                (result.message ? `, message=${result.message}` : "")
+            );
+
+            if (shouldStop(stopOnFailure, context)) {
+                log.warn(`Scenario stopped after failed step.`);
+                break;
+            }
         }
+    } finally {
+        await closeBrowserSession(session);
+        log.info("Browser session closed for scenario.");
     }
 
     const result = buildScenarioExecutionResult({

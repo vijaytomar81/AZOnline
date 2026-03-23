@@ -21,7 +21,7 @@ function validateScenarioIdentity(scenario: ExecutionScenario): string[] {
         errors.push("TotalSteps must be greater than 0");
     }
 
-    if (scenario.startFrom === "ExistingPolicy") {
+    if (scenario.policyContext === "ExistingPolicy") {
         if (!scenario.policyNumber) errors.push("Missing PolicyNumber");
         if (!scenario.loginId) errors.push("Missing LoginId");
         if (!scenario.password) errors.push("Missing Password");

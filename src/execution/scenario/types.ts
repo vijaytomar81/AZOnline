@@ -1,12 +1,14 @@
 // src/execution/scenario/types.ts
 
-export type ScenarioStartFrom = "NewBusiness" | "ExistingPolicy";
+export type ScenarioPolicyContext = "NewBusiness" | "ExistingPolicy";
+export type ScenarioEntryPoint = "Direct" | "PCW" | "PCWTool";
 
 export type RawScenarioRow = {
     ScenarioId: string;
     ScenarioName?: string;
     Journey?: string;
-    StartFrom?: string;
+    PolicyContext?: string;
+    EntryPoint?: string;
     PolicyNumber?: string;
     LoginId?: string;
     Password?: string;
@@ -28,7 +30,8 @@ export type ExecutionScenario = {
     scenarioId: string;
     scenarioName: string;
     journey: string;
-    startFrom: ScenarioStartFrom;
+    policyContext: ScenarioPolicyContext;
+    entryPoint?: ScenarioEntryPoint;
     policyNumber?: string;
     loginId?: string;
     password?: string;

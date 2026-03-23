@@ -1,6 +1,6 @@
-// src/execution/scenario/templateConfig.ts
+// src/execution/scenario/e2EPipelineTemplateConfig.ts
 
-export type ScenarioTemplateConfig = {
+export type E2EPipelineTemplateConfig = {
     requiredBaseHeaders: string[];
     conditionalBaseHeaders: {
         existingPolicy: string[];
@@ -10,12 +10,13 @@ export type ScenarioTemplateConfig = {
     maxSteps: number;
 };
 
-export const defaultScenarioTemplateConfig: ScenarioTemplateConfig = {
+export const defaultE2EPipelineTemplateConfig: E2EPipelineTemplateConfig = {
     requiredBaseHeaders: [
         "ScenarioId",
         "ScenarioName",
         "Journey",
-        "StartFrom",
+        "PolicyContext",
+        "EntryPoint",
         "Description",
         "Execute",
         "TotalSteps",
