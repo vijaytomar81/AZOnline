@@ -6,6 +6,7 @@ import type { DataBuilderContext } from "../types";
 import { executionConfig } from "../../../config/execution.config";
 import { writeArtifactJson } from "../../../utils/artifacts";
 import { DATA_GENERATED_ARCHIVE_DIR } from "../../../utils/paths";
+import { toKebabFromSnake } from "../../../utils/text";
 
 function safeSheetFilename(name: string) {
   return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
@@ -25,7 +26,7 @@ function getDefaultOutputPath(schemaName: string, sheetName: string): string {
     "data",
     "generated",
     "new-business",
-    schemaName,
+    toKebabFromSnake(schemaName),
     `${safeSheetFilename(sheetName)}.json`
   );
 }

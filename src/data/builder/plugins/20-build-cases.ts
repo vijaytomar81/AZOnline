@@ -2,10 +2,10 @@
 
 import type ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
-import type { BuiltCase, CasesFile, DataBuilderContext } from "../types";
-import { buildRowIndex } from "../core/excelRuntime";
-import { buildPayload } from "../core/schemaRuntime";
+import type { CasesFile, DataBuilderContext } from "../types";
 import { getSchema } from "../../data-definitions";
+import { buildVerticalCases } from "../core/buildVerticalCases";
+import { buildTabularCases } from "../core/buildTabularCases";
 
 const plugin: PipelinePlugin = {
     name: "build-cases",
@@ -23,50 +23,16 @@ const plugin: PipelinePlugin = {
 
         const schema = getSchema(ctx.data.schemaName, ctx.data.sheetName);
         const includeEmpty = !ctx.data.excludeEmptyFields;
-        const rowIndex = buildRowIndex(ws, meta.fieldCol, meta.dataStartRow);
 
         ctx.log.info(`Building cases with schema "${ctx.data.schemaName}"...`);
+        ctx.log.debug?.(`layout=${meta.layout}`);
         ctx.log.debug?.(`includeEmpty=${includeEmpty}`);
-        ctx.log.debug?.(`rowIndex size=${rowIndex.size}`);
         ctx.log.debug?.(`cases to build=${meta.caseMetas.length}`);
 
-        const cases: BuiltCase[] = meta.caseMetas.map((m, idx) => {
-            const data = buildPayload(schema, {
-                ws,
-                col: m.col,
-                rowIndex,
-                includeEmpty,
-            });
-
-            const description = String((data as Record<string, any>).meta?.description ?? "").trim() || undefined;
-
-            const builtCase: BuiltCase = {
-                caseIndex: idx + 1,
-                scriptName: m.scriptName,
-                scriptId: m.scriptId,
-                description,
-                data,
-            };
-
-            const additionalDriversCount = Number((data as Record<string, any>).additionalDrivers?.count ?? 0) || 0;
-            const policyHolderClaimsCount =
-                Number((data as Record<string, any>).policyHolderClaims?.count ?? 0) || 0;
-            const policyHolderConvictionsCount =
-                Number((data as Record<string, any>).policyHolderConvictions?.count ?? 0) || 0;
-
-            ctx.log.debug?.(
-                [
-                    `Built case -> index=${builtCase.caseIndex}`,
-                    `scriptId=${builtCase.scriptId ?? ""}`,
-                    `scriptName=${builtCase.scriptName}`,
-                    `policyHolderClaims=${policyHolderClaimsCount}`,
-                    `policyHolderConvictions=${policyHolderConvictionsCount}`,
-                    `additionalDrivers=${additionalDriversCount}`,
-                ].join(", ")
-            );
-
-            return builtCase;
-        });
+        const cases =
+            meta.layout === "tabular"
+                ? buildTabularCases({ ctx, ws, meta, schema, includeEmpty })
+                : buildVerticalCases({ ctx, ws, meta, schema, includeEmpty });
 
         const casesFile: CasesFile = {
             sheet: String(ctx.data.sheetName ?? ws.name ?? "").trim() || "Sheet",

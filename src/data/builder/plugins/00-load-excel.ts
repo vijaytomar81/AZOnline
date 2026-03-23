@@ -4,6 +4,46 @@ import fs from "node:fs";
 import path from "node:path";
 import ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
+import { normalizeSheetKey } from "../../../utils/text";
+
+function resolveWorksheet(
+    workbook: ExcelJS.Workbook,
+    requestedSheetName: string
+): ExcelJS.Worksheet {
+    const worksheets = Array.isArray(workbook.worksheets) ? workbook.worksheets : [];
+    const worksheetNames = worksheets.map((w) => w.name);
+
+    const exact = worksheets.find((w) => w.name === requestedSheetName);
+    if (exact) {
+        return exact;
+    }
+
+    const requestedKey = normalizeSheetKey(requestedSheetName);
+    const normalizedMatches = worksheets.filter(
+        (w) => normalizeSheetKey(w.name) === requestedKey
+    );
+
+    if (normalizedMatches.length === 1) {
+        return normalizedMatches[0];
+    }
+
+    if (normalizedMatches.length > 1) {
+        throw new Error(
+            [
+                `Sheet "${requestedSheetName}" is ambiguous after normalization.`,
+                ``,
+                `Matching sheets found:`,
+                ...normalizedMatches.map((w) => `  - ${w.name}`),
+                ``,
+                `Please pass the exact worksheet name.`,
+            ].join("\n")
+        );
+    }
+
+    throw new Error(
+        `Sheet "${requestedSheetName}" not found. Available: ${worksheetNames.join(", ")}`
+    );
+}
 
 const plugin: PipelinePlugin = {
     name: "load-excel",
@@ -59,12 +99,7 @@ const plugin: PipelinePlugin = {
             );
         }
 
-        const ws = wb.worksheets.find((w) => w.name === sheetName);
-        if (!ws) {
-            throw new Error(
-                `Sheet "${sheetName}" not found. Available: ${worksheetNames.join(", ")}`
-            );
-        }
+        const ws = resolveWorksheet(wb, sheetName);
 
         ctx.data.workbook = wb;
         ctx.data.sheet = ws;

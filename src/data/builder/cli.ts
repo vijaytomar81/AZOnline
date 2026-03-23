@@ -7,6 +7,7 @@ import { createLogger } from "../../utils/logger";
 import { printSection } from "../../utils/cliFormat";
 import { usage } from "./help";
 import { resolveSchemaName } from "../data-definitions";
+import { toKebabFromSnake } from "../../utils/text";
 
 export function createDataBuilderLogger(verbose = false) {
   return createLogger({
@@ -63,7 +64,7 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
       "data",
       "generated",
       "new-business",
-      schemaName,
+      toKebabFromSnake(schemaName),
       `${safeSheetFilename(sheetName)}.json`
     );
 

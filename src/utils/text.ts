@@ -53,3 +53,9 @@ export function normalizeHeaderKey(value: unknown): string {
 export function normalizeSheetKey(value: unknown): string {
     return normalizeLookupKey(value);
 }
+
+export function toKebabFromSnake(value: unknown): string {
+    return String(value ?? "")
+        .trim()
+        .replace(/_/g, "-");
+}

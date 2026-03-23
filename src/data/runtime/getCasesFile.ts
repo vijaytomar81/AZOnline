@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { CasesFile } from "../builder/types";
 import { resolveSchemaName } from "../data-definitions";
+import { toKebabFromSnake } from "../../utils/text";
 
 function safeSheetFilename(name: string) {
     return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
@@ -26,7 +27,7 @@ export function resolveCasesFilePath(sheetName: string, schemaName?: string): st
         "data",
         "generated",
         "new-business",
-        resolvedSchema,
+        toKebabFromSnake(resolvedSchema),
         `${safeSheetFilename(sheetName)}.json`
     );
 }

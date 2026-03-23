@@ -37,4 +37,5 @@ export type RegisteredSchema = {
     name: string;
     schema: DataSchema;
     description?: string;
+    sheetAliases?: string[];
 };

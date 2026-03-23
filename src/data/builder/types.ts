@@ -60,23 +60,30 @@ export type ValidationReport = {
     };
 };
 
+export type CaseMeta = {
+    col?: number;
+    row?: number;
+    scriptId: string;
+    scriptName: string;
+};
+
+export type DataBuilderMeta = {
+    sheet: string;
+    layout: "vertical" | "tabular";
+    scriptIdRow?: number;
+    scriptNameRow?: number;
+    fieldCol?: number;
+    caseStartCol?: number;
+    dataStartRow: number;
+    caseMetas: CaseMeta[];
+    tabularHeaders?: string[];
+};
+
 export type DataBuilderData = DataBuilderBaseArgs & {
     workbook?: any;
     sheet?: any;
     absExcel?: string;
-    meta?: {
-        sheet: string;
-        scriptIdRow?: number;
-        scriptNameRow?: number;
-        fieldCol: number;
-        caseStartCol: number;
-        dataStartRow: number;
-        caseMetas: Array<{
-            col: number;
-            scriptId: string;
-            scriptName: string;
-        }>;
-    };
+    meta?: DataBuilderMeta;
     casesFile?: CasesFile;
     validationReport?: ValidationReport;
     absOut?: string;
