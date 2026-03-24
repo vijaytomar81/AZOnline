@@ -14,6 +14,24 @@ import {
 import { runDataMode } from "./modes/data/runner";
 import { runE2EMode } from "./modes/e2e/runner";
 
+function parseParallel(raw?: string): number {
+    const value = normalizeSpaces(String(raw ?? ""));
+
+    if (!value) return 1;
+
+    const num = Number(value);
+    if (!Number.isInteger(num) || num <= 0) {
+        throw new AppError({
+            code: "INVALID_PARALLEL",
+            stage: "cli-parse",
+            source: "execution-index",
+            message: `Invalid --parallel value "${value}". It must be a positive integer.`,
+        });
+    }
+
+    return num;
+}
+
 async function main(): Promise<void> {
     const argv = normalizeArgv(process.argv.slice(2));
     const mode = normalizeMode(String(getArg(argv, "--mode") ?? "e2e"));
@@ -26,6 +44,7 @@ async function main(): Promise<void> {
 
     const verbose = hasFlag(argv, "--verbose");
     const iterations = parseIterations(String(getArg(argv, "--iterations") ?? ""));
+    const parallel = parseParallel(String(getArg(argv, "--parallel") ?? ""));
 
     if (mode === "data") {
         const source = normalizeSpaces(String(getArg(argv, "--source") ?? ""));
@@ -44,6 +63,7 @@ async function main(): Promise<void> {
             source,
             schemaArg: schemaArg || undefined,
             iterations,
+            parallel,
             verbose,
         });
         return;
@@ -78,6 +98,7 @@ async function main(): Promise<void> {
         selectedIds,
         includeDisabled,
         iterations,
+        parallel,
         verbose,
     });
 }
@@ -92,11 +113,13 @@ main().catch((error: unknown) => {
 
     if (error instanceof AppError) {
         log.error(`❌ [${error.code ?? "APP_ERROR"}] ${error.message}`);
+
         if (error.stage || error.source) {
             log.error(
                 `Stage: ${error.stage ?? "unknown"} | Source: ${error.source ?? "unknown"}`
             );
         }
+
         if (error.context) {
             log.error(`Context: ${JSON.stringify(error.context, null, 2)}`);
         }

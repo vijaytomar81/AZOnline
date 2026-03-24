@@ -1,13 +1,10 @@
 // src/execution/journeys/newBusiness/handlers.ts
 
-import { AppError } from "@utils/errors";
 import { normalizeSpaces } from "@utils/text";
 import { nowIso } from "@utils/time";
 import { setContextOutput } from "@execution/core/executionContext";
 import type { NewBusinessHandler, NewBusinessStartFrom } from "./types";
 import { runNewBusinessPcwTool } from "./pcwTool";
-
-const SMOKE_URL = "https://www.google.com";
 
 function normalizeKey(value?: string): string {
     return normalizeSpaces(String(value ?? ""))
@@ -25,28 +22,6 @@ function buildQuoteNumber(): string {
     return `Q${stamp}`;
 }
 
-async function openSmokeUrl(
-    context: Parameters<NewBusinessHandler>[0]["context"]
-): Promise<string> {
-    const page = context.page;
-    if (!page) {
-        throw new AppError({
-            code: "PLAYWRIGHT_PAGE_MISSING",
-            stage: "execution-handler",
-            source: "newBusiness-handlers",
-            message: "Playwright page is not attached to execution context.",
-            context: {
-                scenarioId: context.scenario.scenarioId,
-                entryPoint: context.scenario.entryPoint ?? "",
-                journey: context.scenario.journey,
-            },
-        });
-    }
-
-    await page.goto(SMOKE_URL, { waitUntil: "domcontentloaded" });
-    return SMOKE_URL;
-}
-
 const runDirect: NewBusinessHandler = async ({
     context,
     step,
@@ -55,15 +30,17 @@ const runDirect: NewBusinessHandler = async ({
     const payload = stepData ?? {};
     const quoteNumber = buildQuoteNumber();
     const policyNumber = buildPolicyNumber();
-    const openedUrl = await openSmokeUrl(context);
 
     context.currentQuoteNumber = quoteNumber;
     context.currentPolicyNumber = policyNumber;
 
     setContextOutput(context, "lastAction", step.action);
-    setContextOutput(context, "lastJourney", context.scenario.journey);
-    setContextOutput(context, "newBusiness.startFrom", context.scenario.entryPoint ?? "Direct");
-    setContextOutput(context, "newBusiness.openedUrl", openedUrl);
+    setContextOutput(context, "lastJourney", context.scenario.journey || "Direct");
+    setContextOutput(
+        context,
+        "newBusiness.startFrom",
+        context.scenario.entryPoint ?? "Direct"
+    );
     setContextOutput(context, "newBusiness.quoteNumber", quoteNumber);
     setContextOutput(context, "newBusiness.policyNumber", policyNumber);
     setContextOutput(context, "newBusiness.payload", payload);
@@ -71,14 +48,6 @@ const runDirect: NewBusinessHandler = async ({
     if (!context.scenario.policyNumber) {
         context.scenario.policyNumber = policyNumber;
     }
-
-    console.log(`StepNo          : ${step.stepNo}`);
-    console.log(`Action          : ${step.action}`);
-    console.log(`DataCaseId      : ${step.testCaseId}`);
-    console.log(`OpenedUrl       : ${openedUrl}`);
-    console.log(`QuoteNumber     : ${quoteNumber}`);
-    console.log(`PolicyNumber    : ${policyNumber}`);
-    // console.log(`PayloadKeys     : ${Object.keys(payload).join(", ")}`);
 };
 
 const runPcw: NewBusinessHandler = async (args) => {
@@ -100,7 +69,6 @@ function resolveStartFrom(
 
     if (normalizedEntryPoint === "pcwtool") return "PCWTool";
     if (normalizedEntryPoint === "pcw") return "PCW";
-
     if (normalizedJourney === "direct") return "Direct";
     return "PCW";
 }

@@ -9,8 +9,6 @@ import {
 } from "@execution/core/executionContext";
 import type { StepExecutorArgs } from "@execution/core/registry";
 
-const SMOKE_URL = "https://www.google.com";
-
 function normalizeKey(value?: string): string {
     return normalizeSpaces(String(value ?? ""))
         .toLowerCase()
@@ -69,67 +67,83 @@ function getCalculatedEmailId(args: StepExecutorArgs): string {
     return generated;
 }
 
-function validatePcwToolPortal(portal: string): string {
-    const normalized = normalizeKey(portal);
+function normalizeJourneyLabel(raw: string): string {
+    const key = normalizeKey(raw);
+
+    if (key === "ctm") return "CTM";
+    if (key === "cnf") return "CNF";
+    if (key === "msm") return "MSM";
+    if (key === "goco") return "GoCo";
+
+    return raw.trim();
+}
+
+function resolveJourney(stepData?: Record<string, unknown>): string {
+    const pcwTool = getPcwToolData(stepData);
+    const raw =
+        normalizeSpaces(String(pcwTool.journey ?? "")) ||
+        normalizeSpaces(String(pcwTool.pcwToolPortal ?? ""));
+
+    if (!raw) {
+        throw new AppError({
+            code: "PCW_TOOL_JOURNEY_MISSING",
+            stage: "execution-handler",
+            source: "newBusiness-pcwTool",
+            message: "Journey is required (MSM, CTM, CNF, GoCo).",
+        });
+    }
+
+    const normalized = normalizeKey(raw);
     const allowed = ["msm", "ctm", "cnf", "goco"];
 
     if (!allowed.includes(normalized)) {
         throw new AppError({
-            code: "PCW_TOOL_PORTAL_UNSUPPORTED",
+            code: "PCW_TOOL_JOURNEY_UNSUPPORTED",
             stage: "execution-handler",
             source: "newBusiness-pcwTool",
-            message: `Unsupported PCW Tool Portal "${portal}". Allowed values: MSM, CTM, CNF, GoCo.`,
+            message: `Unsupported Journey "${raw}". Allowed values: MSM, CTM, CNF, GoCo.`,
             context: {
-                portal,
+                journey: raw,
                 allowed: allowed.join(", "),
             },
         });
     }
 
-    return normalized;
+    return normalizeJourneyLabel(raw);
+}
+
+function detectRequestType(input: string): "XML" | "JSON" | "UNKNOWN" {
+    const trimmed = input.trim();
+
+    if (trimmed.startsWith("<")) return "XML";
+    if (trimmed.startsWith("{") || trimmed.startsWith("[")) return "JSON";
+
+    return "UNKNOWN";
 }
 
 export async function runNewBusinessPcwTool(
     args: StepExecutorArgs
 ): Promise<void> {
-    const page = args.context.page;
-    if (!page) {
-        throw new AppError({
-            code: "PLAYWRIGHT_PAGE_MISSING",
-            stage: "execution-handler",
-            source: "newBusiness-pcwTool",
-            message: "Playwright page is not attached to execution context.",
-            context: {
-                scenarioId: args.context.scenario.scenarioId,
-                stepNo: args.step.stepNo,
-                action: args.step.action,
-            },
-        });
-    }
-
     const pcwTool = getPcwToolData(args.stepData);
+
     const requestMessage = requireStringField(pcwTool, "requestMessage");
     const iql = requireStringField(pcwTool, "iql");
-    const pcwToolPortalRaw = requireStringField(pcwTool, "pcwToolPortal");
     const paymentMode = requireStringField(pcwTool, "paymentMode");
+    const journey = resolveJourney(args.stepData);
     const convertToMonthlyCard = normalizeSpaces(
         String(pcwTool.convertToMonthlyCard ?? "")
     );
 
-    const pcwToolPortal = validatePcwToolPortal(pcwToolPortalRaw);
     const calculatedEmailId = getCalculatedEmailId(args);
     const finalRequestMessage = injectTokens(requestMessage, {
         CalculatedEmailId: calculatedEmailId,
     });
 
-    await page.goto(SMOKE_URL, { waitUntil: "domcontentloaded" });
-
     setContextOutput(args.context, "lastAction", args.step.action);
-    setContextOutput(args.context, "lastJourney", args.context.scenario.journey);
+    setContextOutput(args.context, "lastJourney", journey);
     setContextOutput(args.context, "newBusiness.startFrom", "PCWTool");
-    setContextOutput(args.context, "newBusiness.openedUrl", SMOKE_URL);
+    setContextOutput(args.context, "newBusiness.journey", journey);
     setContextOutput(args.context, "newBusiness.calculatedEmailId", calculatedEmailId);
-    setContextOutput(args.context, "newBusiness.pcwTool.portal", pcwToolPortal);
     setContextOutput(args.context, "newBusiness.pcwTool.iql", iql);
     setContextOutput(args.context, "newBusiness.pcwTool.paymentMode", paymentMode);
     setContextOutput(
@@ -137,18 +151,24 @@ export async function runNewBusinessPcwTool(
         "newBusiness.pcwTool.convertToMonthlyCard",
         convertToMonthlyCard
     );
-    setContextOutput(args.context, "newBusiness.pcwTool.requestMessage.raw", requestMessage);
-    setContextOutput(args.context, "newBusiness.pcwTool.requestMessage.final", finalRequestMessage);
-    setContextOutput(args.context, "newBusiness.pcwTool.payload", args.stepData ?? {});
-
-    console.log(`StepNo          : ${args.step.stepNo}`);
-    console.log(`Action          : ${args.step.action}`);
-    console.log(`TestCaseId      : ${args.step.testCaseId}`);
-    console.log(`OpenedUrl       : ${SMOKE_URL}`);
-    console.log(`PcwToolPortal   : ${pcwToolPortal}`);
-    console.log(`PaymentMode     : ${paymentMode}`);
-    console.log(`IQL             : ${iql}`);
-    console.log(`MonthlyCard     : ${convertToMonthlyCard || "(blank)"}`);
-    console.log(`CalculatedEmail : ${calculatedEmailId}`);
-    console.log(`RequestPreview  : ${finalRequestMessage.slice(0, 200)}`);
+    setContextOutput(
+        args.context,
+        "newBusiness.pcwTool.requestMessage.raw",
+        requestMessage
+    );
+    setContextOutput(
+        args.context,
+        "newBusiness.pcwTool.requestMessage.final",
+        finalRequestMessage
+    );
+    setContextOutput(
+        args.context,
+        "newBusiness.pcwTool.requestType",
+        detectRequestType(requestMessage)
+    );
+    setContextOutput(
+        args.context,
+        "newBusiness.pcwTool.payload",
+        args.stepData ?? {}
+    );
 }

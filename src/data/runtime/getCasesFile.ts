@@ -5,21 +5,10 @@ import path from "node:path";
 import { DataBuilderError } from "../builder/errors";
 import type { CasesFile } from "../builder/types";
 import { resolveSchemaName } from "../data-definitions";
-import { toKebabFromSnake } from "@utils/text";
+import { ROOT, getGeneratedSchemaDir } from "@utils/paths";
 
 function safeSheetFilename(name: string) {
     return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
-}
-
-function getGeneratedDir(schemaName: string): string {
-    return path.join(
-        process.cwd(),
-        "src",
-        "data",
-        "generated",
-        "new-business",
-        toKebabFromSnake(schemaName)
-    );
 }
 
 function findLatestJsonFile(dir: string, baseName: string): string | null {
@@ -35,7 +24,6 @@ function findLatestJsonFile(dir: string, baseName: string): string | null {
         .map((file) => {
             const fullPath = path.join(dir, file);
             return {
-                file,
                 fullPath,
                 mtimeMs: fs.statSync(fullPath).mtimeMs,
             };
@@ -48,11 +36,11 @@ function findLatestJsonFile(dir: string, baseName: string): string | null {
 export function resolveCasesFilePath(sheetName: string, schemaName?: string): string {
     const explicit = String(process.env.CASES_FILE ?? "").trim();
     if (explicit) {
-        return path.isAbsolute(explicit) ? explicit : path.join(process.cwd(), explicit);
+        return path.isAbsolute(explicit) ? explicit : path.join(ROOT, explicit);
     }
 
     const resolvedSchema = resolveSchemaName(schemaName || process.env.SCHEMA, sheetName);
-    const dir = getGeneratedDir(resolvedSchema);
+    const dir = getGeneratedSchemaDir(resolvedSchema);
     const baseName = safeSheetFilename(sheetName);
 
     const exactPath = path.join(dir, `${baseName}.json`);

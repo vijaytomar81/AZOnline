@@ -3,11 +3,11 @@
 import path from "node:path";
 import type { DataBuilderBaseArgs } from "./types";
 import { normalizeArgv, getArg, hasFlag } from "@utils/argv";
-import { createLogger } from "@utils/logger";
 import { printSection } from "@utils/cliFormat";
+import { createLogger } from "@utils/logger";
+import { getGeneratedSchemaDir, toRepoRelative } from "@utils/paths";
 import { usage } from "./help";
 import { resolveSchemaName } from "../data-definitions";
-import { toKebabFromSnake } from "@utils/text";
 import { DataBuilderError } from "./errors";
 
 export function createDataBuilderLogger(verbose = false) {
@@ -42,12 +42,13 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
   const sheetName = String(getArg(argv, "--sheet") ?? process.env.SHEET ?? "").trim();
   const schemaArg = String(getArg(argv, "--schema") ?? process.env.SCHEMA ?? "").trim();
   const scriptIdFilter = String(getArg(argv, "--ids") ?? process.env.SCRIPT_IDS ?? "").trim();
+
   const excludeEmptyFields =
     hasFlag(argv, "--excludeEmptyFields") || parseBoolean(process.env.EXCLUDE_EMPTY_FIELDS);
+
   const strictValidation =
     hasFlag(argv, "--strictValidation") || parseBoolean(process.env.STRICT_VALIDATION);
 
-  // ✅ Replace plain errors with structured errors
   if (!excelPath) {
     throw new DataBuilderError({
       code: "EXCEL_PATH_MISSING",
@@ -70,7 +71,6 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
   try {
     schemaName = resolveSchemaName(schemaArg, sheetName);
   } catch (error) {
-    // 👇 Preserve original error but wrap with context
     const message = error instanceof Error ? error.message : String(error);
 
     throw new DataBuilderError({
@@ -93,13 +93,11 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
 
   const outputPath =
     outRaw ||
-    path.join(
-      "src",
-      "data",
-      "generated",
-      "new-business",
-      toKebabFromSnake(schemaName),
-      `${safeSheetFilename(sheetName)}.json`
+    toRepoRelative(
+      path.join(
+        getGeneratedSchemaDir(schemaName),
+        `${safeSheetFilename(sheetName)}.json`
+      )
     );
 
   return {

@@ -2,12 +2,11 @@
 
 import { AppError } from "@utils/errors";
 import { createLogger } from "@utils/logger";
-import { startTimer } from "@utils/time";
 import { createExecutionBootstrap } from "@execution/core/bootstrap";
+import { runCases } from "@execution/core/caseRunner";
 import { loadScenarioSheet } from "@execution/runtime/loadScenarioSheet";
-import { runScenario } from "@execution/core/scenarioRunner";
-import { parseScenarios } from "./scenario/parser";
-import type { ExecutionScenario } from "./scenario/types";
+import { parseScenarios } from "@execution/modes/e2e/scenario/parser";
+import type { ExecutionScenario } from "@execution/modes/e2e/scenario/types";
 
 export type RunE2EModeArgs = {
     excelPath: string;
@@ -15,6 +14,7 @@ export type RunE2EModeArgs = {
     selectedIds: string[];
     includeDisabled: boolean;
     iterations: number;
+    parallel?: number;
     verbose: boolean;
 };
 
@@ -28,7 +28,6 @@ function filterScenarios(
 }
 
 export async function runE2EMode(args: RunE2EModeArgs): Promise<void> {
-    const timer = startTimer();
     const log = createLogger({
         prefix: "[execution]",
         logLevel: args.verbose ? "debug" : "info",
@@ -55,7 +54,6 @@ export async function runE2EMode(args: RunE2EModeArgs): Promise<void> {
     });
 
     const scenarios = filterScenarios(parsed.scenarios, args.selectedIds);
-
     if (!scenarios.length) {
         throw new AppError({
             code: "NO_SCENARIOS_SELECTED",
@@ -65,33 +63,15 @@ export async function runE2EMode(args: RunE2EModeArgs): Promise<void> {
         });
     }
 
-    let passed = 0;
-    let failed = 0;
-
-    for (let i = 1; i <= args.iterations; i++) {
-        for (const scenario of scenarios) {
-            const scenarioToRun = {
-                ...scenario,
-                scenarioId:
-                    args.iterations > 1
-                        ? `${scenario.scenarioId}#ITER${i}`
-                        : scenario.scenarioId,
-            };
-
-            const result = await runScenario({
-                scenario: scenarioToRun,
-                registry: bootstrap.executorRegistry,
-                dataRegistry: bootstrap.stepDataRegistry,
-                log: log.child(scenarioToRun.scenarioId),
-            });
-
-            if (result.status === "passed") passed++;
-            else failed++;
-        }
-    }
-
-    log.info(
-        `Execution completed -> total=${scenarios.length * args.iterations}, passed=${passed}, failed=${failed}`
-    );
-    log.info(`Total time -> ${timer.elapsedSecondsText()}`);
+    await runCases({
+        mode: "e2e",
+        environment: process.env.ENV ?? "DEV",
+        scenarios,
+        iterations: args.iterations,
+        parallel: args.parallel ?? 1,
+        sheet: args.sheetName,
+        registry: bootstrap.executorRegistry,
+        dataRegistry: bootstrap.stepDataRegistry,
+        log,
+    });
 }

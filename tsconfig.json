@@ -42,6 +42,9 @@
       ],
       "@execution/*": [
         "src/execution/*"
+      ],
+      "@config/*": [
+        "src/config/*"
       ]
     }
   },

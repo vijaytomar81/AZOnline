@@ -1,6 +1,7 @@
 // src/execution/core/result.ts
 
 export type StepExecutionStatus = "passed" | "failed" | "skipped";
+export type ScenarioExecutionStatus = "passed" | "failed";
 
 export type StepExecutionResult = {
     stepNo: number;
@@ -14,40 +15,28 @@ export type StepExecutionResult = {
 
 export type ScenarioExecutionResult = {
     scenarioId: string;
-    status: StepExecutionStatus;
+    status: ScenarioExecutionStatus;
     stepResults: StepExecutionResult[];
+    outputs?: Record<string, unknown>;
 };
 
-export function createStepExecutionResult(args: {
-    stepNo: number;
-    action: string;
-    status: StepExecutionStatus;
-    startedAt: string;
-    finishedAt: string;
-    message?: string;
-    details?: Record<string, unknown>;
-}): StepExecutionResult {
-    return {
-        stepNo: args.stepNo,
-        action: args.action,
-        status: args.status,
-        startedAt: args.startedAt,
-        finishedAt: args.finishedAt,
-        message: args.message,
-        details: args.details,
-    };
+export function createStepExecutionResult(
+    input: StepExecutionResult
+): StepExecutionResult {
+    return input;
 }
 
-export function buildScenarioExecutionResult(args: {
+export function buildScenarioExecutionResult(input: {
     scenarioId: string;
     stepResults: StepExecutionResult[];
+    outputs?: Record<string, unknown>;
 }): ScenarioExecutionResult {
-    const hasFailure = args.stepResults.some((r) => r.status === "failed");
-    const hasPass = args.stepResults.some((r) => r.status === "passed");
+    const hasFailure = input.stepResults.some((item) => item.status === "failed");
 
     return {
-        scenarioId: args.scenarioId,
-        status: hasFailure ? "failed" : hasPass ? "passed" : "skipped",
-        stepResults: args.stepResults,
+        scenarioId: input.scenarioId,
+        status: hasFailure ? "failed" : "passed",
+        stepResults: input.stepResults,
+        outputs: input.outputs ?? {},
     };
 }

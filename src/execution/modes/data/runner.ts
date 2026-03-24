@@ -1,142 +1,103 @@
 // src/execution/modes/data/runner.ts
 
-import { dataDefinitionRegistry } from "../../../data/data-definitions/registry";
-import { resolveSchemaName } from "../../../data/data-definitions";
-import { getCasesFile } from "../../../data/runtime/getCasesFile";
-import { AppError } from "@utils/errors";
-import { createLogger, type Logger } from "@utils/logger";
-import { startTimer } from "@utils/time";
-import type { ExecutionScenario } from "../e2e/scenario/types";
+import type { Logger } from "@utils/logger";
+import { createLogger } from "@utils/logger";
+import { resolveSchemaName } from "@data/data-definitions";
+import { getCasesFile } from "@data/runtime/getCasesFile";
+import { normalizeJourney } from "@config/domain/journey.config";
 import { createExecutionBootstrap } from "@execution/core/bootstrap";
-import { runScenario } from "@execution/core/scenarioRunner";
-
-const DEFAULT_ITERATIONS = 1;
-
-export type RunDataModeArgs = {
-    source: string;
-    schemaArg?: string;
-    iterations?: number;
-    verbose?: boolean;
-};
+import { runCases } from "@execution/core/caseRunner";
+import type { ExecutionScenario } from "@execution/modes/e2e/scenario/types";
 
 function resolveEntryPoint(schemaName: string): "Direct" | "PCW" | "PCWTool" {
     if (schemaName === "direct" || schemaName === "master") return "Direct";
-    if (schemaName === "pcw_tool" || schemaName.endsWith("_pcw_tool")) return "PCWTool";
+    if (schemaName.includes("pcw_tool")) return "PCWTool";
     return "PCW";
 }
 
-function resolveJourney(source: string, schemaName: string): string {
-    if (schemaName === "direct" || schemaName === "master") return "Direct";
-    return source;
-}
-
-function validateSchema(schemaName: string): void {
-    const def = dataDefinitionRegistry[schemaName];
-
-    if (!def || def.schema.dataDefinitionGroup !== "newBusiness") {
-        throw new AppError({
-            code: "DATA_MODE_SCHEMA_NOT_SUPPORTED",
-            stage: "data-runner",
-            source: "dataRunner",
-            message: `Schema "${schemaName}" is not supported for data mode.`,
-        });
+function resolveJourney(
+    schemaName: string,
+    builtCase: { data?: Record<string, unknown> }
+): string {
+    if (schemaName === "direct" || schemaName === "master") {
+        return "Direct";
     }
+
+    if (schemaName === "pcw_tool") {
+        const pcwTool = (builtCase.data?.pcwTool ?? {}) as Record<string, unknown>;
+        const raw =
+            String(pcwTool.journey ?? "").trim() ||
+            String(pcwTool.pcwToolPortal ?? "").trim();
+
+        return normalizeJourney(raw || "CTM");
+    }
+
+    const base = schemaName.replace(/_pcw_tool$/i, "");
+    return normalizeJourney(base);
 }
 
-export async function runDataMode(args: RunDataModeArgs): Promise<void> {
-    const iterations = args.iterations ?? DEFAULT_ITERATIONS;
-
-    const log: Logger = createLogger({
+function buildLogger(verbose?: boolean): Logger {
+    return createLogger({
         prefix: "[execution]",
-        logLevel: args.verbose ? "debug" : "info",
+        logLevel: verbose ? "debug" : "info",
         withTimestamp: true,
         logToFile: false,
     });
+}
 
-    const timer = startTimer();
-
-    // ✅ Resolve schema dynamically
+export async function runDataMode(args: {
+    source: string;
+    schemaArg?: string;
+    iterations?: number;
+    parallel?: number;
+    verbose?: boolean;
+}): Promise<void> {
+    const log = buildLogger(args.verbose);
     const schemaName = resolveSchemaName(args.schemaArg, args.source);
-    validateSchema(schemaName);
-
-    // ✅ Load generated JSON (NO build here)
-    let casesFile;
-    try {
-        casesFile = getCasesFile(args.source, schemaName);
-    } catch {
-        throw new AppError({
-            code: "DATA_JSON_NOT_FOUND",
-            stage: "data-load",
-            source: "dataRunner",
-            message: [
-                `Generated data JSON not found for source "${args.source}".`,
-                "",
-                "Next step:",
-                `  npm run data:build -- --excel <path> --sheet "${args.source}"`,
-            ].join("\n"),
-        });
-    }
-
+    const casesFile = getCasesFile(args.source, schemaName);
     const bootstrap = createExecutionBootstrap({ log });
-
     const entryPoint = resolveEntryPoint(schemaName);
-    const journey = resolveJourney(args.source, schemaName);
 
-    log.info(
-        `Mode -> data | source=${args.source} | schema=${schemaName} | iterations=${iterations}`
-    );
-    log.info(`Cases ready for execution: ${casesFile.cases.length}`);
+    const overrideByScenarioId = new Map<string, Record<string, unknown>>();
+    const scenarios: ExecutionScenario[] = casesFile.cases.map((item) => {
+        const scenarioId = item.scriptId ?? item.scriptName ?? "UNKNOWN_CASE";
+        const scenarioName = item.scriptName ?? scenarioId;
+        const journey = resolveJourney(schemaName, item);
 
-    let passed = 0;
-    let failed = 0;
+        overrideByScenarioId.set(scenarioId, item.data ?? {});
 
-    for (let i = 1; i <= iterations; i++) {
-        for (const builtCase of casesFile.cases) {
-            // ✅ FIX: handle undefined safely
-            const scriptName =
-                builtCase.scriptName ??
-                builtCase.scriptId ??
-                "UNKNOWN_CASE";
+        return {
+            scenarioId,
+            scenarioName,
+            journey,
+            policyContext: "NewBusiness",
+            entryPoint,
+            description: scenarioName,
+            execute: true,
+            totalSteps: 1,
+            steps: [
+                {
+                    stepNo: 1,
+                    action: "NewBusiness",
+                    subType: "",
+                    portal: "",
+                    testCaseId: scenarioId,
+                },
+            ],
+        };
+    });
 
-            const scriptId = builtCase.scriptId ?? scriptName;
-
-            const scenario: ExecutionScenario = {
-                scenarioId:
-                    iterations > 1 ? `${scriptName}#ITER${i}` : scriptName,
-                scenarioName: scriptName,
-                journey,
-                policyContext: "NewBusiness",
-                entryPoint,
-                description: builtCase.description ?? scriptName,
-                execute: true,
-                totalSteps: 1,
-                steps: [
-                    {
-                        stepNo: 1,
-                        action: "NewBusiness",
-                        subType: "",
-                        portal: "CustomerPortal",
-                        testCaseId: scriptId,
-                    },
-                ],
-            };
-
-            const result = await runScenario({
-                scenario,
-                registry: bootstrap.executorRegistry,
-                dataRegistry: bootstrap.stepDataRegistry,
-                log: log.child(scenario.scenarioId),
-                overrideStepData: builtCase.data,
-            });
-
-            if (result.status === "passed") passed++;
-            else failed++;
-        }
-    }
-
-    log.info(
-        `Execution completed -> total=${casesFile.cases.length * iterations
-        }, passed=${passed}, failed=${failed}`
-    );
-    log.info(`Total time -> ${timer.elapsedSecondsText()}`);
+    await runCases({
+        mode: "data",
+        environment: process.env.ENV ?? "DEV",
+        scenarios,
+        iterations: args.iterations ?? 1,
+        parallel: args.parallel ?? 1,
+        schema: schemaName,
+        source: args.source,
+        registry: bootstrap.executorRegistry,
+        dataRegistry: bootstrap.stepDataRegistry,
+        log,
+        resolveOverrideStepData: (scenario) => overrideByScenarioId.get(scenario.scenarioId),
+    });
 }

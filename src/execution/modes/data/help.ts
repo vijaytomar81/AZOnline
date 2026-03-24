@@ -1,16 +1,20 @@
 // src/execution/modes/data/help.ts
 
 import path from "node:path";
-import { dataDefinitionRegistry } from "../../../data/data-definitions/registry";
-import type { RegisteredSchema } from "../../../data/data-definitions/types";
-import { toKebabFromSnake } from "@utils/text";
+import { dataDefinitionRegistry } from "@data/data-definitions/registry";
+import type { RegisteredSchema } from "@data/data-definitions/types";
+import { getGeneratedSchemaDir, toRepoRelative } from "@utils/paths";
 
 function safeSheetFilename(name: string): string {
     return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
 }
 
 function preferredAlias(aliases: string[], fallback: string): string {
-    return aliases.find((alias) => !alias.toLowerCase().includes("template")) ?? aliases[0] ?? fallback;
+    return (
+        aliases.find((alias) => !alias.toLowerCase().includes("template")) ??
+        aliases[0] ??
+        fallback
+    );
 }
 
 export function printDataModeHelp(): void {
@@ -18,17 +22,17 @@ export function printDataModeHelp(): void {
         .filter((item) => item.schema.dataDefinitionGroup === "newBusiness")
         .map((item) => {
             const source = preferredAlias(item.sheetAliases ?? [], item.name);
+            const jsonPath = toRepoRelative(
+                path.join(
+                    getGeneratedSchemaDir(item.name),
+                    `${safeSheetFilename(source)}.json`
+                )
+            );
+
             return {
                 source,
                 schema: item.name,
-                jsonPath: path.join(
-                    "src",
-                    "data",
-                    "generated",
-                    "new-business",
-                    toKebabFromSnake(item.name),
-                    `${safeSheetFilename(source)}.json`
-                ),
+                jsonPath,
             };
         })
         .sort((a, b) => a.source.localeCompare(b.source));
@@ -47,7 +51,9 @@ export function printDataModeHelp(): void {
     console.log("  --help                  Show help");
     console.log("");
     console.log("Available data sources:");
-    console.log(`  ${"Source Name".padEnd(maxSource)}  -> ${"Schema Name".padEnd(maxSchema)}  -> Generated JSON Path`);
+    console.log(
+        `  ${"Source Name".padEnd(maxSource)}  -> ${"Schema Name".padEnd(maxSchema)}  -> Generated JSON Path`
+    );
     console.log(`  ${"-".repeat(maxSource + maxSchema + 28)}`);
 
     rows.forEach((row) => {
@@ -58,5 +64,7 @@ export function printDataModeHelp(): void {
 
     console.log("");
     console.log("Next step:");
-    console.log('  If JSON is missing, build data first using your data-builder command and the matching sheet/source.');
+    console.log(
+        "  If JSON is missing, build data first using your data-builder command and the matching sheet/source."
+    );
 }

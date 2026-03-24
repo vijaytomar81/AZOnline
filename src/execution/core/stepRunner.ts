@@ -1,30 +1,31 @@
 // src/execution/core/stepRunner.ts
 
-import { nowIso } from "@utils/time";
 import type { Logger } from "@utils/logger";
+import { nowIso } from "@utils/time";
 import type { ScenarioStep } from "@execution/modes/e2e/scenario/types";
-import type { ExecutionContext } from "./executionContext";
-import { addStepResult } from "./executionContext";
+import type { ExecutionContext } from "@execution/core/executionContext";
+import { addStepResult } from "@execution/core/executionContext";
 import {
     createStepExecutionResult,
     type StepExecutionResult,
-} from "./result";
+} from "@execution/core/result";
 import {
     getExecutor,
     type ExecutorRegistry,
-} from "./registry";
+} from "@execution/core/registry";
 import {
     resolveStepData,
     type StepDataResolverRegistry,
 } from "@execution/runtime/resolveStepData";
 
-export type RunStepArgs = {
-    context: ExecutionContext;
-    step: ScenarioStep;
-    registry: ExecutorRegistry;
-    dataRegistry: StepDataResolverRegistry;
-    log: Logger;
-    overrideStepData?: Record<string, unknown>;
+type ResolvedOverride = {
+    testCaseId: string;
+    payload: Record<string, unknown>;
+    source: {
+        action: string;
+        sheetName: string;
+    };
+    sourceFileSheet: string;
 };
 
 function buildFailureResult(
@@ -39,51 +40,62 @@ function buildFailureResult(
         startedAt,
         finishedAt: nowIso(),
         message,
+        details: {
+            testCaseId: step.testCaseId,
+        },
     });
 }
 
-export async function runStep(args: RunStepArgs): Promise<StepExecutionResult> {
-    const { context, step, registry, dataRegistry, log, overrideStepData } = args;
+export async function runStep(args: {
+    context: ExecutionContext;
+    step: ScenarioStep;
+    registry: ExecutorRegistry;
+    dataRegistry: StepDataResolverRegistry;
+    log: Logger;
+    overrideStepData?: Record<string, unknown>;
+    mode?: "data" | "e2e";
+}): Promise<StepExecutionResult> {
     const startedAt = nowIso();
 
     try {
-        const executor = getExecutor(registry, context, step);
+        const executor = getExecutor(args.registry, args.context, args.step);
         if (!executor) {
             const result = buildFailureResult(
-                step,
+                args.step,
                 startedAt,
-                `No executor registered for step action="${step.action}"`
+                `No executor registered for step action="${args.step.action}"`
             );
-            addStepResult(context, result);
+            addStepResult(args.context, result);
             return result;
         }
 
-        const resolved = overrideStepData
-            ? {
-                testCaseId: step.testCaseId,
-                payload: overrideStepData,
-                source: {
-                    action: step.action,
-                    sheetName: "data-mode",
-                },
-                sourceFileSheet: "data-mode",
-            }
-            : resolveStepData({
-                registry: dataRegistry,
-                journey: context.scenario.journey,
-                step,
-                log,
-            });
+        const resolved =
+            args.overrideStepData
+                ? ({
+                    testCaseId: args.step.testCaseId,
+                    payload: args.overrideStepData,
+                    source: {
+                        action: args.step.action,
+                        sheetName: "data-mode",
+                    },
+                    sourceFileSheet: "data-mode",
+                } as ResolvedOverride)
+                : resolveStepData({
+                    registry: args.dataRegistry,
+                    journey: args.context.scenario.journey,
+                    step: args.step,
+                    log: args.log,
+                });
 
         await executor({
-            context,
-            step,
+            context: args.context,
+            step: args.step,
             stepData: resolved.payload,
         });
 
         const result = createStepExecutionResult({
-            stepNo: step.stepNo,
-            action: step.action,
+            stepNo: args.step.stepNo,
+            action: args.step.action,
             status: "passed",
             startedAt,
             finishedAt: nowIso(),
@@ -94,14 +106,12 @@ export async function runStep(args: RunStepArgs): Promise<StepExecutionResult> {
             },
         });
 
-        addStepResult(context, result);
+        addStepResult(args.context, result);
         return result;
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        log.error(`Step${step.stepNo} failed: ${message}`);
-
-        const result = buildFailureResult(step, startedAt, message);
-        addStepResult(context, result);
+        const result = buildFailureResult(args.step, startedAt, message);
+        addStepResult(args.context, result);
         return result;
     }
 }

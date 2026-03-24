@@ -26,7 +26,7 @@
     "execution:help": "npm run execution -- --help",
 
     "smoke:direct": "npm run execution -- --mode data --source \"FlowNB\" --verbose",
-    "smoke:pcw": "npm run execution -- --mode data --source \"PCW Tool\" --verbose",
+    "smoke:pcw": "npm run execution -- --mode data --source \"PCW-Tool\" --verbose",
     "smoke:e2e": "npm run execution -- --mode e2e --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\"",
 
     "smoke:direct:loop": "npm run execution -- --mode data --source \"FlowNB\" --iterations 2 --verbose",

@@ -5,8 +5,11 @@ import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
 import { executionConfig } from "../../../config/execution.config";
 import { writeArtifactJson } from "@utils/artifacts";
-import { DATA_GENERATED_ARCHIVE_DIR } from "@utils/paths";
-import { toKebabFromSnake } from "@utils/text";
+import {
+  DATA_GENERATED_ARCHIVE_DIR,
+  ROOT,
+  getGeneratedSchemaDir,
+} from "@utils/paths";
 import { DataBuilderError } from "../errors";
 
 function safeSheetFilename(name: string) {
@@ -23,11 +26,7 @@ function isLikelyDir(p: string): boolean {
 
 function getDefaultOutputPath(schemaName: string, sheetName: string): string {
   return path.join(
-    "src",
-    "data",
-    "generated",
-    "new-business",
-    toKebabFromSnake(schemaName),
+    getGeneratedSchemaDir(schemaName),
     `${safeSheetFilename(sheetName)}.json`
   );
 }
@@ -79,7 +78,7 @@ const plugin: PipelinePlugin = {
 
     const absBaseOut = path.isAbsolute(targetPath)
       ? targetPath
-      : path.join(process.cwd(), targetPath);
+      : path.join(ROOT, targetPath);
 
     const artifactOpts = {
       withTimestamp: executionConfig.generatedArtifacts.withTimestamp,
