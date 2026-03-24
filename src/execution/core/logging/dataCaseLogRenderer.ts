@@ -66,7 +66,7 @@ export function renderDataCaseBlock(args: {
             ? outputs["newBusiness.pcwTool.convertToMonthlyCard"] || "(blank)"
             : undefined;
 
-    collectFieldIfPresent(detailFields, "ConvertToMonthlyCard", monthlyCard);
+    collectFieldIfPresent(detailFields, "Monthly Card", monthlyCard);
 
     collectFieldIfPresent(
         detailFields,

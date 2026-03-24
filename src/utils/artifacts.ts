@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { ensureDir, ensureParentDir } from "./fs";
 import { DATA_GENERATED_ARCHIVE_DIR, DATA_GENERATED_DIR } from "./paths";
+import { formatTimestamp } from "./time";
 
 export type ArtifactWriteOptions = {
     withTimestamp?: boolean;
@@ -12,15 +13,7 @@ export type ArtifactWriteOptions = {
 };
 
 function formatArtifactTimestamp(date = new Date()): string {
-    const yyyy = String(date.getFullYear());
-    const mm = String(date.getMonth() + 1).padStart(2, "0");
-    const dd = String(date.getDate()).padStart(2, "0");
-    const hh = String(date.getHours()).padStart(2, "0");
-    const min = String(date.getMinutes()).padStart(2, "0");
-    const ss = String(date.getSeconds()).padStart(2, "0");
-    const ms = String(date.getMilliseconds()).padStart(3, "0");
-
-    return `${yyyy}${mm}${dd}_${hh}${min}${ss}_${ms}`;
+    return formatTimestamp(date);
 }
 
 function escapeRegex(value: string) {
