@@ -53,6 +53,9 @@ export const DATA_DEFINITIONS_DIR = path.join(DATA_DIR, "data-definitions");
 export const DATA_GENERATED_DIR = path.join(DATA_DIR, "generated");
 export const DATA_GENERATED_ARCHIVE_DIR = path.join(DATA_GENERATED_DIR, "archive");
 
+// index file
+export const DATA_GENERATED_INDEX_FILE = path.join(DATA_GENERATED_DIR, "index.json");
+
 /**
  * 📦 Data domains (central source of truth)
  */

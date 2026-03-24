@@ -6,10 +6,12 @@ import type { DataBuilderContext } from "../types";
 import { executionConfig } from "../../../config/execution.config";
 import { writeArtifactJson } from "@utils/artifacts";
 import {
+  DATA_DOMAINS,
   DATA_GENERATED_ARCHIVE_DIR,
   ROOT,
   getGeneratedSchemaDir,
 } from "@utils/paths";
+import { upsertGeneratedManifestItem } from "@data/runtime/generatedManifest";
 import { DataBuilderError } from "../errors";
 
 function safeSheetFilename(name: string) {
@@ -34,7 +36,12 @@ function getDefaultOutputPath(schemaName: string, sheetName: string): string {
 const plugin: PipelinePlugin = {
   name: "write-json",
   order: 70,
-  requires: ["casesFile", "external:sheetName", "external:outputPath", "external:schemaName"],
+  requires: [
+    "casesFile",
+    "external:sheetName",
+    "external:outputPath",
+    "external:schemaName",
+  ],
   provides: ["absOut"],
 
   run: async (ctx: DataBuilderContext) => {
@@ -73,7 +80,10 @@ const plugin: PipelinePlugin = {
 
     let targetPath = configuredPath;
     if (isLikelyDir(configuredPath)) {
-      targetPath = path.join(configuredPath, `${safeSheetFilename(sheetName)}.json`);
+      targetPath = path.join(
+        configuredPath,
+        `${safeSheetFilename(sheetName)}.json`
+      );
     }
 
     const absBaseOut = path.isAbsolute(targetPath)
@@ -88,6 +98,8 @@ const plugin: PipelinePlugin = {
     };
 
     let writtenJsonPath = "";
+    let writtenReportPath = "";
+
     try {
       writtenJsonPath = writeArtifactJson(absBaseOut, casesFile, artifactOpts);
       ctx.data.absOut = writtenJsonPath;
@@ -110,7 +122,7 @@ const plugin: PipelinePlugin = {
       const baseReportPath = absBaseOut.replace(/\.json$/i, ".validation.json");
 
       try {
-        const writtenReportPath = writeArtifactJson(
+        writtenReportPath = writeArtifactJson(
           baseReportPath,
           ctx.data.validationReport,
           artifactOpts
@@ -133,6 +145,15 @@ const plugin: PipelinePlugin = {
         });
       }
     }
+
+    upsertGeneratedManifestItem({
+      domain: DATA_DOMAINS.NEW_BUSINESS,
+      sheetName,
+      schemaName,
+      filePath: writtenJsonPath,
+      validationReportPath: writtenReportPath || undefined,
+      caseCount: Number(casesFile.caseCount ?? casesFile.cases?.length ?? 0),
+    });
 
     ctx.log.info(`JSON written: ${writtenJsonPath}`);
     ctx.log.debug?.(`cases=${casesFile.caseCount}`);
