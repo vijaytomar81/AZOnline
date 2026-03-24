@@ -25,7 +25,7 @@
     "execution:verbose": "npm run execution -- --verbose",
     "execution:help": "npm run execution -- --help",
     "smoke:direct": "npm run execution -- --excel \"sampleData/New Business.xlsx\" --sheet \"FlowNB\" --verbose",
-    "smoke:pcw": "npm run execution -- --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"PCW Tool\" --verbose",
+    "smoke:pcw": "npm run execution -- --excel \"sampleData/New Business.xlsx\" --sheet \"PCW Tool\" --verbose",
     "smoke:E2E": "npm run execution -- --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\" --verbose",
 
     "scan": "node -r ts-node/register -r tsconfig-paths/register src/tools/page-scanner/cli.ts",
