@@ -2,7 +2,9 @@
 
 import { normalizeSpaces } from "@utils/text";
 import { nowIso } from "@utils/time";
+import { buildCalculatedEmail } from "@utils/calculatedEmail";
 import { setContextOutput } from "@execution/core/executionContext";
+import { OUTPUT_KEYS } from "@execution/constants/outputKeys";
 import type { NewBusinessHandler, NewBusinessStartFrom } from "./types";
 import { runNewBusinessPcwTool } from "./pcwTool";
 
@@ -31,19 +33,33 @@ const runDirect: NewBusinessHandler = async ({
     const quoteNumber = buildQuoteNumber();
     const policyNumber = buildPolicyNumber();
 
+    const calculatedEmail = buildCalculatedEmail({
+        testCaseId: step.testCaseId,
+        startFrom: context.scenario.entryPoint ?? "direct",
+    });
+
     context.currentQuoteNumber = quoteNumber;
     context.currentPolicyNumber = policyNumber;
 
-    setContextOutput(context, "lastAction", step.action);
-    setContextOutput(context, "lastJourney", context.scenario.journey || "Direct");
+    setContextOutput(context, OUTPUT_KEYS.NEW_BUSINESS.LAST_ACTION, step.action);
     setContextOutput(
         context,
-        "newBusiness.startFrom",
+        OUTPUT_KEYS.NEW_BUSINESS.LAST_JOURNEY,
+        context.scenario.journey || "Direct"
+    );
+    setContextOutput(
+        context,
+        OUTPUT_KEYS.NEW_BUSINESS.START_FROM,
         context.scenario.entryPoint ?? "Direct"
     );
-    setContextOutput(context, "newBusiness.quoteNumber", quoteNumber);
-    setContextOutput(context, "newBusiness.policyNumber", policyNumber);
-    setContextOutput(context, "newBusiness.payload", payload);
+    setContextOutput(context, OUTPUT_KEYS.NEW_BUSINESS.QUOTE, quoteNumber);
+    setContextOutput(context, OUTPUT_KEYS.NEW_BUSINESS.POLICY, policyNumber);
+    setContextOutput(context, OUTPUT_KEYS.NEW_BUSINESS.PAYLOAD, payload);
+    setContextOutput(
+        context,
+        OUTPUT_KEYS.NEW_BUSINESS.CALCULATED_EMAIL,
+        calculatedEmail
+    );
 
     if (!context.scenario.policyNumber) {
         context.scenario.policyNumber = policyNumber;

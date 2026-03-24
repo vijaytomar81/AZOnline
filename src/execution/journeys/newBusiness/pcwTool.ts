@@ -1,23 +1,19 @@
 // src/execution/journeys/newBusiness/pcwTool.ts
 
 import { AppError } from "@utils/errors";
-import { nowIso } from "@utils/time";
 import { normalizeSpaces } from "@utils/text";
+import { buildCalculatedEmail } from "@utils/calculatedEmail";
 import {
     getContextOutput,
     setContextOutput,
 } from "@execution/core/executionContext";
+import { OUTPUT_KEYS } from "@execution/constants/outputKeys";
 import type { StepExecutorArgs } from "@execution/core/registry";
 
 function normalizeKey(value?: string): string {
     return normalizeSpaces(String(value ?? ""))
         .toLowerCase()
         .replace(/\s+/g, "");
-}
-
-function buildCalculatedEmailId(): string {
-    const stamp = nowIso().replace(/[-:TZ.]/g, "").slice(0, 14);
-    return `autotest_${stamp}@example.com`;
 }
 
 function injectTokens(input: string, tokens: Record<string, string>): string {
@@ -55,15 +51,24 @@ function requireStringField(
 function getCalculatedEmailId(args: StepExecutorArgs): string {
     const existing = getContextOutput<string>(
         args.context,
-        "newBusiness.calculatedEmailId"
+        OUTPUT_KEYS.NEW_BUSINESS.CALCULATED_EMAIL
     );
 
     if (existing) {
         return existing;
     }
 
-    const generated = buildCalculatedEmailId();
-    setContextOutput(args.context, "newBusiness.calculatedEmailId", generated);
+    const generated = buildCalculatedEmail({
+        testCaseId: args.step.testCaseId,
+        startFrom: "pcwtool",
+    });
+
+    setContextOutput(
+        args.context,
+        OUTPUT_KEYS.NEW_BUSINESS.CALCULATED_EMAIL,
+        generated
+    );
+
     return generated;
 }
 
@@ -139,36 +144,48 @@ export async function runNewBusinessPcwTool(
         CalculatedEmailId: calculatedEmailId,
     });
 
-    setContextOutput(args.context, "lastAction", args.step.action);
-    setContextOutput(args.context, "lastJourney", journey);
-    setContextOutput(args.context, "newBusiness.startFrom", "PCWTool");
-    setContextOutput(args.context, "newBusiness.journey", journey);
-    setContextOutput(args.context, "newBusiness.calculatedEmailId", calculatedEmailId);
-    setContextOutput(args.context, "newBusiness.pcwTool.iql", iql);
-    setContextOutput(args.context, "newBusiness.pcwTool.paymentMode", paymentMode);
+    setContextOutput(args.context, OUTPUT_KEYS.NEW_BUSINESS.LAST_ACTION, args.step.action);
+    setContextOutput(args.context, OUTPUT_KEYS.NEW_BUSINESS.LAST_JOURNEY, journey);
+    setContextOutput(args.context, OUTPUT_KEYS.NEW_BUSINESS.START_FROM, "PCWTool");
+    setContextOutput(args.context, OUTPUT_KEYS.NEW_BUSINESS.JOURNEY, journey);
     setContextOutput(
         args.context,
-        "newBusiness.pcwTool.convertToMonthlyCard",
+        OUTPUT_KEYS.NEW_BUSINESS.CALCULATED_EMAIL,
+        calculatedEmailId
+    );
+    setContextOutput(
+        args.context,
+        OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.IQL,
+        iql
+    );
+    setContextOutput(
+        args.context,
+        OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.PAYMENT_MODE,
+        paymentMode
+    );
+    setContextOutput(
+        args.context,
+        OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.CONVERT_TO_MONTHLY_CARD,
         convertToMonthlyCard
     );
     setContextOutput(
         args.context,
-        "newBusiness.pcwTool.requestMessage.raw",
+        OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.REQUEST_MESSAGE_RAW,
         requestMessage
     );
     setContextOutput(
         args.context,
-        "newBusiness.pcwTool.requestMessage.final",
+        OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.REQUEST_MESSAGE_FINAL,
         finalRequestMessage
     );
     setContextOutput(
         args.context,
-        "newBusiness.pcwTool.requestType",
+        OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.REQUEST_TYPE,
         detectRequestType(requestMessage)
     );
     setContextOutput(
         args.context,
-        "newBusiness.pcwTool.payload",
+        OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.PAYLOAD,
         args.stepData ?? {}
     );
 }

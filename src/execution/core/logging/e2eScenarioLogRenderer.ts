@@ -3,6 +3,7 @@
 import { failure, success } from "@utils/cliFormat";
 import type { ExecutionScenario } from "@execution/modes/e2e/scenario/types";
 import type { ScenarioExecutionResult } from "@execution/core/result";
+import { OUTPUT_KEYS } from "@execution/constants/outputKeys";
 import {
     collectFieldIfPresent,
     field,
@@ -46,13 +47,18 @@ export function renderE2EScenarioBlock(args: {
         if (step.stepNo === 1 && step.action === "NewBusiness") {
             collectFieldIfPresent(
                 stepFields,
+                "CalculatedEmail",
+                outputs[OUTPUT_KEYS.NEW_BUSINESS.CALCULATED_EMAIL]
+            );
+            collectFieldIfPresent(
+                stepFields,
                 "QuoteNumber",
-                outputs["newBusiness.quoteNumber"]
+                outputs[OUTPUT_KEYS.NEW_BUSINESS.QUOTE]
             );
             collectFieldIfPresent(
                 stepFields,
                 "PolicyNumber",
-                outputs["newBusiness.policyNumber"]
+                outputs[OUTPUT_KEYS.NEW_BUSINESS.POLICY]
             );
         }
 

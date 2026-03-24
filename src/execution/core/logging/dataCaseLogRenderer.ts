@@ -3,6 +3,7 @@
 import { muted, success } from "@utils/cliFormat";
 import type { ExecutionScenario } from "@execution/modes/e2e/scenario/types";
 import type { ScenarioExecutionResult } from "@execution/core/result";
+import { OUTPUT_KEYS } from "@execution/constants/outputKeys";
 import {
     collectFieldIfPresent,
     divider,
@@ -15,11 +16,8 @@ function formatRequestPreview(value: unknown): string {
     const text = String(value ?? "").trim();
     if (!text) return "";
 
-    // 👉 Keep logs clean (avoid dumping huge payloads)
     const maxLength = 100;
-    return text.length > maxLength
-        ? `${text.slice(0, maxLength)}...`
-        : text;
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 }
 
 export function renderDataCaseBlock(args: {
@@ -30,10 +28,8 @@ export function renderDataCaseBlock(args: {
     const { scenario, result, duration } = args;
     const outputs = result.outputs ?? {};
     const failedStep = result.stepResults.find((item) => item.status === "failed");
-
     const lines: string[] = [];
 
-    // ================= HEADER =================
     lines.push("");
     lines.push(
         `====================${muted("[DATA-CASE]")} ${success(
@@ -46,24 +42,23 @@ export function renderDataCaseBlock(args: {
     lines.push(field("EntryPoint", scenario.entryPoint ?? "Direct"));
     lines.push("");
 
-    // ================= DETAILS =================
     const detailFields: Array<[string, unknown]> = [];
 
     collectFieldIfPresent(
         detailFields,
         "PaymentMode",
-        outputs["newBusiness.pcwTool.paymentMode"]
+        outputs[OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.PAYMENT_MODE]
     );
 
     collectFieldIfPresent(
         detailFields,
         "IQL",
-        outputs["newBusiness.pcwTool.iql"]
+        outputs[OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.IQL]
     );
 
     const monthlyCard =
-        outputs["newBusiness.pcwTool.paymentMode"] !== undefined
-            ? outputs["newBusiness.pcwTool.convertToMonthlyCard"] || "(blank)"
+        outputs[OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.PAYMENT_MODE] !== undefined
+            ? outputs[OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.CONVERT_TO_MONTHLY_CARD] || "(blank)"
             : undefined;
 
     collectFieldIfPresent(detailFields, "Monthly Card", monthlyCard);
@@ -71,11 +66,12 @@ export function renderDataCaseBlock(args: {
     collectFieldIfPresent(
         detailFields,
         "RequestType",
-        outputs["newBusiness.pcwTool.requestType"]
+        outputs[OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.REQUEST_TYPE]
     );
 
-    // 🔥 NEW → RequestMessage (preview)
-    const requestMessage = outputs["newBusiness.pcwTool.requestMessage.final"];
+    const requestMessage =
+        outputs[OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.REQUEST_MESSAGE_FINAL];
+
     collectFieldIfPresent(
         detailFields,
         "RequestMessage",
@@ -85,19 +81,19 @@ export function renderDataCaseBlock(args: {
     collectFieldIfPresent(
         detailFields,
         "CalculatedEmail",
-        outputs["newBusiness.calculatedEmailId"]
+        outputs[OUTPUT_KEYS.NEW_BUSINESS.CALCULATED_EMAIL]
     );
 
     collectFieldIfPresent(
         detailFields,
         "QuoteNumber",
-        outputs["newBusiness.quoteNumber"]
+        outputs[OUTPUT_KEYS.NEW_BUSINESS.QUOTE]
     );
 
     collectFieldIfPresent(
         detailFields,
         "PolicyNumber",
-        outputs["newBusiness.policyNumber"]
+        outputs[OUTPUT_KEYS.NEW_BUSINESS.POLICY]
     );
 
     if (failedStep?.message) {
@@ -105,8 +101,6 @@ export function renderDataCaseBlock(args: {
     }
 
     lines.push(...renderFields(detailFields));
-
-    // ================= FOOTER =================
     lines.push("");
     lines.push(field("Status", statusText(result.status)));
     lines.push(field("Duration", duration));
