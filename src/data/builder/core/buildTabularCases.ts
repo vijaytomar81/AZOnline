@@ -4,6 +4,7 @@ import type ExcelJS from "exceljs";
 import { normalizeHeaderKey } from "../../../utils/text";
 import type { DataSchema } from "../../data-definitions/types";
 import type { BuiltCase, DataBuilderContext, DataBuilderMeta } from "../types";
+import { DataBuilderError } from "../errors";
 import { cellToString, norm } from "./excelRuntime";
 
 type BuildTabularCasesArgs = {
@@ -97,7 +98,18 @@ export function buildTabularCases(
 
     return meta.caseMetas.map((m, idx) => {
         if (!m.row) {
-            throw new Error("Tabular case meta is missing row.");
+            throw new DataBuilderError({
+                code: "TABULAR_CASE_ROW_MISSING",
+                stage: "build-cases",
+                source: "buildTabularCases",
+                message: "Tabular case meta is missing row.",
+                context: {
+                    sheetName: meta.sheet,
+                    caseIndex: idx + 1,
+                    scriptId: m.scriptId,
+                    scriptName: m.scriptName,
+                },
+            });
         }
 
         const rowMap = buildRowValueMap(ws, m.row, headers);

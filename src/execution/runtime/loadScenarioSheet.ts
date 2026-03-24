@@ -2,8 +2,9 @@
 
 import path from "node:path";
 import ExcelJS from "exceljs";
+import { AppError } from "../../utils/errors";
 import { fileExists } from "../../utils/fs";
-import { normalizeHeaderKey, normalizeSpaces } from "../../utils/text";
+import { normalizeHeaderKey, normalizeSheetKey, normalizeSpaces } from "../../utils/text";
 import type { Logger } from "../../utils/logger";
 import { defaultE2EPipelineTemplateConfig } from "../scenario/e2EPipelineTemplateConfig";
 import { validateE2EPipelineTemplateHeaders } from "../scenario/e2EPipelineTemplateValidator";
@@ -62,6 +63,59 @@ function isEmptyRow(values: string[]): boolean {
     return values.every((value) => !normalizeSpaces(value));
 }
 
+function resolveWorksheet(
+    workbook: ExcelJS.Workbook,
+    requestedSheetName: string
+): ExcelJS.Worksheet {
+    const worksheets = Array.isArray(workbook.worksheets) ? workbook.worksheets : [];
+    const worksheetNames = worksheets.map((item) => item.name);
+
+    const exact = worksheets.find((item) => item.name === requestedSheetName);
+    if (exact) {
+        return exact;
+    }
+
+    const requestedKey = normalizeSheetKey(requestedSheetName);
+    const normalizedMatches = worksheets.filter(
+        (item) => normalizeSheetKey(item.name) === requestedKey
+    );
+
+    if (normalizedMatches.length === 1) {
+        return normalizedMatches[0];
+    }
+
+    if (normalizedMatches.length > 1) {
+        throw new AppError({
+            code: "SCENARIO_SHEET_NAME_AMBIGUOUS",
+            stage: "load-scenario-sheet",
+            source: "loadScenarioSheet",
+            message: [
+                `Sheet "${requestedSheetName}" is ambiguous after normalization.`,
+                "",
+                "Matching sheets found:",
+                ...normalizedMatches.map((item) => `  - ${item.name}`),
+                "",
+                "Please pass the exact worksheet name.",
+            ].join("\n"),
+            context: {
+                requestedSheetName,
+                matchingSheets: normalizedMatches.map((item) => item.name).join(", "),
+            },
+        });
+    }
+
+    throw new AppError({
+        code: "SCENARIO_SHEET_NOT_FOUND",
+        stage: "load-scenario-sheet",
+        source: "loadScenarioSheet",
+        message: `Sheet "${requestedSheetName}" not found. Available: ${worksheetNames.join(", ")}`,
+        context: {
+            requestedSheetName,
+            availableSheets: worksheetNames.join(", "),
+        },
+    });
+}
+
 export async function loadScenarioSheet(args: {
     excelPath: string;
     sheetName: string;
@@ -72,28 +126,53 @@ export async function loadScenarioSheet(args: {
         : path.join(process.cwd(), args.excelPath);
 
     if (!fileExists(absExcel)) {
-        throw new Error(`Execution Excel file not found: ${absExcel}`);
+        throw new AppError({
+            code: "EXECUTION_EXCEL_NOT_FOUND",
+            stage: "load-scenario-sheet",
+            source: "loadScenarioSheet",
+            message: `Execution Excel file not found: ${absExcel}`,
+            context: {
+                excelPath: args.excelPath,
+                absExcel,
+            },
+        });
     }
 
     args.log?.info(`Loading execution workbook: ${absExcel}`);
 
     const wb = new ExcelJS.Workbook();
-    await wb.xlsx.readFile(absExcel);
 
-    const ws = wb.getWorksheet(args.sheetName);
-    if (!ws) {
-        const names = wb.worksheets.map((item) => item.name).join(", ");
-        throw new Error(`Sheet "${args.sheetName}" not found. Available: ${names}`);
+    try {
+        await wb.xlsx.readFile(absExcel);
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        throw new AppError({
+            code: "EXECUTION_WORKBOOK_READ_FAILED",
+            stage: "load-scenario-sheet",
+            source: "loadScenarioSheet",
+            message: `Failed to read execution workbook "${absExcel}": ${message}`,
+            context: {
+                absExcel,
+            },
+        });
     }
 
+    const ws = resolveWorksheet(wb, args.sheetName);
     args.log?.debug(`Workbook sheets: ${wb.worksheets.map((item) => item.name).join(", ")}`);
 
     const rawHeaders = getHeaders(ws);
     const headerErrors = validateE2EPipelineTemplateHeaders(rawHeaders);
     if (headerErrors.length) {
-        throw new Error(
-            `E2E pipeline sheet header validation failed\n${headerErrors.join("\n")}`
-        );
+        throw new AppError({
+            code: "SCENARIO_HEADER_VALIDATION_FAILED",
+            stage: "load-scenario-sheet",
+            source: "loadScenarioSheet",
+            message: `E2E pipeline sheet header validation failed\n${headerErrors.join("\n")}`,
+            context: {
+                sheetName: ws.name,
+                errorCount: headerErrors.length,
+            },
+        });
     }
 
     const canonicalHeaders = buildCanonicalHeaders();

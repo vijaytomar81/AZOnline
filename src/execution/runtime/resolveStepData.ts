@@ -1,5 +1,6 @@
 // src/execution/runtime/resolveStepData.ts
 
+import { AppError } from "../../utils/errors";
 import { normalizeSpaces } from "../../utils/text";
 import { getCasesFile } from "../../data/runtime/getCasesFile";
 import type { CasesFile } from "../../data/builder/types";
@@ -91,6 +92,7 @@ export function resolveStepData(args: {
     log?: Logger;
 }): ResolvedStepData {
     const testCaseId = normalizeSpaces(args.step.testCaseId);
+
     args.log?.debug(
         `Resolving step data -> action=${args.step.action}, journey=${args.journey}, ` +
         `subType=${args.step.subType ?? ""}, testCaseId=${testCaseId}`
@@ -101,10 +103,20 @@ export function resolveStepData(args: {
     );
 
     if (!source) {
-        throw new Error(
-            `No step data source registered for action="${args.step.action}", ` +
-            `journey="${args.journey}", subType="${args.step.subType ?? ""}".`
-        );
+        throw new AppError({
+            code: "STEP_DATA_SOURCE_NOT_FOUND",
+            stage: "resolve-step-data",
+            source: "resolveStepData",
+            message:
+                `No step data source registered for action="${args.step.action}", ` +
+                `journey="${args.journey}", subType="${args.step.subType ?? ""}".`,
+            context: {
+                action: args.step.action,
+                journey: args.journey,
+                subType: args.step.subType ?? "",
+                testCaseId,
+            },
+        });
     }
 
     args.log?.debug(
@@ -119,10 +131,20 @@ export function resolveStepData(args: {
     );
 
     if (!hit) {
-        throw new Error(
-            `TestCaseId "${testCaseId}" not found in sheet "${source.sheetName}" ` +
-            `for action "${args.step.action}".`
-        );
+        throw new AppError({
+            code: "STEP_TEST_CASE_NOT_FOUND",
+            stage: "resolve-step-data",
+            source: "resolveStepData",
+            message:
+                `TestCaseId "${testCaseId}" not found in sheet "${source.sheetName}" ` +
+                `for action "${args.step.action}".`,
+            context: {
+                testCaseId,
+                action: args.step.action,
+                sheetName: source.sheetName,
+                schemaName: source.schemaName ?? "",
+            },
+        });
     }
 
     args.log?.debug(

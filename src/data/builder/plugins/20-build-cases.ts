@@ -6,6 +6,7 @@ import type { CasesFile, DataBuilderContext } from "../types";
 import { getSchema } from "../../data-definitions";
 import { buildVerticalCases } from "../core/buildVerticalCases";
 import { buildTabularCases } from "../core/buildTabularCases";
+import { DataBuilderError } from "../errors";
 
 const plugin: PipelinePlugin = {
     name: "build-cases",
@@ -18,7 +19,17 @@ const plugin: PipelinePlugin = {
         const meta = ctx.data.meta;
 
         if (!ws || !meta?.caseMetas?.length) {
-            throw new Error("Sheet/meta missing. Ensure prior plugins ran.");
+            throw new DataBuilderError({
+                code: "BUILD_CASES_MISSING_INPUT",
+                stage: "build-cases",
+                source: "20-build-cases",
+                message: "Sheet/meta missing. Ensure prior plugins ran.",
+                context: {
+                    hasSheet: !!ws,
+                    hasMeta: !!meta,
+                    caseCount: meta?.caseMetas?.length ?? 0,
+                },
+            });
         }
 
         const schema = getSchema(ctx.data.schemaName, ctx.data.sheetName);

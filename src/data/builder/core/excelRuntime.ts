@@ -1,7 +1,9 @@
 // src/data/builder/core/excelRuntime.ts
+
 import type ExcelJS from "exceljs";
 import { defaultSheetLayoutConfig } from "./sheetLayoutConfig";
 import { normalizeHeaderKey, normalizeSpaces } from "../../../utils/text";
+import { DataBuilderError } from "../errors";
 
 export function cellToString(v: any): string {
     if (v === null || v === undefined) return "";
@@ -53,9 +55,7 @@ export function detectLayout(ws: ExcelJS.Worksheet): SheetLayout {
     const cfg = defaultSheetLayoutConfig;
     const headerRow = cfg.headerRow;
 
-    const sectionCol = findHeaderColumn(ws, headerRow, cfg.sectionHeaderAliases);
     const fieldCol = findHeaderColumn(ws, headerRow, cfg.fieldHeaderAliases);
-    const appFieldCol = findHeaderColumn(ws, headerRow, cfg.appFieldHeaderAliases);
     const firstValueCol = findHeaderColumn(ws, headerRow, cfg.valueHeaderAliases);
 
     if (fieldCol && firstValueCol) {
@@ -66,8 +66,6 @@ export function detectLayout(ws: ExcelJS.Worksheet): SheetLayout {
         };
     }
 
-    // Backward-compatible pattern:
-    // A=Section, B=StandardFieldName, C=ApplicationFieldName, D+=case values
     const a1 = normKey(cellToString(ws.getCell(1, 1).value));
     const b1 = normKey(cellToString(ws.getCell(1, 2).value));
     const c1 = normKey(cellToString(ws.getCell(1, 3).value));
@@ -76,8 +74,6 @@ export function detectLayout(ws: ExcelJS.Worksheet): SheetLayout {
         return { dataStartRow: 2, fieldCol: 2, caseStartCol: 4 };
     }
 
-    // Backward-compatible pattern:
-    // A=Section, B=StandardFieldName, C+=case values
     if (a1 === "section" && b1 === "standardfieldname") {
         const c1Raw = cellToString(ws.getCell(1, 3).value);
         const d1Raw = cellToString(ws.getCell(1, 4).value);
@@ -97,9 +93,16 @@ export function detectLayout(ws: ExcelJS.Worksheet): SheetLayout {
         ...cfg.valueHeaderAliases,
     ].join(", ");
 
-    throw new Error(
-        `Unable to detect sheet layout. Expected common template headers like: ${knownHeaders}`
-    );
+    throw new DataBuilderError({
+        code: "SHEET_LAYOUT_NOT_DETECTED",
+        stage: "extract-meta",
+        source: "excelRuntime",
+        message: `Unable to detect sheet layout. Expected common template headers like: ${knownHeaders}`,
+        context: {
+            worksheetName: ws.name,
+            knownHeaders,
+        },
+    });
 }
 
 export function findRowByField(
@@ -116,7 +119,18 @@ export function findRowByField(
         if (wanted.includes(value)) return r;
     }
 
-    throw new Error(`Field row not found. Tried: ${labels.join(", ")}`);
+    throw new DataBuilderError({
+        code: "FIELD_ROW_NOT_FOUND",
+        stage: "extract-meta",
+        source: "excelRuntime",
+        message: `Field row not found. Tried: ${labels.join(", ")}`,
+        context: {
+            worksheetName: ws.name,
+            fieldCol,
+            dataStartRow,
+            labels: labels.join(", "),
+        },
+    });
 }
 
 export function detectCaseColumns(
@@ -134,7 +148,17 @@ export function detectCaseColumns(
     }
 
     if (!cols.length) {
-        throw new Error("No case columns found on anchor row.");
+        throw new DataBuilderError({
+            code: "CASE_COLUMNS_NOT_FOUND",
+            stage: "extract-meta",
+            source: "excelRuntime",
+            message: "No case columns found on anchor row.",
+            context: {
+                worksheetName: ws.name,
+                anchorRow,
+                caseStartCol,
+            },
+        });
     }
 
     return cols;

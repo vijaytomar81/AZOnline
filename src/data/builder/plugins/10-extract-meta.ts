@@ -1,4 +1,5 @@
 // src/data/builder/plugins/10-extract-meta.ts
+
 import type ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
 import { defaultSheetLayoutConfig } from "../core/sheetLayoutConfig";
@@ -10,6 +11,7 @@ import {
     norm,
 } from "../core/excelRuntime";
 import { normalizeHeaderKey, normalizeSpaces } from "../../../utils/text";
+import { DataBuilderError } from "../errors";
 
 function getHeaderRow(ws: ExcelJS.Worksheet, rowNo: number): string[] {
     const maxCol = ws.columnCount || ws.actualColumnCount || 0;
@@ -69,7 +71,14 @@ const plugin: PipelinePlugin = {
 
     run: async (ctx) => {
         const ws = ctx.data.sheet as ExcelJS.Worksheet | undefined;
-        if (!ws) throw new Error("Sheet not loaded. Ensure load-excel ran.");
+        if (!ws) {
+            throw new DataBuilderError({
+                code: "SHEET_NOT_LOADED",
+                stage: "extract-meta",
+                source: "10-extract-meta",
+                message: "Sheet not loaded. Ensure load-excel ran.",
+            });
+        }
 
         const tabularMeta = tryExtractTabularMeta(ws);
         if (tabularMeta) {

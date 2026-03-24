@@ -1,9 +1,18 @@
 // src/execution/journeys/mtc/index.ts
 
+import { AppError } from "../../../utils/errors";
 import type { StepExecutor } from "../../runtime/registry";
 
 export const runMtc: StepExecutor = async ({ step }) => {
-    throw new Error(
-        `MTC executor not implemented for subType="${step.subType ?? ""}".`
-    );
+    throw new AppError({
+        code: "MTC_HANDLER_NOT_IMPLEMENTED",
+        stage: "execution-handler",
+        source: "mtc-index",
+        message: `MTC executor not implemented for subType="${step.subType ?? ""}".`,
+        context: {
+            subType: step.subType ?? "",
+            action: step.action,
+            testCaseId: step.testCaseId,
+        },
+    });
 };

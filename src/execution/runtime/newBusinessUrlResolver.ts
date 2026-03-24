@@ -1,5 +1,6 @@
 // src/execution/runtime/newBusinessUrlResolver.ts
 
+import { AppError } from "../../utils/errors";
 import { environments } from "../../config/environments";
 import type { ExecutionScenario } from "../scenario/types";
 
@@ -15,7 +16,15 @@ function getPcwJourneyUrl(journey: string): string {
     if (key === "msm") return environments.pcw.msmUrl;
     if (key === "goco") return environments.pcw.gocoUrl;
 
-    throw new Error(`Unsupported PCW journey "${journey}" for NB smoke.`);
+    throw new AppError({
+        code: "UNSUPPORTED_PCW_JOURNEY",
+        stage: "resolve-start-url",
+        source: "newBusinessUrlResolver",
+        message: `Unsupported PCW journey "${journey}" for NB smoke.`,
+        context: {
+            journey,
+        },
+    });
 }
 
 export function resolveNewBusinessStartUrl(scenario: ExecutionScenario): string {

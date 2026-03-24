@@ -3,6 +3,7 @@
 import type ExcelJS from "exceljs";
 import type { DataSchema } from "../../data-definitions/types";
 import type { BuiltCase, DataBuilderContext, DataBuilderMeta } from "../types";
+import { DataBuilderError } from "../errors";
 import { buildRowIndex } from "./excelRuntime";
 import { buildPayload } from "./schemaRuntime";
 
@@ -48,7 +49,16 @@ export function buildVerticalCases(
     const { ctx, ws, meta, schema, includeEmpty } = args;
 
     if (!meta.fieldCol) {
-        throw new Error("Vertical layout requires fieldCol.");
+        throw new DataBuilderError({
+            code: "VERTICAL_FIELD_COLUMN_MISSING",
+            stage: "build-cases",
+            source: "buildVerticalCases",
+            message: "Vertical layout requires fieldCol.",
+            context: {
+                sheetName: meta.sheet,
+                layout: meta.layout,
+            },
+        });
     }
 
     const rowIndex = buildRowIndex(ws, meta.fieldCol, meta.dataStartRow);
@@ -57,7 +67,18 @@ export function buildVerticalCases(
 
     return meta.caseMetas.map((m, idx) => {
         if (!m.col) {
-            throw new Error("Vertical case meta is missing col.");
+            throw new DataBuilderError({
+                code: "VERTICAL_CASE_COLUMN_MISSING",
+                stage: "build-cases",
+                source: "buildVerticalCases",
+                message: "Vertical case meta is missing col.",
+                context: {
+                    sheetName: meta.sheet,
+                    caseIndex: idx + 1,
+                    scriptId: m.scriptId,
+                    scriptName: m.scriptName,
+                },
+            });
         }
 
         const data = buildPayload(schema, {

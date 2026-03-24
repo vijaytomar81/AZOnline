@@ -5,6 +5,7 @@ import path from "node:path";
 import ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
 import { normalizeSheetKey } from "../../../utils/text";
+import { DataBuilderError } from "../errors";
 
 function resolveWorksheet(
     workbook: ExcelJS.Workbook,
@@ -28,21 +29,35 @@ function resolveWorksheet(
     }
 
     if (normalizedMatches.length > 1) {
-        throw new Error(
-            [
+        throw new DataBuilderError({
+            code: "WORKSHEET_NAME_AMBIGUOUS",
+            stage: "load-excel",
+            source: "load-excel",
+            message: [
                 `Sheet "${requestedSheetName}" is ambiguous after normalization.`,
                 ``,
                 `Matching sheets found:`,
                 ...normalizedMatches.map((w) => `  - ${w.name}`),
                 ``,
                 `Please pass the exact worksheet name.`,
-            ].join("\n")
-        );
+            ].join("\n"),
+            context: {
+                requestedSheetName,
+                matchingSheets: normalizedMatches.map((w) => w.name).join(", "),
+            },
+        });
     }
 
-    throw new Error(
-        `Sheet "${requestedSheetName}" not found. Available: ${worksheetNames.join(", ")}`
-    );
+    throw new DataBuilderError({
+        code: "WORKSHEET_NOT_FOUND",
+        stage: "load-excel",
+        source: "load-excel",
+        message: `Sheet "${requestedSheetName}" not found. Available: ${worksheetNames.join(", ")}`,
+        context: {
+            requestedSheetName,
+            availableSheets: worksheetNames.join(", "),
+        },
+    });
 }
 
 const plugin: PipelinePlugin = {
@@ -55,11 +70,21 @@ const plugin: PipelinePlugin = {
         const sheetName = String(ctx.data.sheetName ?? "").trim();
 
         if (!excelPath) {
-            throw new Error("Missing excelPath. Provide --excel (or EXCEL_PATH).");
+            throw new DataBuilderError({
+                code: "EXCEL_PATH_MISSING",
+                stage: "load-excel",
+                source: "load-excel",
+                message: "Missing excelPath. Provide --excel (or EXCEL_PATH).",
+            });
         }
 
         if (!sheetName) {
-            throw new Error("Missing sheetName. Provide --sheet (or SHEET).");
+            throw new DataBuilderError({
+                code: "SHEET_NAME_MISSING",
+                stage: "load-excel",
+                source: "load-excel",
+                message: "Missing sheetName. Provide --sheet (or SHEET).",
+            });
         }
 
         const absExcel = path.isAbsolute(excelPath)
@@ -67,12 +92,30 @@ const plugin: PipelinePlugin = {
             : path.join(process.cwd(), excelPath);
 
         if (!fs.existsSync(absExcel)) {
-            throw new Error(`Excel file not found: ${absExcel}`);
+            throw new DataBuilderError({
+                code: "EXCEL_FILE_NOT_FOUND",
+                stage: "load-excel",
+                source: "load-excel",
+                message: `Excel file not found: ${absExcel}`,
+                context: {
+                    excelPath,
+                    absExcel,
+                },
+            });
         }
 
         const stat = fs.statSync(absExcel);
         if (!stat.isFile()) {
-            throw new Error(`Excel path is not a file: ${absExcel}`);
+            throw new DataBuilderError({
+                code: "EXCEL_PATH_NOT_FILE",
+                stage: "load-excel",
+                source: "load-excel",
+                message: `Excel path is not a file: ${absExcel}`,
+                context: {
+                    excelPath,
+                    absExcel,
+                },
+            });
         }
 
         ctx.log.info(`Loading workbook: ${absExcel}`);
@@ -84,7 +127,15 @@ const plugin: PipelinePlugin = {
             await wb.xlsx.readFile(absExcel);
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
-            throw new Error(`Failed to read Excel workbook "${absExcel}": ${message}`);
+            throw new DataBuilderError({
+                code: "WORKBOOK_READ_FAILED",
+                stage: "load-excel",
+                source: "load-excel",
+                message: `Failed to read Excel workbook "${absExcel}": ${message}`,
+                context: {
+                    absExcel,
+                },
+            });
         }
 
         const worksheetNames = Array.isArray(wb.worksheets)
@@ -94,9 +145,15 @@ const plugin: PipelinePlugin = {
         ctx.log.debug?.(`Workbook sheets: ${worksheetNames.join(", ") || "(none)"}`);
 
         if (!worksheetNames.length) {
-            throw new Error(
-                `Workbook loaded but no worksheets were found in: ${absExcel}`
-            );
+            throw new DataBuilderError({
+                code: "NO_WORKSHEETS_FOUND",
+                stage: "load-excel",
+                source: "load-excel",
+                message: `Workbook loaded but no worksheets were found in: ${absExcel}`,
+                context: {
+                    absExcel,
+                },
+            });
         }
 
         const ws = resolveWorksheet(wb, sheetName);

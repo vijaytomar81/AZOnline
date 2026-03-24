@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { CasesFile } from "../builder/types";
 import { resolveSchemaName } from "../data-definitions";
+import { DataBuilderError } from "../builder/errors";
 import { toKebabFromSnake } from "../../utils/text";
 
 function safeSheetFilename(name: string) {
@@ -36,7 +37,17 @@ export function getCasesFile(sheetName: string, schemaName?: string): CasesFile 
     const filePath = resolveCasesFilePath(sheetName, schemaName);
 
     if (!fs.existsSync(filePath)) {
-        throw new Error(`❌ Test data JSON not found: ${filePath}`);
+        throw new DataBuilderError({
+            code: "CASES_FILE_NOT_FOUND",
+            stage: "load-cases-file",
+            source: "getCasesFile",
+            message: `Test data JSON not found: ${filePath}`,
+            context: {
+                sheetName,
+                schemaName: schemaName ?? "",
+                filePath,
+            },
+        });
     }
 
     const raw = fs.readFileSync(filePath, "utf-8");

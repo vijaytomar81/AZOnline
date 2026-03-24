@@ -1,5 +1,6 @@
 // src/execution/journeys/newBusiness/handlers.ts
 
+import { AppError } from "../../../utils/errors";
 import { normalizeSpaces } from "../../../utils/text";
 import { nowIso } from "../../../utils/time";
 import { setContextOutput } from "../../runtime/executionContext";
@@ -29,7 +30,17 @@ async function openSmokeUrl(
 ): Promise<string> {
     const page = context.page;
     if (!page) {
-        throw new Error("Playwright page is not attached to execution context.");
+        throw new AppError({
+            code: "PLAYWRIGHT_PAGE_MISSING",
+            stage: "execution-handler",
+            source: "newBusiness-handlers",
+            message: "Playwright page is not attached to execution context.",
+            context: {
+                scenarioId: context.scenario.scenarioId,
+                entryPoint: context.scenario.entryPoint ?? "",
+                journey: context.scenario.journey,
+            },
+        });
     }
 
     await page.goto(SMOKE_URL, { waitUntil: "domcontentloaded" });
@@ -76,7 +87,7 @@ const runDirect: NewBusinessHandler = async ({
     console.log(`PolicyNumber    : ${policyNumber}`);
     console.log(`PayloadKeys     : ${Object.keys(payload).join(", ")}`);
     console.log("========================================");
-}
+};
 
 const runPcw: NewBusinessHandler = async (args) => {
     await runDirect(args);

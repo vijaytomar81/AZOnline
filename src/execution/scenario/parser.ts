@@ -1,5 +1,6 @@
 // src/execution/scenario/parser.ts
 
+import { AppError } from "../../utils/errors";
 import { normalizeScenarios } from "./normalizer";
 import { validateScenarios } from "./validator";
 import { validateE2EPipelineTemplateRows } from "./e2EPipelineTemplateValidator";
@@ -50,9 +51,18 @@ export function parseScenarios(
     const templateValidation = validateE2EPipelineTemplateRows(rows);
 
     if (opts.failOnTemplateErrors && hasErrors(templateValidation)) {
-        throw new Error(
-            formatErrors("E2E pipeline template validation failed", templateValidation)
-        );
+        throw new AppError({
+            code: "SCENARIO_TEMPLATE_VALIDATION_FAILED",
+            stage: "scenario-parsing",
+            source: "parser",
+            message: formatErrors(
+                "E2E pipeline template validation failed",
+                templateValidation
+            ),
+            context: {
+                errorCount: templateValidation.length,
+            },
+        });
     }
 
     const normalized = normalizeScenarios(rows);
@@ -60,7 +70,15 @@ export function parseScenarios(
     const validation = validateScenarios(scenarios);
 
     if (opts.failOnValidationErrors && hasErrors(validation)) {
-        throw new Error(formatErrors("Scenario validation failed", validation));
+        throw new AppError({
+            code: "SCENARIO_VALIDATION_FAILED",
+            stage: "scenario-parsing",
+            source: "parser",
+            message: formatErrors("Scenario validation failed", validation),
+            context: {
+                errorCount: validation.length,
+            },
+        });
     }
 
     return {

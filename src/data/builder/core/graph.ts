@@ -1,21 +1,27 @@
 // src/data/builder/core/graph.ts
+
 import type { PipelinePlugin } from "./pipeline";
+import { DataBuilderError } from "../errors";
 
 type GraphIssue =
     | { type: "DUPLICATE_PLUGIN_NAME"; name: string }
     | { type: "CYCLE"; cycle: string[] };
 
 export function resolvePluginOrder(plugins: PipelinePlugin[]): { ordered: PipelinePlugin[] } {
-    // 1) Ensure unique plugin names
     const seen = new Set<string>();
     const issues: GraphIssue[] = [];
+
     for (const p of plugins) {
-        if (seen.has(p.name)) issues.push({ type: "DUPLICATE_PLUGIN_NAME", name: p.name });
+        if (seen.has(p.name)) {
+            issues.push({ type: "DUPLICATE_PLUGIN_NAME", name: p.name });
+        }
         seen.add(p.name);
     }
-    if (issues.length) throwGraphError(issues);
 
-    // 2) Map: dataKey -> plugin names providing it
+    if (issues.length) {
+        throwGraphError(issues);
+    }
+
     const providersByKey = new Map<string, string[]>();
     for (const p of plugins) {
         for (const k of p.provides ?? []) {
@@ -25,7 +31,6 @@ export function resolvePluginOrder(plugins: PipelinePlugin[]): { ordered: Pipeli
         }
     }
 
-    // 3) Build edges provider -> consumer
     const edges = new Map<string, Set<string>>();
     const indeg = new Map<string, number>();
 
@@ -36,13 +41,12 @@ export function resolvePluginOrder(plugins: PipelinePlugin[]): { ordered: Pipeli
 
     for (const consumer of plugins) {
         for (const req of consumer.requires ?? []) {
-            // "external:" means ctx provides it initially, no edge needed
             if (req.startsWith("external:")) continue;
 
-            // If multiple providers exist, depend on all of them (safe default)
             const providers = providersByKey.get(req) ?? [];
             for (const providerName of providers) {
                 if (providerName === consumer.name) continue;
+
                 const out = edges.get(providerName)!;
                 if (!out.has(consumer.name)) {
                     out.add(consumer.name);
@@ -52,7 +56,6 @@ export function resolvePluginOrder(plugins: PipelinePlugin[]): { ordered: Pipeli
         }
     }
 
-    // 4) Topological sort (Kahn)
     const queue: string[] = [];
     for (const [name, d] of indeg.entries()) {
         if (d === 0) queue.push(name);
@@ -60,7 +63,7 @@ export function resolvePluginOrder(plugins: PipelinePlugin[]): { ordered: Pipeli
 
     const orderedNames: string[] = [];
     while (queue.length) {
-        queue.sort(); // deterministic order
+        queue.sort();
         const n = queue.shift()!;
         orderedNames.push(n);
 
@@ -71,7 +74,10 @@ export function resolvePluginOrder(plugins: PipelinePlugin[]): { ordered: Pipeli
     }
 
     if (orderedNames.length !== plugins.length) {
-        const remaining = [...indeg.entries()].filter(([, d]) => (d ?? 0) > 0).map(([n]) => n);
+        const remaining = [...indeg.entries()]
+            .filter(([, d]) => (d ?? 0) > 0)
+            .map(([n]) => n);
+
         throwGraphError([{ type: "CYCLE", cycle: remaining }]);
     }
 
@@ -81,13 +87,24 @@ export function resolvePluginOrder(plugins: PipelinePlugin[]): { ordered: Pipeli
 
 function throwGraphError(issues: GraphIssue[]): never {
     const lines: string[] = ["Plugin graph error(s):"];
-    for (const i of issues) {
-        if (i.type === "DUPLICATE_PLUGIN_NAME") {
-            lines.push(`- Duplicate plugin name: "${i.name}"`);
+
+    for (const issue of issues) {
+        if (issue.type === "DUPLICATE_PLUGIN_NAME") {
+            lines.push(`- Duplicate plugin name: "${issue.name}"`);
         }
-        if (i.type === "CYCLE") {
-            lines.push(`- Cycle detected among: ${i.cycle.join(" -> ")}`);
+
+        if (issue.type === "CYCLE") {
+            lines.push(`- Cycle detected among: ${issue.cycle.join(" -> ")}`);
         }
     }
-    throw new Error(lines.join("\n"));
+
+    throw new DataBuilderError({
+        code: "PLUGIN_GRAPH_ERROR",
+        stage: "plugin-scan",
+        source: "graph",
+        message: lines.join("\n"),
+        context: {
+            issueCount: issues.length,
+        },
+    });
 }

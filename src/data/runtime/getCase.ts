@@ -1,6 +1,7 @@
 // src/data/runtime/getCase.ts
 
 import type { CasesFile, BuiltCase } from "../builder/types";
+import { DataBuilderError } from "../builder/errors";
 import { getCasesFile, resolveCasesFilePath } from "./getCasesFile";
 
 export type CaseObject = Record<string, any>;
@@ -17,7 +18,17 @@ export function loadCases(
     const json = getCasesFile(sheetName, schemaName) as CasesFile;
 
     if (!Array.isArray(json.cases)) {
-        throw new Error(`Invalid cases JSON structure. Expected "cases" array in ${filePath}`);
+        throw new DataBuilderError({
+            code: "INVALID_CASES_JSON",
+            stage: "load-cases-file",
+            source: "getCase",
+            message: `Invalid cases JSON structure. Expected "cases" array in ${filePath}`,
+            context: {
+                sheetName,
+                schemaName: schemaName ?? "",
+                filePath,
+            },
+        });
     }
 
     return json.cases.map((c: BuiltCase) => ({
@@ -49,7 +60,18 @@ export function selectCases(
     });
 
     if (missing.length) {
-        throw new Error(`CASE selection error. Missing scriptName(s): ${missing.join(", ")}`);
+        throw new DataBuilderError({
+            code: "CASE_SELECTION_ERROR",
+            stage: "select-cases",
+            source: "getCase",
+            message: `CASE selection error. Missing scriptName(s): ${missing.join(", ")}`,
+            context: {
+                sheetName,
+                schemaName: schemaName ?? "",
+                requestedCases: wanted.join(", "),
+                missingCases: missing.join(", "),
+            },
+        });
     }
 
     return selected;

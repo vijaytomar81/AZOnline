@@ -6,6 +6,7 @@ import { getSchema } from "../../data-definitions";
 import { detectLayout } from "../core/excelRuntime";
 import { validateTabularSchema } from "../core/validateTabularSchema";
 import { validateVerticalSchema } from "../core/validateVerticalSchema";
+import { DataBuilderError } from "../errors";
 
 function logValidationSummary(
     ctx: Parameters<PipelinePlugin["run"]>[0],
@@ -67,7 +68,14 @@ const plugin: PipelinePlugin = {
 
     run: async (ctx) => {
         const ws = ctx.data.sheet as ExcelJS.Worksheet;
-        if (!ws) throw new Error("Sheet not loaded.");
+        if (!ws) {
+            throw new DataBuilderError({
+                code: "SHEET_NOT_LOADED",
+                stage: "validate-schema",
+                source: "05-validate-schema",
+                message: "Sheet not loaded.",
+            });
+        }
 
         const strict = !!ctx.data.strictValidation;
         const verbose = !!ctx.data.verbose;
@@ -101,7 +109,17 @@ const plugin: PipelinePlugin = {
 
         if (report.errors.length) {
             report.errors.slice(0, 20).forEach((error) => ctx.log.error(error));
-            throw new Error("Schema validation failed.");
+            throw new DataBuilderError({
+                code: "SCHEMA_VALIDATION_FAILED",
+                stage: "validate-schema",
+                source: "05-validate-schema",
+                message: "Schema validation failed.",
+                context: {
+                    schemaName: ctx.data.schemaName,
+                    sheetName: ctx.data.sheetName,
+                    errorCount: report.errors.length,
+                },
+            });
         }
 
         if (verbose) {

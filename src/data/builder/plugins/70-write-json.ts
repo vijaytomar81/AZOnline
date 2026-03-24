@@ -7,6 +7,7 @@ import { executionConfig } from "../../../config/execution.config";
 import { writeArtifactJson } from "../../../utils/artifacts";
 import { DATA_GENERATED_ARCHIVE_DIR } from "../../../utils/paths";
 import { toKebabFromSnake } from "../../../utils/text";
+import { DataBuilderError } from "../errors";
 
 function safeSheetFilename(name: string) {
   return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
@@ -40,15 +41,32 @@ const plugin: PipelinePlugin = {
   run: async (ctx: DataBuilderContext) => {
     const casesFile = ctx.data.casesFile;
     if (!casesFile) {
-      throw new Error("casesFile missing. build-cases must run before write-json.");
+      throw new DataBuilderError({
+        code: "CASES_FILE_MISSING",
+        stage: "write-json",
+        source: "70-write-json",
+        message: "casesFile missing. build-cases must run before write-json.",
+      });
     }
 
     const sheetName = String(casesFile.sheet ?? ctx.data.sheetName ?? "").trim();
-    if (!sheetName) throw new Error("sheetName missing.");
+    if (!sheetName) {
+      throw new DataBuilderError({
+        code: "SHEET_NAME_MISSING",
+        stage: "write-json",
+        source: "70-write-json",
+        message: "sheetName missing.",
+      });
+    }
 
     const schemaName = String(ctx.data.schemaName ?? "").trim();
     if (!schemaName) {
-      throw new Error("schemaName missing. Ensure schema is resolved before write-json.");
+      throw new DataBuilderError({
+        code: "SCHEMA_NAME_MISSING",
+        stage: "write-json",
+        source: "70-write-json",
+        message: "schemaName missing. Ensure schema is resolved before write-json.",
+      });
     }
 
     const outRaw = String(ctx.data.outputPath ?? "").trim();
@@ -70,19 +88,51 @@ const plugin: PipelinePlugin = {
       pretty: true,
     };
 
-    const writtenJsonPath = writeArtifactJson(absBaseOut, casesFile, artifactOpts);
-    ctx.data.absOut = writtenJsonPath;
+    let writtenJsonPath = "";
+    try {
+      writtenJsonPath = writeArtifactJson(absBaseOut, casesFile, artifactOpts);
+      ctx.data.absOut = writtenJsonPath;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new DataBuilderError({
+        code: "JSON_WRITE_FAILED",
+        stage: "write-json",
+        source: "70-write-json",
+        message: `Failed to write cases JSON: ${message}`,
+        context: {
+          targetPath: absBaseOut,
+          sheetName,
+          schemaName,
+        },
+      });
+    }
 
     if (ctx.data.validationReport) {
       const baseReportPath = absBaseOut.replace(/\.json$/i, ".validation.json");
-      const writtenReportPath = writeArtifactJson(
-        baseReportPath,
-        ctx.data.validationReport,
-        artifactOpts
-      );
 
-      ctx.data.validationReport.reportPath = writtenReportPath;
-      ctx.log.info(`Validation report written: ${writtenReportPath}`);
+      try {
+        const writtenReportPath = writeArtifactJson(
+          baseReportPath,
+          ctx.data.validationReport,
+          artifactOpts
+        );
+
+        ctx.data.validationReport.reportPath = writtenReportPath;
+        ctx.log.info(`Validation report written: ${writtenReportPath}`);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        throw new DataBuilderError({
+          code: "VALIDATION_REPORT_WRITE_FAILED",
+          stage: "write-json",
+          source: "70-write-json",
+          message: `Failed to write validation report: ${message}`,
+          context: {
+            targetPath: baseReportPath,
+            sheetName,
+            schemaName,
+          },
+        });
+      }
     }
 
     ctx.log.info(`JSON written: ${writtenJsonPath}`);

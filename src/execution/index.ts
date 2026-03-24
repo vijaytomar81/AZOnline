@@ -1,5 +1,6 @@
 // src/execution/index.ts
 
+import { AppError } from "../utils/errors";
 import { getArg, hasFlag, normalizeArgv } from "../utils/argv";
 import { createLogger } from "../utils/logger";
 import { startTimer } from "../utils/time";
@@ -41,6 +42,7 @@ function filterScenarios(
 
 async function main(): Promise<void> {
     const argv = normalizeArgv(process.argv.slice(2));
+
     if (hasFlag(argv, "--help") || hasFlag(argv, "-h")) {
         console.log(usage());
         return;
@@ -53,8 +55,23 @@ async function main(): Promise<void> {
     const verbose = hasFlag(argv, "--verbose");
     const timer = startTimer();
 
-    if (!excelPath) throw new Error("Missing --excel");
-    if (!sheetName) throw new Error("Missing --sheet");
+    if (!excelPath) {
+        throw new AppError({
+            code: "EXECUTION_MISSING_EXCEL",
+            stage: "cli-parse",
+            source: "execution-index",
+            message: "Missing --excel",
+        });
+    }
+
+    if (!sheetName) {
+        throw new AppError({
+            code: "EXECUTION_MISSING_SHEET",
+            stage: "cli-parse",
+            source: "execution-index",
+            message: "Missing --sheet",
+        });
+    }
 
     const log = createLogger({
         prefix: "[execution]",
@@ -70,6 +87,7 @@ async function main(): Promise<void> {
     );
 
     const bootstrap = createExecutionBootstrap({ log });
+
     const loaded = await loadScenarioSheet({
         excelPath,
         sheetName,
@@ -83,8 +101,18 @@ async function main(): Promise<void> {
     });
 
     const scenarios = filterScenarios(parsed.scenarios, selectedIds);
+
     if (!scenarios.length) {
-        throw new Error("No scenarios selected for execution.");
+        throw new AppError({
+            code: "NO_SCENARIOS_SELECTED",
+            stage: "scenario-selection",
+            source: "execution-index",
+            message: "No scenarios selected for execution.",
+            context: {
+                selectedIds,
+                totalAvailable: parsed.scenarios.length,
+            },
+        });
     }
 
     log.info(`Scenarios ready for execution: ${scenarios.length}`);
@@ -118,7 +146,22 @@ main().catch((error: unknown) => {
         logToFile: false,
     });
 
-    const message = error instanceof Error ? error.message : String(error);
-    log.error(message);
+    if (error instanceof AppError) {
+        log.error(`❌ [${error.code ?? "APP_ERROR"}] ${error.message}`);
+
+        if (error.stage || error.source) {
+            log.error(
+                `Stage: ${error.stage ?? "unknown"} | Source: ${error.source ?? "unknown"}`
+            );
+        }
+
+        if (error.context) {
+            log.error(`Context: ${JSON.stringify(error.context, null, 2)}`);
+        }
+    } else {
+        const message = error instanceof Error ? error.message : String(error);
+        log.error(message);
+    }
+
     process.exit(1);
 });

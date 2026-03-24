@@ -8,6 +8,7 @@ import { printSection } from "../../utils/cliFormat";
 import { usage } from "./help";
 import { resolveSchemaName } from "../data-definitions";
 import { toKebabFromSnake } from "../../utils/text";
+import { DataBuilderError } from "./errors";
 
 export function createDataBuilderLogger(verbose = false) {
   return createLogger({
@@ -46,10 +47,43 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
   const strictValidation =
     hasFlag(argv, "--strictValidation") || parseBoolean(process.env.STRICT_VALIDATION);
 
-  if (!excelPath) throw new Error("❌ EXCEL_PATH is required (or use --excel).");
-  if (!sheetName) throw new Error("❌ SHEET is required (or use --sheet).");
+  // ✅ Replace plain errors with structured errors
+  if (!excelPath) {
+    throw new DataBuilderError({
+      code: "EXCEL_PATH_MISSING",
+      stage: "cli-args",
+      source: "cli.ts",
+      message: "EXCEL_PATH is required (or use --excel).",
+    });
+  }
 
-  const schemaName = resolveSchemaName(schemaArg, sheetName);
+  if (!sheetName) {
+    throw new DataBuilderError({
+      code: "SHEET_NAME_MISSING",
+      stage: "cli-args",
+      source: "cli.ts",
+      message: "SHEET is required (or use --sheet).",
+    });
+  }
+
+  let schemaName: string;
+  try {
+    schemaName = resolveSchemaName(schemaArg, sheetName);
+  } catch (error) {
+    // 👇 Preserve original error but wrap with context
+    const message = error instanceof Error ? error.message : String(error);
+
+    throw new DataBuilderError({
+      code: "SCHEMA_RESOLUTION_FAILED",
+      stage: "schema-resolution",
+      source: "cli.ts",
+      message,
+      context: {
+        sheetName,
+        schemaArg,
+      },
+    });
+  }
 
   if (verbose) {
     log.debug(`Resolved schema "${schemaName}" from sheet "${sheetName}"`);

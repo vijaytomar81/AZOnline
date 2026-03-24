@@ -1,5 +1,6 @@
 // src/execution/journeys/newBusiness/pcwTool.ts
 
+import { AppError } from "../../../utils/errors";
 import { nowIso } from "../../../utils/time";
 import { normalizeSpaces } from "../../../utils/text";
 import {
@@ -42,7 +43,15 @@ function requireStringField(
 ): string {
     const value = normalizeSpaces(String(source[fieldName] ?? ""));
     if (!value) {
-        throw new Error(`PCW Tool field "${fieldName}" is missing.`);
+        throw new AppError({
+            code: "PCW_TOOL_FIELD_MISSING",
+            stage: "execution-handler",
+            source: "newBusiness-pcwTool",
+            message: `PCW Tool field "${fieldName}" is missing.`,
+            context: {
+                fieldName,
+            },
+        });
     }
     return value;
 }
@@ -67,9 +76,16 @@ function validatePcwToolPortal(portal: string): string {
     const allowed = ["msm", "ctm", "cnf", "goco"];
 
     if (!allowed.includes(normalized)) {
-        throw new Error(
-            `Unsupported PCW Tool Portal "${portal}". Allowed values: MSM, CTM, CNF, GoCo.`
-        );
+        throw new AppError({
+            code: "PCW_TOOL_PORTAL_UNSUPPORTED",
+            stage: "execution-handler",
+            source: "newBusiness-pcwTool",
+            message: `Unsupported PCW Tool Portal "${portal}". Allowed values: MSM, CTM, CNF, GoCo.`,
+            context: {
+                portal,
+                allowed: allowed.join(", "),
+            },
+        });
     }
 
     return normalized;
@@ -80,7 +96,17 @@ export async function runNewBusinessPcwTool(
 ): Promise<void> {
     const page = args.context.page;
     if (!page) {
-        throw new Error("Playwright page is not attached to execution context.");
+        throw new AppError({
+            code: "PLAYWRIGHT_PAGE_MISSING",
+            stage: "execution-handler",
+            source: "newBusiness-pcwTool",
+            message: "Playwright page is not attached to execution context.",
+            context: {
+                scenarioId: args.context.scenario.scenarioId,
+                stepNo: args.step.stepNo,
+                action: args.step.action,
+            },
+        });
     }
 
     const pcwTool = getPcwToolData(args.stepData);

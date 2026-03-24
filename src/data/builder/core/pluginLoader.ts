@@ -7,6 +7,7 @@ import { createRequire } from "node:module";
 
 import type { PipelineContext, PipelinePlugin } from "./pipeline";
 import type { Logger } from "../../../utils/logger";
+import { DataBuilderError } from "../errors";
 
 type DiscoveredPlugin = {
     file: string;
@@ -46,7 +47,15 @@ export async function loadPluginsFromFolder(opts: {
     const { pluginsDirAbs, verbose = false, onlyNames, log } = opts;
 
     if (!fs.existsSync(pluginsDirAbs)) {
-        throw new Error(`Plugins folder not found: ${pluginsDirAbs}`);
+        throw new DataBuilderError({
+            code: "PLUGINS_FOLDER_NOT_FOUND",
+            stage: "plugin-scan",
+            source: "pluginLoader",
+            message: `Plugins folder not found: ${pluginsDirAbs}`,
+            context: {
+                pluginsDirAbs,
+            },
+        });
     }
 
     const files = fs
@@ -69,9 +78,16 @@ export async function loadPluginsFromFolder(opts: {
             } catch (e2: any) {
                 const msg1 = e1?.message ?? String(e1);
                 const msg2 = e2?.message ?? String(e2);
-                throw new Error(
-                    `Failed to load plugin file: ${fileAbs}\n- import(): ${msg1}\n- require(): ${msg2}`
-                );
+
+                throw new DataBuilderError({
+                    code: "PLUGIN_LOAD_FAILED",
+                    stage: "plugin-scan",
+                    source: "pluginLoader",
+                    message: `Failed to load plugin file: ${fileAbs}\n- import(): ${msg1}\n- require(): ${msg2}`,
+                    context: {
+                        fileAbs,
+                    },
+                });
             }
         }
 
@@ -93,7 +109,15 @@ export async function loadPluginsFromFolder(opts: {
     const dup = names.filter((n, i) => names.indexOf(n) !== i);
     if (dup.length > 0) {
         const uniq = Array.from(new Set(dup));
-        throw new Error(`Duplicate plugin name(s): ${uniq.join(", ")}`);
+        throw new DataBuilderError({
+            code: "DUPLICATE_PLUGIN_NAMES",
+            stage: "plugin-scan",
+            source: "pluginLoader",
+            message: `Duplicate plugin name(s): ${uniq.join(", ")}`,
+            context: {
+                duplicateNames: uniq.join(", "),
+            },
+        });
     }
 
     if (verbose) {
@@ -152,7 +176,17 @@ function resolveRunOrderOrThrow(all: PipelinePlugin[]): PipelinePlugin[] {
         for (const token of p.provides ?? []) {
             const existing = providers.get(token);
             if (existing && existing !== p.name) {
-                throw new Error(`Multiple providers for token "${token}": ${existing}, ${p.name}`);
+                throw new DataBuilderError({
+                    code: "MULTIPLE_PROVIDERS_FOR_TOKEN",
+                    stage: "plugin-scan",
+                    source: "pluginLoader",
+                    message: `Multiple providers for token "${token}": ${existing}, ${p.name}`,
+                    context: {
+                        token,
+                        existingProvider: existing,
+                        newProvider: p.name,
+                    },
+                });
             }
             providers.set(token, p.name);
         }
@@ -174,7 +208,16 @@ function resolveRunOrderOrThrow(all: PipelinePlugin[]): PipelinePlugin[] {
 
             const providerName = providers.get(req);
             if (!providerName) {
-                throw new Error(`No provider found for required token "${req}" required by "${p.name}"`);
+                throw new DataBuilderError({
+                    code: "PROVIDER_NOT_FOUND",
+                    stage: "plugin-scan",
+                    source: "pluginLoader",
+                    message: `No provider found for required token "${req}" required by "${p.name}"`,
+                    context: {
+                        requiredToken: req,
+                        consumerPlugin: p.name,
+                    },
+                });
             }
             if (providerName === p.name) continue;
 
@@ -217,7 +260,15 @@ function resolveRunOrderOrThrow(all: PipelinePlugin[]): PipelinePlugin[] {
 
     if (result.length !== all.length) {
         const remaining = all.map((p) => p.name).filter((n) => !result.includes(n));
-        throw new Error(`Cycle detected among: ${remaining.join(" -> ")}`);
+        throw new DataBuilderError({
+            code: "PLUGIN_CYCLE_DETECTED",
+            stage: "plugin-scan",
+            source: "pluginLoader",
+            message: `Cycle detected among: ${remaining.join(" -> ")}`,
+            context: {
+                remainingPlugins: remaining.join(" -> "),
+            },
+        });
     }
 
     return result.map((n) => byName.get(n)!);

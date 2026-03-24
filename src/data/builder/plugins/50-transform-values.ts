@@ -1,6 +1,8 @@
 // src/data/builder/plugins/50-transform-values.ts
+
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
+import { DataBuilderError } from "../errors";
 
 function toNumberIfPossible(value: string): string | number {
     const trimmed = value.trim();
@@ -27,6 +29,7 @@ function transformNode(node: any, parentKey = ""): any {
     }
 
     const out: Record<string, any> = {};
+
     for (const [key, value] of Object.entries(node)) {
         if (typeof value === "string") {
             if (key === "count" || key.endsWith("Count")) {
@@ -39,6 +42,7 @@ function transformNode(node: any, parentKey = ""): any {
 
         out[key] = transformNode(value, key);
     }
+
     return out;
 }
 
@@ -49,8 +53,14 @@ const plugin: PipelinePlugin = {
 
     run: async (ctx: DataBuilderContext) => {
         const casesFile = ctx.data.casesFile;
+
         if (!casesFile) {
-            throw new Error("casesFile missing. build-cases must run before transform-values.");
+            throw new DataBuilderError({
+                code: "CASES_FILE_MISSING",
+                stage: "transform-values",
+                source: "50-transform-values",
+                message: "casesFile missing. build-cases must run before transform-values.",
+            });
         }
 
         let transformed = 0;

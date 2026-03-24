@@ -4,6 +4,7 @@ import { uniq } from "../../utils/collections";
 import { normalizeSheetKey } from "../../utils/text";
 import { dataDefinitionRegistry } from "./registry";
 import type { DataSchema, DataDefinitionGroup, RegisteredSchema } from "./types";
+import { DataBuilderError } from "../builder/errors";
 
 function normalizeSchemaName(name?: string): string {
     return String(name ?? "").trim().toLowerCase();
@@ -36,6 +37,31 @@ export function listSheetAliases(): Array<{ sheet: string; schema: string }> {
         .sort((a, b) => a.sheet.localeCompare(b.sheet));
 }
 
+function buildAvailableSheetMappingsText(): string {
+    const availableSheetsList = listSheetAliases();
+
+    const maxSheetLength = Math.max(
+        ...availableSheetsList.map((item) => item.sheet.length),
+        "Sheet Name (Excel)".length
+    );
+
+    const header =
+        `  Sheet Name (Excel)` +
+        `${" ".repeat(maxSheetLength - "Sheet Name (Excel)".length)}  -> Schema Name (System)`;
+
+    const divider = `  ${"-".repeat(header.trim().length)}`;
+
+    return [
+        header,
+        divider,
+        "",
+        ...availableSheetsList.map((item) => {
+            const paddedSheet = item.sheet.padEnd(maxSheetLength, " ");
+            return `  - ${paddedSheet}  -> ${item.schema}`;
+        }),
+    ].join("\n");
+}
+
 export function resolveSchemaName(name?: string, sheetName?: string): string {
     const explicit = normalizeSchemaName(name);
     if (explicit) return explicit;
@@ -46,39 +72,21 @@ export function resolveSchemaName(name?: string, sheetName?: string): string {
 
     if (mapped) return mapped;
 
-    const availableSheetsList = listSheetAliases();
-
-    const maxSheetLength = Math.max(
-        ...availableSheetsList.map((item) => item.sheet.length),
-        "Sheet Name (Excel)".length
-    );
-
-    const header = `  Sheet Name (Excel)${" ".repeat(maxSheetLength - "Sheet Name (Excel)".length)}  -> Schema Name (System)`;
-
-    // 👇 NEW divider
-    const divider = `  ${"-".repeat(header.trim().length)}`;
-
-    const availableSheets = [
-        header,
-        divider,
-        "",
-        ...availableSheetsList.map((item) => {
-            const paddedSheet = item.sheet.padEnd(maxSheetLength, " ");
-            return `  - ${paddedSheet}  -> ${item.schema}`;
-        }),
-    ].join("\n");
-
-    throw new Error(
-        [
+    throw new DataBuilderError({
+        code: "SCHEMA_NOT_AVAILABLE",
+        stage: "schema-resolution",
+        source: "data-definitions",
+        message: [
             `Schema not available from sheet "${sheetName}".`,
             ``,
             `Available sheet → schema mappings:`,
             ``,
-            availableSheets,
+            buildAvailableSheetMappingsText(),
             ``,
             `Please rename the sheet accordingly.`,
-        ].join("\n")
-    );
+        ].join("\n"),
+        context: { sheetName },
+    });
 }
 
 export function getSchemaDefinition(
@@ -89,9 +97,16 @@ export function getSchemaDefinition(
     const definition = dataDefinitionRegistry[key];
 
     if (!definition) {
-        throw new Error(
-            `Unknown schema "${key}". Available schemas: ${listSchemas().join(", ")}`
-        );
+        throw new DataBuilderError({
+            code: "UNKNOWN_SCHEMA",
+            stage: "schema-resolution",
+            source: "data-definitions",
+            message: `Unknown schema "${key}". Available schemas: ${listSchemas().join(", ")}`,
+            context: {
+                schemaName: key,
+                sheetName: sheetName ?? "",
+            },
+        });
     }
 
     return definition;
