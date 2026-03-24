@@ -2,9 +2,9 @@
 
 import fs from "node:fs";
 
-import type { TreeNode } from "@/utils/cliTree";
-import { isValidTsIdentifier } from "@/utils/ts";
-import { toRepoRelative } from "@/utils/paths";
+import type { TreeNode } from "@utils/cliTree";
+import { isValidTsIdentifier } from "@utils/ts";
+import { toRepoRelative } from "@utils/paths";
 import type { RepairRule } from "../../pipeline/types";
 import { readElementsInfo } from "../../shared/elements";
 import { getPageArtifactPaths } from "@/tools/page-object-common/pagePaths";

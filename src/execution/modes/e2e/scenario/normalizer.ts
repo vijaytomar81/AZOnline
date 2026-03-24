@@ -1,6 +1,6 @@
-// src/execution/scenario/normalizer.ts
+// src/execution/modes/e2e/scenario/normalizer.ts
 
-import { normalizeSpaces } from "../../utils/text";
+import { normalizeSpaces } from "@utils/text";
 import type {
     ExecutionScenario,
     RawScenarioRow,

@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
-import { normalizeSheetKey } from "../../../utils/text";
+import { normalizeSheetKey } from "@utils/text";
 import { DataBuilderError } from "../errors";
 
 function resolveWorksheet(

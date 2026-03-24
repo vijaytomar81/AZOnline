@@ -1,6 +1,6 @@
-// src/execution/scenario/e2EPipelineTemplateValidator.ts
+// src/execution/modes/e2e/scenario/e2EPipelineTemplateValidator.ts
 
-import { normalizeSpaces } from "../../utils/text";
+import { normalizeSpaces } from "@utils/text";
 import { defaultE2EPipelineTemplateConfig } from "./e2EPipelineTemplateConfig";
 import type { RawScenarioRow } from "./types";
 

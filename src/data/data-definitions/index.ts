@@ -1,7 +1,7 @@
 // src/data/data-definitions/index.ts
 
-import { uniq } from "../../utils/collections";
-import { normalizeSheetKey } from "../../utils/text";
+import { uniq } from "@utils/collections";
+import { normalizeSheetKey } from "@utils/text";
 import { dataDefinitionRegistry } from "./registry";
 import type { DataSchema, DataDefinitionGroup, RegisteredSchema } from "./types";
 import { DataBuilderError } from "../builder/errors";

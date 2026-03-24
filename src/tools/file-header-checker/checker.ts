@@ -12,8 +12,8 @@ import {
     printSummary,
     success,
     failure,
-} from "../../utils/cliFormat";
-import { ICONS } from "../../utils/icons";
+} from "@utils/cliFormat";
+import { ICONS } from "@utils/icons";
 
 const ROOT = process.cwd();
 const SRC_DIR = path.join(ROOT, "src");

@@ -1,9 +1,9 @@
 // src/execution/journeys/newBusiness/handlers.ts
 
-import { AppError } from "../../../utils/errors";
-import { normalizeSpaces } from "../../../utils/text";
-import { nowIso } from "../../../utils/time";
-import { setContextOutput } from "../../runtime/executionContext";
+import { AppError } from "@utils/errors";
+import { normalizeSpaces } from "@utils/text";
+import { nowIso } from "@utils/time";
+import { setContextOutput } from "@execution/core/executionContext";
 import type { NewBusinessHandler, NewBusinessStartFrom } from "./types";
 import { runNewBusinessPcwTool } from "./pcwTool";
 
@@ -72,21 +72,13 @@ const runDirect: NewBusinessHandler = async ({
         context.scenario.policyNumber = policyNumber;
     }
 
-    console.log("========================================");
-    console.log("[NB-SMOKE] NewBusiness step executed");
-    console.log(`ScenarioId      : ${context.scenario.scenarioId}`);
-    console.log(`ScenarioName    : ${context.scenario.scenarioName}`);
-    console.log(`Journey         : ${context.scenario.journey}`);
-    console.log(`PolicyContext   : ${context.scenario.policyContext}`);
-    console.log(`EntryPoint      : ${context.scenario.entryPoint ?? "Direct"}`);
     console.log(`StepNo          : ${step.stepNo}`);
     console.log(`Action          : ${step.action}`);
-    console.log(`TestCaseId      : ${step.testCaseId}`);
+    console.log(`DataCaseId      : ${step.testCaseId}`);
     console.log(`OpenedUrl       : ${openedUrl}`);
     console.log(`QuoteNumber     : ${quoteNumber}`);
     console.log(`PolicyNumber    : ${policyNumber}`);
-    console.log(`PayloadKeys     : ${Object.keys(payload).join(", ")}`);
-    console.log("========================================");
+    // console.log(`PayloadKeys     : ${Object.keys(payload).join(", ")}`);
 };
 
 const runPcw: NewBusinessHandler = async (args) => {

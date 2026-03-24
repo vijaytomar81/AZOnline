@@ -2,8 +2,8 @@
 
 import path from "node:path";
 
-import type { TreeNode } from "@/utils/cliTree";
-import { safeReadJson } from "@/utils/fs";
+import type { TreeNode } from "@utils/cliTree";
+import { safeReadJson } from "@utils/fs";
 import type { PageMap } from "@/tools/page-object-generator/generator/types";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";

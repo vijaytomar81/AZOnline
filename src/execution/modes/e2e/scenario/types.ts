@@ -1,4 +1,4 @@
-// src/execution/scenario/types.ts
+// src/execution/modes/e2e/scenario/types.ts
 
 export type ScenarioPolicyContext = "NewBusiness" | "ExistingPolicy";
 export type ScenarioEntryPoint = "Direct" | "PCW" | "PCWTool";

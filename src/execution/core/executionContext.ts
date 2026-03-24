@@ -1,7 +1,7 @@
-// src/execution/runtime/executionContext.ts
+// src/execution/core/executionContext.ts
 
 import type { Browser, BrowserContext, Page } from "@playwright/test";
-import type { ExecutionScenario } from "../scenario/types";
+import type { ExecutionScenario } from "@execution/modes/e2e/scenario/types";
 import type { StepExecutionResult } from "./result";
 
 export type ExecutionContext = {

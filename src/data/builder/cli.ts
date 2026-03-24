@@ -2,12 +2,12 @@
 
 import path from "node:path";
 import type { DataBuilderBaseArgs } from "./types";
-import { normalizeArgv, getArg, hasFlag } from "../../utils/argv";
-import { createLogger } from "../../utils/logger";
-import { printSection } from "../../utils/cliFormat";
+import { normalizeArgv, getArg, hasFlag } from "@utils/argv";
+import { createLogger } from "@utils/logger";
+import { printSection } from "@utils/cliFormat";
 import { usage } from "./help";
 import { resolveSchemaName } from "../data-definitions";
-import { toKebabFromSnake } from "../../utils/text";
+import { toKebabFromSnake } from "@utils/text";
 import { DataBuilderError } from "./errors";
 
 export function createDataBuilderLogger(verbose = false) {

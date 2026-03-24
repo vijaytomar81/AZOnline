@@ -4,9 +4,9 @@ import path from "node:path";
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
 import { executionConfig } from "../../../config/execution.config";
-import { writeArtifactJson } from "../../../utils/artifacts";
-import { DATA_GENERATED_ARCHIVE_DIR } from "../../../utils/paths";
-import { toKebabFromSnake } from "../../../utils/text";
+import { writeArtifactJson } from "@utils/artifacts";
+import { DATA_GENERATED_ARCHIVE_DIR } from "@utils/paths";
+import { toKebabFromSnake } from "@utils/text";
 import { DataBuilderError } from "../errors";
 
 function safeSheetFilename(name: string) {

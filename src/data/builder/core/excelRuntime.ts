@@ -2,7 +2,7 @@
 
 import type ExcelJS from "exceljs";
 import { defaultSheetLayoutConfig } from "./sheetLayoutConfig";
-import { normalizeHeaderKey, normalizeSpaces } from "../../../utils/text";
+import { normalizeHeaderKey, normalizeSpaces } from "@utils/text";
 import { DataBuilderError } from "../errors";
 
 export function cellToString(v: any): string {

@@ -1,11 +1,11 @@
 // src/execution/runtime/resolveStepData.ts
 
-import { AppError } from "../../utils/errors";
-import { normalizeSpaces } from "../../utils/text";
+import { AppError } from "@utils/errors";
+import { normalizeSpaces } from "@utils/text";
 import { getCasesFile } from "../../data/runtime/getCasesFile";
 import type { CasesFile } from "../../data/builder/types";
-import type { Logger } from "../../utils/logger";
-import type { ScenarioStep } from "../scenario/types";
+import type { Logger } from "@utils/logger";
+import type { ScenarioStep } from "@execution/modes/e2e/scenario/types";
 
 export type StepDataSource = {
     action: string;

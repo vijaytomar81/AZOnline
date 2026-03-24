@@ -1,6 +1,6 @@
 // src/tools/page-object-generator/generator/types.ts
 
-import type { Logger } from "@/utils/logger";
+import type { Logger } from "@utils/logger";
 
 export type PageMapElement = {
     type: string;

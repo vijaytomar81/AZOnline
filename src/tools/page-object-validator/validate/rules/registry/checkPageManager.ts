@@ -2,8 +2,8 @@
 
 import fs from "node:fs";
 
-import type { TreeNode } from "@/utils/cliTree";
-import { toCamelFromText } from "@/utils/text";
+import type { TreeNode } from "@utils/cliTree";
+import { toCamelFromText } from "@utils/text";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
 import { getPageManagerFile } from "../../../../page-object-common/pagePaths";

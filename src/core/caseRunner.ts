@@ -2,7 +2,7 @@
 import type { Page } from "@playwright/test";
 
 import { PageManager } from "../pages";
-import { createLogger } from "../utils/logger";
+import { createLogger } from "@utils/logger";
 import {
     printSection,
     printStatus,
@@ -11,7 +11,7 @@ import {
     success,
     strong,
     printCommandTitle,
-} from "../utils/cliFormat";
+} from "@utils/cliFormat";
 
 import type { HealEvent } from "./selfHealWriter";
 

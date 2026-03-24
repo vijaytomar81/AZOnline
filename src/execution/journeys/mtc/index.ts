@@ -1,7 +1,7 @@
 // src/execution/journeys/mtc/index.ts
 
-import { AppError } from "../../../utils/errors";
-import type { StepExecutor } from "../../runtime/registry";
+import { AppError } from "@utils/errors";
+import type { StepExecutor } from "@execution/core/registry";
 
 export const runMtc: StepExecutor = async ({ step }) => {
     throw new AppError({

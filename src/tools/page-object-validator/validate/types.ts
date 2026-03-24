@@ -1,6 +1,6 @@
 // src/tools/page-object-validator/validate/types.ts
 
-import type { TreeNode } from "@/utils/cliTree";
+import type { TreeNode } from "@utils/cliTree";
 
 export type ValidationSeverity = "INFO" | "WARN" | "ERROR";
 

@@ -1,8 +1,8 @@
 // src/tools/page-scanner/scanner/selectors/textStrategy.ts
 
 import type { ScannedElement, SelectorCandidate } from "../types";
-import { escapeForRegex } from "@/utils/regex";
-import { normalizeSpaces } from "@/utils/text";
+import { escapeForRegex } from "@utils/regex";
+import { normalizeSpaces } from "@utils/text";
 import { inferRoleFromTag, scoreText } from "./shared";
 
 export function buildTextSelectors(el: ScannedElement): SelectorCandidate[] {

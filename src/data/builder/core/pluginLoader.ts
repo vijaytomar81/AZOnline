@@ -6,7 +6,7 @@ import url from "node:url";
 import { createRequire } from "node:module";
 
 import type { PipelineContext, PipelinePlugin } from "./pipeline";
-import type { Logger } from "../../../utils/logger";
+import type { Logger } from "@utils/logger";
 import { DataBuilderError } from "../errors";
 
 type DiscoveredPlugin = {

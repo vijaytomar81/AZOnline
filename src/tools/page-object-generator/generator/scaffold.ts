@@ -3,8 +3,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import type { Logger } from "@/utils/logger";
-import { ensureDir, safeWriteText } from "@/utils/fs";
+import type { Logger } from "@utils/logger";
+import { ensureDir, safeWriteText } from "@utils/fs";
 import type { PageMap } from "./types";
 import { buildPageArtifact } from "./pageArtifact";
 import { buildAliasesGeneratedTs } from "../builders/buildAliasesGeneratedTs";

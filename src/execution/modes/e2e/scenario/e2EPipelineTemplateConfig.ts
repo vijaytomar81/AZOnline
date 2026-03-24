@@ -1,4 +1,4 @@
-// src/execution/scenario/e2EPipelineTemplateConfig.ts
+// src/execution/modes/e2e/scenario/e2EPipelineTemplateConfig.ts
 
 export type E2EPipelineTemplateConfig = {
     requiredBaseHeaders: string[];

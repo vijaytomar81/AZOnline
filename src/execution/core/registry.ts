@@ -1,8 +1,8 @@
-// src/execution/runtime/registry.ts
+// src/execution/core/registry.ts
 
-import { normalizeSpaces, toCamelFromText } from "../../utils/text";
+import { normalizeSpaces, toCamelFromText } from "@utils/text";
 import type { ExecutionContext } from "./executionContext";
-import type { ScenarioStep } from "../scenario/types";
+import type { ScenarioStep } from "@execution/modes/e2e/scenario/types";
 
 export type StepExecutorArgs = {
     context: ExecutionContext;

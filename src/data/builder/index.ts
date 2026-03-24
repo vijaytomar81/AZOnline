@@ -1,10 +1,10 @@
 // src/data/builder/index.ts
 
 import path from "node:path";
-import { getArg, hasFlag, normalizeArgv } from "../../utils/argv";
-import { AppError } from "../../utils/errors";
-import { printSection, printKeyValue, printSummary, success, printCommandTitle } from "../../utils/cliFormat";
-import { startTimer } from "../../utils/time";
+import { getArg, hasFlag, normalizeArgv } from "@utils/argv";
+import { AppError } from "@utils/errors";
+import { printSection, printKeyValue, printSummary, success, printCommandTitle } from "@utils/cliFormat";
+import { startTimer } from "@utils/time";
 import { loadPluginsFromFolder, runDiscoveredPlugins } from "./core/pluginLoader";
 import { parseBuildArgs, createDataBuilderLogger } from "./cli";
 import { listSchemas } from "../data-definitions";

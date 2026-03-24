@@ -1,4 +1,4 @@
-// src/execution/runtime/result.ts
+// src/execution/core/result.ts
 
 export type StepExecutionStatus = "passed" | "failed" | "skipped";
 

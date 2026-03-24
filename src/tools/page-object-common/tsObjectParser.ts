@@ -1,6 +1,6 @@
 // src/tools/page-object-common/tsObjectParser.ts
 
-import { stripLineComments } from "@/utils/text";
+import { stripLineComments } from "@utils/text";
 
 function findMatchingBrace(text: string, openIndex: number): number {
     let depth = 0;

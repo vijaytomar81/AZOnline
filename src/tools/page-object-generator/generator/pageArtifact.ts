@@ -2,7 +2,7 @@
 
 import path from "node:path";
 
-import { toPascal } from "@/utils/ts";
+import { toPascal } from "@utils/ts";
 
 export type PageArtifact = {
     pageKey: string;

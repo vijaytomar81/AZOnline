@@ -1,7 +1,7 @@
 // src/tools/page-object-validator/validate/report.ts
 
-import { printTree, type TreeNode } from "@/utils/cliTree";
-import { ICONS } from "@/utils/icons";
+import { printTree, type TreeNode } from "@utils/cliTree";
+import { ICONS } from "@utils/icons";
 import {
     failure,
     info,
@@ -10,7 +10,7 @@ import {
     strong,
     success,
     warning,
-} from "@/utils/cliFormat";
+} from "@utils/cliFormat";
 import type {
     ValidationIssue,
     ValidationRunResult,

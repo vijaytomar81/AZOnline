@@ -1,13 +1,13 @@
 // src/execution/journeys/newBusiness/pcwTool.ts
 
-import { AppError } from "../../../utils/errors";
-import { nowIso } from "../../../utils/time";
-import { normalizeSpaces } from "../../../utils/text";
+import { AppError } from "@utils/errors";
+import { nowIso } from "@utils/time";
+import { normalizeSpaces } from "@utils/text";
 import {
     getContextOutput,
     setContextOutput,
-} from "../../runtime/executionContext";
-import type { StepExecutorArgs } from "../../runtime/registry";
+} from "@execution/core/executionContext";
+import type { StepExecutorArgs } from "@execution/core/registry";
 
 const SMOKE_URL = "https://www.google.com";
 
@@ -48,9 +48,7 @@ function requireStringField(
             stage: "execution-handler",
             source: "newBusiness-pcwTool",
             message: `PCW Tool field "${fieldName}" is missing.`,
-            context: {
-                fieldName,
-            },
+            context: { fieldName },
         });
     }
     return value;
@@ -130,54 +128,19 @@ export async function runNewBusinessPcwTool(
     setContextOutput(args.context, "lastJourney", args.context.scenario.journey);
     setContextOutput(args.context, "newBusiness.startFrom", "PCWTool");
     setContextOutput(args.context, "newBusiness.openedUrl", SMOKE_URL);
-    setContextOutput(
-        args.context,
-        "newBusiness.calculatedEmailId",
-        calculatedEmailId
-    );
-    setContextOutput(
-        args.context,
-        "newBusiness.pcwTool.portal",
-        pcwToolPortal
-    );
-    setContextOutput(
-        args.context,
-        "newBusiness.pcwTool.iql",
-        iql
-    );
-    setContextOutput(
-        args.context,
-        "newBusiness.pcwTool.paymentMode",
-        paymentMode
-    );
+    setContextOutput(args.context, "newBusiness.calculatedEmailId", calculatedEmailId);
+    setContextOutput(args.context, "newBusiness.pcwTool.portal", pcwToolPortal);
+    setContextOutput(args.context, "newBusiness.pcwTool.iql", iql);
+    setContextOutput(args.context, "newBusiness.pcwTool.paymentMode", paymentMode);
     setContextOutput(
         args.context,
         "newBusiness.pcwTool.convertToMonthlyCard",
         convertToMonthlyCard
     );
-    setContextOutput(
-        args.context,
-        "newBusiness.pcwTool.requestMessage.raw",
-        requestMessage
-    );
-    setContextOutput(
-        args.context,
-        "newBusiness.pcwTool.requestMessage.final",
-        finalRequestMessage
-    );
-    setContextOutput(
-        args.context,
-        "newBusiness.pcwTool.payload",
-        args.stepData ?? {}
-    );
+    setContextOutput(args.context, "newBusiness.pcwTool.requestMessage.raw", requestMessage);
+    setContextOutput(args.context, "newBusiness.pcwTool.requestMessage.final", finalRequestMessage);
+    setContextOutput(args.context, "newBusiness.pcwTool.payload", args.stepData ?? {});
 
-    console.log("========================================");
-    console.log("[NB-SMOKE] PCWTool step executed");
-    console.log(`ScenarioId      : ${args.context.scenario.scenarioId}`);
-    console.log(`ScenarioName    : ${args.context.scenario.scenarioName}`);
-    console.log(`Journey         : ${args.context.scenario.journey}`);
-    console.log(`PolicyContext   : ${args.context.scenario.policyContext}`);
-    console.log(`EntryPoint      : ${args.context.scenario.entryPoint ?? ""}`);
     console.log(`StepNo          : ${args.step.stepNo}`);
     console.log(`Action          : ${args.step.action}`);
     console.log(`TestCaseId      : ${args.step.testCaseId}`);
@@ -188,5 +151,4 @@ export async function runNewBusinessPcwTool(
     console.log(`MonthlyCard     : ${convertToMonthlyCard || "(blank)"}`);
     console.log(`CalculatedEmail : ${calculatedEmailId}`);
     console.log(`RequestPreview  : ${finalRequestMessage.slice(0, 200)}`);
-    console.log("========================================");
 }

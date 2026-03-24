@@ -1,6 +1,6 @@
 // src/execution/journeys/mta/handlers.ts
 
-import { AppError } from "../../../utils/errors";
+import { AppError } from "@utils/errors";
 import type { MtaHandler } from "./types";
 
 const notImplemented: MtaHandler = async ({ step }) => {

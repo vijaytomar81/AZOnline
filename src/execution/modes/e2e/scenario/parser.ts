@@ -1,6 +1,6 @@
-// src/execution/scenario/parser.ts
+// src/execution/modes/e2e/scenario/parser.ts
 
-import { AppError } from "../../utils/errors";
+import { AppError } from "@utils/errors";
 import { normalizeScenarios } from "./normalizer";
 import { validateScenarios } from "./validator";
 import { validateE2EPipelineTemplateRows } from "./e2EPipelineTemplateValidator";

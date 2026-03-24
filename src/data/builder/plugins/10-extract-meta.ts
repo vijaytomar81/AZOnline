@@ -10,7 +10,7 @@ import {
     findRowByField,
     norm,
 } from "../core/excelRuntime";
-import { normalizeHeaderKey, normalizeSpaces } from "../../../utils/text";
+import { normalizeHeaderKey, normalizeSpaces } from "@utils/text";
 import { DataBuilderError } from "../errors";
 
 function getHeaderRow(ws: ExcelJS.Worksheet, rowNo: number): string[] {

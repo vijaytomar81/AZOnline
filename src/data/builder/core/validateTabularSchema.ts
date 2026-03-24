@@ -1,7 +1,7 @@
 // src/data/builder/core/validateTabularSchema.ts
 
 import type ExcelJS from "exceljs";
-import { normalizeHeaderKey, normalizeSpaces } from "../../../utils/text";
+import { normalizeHeaderKey, normalizeSpaces } from "@utils/text";
 import type { DataSchema } from "../../data-definitions/types";
 import {
     buildSectionBuckets,

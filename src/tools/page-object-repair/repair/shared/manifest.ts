@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
-import { ensureDir, safeReadJson } from "@/utils/fs";
+import { ensureDir, safeReadJson } from "@utils/fs";
 import { getPageArtifactPaths } from "@/tools/page-object-common/pagePaths";
 import { loadAllPageMaps } from "@/tools/page-object-common/readPageMap";
 

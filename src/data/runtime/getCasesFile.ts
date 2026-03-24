@@ -5,7 +5,7 @@ import path from "node:path";
 import { DataBuilderError } from "../builder/errors";
 import type { CasesFile } from "../builder/types";
 import { resolveSchemaName } from "../data-definitions";
-import { toKebabFromSnake } from "../../utils/text";
+import { toKebabFromSnake } from "@utils/text";
 
 function safeSheetFilename(name: string) {
     return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";

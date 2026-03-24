@@ -1,7 +1,7 @@
 // src/data/builder/core/buildTabularCases.ts
 
 import type ExcelJS from "exceljs";
-import { normalizeHeaderKey } from "../../../utils/text";
+import { normalizeHeaderKey } from "@utils/text";
 import type { DataSchema } from "../../data-definitions/types";
 import type { BuiltCase, DataBuilderContext, DataBuilderMeta } from "../types";
 import { DataBuilderError } from "../errors";

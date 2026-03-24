@@ -1,4 +1,4 @@
-// src/execution/help.ts
+// src/execution/modes/e2e/help.ts
 
 export function usage(): string {
     return [

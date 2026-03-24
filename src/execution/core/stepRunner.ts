@@ -1,22 +1,22 @@
-// src/execution/runners/stepRunner.ts
+// src/execution/core/stepRunner.ts
 
-import { nowIso } from "../../utils/time";
-import type { Logger } from "../../utils/logger";
-import type { ScenarioStep } from "../scenario/types";
-import type { ExecutionContext } from "../runtime/executionContext";
-import { addStepResult } from "../runtime/executionContext";
+import { nowIso } from "@utils/time";
+import type { Logger } from "@utils/logger";
+import type { ScenarioStep } from "@execution/modes/e2e/scenario/types";
+import type { ExecutionContext } from "./executionContext";
+import { addStepResult } from "./executionContext";
 import {
     createStepExecutionResult,
     type StepExecutionResult,
-} from "../runtime/result";
+} from "./result";
 import {
     getExecutor,
     type ExecutorRegistry,
-} from "../runtime/registry";
+} from "./registry";
 import {
     resolveStepData,
     type StepDataResolverRegistry,
-} from "../runtime/resolveStepData";
+} from "@execution/runtime/resolveStepData";
 
 export type RunStepArgs = {
     context: ExecutionContext;

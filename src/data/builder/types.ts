@@ -1,5 +1,5 @@
 // src/data/builder/types.ts
-import type { Logger } from "../../utils/logger";
+import type { Logger } from "@utils/logger";
 
 export type ScriptIdFilter = string;
 

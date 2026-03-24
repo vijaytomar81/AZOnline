@@ -2,17 +2,17 @@
 import os from "node:os";
 import path from "node:path";
 
-import { createLogger } from "../../utils/logger";
-import { normalizeArgv, hasFlag, getArg } from "../../utils/argv";
+import { createLogger } from "@utils/logger";
+import { normalizeArgv, hasFlag, getArg } from "@utils/argv";
 import { usage } from "./elementGeneratorHelp";
-import { printCommandTitle } from "../../utils/cliFormat";
+import { printCommandTitle } from "@utils/cliFormat";
 import { runElementsGenerator } from "./generator/runner";
 import {
     PAGE_MAPS_DIR,
     PAGE_OBJECTS_DIR,
     PAGE_REGISTRY_DIR,
     PAGE_OBJECT_GENERATOR_LOG_FILE,
-} from "../../utils/paths";
+} from "@utils/paths";
 
 function buildRunLabel(): string {
     const host = os.hostname().replace(/[^a-zA-Z0-9_-]/g, "").toLowerCase() || "unknown-host";

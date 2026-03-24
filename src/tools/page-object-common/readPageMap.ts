@@ -2,7 +2,7 @@
 
 import path from "node:path";
 
-import { listFiles, safeReadJson } from "@/utils/fs";
+import { listFiles, safeReadJson } from "@utils/fs";
 import type { PageMap } from "@/tools/page-object-generator/generator/types";
 
 /**

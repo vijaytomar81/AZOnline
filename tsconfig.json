@@ -33,6 +33,15 @@
       ],
       "@page-manifest/*": [
         "src/pages/.manifest/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@data/*": [
+        "src/data/*"
+      ],
+      "@execution/*": [
+        "src/execution/*"
       ]
     }
   },

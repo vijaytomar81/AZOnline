@@ -1,7 +1,7 @@
 // src/execution/journeys/renewal/index.ts
 
-import { AppError } from "../../../utils/errors";
-import type { StepExecutor } from "../../runtime/registry";
+import { AppError } from "@utils/errors";
+import type { StepExecutor } from "@execution/core/registry";
 
 export const runRenewal: StepExecutor = async ({ step }) => {
     throw new AppError({

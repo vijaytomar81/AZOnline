@@ -1,6 +1,6 @@
 // src/tools/page-object-repair/repair/types.ts
 
-import type { TreeNode } from "@/utils/cliTree";
+import type { TreeNode } from "@utils/cliTree";
 
 export type RepairRuleResult = {
     changedFiles: number;

@@ -1,6 +1,6 @@
-// src/execution/runtime/bootstrap.ts
+// src/execution/core/bootstrap.ts
 
-import { createLogger, type Logger } from "../../utils/logger";
+import { createLogger, type Logger } from "@utils/logger";
 import {
     createExecutorRegistry,
     type ExecutorRegistry,
@@ -12,8 +12,8 @@ import {
     type StepDataResolverRegistry,
     type StepDataSource,
     registerStepDataSource,
-} from "./resolveStepData";
-import { registerDefaultExecutors } from "./registerDefaults";
+} from "@execution/runtime/resolveStepData";
+import { registerDefaultExecutors } from "@execution/runtime/registerDefaults";
 
 export type ExecutionBootstrap = {
     log: Logger;

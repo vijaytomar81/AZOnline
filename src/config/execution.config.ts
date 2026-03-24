@@ -1,5 +1,5 @@
 // src/config/execution.config.ts
-import { envBool, envNumber, envString } from "../utils/env";
+import { envBool, envNumber, envString } from "@utils/env";
 
 export type ExecutionConfig = {
   browser: {

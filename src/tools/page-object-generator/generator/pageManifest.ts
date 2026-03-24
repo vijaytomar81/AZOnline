@@ -3,7 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { ensureDir } from "@/utils/fs";
+import { ensureDir } from "@utils/fs";
 import type { PageMap } from "./types";
 import type { PageArtifact } from "./pageArtifact";
 

@@ -2,7 +2,7 @@
 
 import path from "node:path";
 
-import { ensureDir } from "@/utils/fs";
+import { ensureDir } from "@utils/fs";
 import type { GenOptions } from "./types";
 import { buildRegistryEntry } from "./changeDetection";
 import { buildPageGenerationContext } from "./pageGenerationContext";

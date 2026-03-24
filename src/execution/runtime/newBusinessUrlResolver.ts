@@ -1,8 +1,8 @@
 // src/execution/runtime/newBusinessUrlResolver.ts
 
-import { AppError } from "../../utils/errors";
+import { AppError } from "@utils/errors";
 import { environments } from "../../config/environments";
-import type { ExecutionScenario } from "../scenario/types";
+import type { ExecutionScenario } from "@execution/modes/e2e/scenario/types";
 
 function normalizeKey(value?: string): string {
     return String(value ?? "").trim().toLowerCase().replace(/\s+/g, "");

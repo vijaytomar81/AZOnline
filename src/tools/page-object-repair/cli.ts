@@ -1,8 +1,8 @@
 // src/tools/page-object-repair/cli.ts
 
-import { normalizeArgv } from "@/utils/argv";
-import { printCommandTitle } from "@/utils/cliFormat";
-import { createLogger } from "@/utils/logger";
+import { normalizeArgv } from "@utils/argv";
+import { printCommandTitle } from "@utils/cliFormat";
+import { createLogger } from "@utils/logger";
 
 import { usage } from "./repairHelp";
 import { runRepairCommand } from "./commands/repair";

@@ -1,4 +1,4 @@
-// src/execution/scenario/validator.ts
+// src/execution/modes/e2e/scenario/validator.ts
 
 import type {
     ExecutionScenario,

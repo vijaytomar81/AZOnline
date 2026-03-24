@@ -2,13 +2,13 @@
 
 import path from "node:path";
 import ExcelJS from "exceljs";
-import { AppError } from "../../utils/errors";
-import { fileExists } from "../../utils/fs";
-import { normalizeHeaderKey, normalizeSheetKey, normalizeSpaces } from "../../utils/text";
-import type { Logger } from "../../utils/logger";
-import { defaultE2EPipelineTemplateConfig } from "../scenario/e2EPipelineTemplateConfig";
-import { validateE2EPipelineTemplateHeaders } from "../scenario/e2EPipelineTemplateValidator";
-import type { RawScenarioRow } from "../scenario/types";
+import { AppError } from "@utils/errors";
+import { fileExists } from "@utils/fs";
+import { normalizeHeaderKey, normalizeSheetKey, normalizeSpaces } from "@utils/text";
+import type { Logger } from "@utils/logger";
+import { defaultE2EPipelineTemplateConfig } from "@execution/modes/e2e/scenario/e2EPipelineTemplateConfig";
+import { validateE2EPipelineTemplateHeaders } from "@execution/modes/e2e/scenario/e2EPipelineTemplateValidator";
+import type { RawScenarioRow } from "@execution/modes/e2e/scenario/types";
 
 export type LoadScenarioSheetResult = {
     sheetName: string;

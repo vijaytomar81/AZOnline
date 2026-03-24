@@ -1,12 +1,12 @@
 // src/tools/page-object-repair/repair/report.ts
 
-import { printTree, type TreeNode } from "@/utils/cliTree";
+import { printTree, type TreeNode } from "@utils/cliTree";
 import {
     info,
     printSection,
     success,
     warning,
-} from "@/utils/cliFormat";
+} from "@utils/cliFormat";
 import type { RepairRuleExecutionResult, RepairRunResult } from "./types";
 
 type RepairGroupKey = "pageChain" | "manifest" | "registry" | "other";

@@ -2,7 +2,7 @@
 
 import fs from "node:fs";
 
-import type { Logger } from "@/utils/logger";
+import type { Logger } from "@utils/logger";
 import { toPropertyAccess } from "./aliasParser/shared";
 
 function replaceGeneratedRhs(line: string, oldKey: string, newKey: string): string {

@@ -1,7 +1,7 @@
 // src/tools/page-object-validator/validatorHelp.ts
 
-import { strong, info } from "@/utils/cliFormat";
-import { ICONS } from "@/utils/icons";
+import { strong, info } from "@utils/cliFormat";
+import { ICONS } from "@utils/icons";
 
 export function usage(): string {
     return `

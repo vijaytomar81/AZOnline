@@ -1,6 +1,6 @@
 // src/tools/file-header-checker/cli.ts
 
-import { normalizeArgv, hasFlag } from "../../utils/argv";
+import { normalizeArgv, hasFlag } from "@utils/argv";
 import { runHeaderChecker } from "./checker";
 import type { HeaderCheckMode } from "./checker";
 import { usage } from "./fileHeaderCheckerHelp";

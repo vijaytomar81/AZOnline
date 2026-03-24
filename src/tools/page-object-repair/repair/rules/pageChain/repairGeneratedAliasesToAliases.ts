@@ -1,6 +1,6 @@
 // src/tools/page-object-repair/repair/rules/pageChain/repairGeneratedAliasesToAliases.ts
 
-import type { TreeNode } from "@/utils/cliTree";
+import type { TreeNode } from "@utils/cliTree";
 import type { RepairRule } from "../../pipeline/types";
 import {
     aliasPairText,

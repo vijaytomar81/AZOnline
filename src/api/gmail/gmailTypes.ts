@@ -1,6 +1,6 @@
 // src/api/gmail/gmailTypes.ts
 
-import type { Logger } from "../../utils/logger";
+import type { Logger } from "@utils/logger";
 
 export type GmailEmail = {
     id: string;

@@ -1,4 +1,4 @@
-// src/execution/runtime/browserSession.ts
+// src/execution/core/browserSession.ts
 
 import { chromium, firefox, webkit, type Browser, type BrowserContext, type Page } from "@playwright/test";
 import { executionConfig } from "../../config/execution.config";

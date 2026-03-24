@@ -1,6 +1,6 @@
 // src/tools/page-object-generator/generator/pageGenerationContext.ts
 
-import { hashContent } from "@/utils/hash";
+import { hashContent } from "@utils/hash";
 import type { PageMap } from "./types";
 import { buildPageArtifact, type PageArtifact } from "./pageArtifact";
 import { hasMissingGeneratedOutputs } from "./scaffold";

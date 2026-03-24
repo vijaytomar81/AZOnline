@@ -1,8 +1,9 @@
-// src/execution/runtime/dataModeHelp.ts
+// src/execution/modes/data/help.ts
 
 import path from "node:path";
-import { dataDefinitionRegistry } from "../../data/data-definitions/registry";
-import { toKebabFromSnake } from "../../utils/text";
+import { dataDefinitionRegistry } from "../../../data/data-definitions/registry";
+import type { RegisteredSchema } from "../../../data/data-definitions/types";
+import { toKebabFromSnake } from "@utils/text";
 
 function safeSheetFilename(name: string): string {
     return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
@@ -13,7 +14,7 @@ function preferredAlias(aliases: string[], fallback: string): string {
 }
 
 export function printDataModeHelp(): void {
-    const rows = Object.values(dataDefinitionRegistry)
+    const rows = (Object.values(dataDefinitionRegistry) as RegisteredSchema[])
         .filter((item) => item.schema.dataDefinitionGroup === "newBusiness")
         .map((item) => {
             const source = preferredAlias(item.sheetAliases ?? [], item.name);

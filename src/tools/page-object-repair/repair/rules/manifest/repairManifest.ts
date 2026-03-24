@@ -1,6 +1,6 @@
 // src/tools/page-object-repair/repair/rules/manifest/repairManifest.ts
 
-import type { TreeNode } from "@/utils/cliTree";
+import type { TreeNode } from "@utils/cliTree";
 import type { RepairRule } from "../../pipeline/types";
 import type { ManifestPageEntry, PageObjectsManifest } from "../../shared/manifest";
 import { buildManifest, readManifest, writeManifest } from "../../shared/manifest";

@@ -1,6 +1,6 @@
 // src/execution/runtime/registerDefaults.ts
 
-import { addStepExecutor, type ExecutionBootstrap } from "./bootstrap";
+import { addStepExecutor, type ExecutionBootstrap } from "@execution/core/bootstrap";
 import { runMta } from "../journeys/mta";
 import { runMtc } from "../journeys/mtc";
 import { runNewBusiness } from "../journeys/newBusiness";
