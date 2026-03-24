@@ -79,6 +79,68 @@ function resolveGeneratedCasesFile(
     return exactPath;
 }
 
+function buildCasesFileNotFoundError(args: {
+    sheetName: string;
+    schemaName: string;
+    attemptedPath: string;
+}): DataBuilderError {
+    const manifestItem = findGeneratedManifestItem({
+        sheetName: args.sheetName,
+        schemaName: args.schemaName,
+    });
+
+    const messageLines: string[] = [
+        "No generated data JSON found.",
+        "",
+        `Sheet   : ${args.sheetName}`,
+        `Schema  : ${args.schemaName}`,
+        "",
+    ];
+
+    if (manifestItem) {
+        messageLines.push("Last generated entry (from index.json):");
+        messageLines.push(`  File         : ${manifestItem.filePath}`);
+
+        if (manifestItem.validationReportPath) {
+            messageLines.push(
+                `  Validation   : ${manifestItem.validationReportPath}`
+            );
+        }
+
+        messageLines.push(`  Case Count   : ${manifestItem.caseCount}`);
+        messageLines.push(`  Generated At : ${manifestItem.generatedAt}`);
+        messageLines.push("");
+        messageLines.push("The manifest entry exists, but the file is missing on disk.");
+        messageLines.push("");
+    } else {
+        messageLines.push("No matching entry found in generated index.json.");
+        messageLines.push("");
+    }
+
+    messageLines.push("Attempted path:");
+    messageLines.push(`  ${args.attemptedPath}`);
+    messageLines.push("");
+    messageLines.push("Next step:");
+    messageLines.push(
+        `  npm run data:build -- --excel <path> --sheet "${args.sheetName}"`
+    );
+
+    return new DataBuilderError({
+        code: "CASES_FILE_NOT_FOUND",
+        stage: "load-cases-file",
+        source: "getCasesFile",
+        message: messageLines.join("\n"),
+        context: {
+            sheetName: args.sheetName,
+            schemaName: args.schemaName,
+            filePath: args.attemptedPath,
+            manifestKey: manifestItem?.key ?? "",
+            manifestFilePath: manifestItem?.filePath ?? "",
+            manifestGeneratedAt: manifestItem?.generatedAt ?? "",
+        },
+    });
+}
+
 export function resolveCasesFilePath(
     sheetName: string,
     schemaName?: string
@@ -102,19 +164,18 @@ export function resolveCasesFilePath(
 }
 
 export function getCasesFile(sheetName: string, schemaName?: string): CasesFile {
-    const filePath = resolveCasesFilePath(sheetName, schemaName);
+    const resolvedSchema = resolveSchemaName(
+        schemaName || process.env.SCHEMA,
+        sheetName
+    );
+
+    const filePath = resolveCasesFilePath(sheetName, resolvedSchema);
 
     if (!fs.existsSync(filePath)) {
-        throw new DataBuilderError({
-            code: "CASES_FILE_NOT_FOUND",
-            stage: "load-cases-file",
-            source: "getCasesFile",
-            message: `Test data JSON not found: ${filePath}`,
-            context: {
-                sheetName,
-                schemaName: schemaName ?? "",
-                filePath,
-            },
+        throw buildCasesFileNotFoundError({
+            sheetName,
+            schemaName: resolvedSchema,
+            attemptedPath: filePath,
         });
     }
 
