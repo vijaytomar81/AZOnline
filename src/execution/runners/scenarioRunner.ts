@@ -25,6 +25,7 @@ export type RunScenarioArgs = {
     dataRegistry: StepDataResolverRegistry;
     log?: Logger;
     stopOnFailure?: boolean;
+    overrideStepData?: Record<string, unknown>;
 };
 
 function createScenarioLogger(scenarioId: string, log?: Logger): Logger {
@@ -44,44 +45,26 @@ export async function runScenario(
     const stopOnFailure = args.stopOnFailure !== false;
     let session;
 
-    log.info(
-        `Scenario start -> id=${args.scenario.scenarioId}, journey=${args.scenario.journey}, ` +
-        `policyContext=${args.scenario.policyContext}, totalSteps=${args.scenario.totalSteps}`
-    );
-    log.debug(
-        `Scenario details -> execute=${args.scenario.execute}, ` +
-        `policyNumber=${args.scenario.policyNumber ?? ""}, ` +
-        `entryPoint=${args.scenario.entryPoint ?? ""}, ` +
-        `description=${args.scenario.description}`
-    );
-
     try {
         session = await createBrowserSession();
         attachBrowserSession(context, session);
-        log.info("Browser session created for scenario.");
-        log.debug(`Initial page url=${context.page?.url() ?? ""}`);
 
         for (const step of args.scenario.steps) {
-            log.info(
-                `Running Step${step.stepNo} -> action=${step.action}, ` +
-                `portal=${step.portal}, testCaseId=${step.testCaseId}`
-            );
-            log.debug(
-                `Step details -> subType=${step.subType ?? ""}, journey=${args.scenario.journey}`
-            );
-
             const result = await runStep({
                 context,
                 step,
                 registry: args.registry,
                 dataRegistry: args.dataRegistry,
                 log: log.child(`step${step.stepNo}`),
+                overrideStepData: args.overrideStepData,
             });
 
-            log.info(
-                `Step${step.stepNo} finished -> status=${result.status}` +
-                (result.message ? `, message=${result.message}` : "")
-            );
+            if (log) {
+                log.info(
+                    `Step${step.stepNo} finished -> status=${result.status}` +
+                    (result.message ? `, message=${result.message}` : "")
+                );
+            }
 
             if (shouldStop(stopOnFailure, context)) {
                 log.warn(`Scenario stopped after failed step.`);
@@ -90,20 +73,10 @@ export async function runScenario(
         }
     } finally {
         await closeBrowserSession(session);
-        log.info("Browser session closed for scenario.");
     }
 
-    const result = buildScenarioExecutionResult({
+    return buildScenarioExecutionResult({
         scenarioId: args.scenario.scenarioId,
         stepResults: context.stepResults,
     });
-
-    log.info(`Scenario finished -> status=${result.status}`);
-    log.debug(
-        `Scenario outputs -> currentPolicyNumber=${context.currentPolicyNumber ?? ""}, ` +
-        `currentQuoteNumber=${context.currentQuoteNumber ?? ""}, ` +
-        `stepResults=${context.stepResults.length}`
-    );
-
-    return result;
 }
