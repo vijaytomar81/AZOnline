@@ -5,6 +5,7 @@ import { ensureParentDir } from "@utils/fs";
 import {
     DATA_DOMAINS,
     DATA_GENERATED_INDEX_FILE,
+    ROOT,
     toRepoRelative,
 } from "@utils/paths";
 
@@ -55,6 +56,29 @@ export function readGeneratedManifest(): GeneratedManifest {
     } catch {
         return buildEmptyManifest();
     }
+}
+
+export function findGeneratedManifestItem(args: {
+    domain?: string;
+    sheetName: string;
+    schemaName: string;
+}): GeneratedManifestItem | undefined {
+    const domain = args.domain ?? DATA_DOMAINS.NEW_BUSINESS;
+    const key = buildGeneratedManifestKey({
+        domain,
+        schemaName: args.schemaName,
+        sheetName: args.sheetName,
+    });
+
+    const manifest = readGeneratedManifest();
+    return manifest.data[key];
+}
+
+export function resolveManifestFilePath(
+    item?: Pick<GeneratedManifestItem, "filePath">
+): string | null {
+    if (!item?.filePath) return null;
+    return fs.existsSync(item.filePath) ? item.filePath : `${ROOT}/${item.filePath}`.replace(/\/+/g, "/");
 }
 
 export function upsertGeneratedManifestItem(args: {
