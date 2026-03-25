@@ -1,6 +1,6 @@
 // src/execution/core/logging/e2eScenarioLogRenderer.ts
 
-import { failure, success } from "@utils/cliFormat";
+import { success } from "@utils/cliFormat";
 import type { ExecutionScenario } from "@execution/modes/e2e/scenario/types";
 import type { ScenarioExecutionResult } from "@execution/core/result";
 import { OUTPUT_KEYS } from "@execution/constants/outputKeys";
@@ -11,6 +11,15 @@ import {
     statusText,
     stepDuration,
 } from "@execution/core/logging/shared";
+
+function getTreeTokens(index: number, total: number) {
+    const isLast = index === total - 1;
+
+    return {
+        branch: isLast ? "└─" : "├─",
+        indent: isLast ? "   " : "│  ",
+    };
+}
 
 export function renderE2EScenarioBlock(args: {
     scenario: ExecutionScenario;
@@ -25,26 +34,25 @@ export function renderE2EScenarioBlock(args: {
     lines.push(
         `====================${success("[SCENARIO]")} ${scenario.scenarioId} | ${scenario.scenarioName}====================`
     );
-    lines.push(`ScenarioId      : ${scenario.scenarioId}`);
-    lines.push(`ScenarioName    : ${scenario.scenarioName}`);
-    lines.push(`Journey         : ${scenario.journey}`);
-    lines.push(`PolicyContext   : ${scenario.policyContext}`);
-    lines.push(`EntryPoint      : ${scenario.entryPoint ?? "Direct"}`);
-    lines.push(`Total Steps     : ${scenario.totalSteps}`);
+    lines.push(`ScenarioId       : ${scenario.scenarioId}`);
+    lines.push(`ScenarioName     : ${scenario.scenarioName}`);
+    lines.push(`Journey          : ${scenario.journey}`);
+    lines.push(`PolicyContext    : ${scenario.policyContext}`);
+    lines.push(`EntryPoint       : ${scenario.entryPoint ?? "Direct"}`);
+    lines.push(`Total Steps      : ${scenario.totalSteps}`);
     lines.push("");
 
-    for (const step of result.stepResults) {
+    result.stepResults.forEach((step, index) => {
         const testCaseId = step.details?.testCaseId ?? "";
+        const { branch, indent } = getTreeTokens(index, result.stepResults.length);
 
-        lines.push("----------------------------------------");
-        lines.push(`[STEP ${step.stepNo}] ${step.action} | TestCaseId=${testCaseId}`);
-        lines.push("----------------------------------------");
-        lines.push(field("Status", statusText(step.status)));
-        lines.push(field("Duration", stepDuration(step)));
+        lines.push(`${branch} [STEP ${step.stepNo}] ${step.action} | TestCaseId=${testCaseId}`);
+        lines.push(`${indent}${field("Status", statusText(step.status)).trimStart()}`);
+        lines.push(`${indent}${field("Duration", stepDuration(step)).trimStart()}`);
 
         const stepFields: Array<[string, unknown]> = [];
 
-        if (step.stepNo === 1 && step.action === "NewBusiness") {
+        if (step.action === "NewBusiness") {
             collectFieldIfPresent(
                 stepFields,
                 "CalculatedEmail",
@@ -66,16 +74,16 @@ export function renderE2EScenarioBlock(args: {
             collectFieldIfPresent(stepFields, "Error", step.message);
         }
 
-        lines.push(...renderFields(stepFields));
-        lines.push("");
-    }
+        renderFields(stepFields).forEach((line) => {
+            lines.push(`${indent}${line}`);
+        });
 
-    const failedStep = result.stepResults.find((item) => item.status === "failed");
-    if (failedStep && failedStep.stepNo < scenario.totalSteps) {
-        lines.push(failure("🚫 Scenario stopped after failed step"));
-        lines.push("");
-    }
+        if (index < result.stepResults.length - 1) {
+            lines.push(indent.trimEnd());
+        }
+    });
 
+    lines.push("");
     lines.push(field("ScenarioStatus", statusText(result.status)));
     lines.push(field("ScenarioTime", duration));
     lines.push("============================================================");
