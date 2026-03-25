@@ -28,20 +28,39 @@ type ResolvedOverride = {
     sourceFileSheet: string;
 };
 
-function buildFailureResult(
-    step: ScenarioStep,
-    startedAt: string,
-    message: string
-): StepExecutionResult {
+function createStepDebugCollector(enabled: boolean) {
+    const debugLines: string[] = [];
+
+    return {
+        push(message: string): void {
+            if (!enabled) return;
+            const text = String(message ?? "").trim();
+            if (text) {
+                debugLines.push(text);
+            }
+        },
+        all(): string[] {
+            return debugLines;
+        },
+    };
+}
+
+function buildFailureResult(args: {
+    step: ScenarioStep;
+    startedAt: string;
+    message: string;
+    debugLines?: string[];
+}): StepExecutionResult {
     return createStepExecutionResult({
-        stepNo: step.stepNo,
-        action: step.action,
+        stepNo: args.step.stepNo,
+        action: args.step.action,
         status: "failed",
-        startedAt,
+        startedAt: args.startedAt,
         finishedAt: nowIso(),
-        message,
+        message: args.message,
         details: {
-            testCaseId: step.testCaseId,
+            testCaseId: args.step.testCaseId,
+            debugLines: args.debugLines ?? [],
         },
     });
 }
@@ -56,15 +75,19 @@ export async function runStep(args: {
     mode?: "data" | "e2e";
 }): Promise<StepExecutionResult> {
     const startedAt = nowIso();
+    const isE2E = args.mode === "e2e";
+    const debug = createStepDebugCollector(isE2E);
 
     try {
         const executor = getExecutor(args.registry, args.context, args.step);
+
         if (!executor) {
-            const result = buildFailureResult(
-                args.step,
+            const result = buildFailureResult({
+                step: args.step,
                 startedAt,
-                `No executor registered for step action="${args.step.action}"`
-            );
+                message: `No executor registered for step action="${args.step.action}"`,
+                debugLines: debug.all(),
+            });
             addStepResult(args.context, result);
             return result;
         }
@@ -85,6 +108,7 @@ export async function runStep(args: {
                     journey: args.context.scenario.journey,
                     step: args.step,
                     log: args.log,
+                    debugCollector: debug,
                 });
 
         await executor({
@@ -103,6 +127,7 @@ export async function runStep(args: {
                 testCaseId: resolved.testCaseId,
                 sourceSheet: resolved.sourceFileSheet,
                 sourceAction: resolved.source.action,
+                debugLines: debug.all(),
             },
         });
 
@@ -110,7 +135,14 @@ export async function runStep(args: {
         return result;
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        const result = buildFailureResult(args.step, startedAt, message);
+
+        const result = buildFailureResult({
+            step: args.step,
+            startedAt,
+            message,
+            debugLines: debug.all(),
+        });
+
         addStepResult(args.context, result);
         return result;
     }

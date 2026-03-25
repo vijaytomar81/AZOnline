@@ -3,6 +3,14 @@
 export type StepExecutionStatus = "passed" | "failed" | "skipped";
 export type ScenarioExecutionStatus = "passed" | "failed";
 
+export type StepExecutionDetails = {
+    testCaseId?: string;
+    sourceSheet?: string;
+    sourceAction?: string;
+    debugLines?: string[];
+    [key: string]: unknown;
+};
+
 export type StepExecutionResult = {
     stepNo: number;
     action: string;
@@ -10,7 +18,7 @@ export type StepExecutionResult = {
     startedAt: string;
     finishedAt: string;
     message?: string;
-    details?: Record<string, unknown>;
+    details?: StepExecutionDetails;
 };
 
 export type ScenarioExecutionResult = {

@@ -27,10 +27,30 @@ export type StepDataResolverRegistry = {
     cache: Map<string, CasesFile>;
 };
 
+type DebugCollector = {
+    push: (message: string) => void;
+};
+
 function normalizeKey(value?: string): string {
     return normalizeSpaces(String(value ?? ""))
         .toLowerCase()
         .replace(/\s+/g, "");
+}
+
+function emitDebug(
+    message: string,
+    log?: Logger,
+    debugCollector?: DebugCollector
+): void {
+    const text = normalizeSpaces(message);
+    if (!text) return;
+
+    if (debugCollector) {
+        debugCollector.push(text);
+        return;
+    }
+
+    log?.debug(text);
 }
 
 function buildCacheKey(source: StepDataSource): string {
@@ -41,33 +61,49 @@ function buildCacheKey(source: StepDataSource): string {
     ].join("|");
 }
 
-function matchesSource(step: ScenarioStep, journey: string, source: StepDataSource): boolean {
-    if (normalizeKey(step.action) !== normalizeKey(source.action)) return false;
+function matchesSource(
+    step: ScenarioStep,
+    journey: string,
+    source: StepDataSource
+): boolean {
+    if (normalizeKey(step.action) !== normalizeKey(source.action)) {
+        return false;
+    }
+
     if (source.journey && normalizeKey(journey) !== normalizeKey(source.journey)) {
         return false;
     }
+
     if (source.subType && normalizeKey(step.subType) !== normalizeKey(source.subType)) {
         return false;
     }
+
     return true;
 }
 
-function getOrLoadCasesFile(
-    registry: StepDataResolverRegistry,
-    source: StepDataSource,
-    log?: Logger
-): CasesFile {
-    const key = buildCacheKey(source);
-    const cached = registry.cache.get(key);
+function getOrLoadCasesFile(args: {
+    registry: StepDataResolverRegistry;
+    source: StepDataSource;
+    log?: Logger;
+    debugCollector?: DebugCollector;
+}): CasesFile {
+    const key = buildCacheKey(args.source);
+    const cached = args.registry.cache.get(key);
 
     if (cached) {
-        log?.debug(`Step data cache hit -> key=${key}`);
+        emitDebug(`Step data cache hit -> key=${key}`, args.log, args.debugCollector);
         return cached;
     }
 
-    log?.debug(`Step data cache miss -> key=${key}. Loading cases file...`);
-    const loaded = getCasesFile(source.sheetName, source.schemaName);
-    registry.cache.set(key, loaded);
+    emitDebug(
+        `Step data cache miss -> key=${key}. Loading cases file...`,
+        args.log,
+        args.debugCollector
+    );
+
+    const loaded = getCasesFile(args.source.sheetName, args.source.schemaName);
+    args.registry.cache.set(key, loaded);
+
     return loaded;
 }
 
@@ -90,12 +126,15 @@ export function resolveStepData(args: {
     journey: string;
     step: ScenarioStep;
     log?: Logger;
+    debugCollector?: DebugCollector;
 }): ResolvedStepData {
     const testCaseId = normalizeSpaces(args.step.testCaseId);
 
-    args.log?.debug(
+    emitDebug(
         `Resolving step data -> action=${args.step.action}, journey=${args.journey}, ` +
-        `subType=${args.step.subType ?? ""}, testCaseId=${testCaseId}`
+        `subType=${args.step.subType ?? ""}, testCaseId=${testCaseId}`,
+        args.log,
+        args.debugCollector
     );
 
     const source = args.registry.sources.find((item) =>
@@ -119,13 +158,21 @@ export function resolveStepData(args: {
         });
     }
 
-    args.log?.debug(
+    emitDebug(
         `Matched step data source -> action=${source.action}, ` +
         `journey=${source.journey ?? ""}, subType=${source.subType ?? ""}, ` +
-        `sheet=${source.sheetName}, schema=${source.schemaName ?? ""}`
+        `sheet=${source.sheetName}, schema=${source.schemaName ?? ""}`,
+        args.log,
+        args.debugCollector
     );
 
-    const casesFile = getOrLoadCasesFile(args.registry, source, args.log);
+    const casesFile = getOrLoadCasesFile({
+        registry: args.registry,
+        source,
+        log: args.log,
+        debugCollector: args.debugCollector,
+    });
+
     const hit = casesFile.cases.find(
         (item) => item.scriptId === testCaseId || item.scriptName === testCaseId
     );
@@ -147,8 +194,10 @@ export function resolveStepData(args: {
         });
     }
 
-    args.log?.debug(
-        `Resolved test case -> scriptId=${hit.scriptId ?? ""}, scriptName=${hit.scriptName}`
+    emitDebug(
+        `Resolved test case -> scriptId=${hit.scriptId ?? ""}, scriptName=${hit.scriptName}`,
+        args.log,
+        args.debugCollector
     );
 
     return {

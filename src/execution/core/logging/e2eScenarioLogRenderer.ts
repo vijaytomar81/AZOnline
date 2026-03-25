@@ -2,12 +2,16 @@
 
 import { success } from "@utils/cliFormat";
 import type { ExecutionScenario } from "@execution/modes/e2e/scenario/types";
-import type { ScenarioExecutionResult } from "@execution/core/result";
+import type {
+    ScenarioExecutionResult,
+    StepExecutionResult,
+} from "@execution/core/result";
 import { OUTPUT_KEYS } from "@execution/constants/outputKeys";
 import {
     collectFieldIfPresent,
     field,
     renderFields,
+    safeText,
     statusText,
     stepDuration,
 } from "@execution/core/logging/shared";
@@ -19,6 +23,80 @@ function getTreeTokens(index: number, total: number) {
         branch: isLast ? "└─" : "├─",
         indent: isLast ? "   " : "│  ",
     };
+}
+
+function getStepDebugLines(step: StepExecutionResult): string[] {
+    const raw = step.details?.debugLines;
+
+    if (!Array.isArray(raw)) {
+        return [];
+    }
+
+    return raw
+        .map((item) => safeText(item).trim())
+        .filter(Boolean);
+}
+
+function buildStepFields(
+    step: StepExecutionResult,
+    outputs: Record<string, unknown>
+): Array<[string, unknown]> {
+    const stepFields: Array<[string, unknown]> = [];
+
+    getStepDebugLines(step).forEach((debugLine) => {
+        stepFields.push(["DEBUG", debugLine]);
+    });
+
+    stepFields.push(["Status", statusText(step.status)]);
+    stepFields.push(["Duration", stepDuration(step)]);
+
+    if (step.action === "NewBusiness") {
+        collectFieldIfPresent(
+            stepFields,
+            "CalculatedEmail",
+            outputs[OUTPUT_KEYS.NEW_BUSINESS.CALCULATED_EMAIL]
+        );
+        collectFieldIfPresent(
+            stepFields,
+            "QuoteNumber",
+            outputs[OUTPUT_KEYS.NEW_BUSINESS.QUOTE]
+        );
+        collectFieldIfPresent(
+            stepFields,
+            "PolicyNumber",
+            outputs[OUTPUT_KEYS.NEW_BUSINESS.POLICY]
+        );
+    }
+
+    if (step.message) {
+        collectFieldIfPresent(stepFields, "Error", step.message);
+    }
+
+    return stepFields;
+}
+
+function renderStepBlock(args: {
+    step: StepExecutionResult;
+    index: number;
+    total: number;
+    outputs: Record<string, unknown>;
+}): string[] {
+    const { step, index, total, outputs } = args;
+    const { branch, indent } = getTreeTokens(index, total);
+    const testCaseId = safeText(step.details?.testCaseId ?? "");
+    const lines: string[] = [];
+
+    lines.push(`${branch} [STEP ${step.stepNo}] ${step.action} | TestCaseId=${testCaseId}`);
+
+    renderFields(buildStepFields(step, outputs), 16).forEach((line) => {
+        lines.push(`${indent}${line}`);
+    });
+
+    if (index < total - 1) {
+        lines.push(indent.trimEnd());
+    }
+
+    return lines;
 }
 
 export function renderE2EScenarioBlock(args: {
@@ -34,53 +112,23 @@ export function renderE2EScenarioBlock(args: {
     lines.push(
         `====================${success("[SCENARIO]")} ${scenario.scenarioId} | ${scenario.scenarioName}====================`
     );
-    lines.push(`ScenarioId       : ${scenario.scenarioId}`);
-    lines.push(`ScenarioName     : ${scenario.scenarioName}`);
-    lines.push(`Journey          : ${scenario.journey}`);
-    lines.push(`PolicyContext    : ${scenario.policyContext}`);
-    lines.push(`EntryPoint       : ${scenario.entryPoint ?? "Direct"}`);
-    lines.push(`Total Steps      : ${scenario.totalSteps}`);
+    lines.push(field("ScenarioId", scenario.scenarioId));
+    lines.push(field("ScenarioName", scenario.scenarioName));
+    lines.push(field("Journey", scenario.journey));
+    lines.push(field("PolicyContext", scenario.policyContext));
+    lines.push(field("EntryPoint", scenario.entryPoint ?? "Direct"));
+    lines.push(field("TotalSteps", scenario.totalSteps));
     lines.push("");
 
     result.stepResults.forEach((step, index) => {
-        const testCaseId = step.details?.testCaseId ?? "";
-        const { branch, indent } = getTreeTokens(index, result.stepResults.length);
-
-        lines.push(`${branch} [STEP ${step.stepNo}] ${step.action} | TestCaseId=${testCaseId}`);
-        lines.push(`${indent}${field("Status", statusText(step.status)).trimStart()}`);
-        lines.push(`${indent}${field("Duration", stepDuration(step)).trimStart()}`);
-
-        const stepFields: Array<[string, unknown]> = [];
-
-        if (step.action === "NewBusiness") {
-            collectFieldIfPresent(
-                stepFields,
-                "CalculatedEmail",
-                outputs[OUTPUT_KEYS.NEW_BUSINESS.CALCULATED_EMAIL]
-            );
-            collectFieldIfPresent(
-                stepFields,
-                "QuoteNumber",
-                outputs[OUTPUT_KEYS.NEW_BUSINESS.QUOTE]
-            );
-            collectFieldIfPresent(
-                stepFields,
-                "PolicyNumber",
-                outputs[OUTPUT_KEYS.NEW_BUSINESS.POLICY]
-            );
-        }
-
-        if (step.message) {
-            collectFieldIfPresent(stepFields, "Error", step.message);
-        }
-
-        renderFields(stepFields).forEach((line) => {
-            lines.push(`${indent}${line}`);
-        });
-
-        if (index < result.stepResults.length - 1) {
-            lines.push(indent.trimEnd());
-        }
+        lines.push(
+            ...renderStepBlock({
+                step,
+                index,
+                total: result.stepResults.length,
+                outputs,
+            })
+        );
     });
 
     lines.push("");
