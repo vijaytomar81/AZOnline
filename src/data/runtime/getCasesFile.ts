@@ -5,37 +5,11 @@ import path from "node:path";
 import { DataBuilderError } from "../builder/errors";
 import type { CasesFile } from "../builder/types";
 import { resolveSchemaName } from "../data-definitions";
-import { ROOT, getGeneratedSchemaDir } from "@utils/paths";
+import { ROOT } from "@utils/paths";
 import {
     findGeneratedManifestItem,
     resolveManifestFilePath,
 } from "@data/runtime/generatedManifest";
-
-function safeSheetFilename(name: string) {
-    return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
-}
-
-function findLatestJsonFile(dir: string, baseName: string): string | null {
-    if (!fs.existsSync(dir)) return null;
-
-    const files = fs
-        .readdirSync(dir)
-        .filter((file) => {
-            if (!file.endsWith(".json")) return false;
-            if (file.includes(".validation")) return false;
-            return file === `${baseName}.json` || file.startsWith(`${baseName}_`);
-        })
-        .map((file) => {
-            const fullPath = path.join(dir, file);
-            return {
-                fullPath,
-                mtimeMs: fs.statSync(fullPath).mtimeMs,
-            };
-        })
-        .sort((a, b) => b.mtimeMs - a.mtimeMs);
-
-    return files[0]?.fullPath ?? null;
-}
 
 function resolveExplicitCasesFile(): string | null {
     const explicit = String(process.env.CASES_FILE ?? "").trim();
@@ -53,44 +27,21 @@ function resolveManifestCasesFile(
         schemaName,
     });
 
-    const manifestPath = resolveManifestFilePath(item);
-    if (!manifestPath) return null;
-
-    return fs.existsSync(manifestPath) ? manifestPath : null;
-}
-
-function resolveGeneratedCasesFile(
-    sheetName: string,
-    schemaName: string
-): string {
-    const dir = getGeneratedSchemaDir(schemaName);
-    const baseName = safeSheetFilename(sheetName);
-
-    const exactPath = path.join(dir, `${baseName}.json`);
-    if (fs.existsSync(exactPath)) {
-        return exactPath;
-    }
-
-    const latestPath = findLatestJsonFile(dir, baseName);
-    if (latestPath) {
-        return latestPath;
-    }
-
-    return exactPath;
+    return resolveManifestFilePath(item);
 }
 
 function buildCasesFileNotFoundError(args: {
     sheetName: string;
     schemaName: string;
-    attemptedPath: string;
+    attemptedPath?: string;
 }): DataBuilderError {
     const manifestItem = findGeneratedManifestItem({
         sheetName: args.sheetName,
         schemaName: args.schemaName,
     });
 
-    const messageLines: string[] = [
-        "No generated data JSON found.",
+    const lines: string[] = [
+        "No generated data JSON found via manifest.",
         "",
         `Sheet   : ${args.sheetName}`,
         `Schema  : ${args.schemaName}`,
@@ -98,30 +49,30 @@ function buildCasesFileNotFoundError(args: {
     ];
 
     if (manifestItem) {
-        messageLines.push("Last generated entry (from index.json):");
-        messageLines.push(`  File         : ${manifestItem.filePath}`);
+        lines.push("Manifest entry found:");
+        lines.push(`  Key          : ${manifestItem.key}`);
+        lines.push(`  File         : ${manifestItem.filePath}`);
 
         if (manifestItem.validationReportPath) {
-            messageLines.push(
-                `  Validation   : ${manifestItem.validationReportPath}`
-            );
+            lines.push(`  Validation   : ${manifestItem.validationReportPath}`);
         }
 
-        messageLines.push(`  Case Count   : ${manifestItem.caseCount}`);
-        messageLines.push(`  Generated At : ${manifestItem.generatedAt}`);
-        messageLines.push("");
-        messageLines.push("The manifest entry exists, but the file is missing on disk.");
-        messageLines.push("");
+        lines.push(`  Case Count   : ${manifestItem.caseCount}`);
+        lines.push(`  Generated At : ${manifestItem.generatedAt}`);
+        lines.push("");
+
+        if (args.attemptedPath) {
+            lines.push("The manifest entry exists, but the file is missing on disk:");
+            lines.push(`  ${args.attemptedPath}`);
+            lines.push("");
+        }
     } else {
-        messageLines.push("No matching entry found in generated index.json.");
-        messageLines.push("");
+        lines.push("No matching entry found in generated index.json.");
+        lines.push("");
     }
 
-    messageLines.push("Attempted path:");
-    messageLines.push(`  ${args.attemptedPath}`);
-    messageLines.push("");
-    messageLines.push("Next step:");
-    messageLines.push(
+    lines.push("Next step:");
+    lines.push(
         `  npm run data:build -- --excel <path> --sheet "${args.sheetName}"`
     );
 
@@ -129,11 +80,11 @@ function buildCasesFileNotFoundError(args: {
         code: "CASES_FILE_NOT_FOUND",
         stage: "load-cases-file",
         source: "getCasesFile",
-        message: messageLines.join("\n"),
+        message: lines.join("\n"),
         context: {
             sheetName: args.sheetName,
             schemaName: args.schemaName,
-            filePath: args.attemptedPath,
+            filePath: args.attemptedPath ?? "",
             manifestKey: manifestItem?.key ?? "",
             manifestFilePath: manifestItem?.filePath ?? "",
             manifestGeneratedAt: manifestItem?.generatedAt ?? "",
@@ -156,11 +107,22 @@ export function resolveCasesFilePath(
     );
 
     const manifestPath = resolveManifestCasesFile(sheetName, resolvedSchema);
-    if (manifestPath) {
-        return manifestPath;
+    if (!manifestPath) {
+        throw buildCasesFileNotFoundError({
+            sheetName,
+            schemaName: resolvedSchema,
+        });
     }
 
-    return resolveGeneratedCasesFile(sheetName, resolvedSchema);
+    if (!fs.existsSync(manifestPath)) {
+        throw buildCasesFileNotFoundError({
+            sheetName,
+            schemaName: resolvedSchema,
+            attemptedPath: manifestPath,
+        });
+    }
+
+    return manifestPath;
 }
 
 export function getCasesFile(sheetName: string, schemaName?: string): CasesFile {
@@ -170,15 +132,7 @@ export function getCasesFile(sheetName: string, schemaName?: string): CasesFile 
     );
 
     const filePath = resolveCasesFilePath(sheetName, resolvedSchema);
-
-    if (!fs.existsSync(filePath)) {
-        throw buildCasesFileNotFoundError({
-            sheetName,
-            schemaName: resolvedSchema,
-            attemptedPath: filePath,
-        });
-    }
-
     const raw = fs.readFileSync(filePath, "utf-8");
+
     return JSON.parse(raw) as CasesFile;
 }
