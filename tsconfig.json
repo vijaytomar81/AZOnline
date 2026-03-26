@@ -45,6 +45,9 @@
       ],
       "@config/*": [
         "src/config/*"
+      ],
+      "@logging/*": [
+        "src/logging/*"
       ]
     }
   },
