@@ -2,8 +2,8 @@
 
 import fs from "node:fs";
 
-import { isValidTsIdentifier } from "@/utils/ts";
-import { toRepoRelative } from "@/utils/paths";
+import { isValidTsIdentifier } from "@utils/ts";
+import { toRepoRelative } from "@utils/paths";
 import {
     extractExportedObjectBody,
     splitTopLevelObjectEntries,

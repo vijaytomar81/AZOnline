@@ -1,7 +1,7 @@
 // src/tools/page-scanner/scanner/pageMap/buildPageMap.ts
 
-import { nowIso } from "@/utils/time";
-import { uniq, uniqueKey } from "@/utils/collections";
+import { nowIso } from "@utils/time";
+import { uniq, uniqueKey } from "@utils/collections";
 import type {
     PageMap,
     PageMapElementEntry,

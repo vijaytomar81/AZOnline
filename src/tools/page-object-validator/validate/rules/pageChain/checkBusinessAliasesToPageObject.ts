@@ -2,7 +2,7 @@
 
 import fs from "node:fs";
 
-import type { TreeNode } from "@/utils/cliTree";
+import type { TreeNode } from "@utils/cliTree";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
 import {

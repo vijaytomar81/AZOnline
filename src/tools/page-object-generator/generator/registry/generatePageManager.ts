@@ -2,9 +2,9 @@
 
 import path from "node:path";
 
-import { safeReadText, safeWriteText } from "@/utils/fs";
-import { PAGES_DIR } from "@/utils/paths";
-import { toCamelFromText } from "@/utils/text";
+import { safeReadText, safeWriteText } from "@utils/fs";
+import { PAGES_DIR } from "@utils/paths";
+import { toCamelFromText } from "@utils/text";
 import type { PageManifestEntry } from "../pageManifest";
 
 export type GeneratePageManagerResult = {

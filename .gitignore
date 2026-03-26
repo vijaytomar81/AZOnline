@@ -62,3 +62,18 @@ token.json
 # Recommended config folder for API credentials
 config/*.json
 !config/.gitkeep
+
+# ------------------------------------------------------------
+# Data Builder (generated data + manifest)
+# ------------------------------------------------------------
+
+# Ignore all generated data files
+src/data/generated/**
+src/data/generated/archive/**
+
+# Keep folder structure (optional)
+!src/data/generated/.gitkeep
+!src/data/generated/**/.gitkeep
+
+# Explicitly ignore manifest/index
+src/data/generated/index.json

@@ -2,7 +2,7 @@
 
 import path from "node:path";
 
-import type { TreeNode } from "@/utils/cliTree";
+import type { TreeNode } from "@utils/cliTree";
 import { loadPageManifest } from "@/tools/page-object-generator/generator/pageManifest";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";

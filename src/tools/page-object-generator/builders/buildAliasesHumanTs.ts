@@ -1,7 +1,7 @@
 // src/tools/page-object-generator/builders/buildAliasesHumanTs.ts
 
 import type { PageMap } from "../generator/types";
-import { isValidTsIdentifier } from "../../../utils/ts";
+import { isValidTsIdentifier } from "@utils/ts";
 
 function toPropertyAccess(objectName: string, key: string): string {
     return isValidTsIdentifier(key)

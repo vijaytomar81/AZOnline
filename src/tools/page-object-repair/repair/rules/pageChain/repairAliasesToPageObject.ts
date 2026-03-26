@@ -2,7 +2,7 @@
 
 import fs from "node:fs";
 
-import type { TreeNode } from "@/utils/cliTree";
+import type { TreeNode } from "@utils/cliTree";
 import type { RepairRule } from "../../pipeline/types";
 import { readAliasPairs } from "../../shared/aliases";
 import { readElementsInfo } from "../../shared/elements";

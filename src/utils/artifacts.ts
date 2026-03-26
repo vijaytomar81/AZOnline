@@ -2,6 +2,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { ensureDir, ensureParentDir } from "./fs";
+import { DATA_GENERATED_ARCHIVE_DIR, DATA_GENERATED_DIR } from "./paths";
+import { formatTimestamp } from "./time";
 
 export type ArtifactWriteOptions = {
     withTimestamp?: boolean;
@@ -11,15 +13,7 @@ export type ArtifactWriteOptions = {
 };
 
 function formatArtifactTimestamp(date = new Date()): string {
-    const yyyy = String(date.getFullYear());
-    const mm = String(date.getMonth() + 1).padStart(2, "0");
-    const dd = String(date.getDate()).padStart(2, "0");
-    const hh = String(date.getHours()).padStart(2, "0");
-    const min = String(date.getMinutes()).padStart(2, "0");
-    const ss = String(date.getSeconds()).padStart(2, "0");
-    const ms = String(date.getMilliseconds()).padStart(3, "0");
-
-    return `${yyyy}${mm}${dd}_${hh}${min}${ss}_${ms}`;
+    return formatTimestamp(date);
 }
 
 function escapeRegex(value: string) {
@@ -36,8 +30,22 @@ function buildActiveArtifactPath(baseFilePath: string, withTimestamp: boolean, d
     return path.join(dir, `${base}_${formatArtifactTimestamp(date)}${ext}`);
 }
 
+function getArchiveTargetDir(sourceFilePath: string, archiveDirPath: string): string {
+    const absSource = path.resolve(sourceFilePath);
+    const absGeneratedDir = path.resolve(DATA_GENERATED_DIR);
+    const absArchiveDir = path.resolve(archiveDirPath);
+
+    if (absSource.startsWith(absGeneratedDir + path.sep)) {
+        const relativeFromGenerated = path.relative(absGeneratedDir, path.dirname(absSource));
+        return path.join(absArchiveDir, relativeFromGenerated);
+    }
+
+    return absArchiveDir;
+}
+
 function buildArchivedArtifactPath(sourceFilePath: string, archiveDirPath: string) {
-    return path.join(archiveDirPath, path.basename(sourceFilePath));
+    const targetDir = getArchiveTargetDir(sourceFilePath, archiveDirPath);
+    return path.join(targetDir, path.basename(sourceFilePath));
 }
 
 function listActiveFamilyFiles(baseFilePath: string): string[] {
@@ -57,19 +65,21 @@ function listActiveFamilyFiles(baseFilePath: string): string[] {
 }
 
 function listArchivedFamilyFiles(baseFilePath: string, archiveDirPath: string) {
+    const archivedDir = getArchiveTargetDir(baseFilePath, archiveDirPath);
     const ext = path.extname(baseFilePath);
     const base = path.basename(baseFilePath, ext);
-    if (!fs.existsSync(archiveDirPath)) return [];
+
+    if (!fs.existsSync(archivedDir)) return [];
 
     const plainName = `${base}${ext}`;
     const stampedPattern = new RegExp(
         `^${escapeRegex(base)}_\\d{8}_\\d{6}_\\d{3}${escapeRegex(ext)}$`
     );
 
-    return fs.readdirSync(archiveDirPath)
+    return fs.readdirSync(archivedDir)
         .filter((name) => name === plainName || stampedPattern.test(name))
         .sort((a, b) => b.localeCompare(a))
-        .map((name) => path.join(archiveDirPath, name));
+        .map((name) => path.join(archivedDir, name));
 }
 
 function trimArchivedFamily(baseFilePath: string, archiveDirPath: string, maxToKeep: number) {
@@ -80,7 +90,6 @@ function trimArchivedFamily(baseFilePath: string, archiveDirPath: string, maxToK
 
 function archiveActiveFamily(baseFilePath: string, archiveDirPath: string, maxToKeep: number) {
     const activeFiles = listActiveFamilyFiles(baseFilePath);
-    ensureDir(archiveDirPath);
 
     activeFiles.forEach((activePath) => {
         const archivedPath = buildArchivedArtifactPath(activePath, archiveDirPath);
@@ -104,7 +113,7 @@ export function writeArtifactFile(
     ensureParentDir(baseFilePath);
 
     const withTimestamp = !!opts.withTimestamp;
-    const archiveDirPath = opts.archiveDirPath;
+    const archiveDirPath = opts.archiveDirPath || DATA_GENERATED_ARCHIVE_DIR;
     const maxToKeep = opts.maxToKeep ?? 30;
 
     archiveActiveFamily(baseFilePath, archiveDirPath, maxToKeep);

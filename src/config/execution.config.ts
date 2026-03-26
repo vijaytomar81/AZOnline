@@ -1,5 +1,5 @@
 // src/config/execution.config.ts
-import { envBool, envNumber, envString } from "../utils/env";
+import { envBool, envNumber, envString } from "@utils/env";
 
 export type ExecutionConfig = {
   browser: {
@@ -41,7 +41,7 @@ export const executionConfig: ExecutionConfig = {
   },
 
   generatedArtifacts: {
-    withTimestamp: envBool("ARTIFACTS_WITH_TIMESTAMP", false),
+    withTimestamp: envBool("ARTIFACTS_WITH_TIMESTAMP", true),
     maxToKeep: envNumber("MAX_ARTIFACTS_TO_KEEP", 30),
   },
 };

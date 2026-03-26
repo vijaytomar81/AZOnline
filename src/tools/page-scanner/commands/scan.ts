@@ -1,10 +1,10 @@
 // src/tools/page-scanner/commands/scan.ts
 
-import { createLogger } from "@/utils/logger";
+import { createLogger } from "@utils/logger";
 import { scanPage } from "../scanner/runner";
-import { getArg, hasFlag, required } from "@/utils/argv";
+import { getArg, hasFlag, required } from "@utils/argv";
 import { usage } from "../scannerHelp";
-import { PAGE_MAPS_DIR, PAGE_SCANNER_LOG_FILE } from "@/utils/paths";
+import { PAGE_MAPS_DIR, PAGE_SCANNER_LOG_FILE } from "@utils/paths";
 
 export async function runScanCommand(args: string[]) {
     const verbose = hasFlag(args, "--verbose");

@@ -1,7 +1,7 @@
 // src/tools/page-object-generator/builders/buildElementsTs.ts
 
 import type { PageMap, PageMapElement } from "../generator/types";
-import { escapeTsString, isValidTsIdentifier } from "../../../utils/ts";
+import { escapeTsString, isValidTsIdentifier } from "@utils/ts";
 
 type ElementEntry = {
     key: string;

@@ -2,8 +2,8 @@
 
 import type { PageMap } from "../generator/types";
 import { buildUrlReFromUrlPath } from "../generator/urlMeta";
-import { isValidTsIdentifier } from "../../../utils/ts";
-import { escapeForRegex } from "../../../utils/regex";
+import { isValidTsIdentifier } from "@utils/ts";
+import { escapeForRegex } from "@utils/regex";
 
 function toTsValue(value?: string): string {
     return value && value.trim() ? value : "undefined";

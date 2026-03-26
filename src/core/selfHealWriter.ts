@@ -2,9 +2,9 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { createLogger } from "../utils/logger";
-import type { Logger } from "../utils/logger";
-import { PAGE_MAPS_DIR } from "../utils/paths";
+import { createLogger } from "@utils/logger";
+import type { Logger } from "@utils/logger";
+import { PAGE_MAPS_DIR } from "@utils/paths";
 
 type PageMap = {
     pageKey: string;

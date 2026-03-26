@@ -1,8 +1,8 @@
 // src/tools/page-scanner/scanner/selectors/roleStrategy.ts
 
 import type { ScannedElement, SelectorCandidate } from "../types";
-import { escapeForRegex } from "@/utils/regex";
-import { normalizeSpaces } from "@/utils/text";
+import { escapeForRegex } from "@utils/regex";
+import { normalizeSpaces } from "@utils/text";
 import { inferRoleFromTag, scoreRole } from "./shared";
 
 export function buildRoleSelectors(el: ScannedElement): SelectorCandidate[] {

@@ -1,6 +1,6 @@
 // src/tools/page-scanner/scanner/pageMap/groupControls.ts
 
-import { uniq } from "@/utils/collections";
+import { uniq } from "@utils/collections";
 import type { PageMap, PageMapElementEntry, ScannedElement } from "../types";
 
 type BuiltElementRecord = {

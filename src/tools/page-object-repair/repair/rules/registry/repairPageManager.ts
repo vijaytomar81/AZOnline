@@ -2,7 +2,7 @@
 
 import fs from "node:fs";
 
-import type { TreeNode } from "@/utils/cliTree";
+import type { TreeNode } from "@utils/cliTree";
 import { getPageManagerFile } from "@/tools/page-object-common/pagePaths";
 import type { RepairRule } from "../../pipeline/types";
 import {

@@ -1,6 +1,6 @@
 // src/api/gmail/gmailPolicyService.ts
 
-import { createLogger, type Logger } from "../../utils/logger";
+import { createLogger, type Logger } from "@utils/logger";
 import { verifyPolicyEmailReceived } from "./gmailService";
 
 export type WaitForPolicyEmailOptions = {

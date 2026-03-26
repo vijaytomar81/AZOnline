@@ -13,12 +13,14 @@ export type TargetEnvUrls = {
 
 export type EnvironmentsConfig = {
   defaultEnv: EnvKey;
+  calculatedEmailBase: string; // ✅ ADD HERE
   pcw: PcwUrls;
   envs: Record<EnvKey, TargetEnvUrls>;
 };
 
 export const environments: EnvironmentsConfig = {
   defaultEnv: 'azOnlineTest',
+  calculatedEmailBase: "test@mail.com",
 
   pcw: {
     ctmMotorUrl: "https://journey-gateway-product.uat.ctmers.io/car/5.0/start",

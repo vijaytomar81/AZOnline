@@ -2,15 +2,15 @@
 
 import fs from "node:fs";
 
-import { createLogger } from "@/utils/logger";
-import { normalizeArgv, hasFlag, getArg } from "@/utils/argv";
+import { createLogger } from "@utils/logger";
+import { normalizeArgv, hasFlag, getArg } from "@utils/argv";
 import {
     PAGE_MAPS_DIR,
     PAGE_OBJECTS_DIR,
     PAGE_REGISTRY_DIR,
     PAGE_MANIFEST_DIR,
-} from "@/utils/paths";
-import { printKeyValue, printSection } from "@/utils/cliFormat";
+} from "@utils/paths";
+import { printKeyValue, printSection } from "@utils/cliFormat";
 
 import { runValidationPipeline } from "../validate/pipeline/runner";
 import { printValidationExecution, printValidationSummary } from "../validate/report";

@@ -1,6 +1,6 @@
 // src/tools/page-object-generator/generator/aliasParser/shared.ts
-import { isValidTsIdentifier } from "@/utils/ts";
-import { stripLineComments } from "@/utils/text";
+import { isValidTsIdentifier } from "@utils/ts";
+import { stripLineComments } from "@utils/text";
 import type { AliasEntry, AliasPair, AliasesObjectBody } from "./types";
 
 export function toPropertyAccess(objectName: string, key: string): string {

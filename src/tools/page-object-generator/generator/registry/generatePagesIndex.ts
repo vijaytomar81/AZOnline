@@ -2,8 +2,8 @@
 
 import path from "node:path";
 
-import { safeReadText, safeWriteText } from "@/utils/fs";
-import { PAGES_DIR } from "@/utils/paths";
+import { safeReadText, safeWriteText } from "@utils/fs";
+import { PAGES_DIR } from "@utils/paths";
 import type { PageManifestEntry } from "../pageManifest";
 
 export type GeneratePagesIndexResult = {

@@ -2,8 +2,8 @@
 
 import fs from "node:fs";
 
-import { toRepoRelative } from "@/utils/paths";
-import { toPascal } from "@/utils/ts";
+import { toRepoRelative } from "@utils/paths";
+import { toPascal } from "@utils/ts";
 import type { AliasPair } from "./aliases";
 import type { ElementInfo } from "./elements";
 

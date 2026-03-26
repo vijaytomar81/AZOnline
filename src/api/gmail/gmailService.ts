@@ -1,6 +1,6 @@
 // src/api/gmail/gmailService.ts
 
-import { createLogger } from "../../utils/logger";
+import { createLogger } from "@utils/logger";
 import { createGmailClient } from "./gmailClient";
 import {
     buildSearchableEmailText,

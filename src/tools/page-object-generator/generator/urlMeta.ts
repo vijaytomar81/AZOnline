@@ -1,6 +1,6 @@
 // src/tools/page-object-generator/generator/urlMeta.ts
 
-import { escapeForRegex } from "@/utils/regex";
+import { escapeForRegex } from "@utils/regex";
 
 /**
  * Create a stable URL regex from urlPath.
