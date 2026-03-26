@@ -1,10 +1,8 @@
 // src/logging/log.ts
 
-import type { Logger } from "@utils/logger";
 import type { LogEvent } from "@logging/core/logEvent";
 import { publishToConsole } from "@logging/publishers/consolePublisher";
 import { publishToFile } from "@logging/publishers/filePublisher";
-import { publishToLogger } from "@logging/publishers/loggerPublisher";
 
 function normalizeEvent(event: LogEvent): LogEvent {
     return {
@@ -18,17 +16,6 @@ export function logEvent(event: LogEvent): void {
 
     publishToConsole(normalized);
     publishToFile(normalized);
-}
-
-export function logEventWithLogger(
-    logger: Logger,
-    event: LogEvent
-): void {
-    const normalized = normalizeEvent(event);
-
-    publishToConsole(normalized);
-    publishToFile(normalized);
-    publishToLogger(logger, normalized);
 }
 
 export function createLogEvent(args: {

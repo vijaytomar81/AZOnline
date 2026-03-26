@@ -3,7 +3,9 @@
 import path from "node:path";
 import { AppError } from "@utils/errors";
 import { fileExists } from "@utils/fs";
-import type { Logger } from "@utils/logger";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
+import { createLogEvent, logEvent } from "@logging/log";
 import type { RawScenarioRow } from "@execution/modes/e2e/scenario/types";
 import {
     loadWorkbookAndWorksheet,
@@ -22,8 +24,23 @@ export type LoadScenarioSheetResult = {
     rows: RawScenarioRow[];
 };
 
+function emitTechnicalLog(args: {
+    logScope: string;
+    level: "debug" | "info" | "warn" | "error";
+    message: string;
+}): void {
+    logEvent(createLogEvent({
+        level: args.level,
+        category: LOG_CATEGORIES.TECHNICAL,
+        message: args.message,
+        scope: args.logScope,
+    }));
+}
+
 function resolveExcelPath(excelPath: string): string {
-    return path.isAbsolute(excelPath) ? excelPath : path.join(process.cwd(), excelPath);
+    return path.isAbsolute(excelPath)
+        ? excelPath
+        : path.join(process.cwd(), excelPath);
 }
 
 function ensureExcelExists(absExcel: string, excelPath: string): void {
@@ -52,28 +69,48 @@ function buildHeaders(loaded: LoadedWorksheet): string[] {
 export async function loadScenarioSheet(args: {
     excelPath: string;
     sheetName: string;
-    log?: Logger;
+    logScope: string;
 }): Promise<LoadScenarioSheetResult> {
     const absExcel = resolveExcelPath(args.excelPath);
     ensureExcelExists(absExcel, args.excelPath);
 
-    args.log?.info(`Loading execution workbook: ${absExcel}`);
+    emitTechnicalLog({
+        logScope: args.logScope,
+        level: LOG_LEVELS.INFO,
+        message: `Loading execution workbook: ${absExcel}`,
+    });
 
     const loaded = await loadWorkbookAndWorksheet({
         absExcel,
         requestedSheetName: args.sheetName,
     });
 
-    args.log?.debug(
-        `Workbook sheets: ${loaded.workbook.worksheets.map((item) => item.name).join(", ")}`
-    );
+    emitTechnicalLog({
+        logScope: args.logScope,
+        level: LOG_LEVELS.DEBUG,
+        message: `Workbook sheets: ${loaded.workbook.worksheets.map((item) => item.name).join(", ")}`,
+    });
 
     const headers = buildHeaders(loaded);
     const rows = mapScenarioRows(loaded.worksheet, headers);
 
-    args.log?.info(`Loaded execution sheet: ${loaded.worksheet.name}`);
-    args.log?.info(`Scenario rows loaded: ${rows.length}`);
-    args.log?.debug(`Headers: ${headers.filter(Boolean).join(", ")}`);
+    emitTechnicalLog({
+        logScope: args.logScope,
+        level: LOG_LEVELS.INFO,
+        message: `Loaded execution sheet: ${loaded.worksheet.name}`,
+    });
+
+    emitTechnicalLog({
+        logScope: args.logScope,
+        level: LOG_LEVELS.INFO,
+        message: `Scenario rows loaded: ${rows.length}`,
+    });
+
+    emitTechnicalLog({
+        logScope: args.logScope,
+        level: LOG_LEVELS.DEBUG,
+        message: `Headers: ${headers.filter(Boolean).join(", ")}`,
+    });
 
     return {
         sheetName: loaded.worksheet.name,

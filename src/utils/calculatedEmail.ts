@@ -1,4 +1,4 @@
-// src/execution/utils/calculatedEmail.ts
+// src/utils/calculatedEmail.ts
 
 import { formatTimestamp } from "@utils/time";
 import { environments } from "@config/environments";

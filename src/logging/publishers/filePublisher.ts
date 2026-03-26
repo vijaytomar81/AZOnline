@@ -19,6 +19,15 @@ function toJsonLine(event: LogEvent): string {
     });
 }
 
+function appendLine(filePath: string, line: string): void {
+    fs.appendFile(filePath, line, "utf8", (err) => {
+        if (err) {
+            // fallback to console (never throw from logger)
+            console.error("[LOGGING_ERROR] Failed to write log file:", err.message);
+        }
+    });
+}
+
 export function publishToFile(event: LogEvent): void {
     if (!shouldWriteLogToFile(event)) {
         return;
@@ -27,5 +36,5 @@ export function publishToFile(event: LogEvent): void {
     const filePath = buildLogFilePath(event.category);
     ensureLogDir(path.dirname(filePath));
 
-    fs.appendFileSync(filePath, `${toJsonLine(event)}\n`, "utf8");
+    appendLine(filePath, `${toJsonLine(event)}\n`);
 }

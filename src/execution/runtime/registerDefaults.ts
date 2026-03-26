@@ -1,5 +1,8 @@
 // src/execution/runtime/registerDefaults.ts
 
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
+import { createLogEvent, logEvent } from "@logging/log";
 import { addStepExecutor, type ExecutionBootstrap } from "@execution/core/bootstrap";
 import { runMta } from "../journeys/mta";
 import { runMtc } from "../journeys/mtc";
@@ -15,12 +18,20 @@ type ExecutorRegistration = {
     executor: Parameters<typeof addStepExecutor>[0]["executor"];
 };
 
-function logRegistration(
-    bootstrap: ExecutionBootstrap,
-    registration: ExecutorRegistration
+function emitFrameworkLog(
+    level: "debug" | "info" | "warn" | "error",
+    message: string
 ): void {
-    const log = bootstrap.log.child("register-defaults");
-    const route = [
+    logEvent(createLogEvent({
+        level,
+        category: LOG_CATEGORIES.FRAMEWORK,
+        message,
+        scope: "execution:register-defaults",
+    }));
+}
+
+function buildRoute(registration: ExecutorRegistration): string {
+    return [
         `action=${registration.action}`,
         registration.journey ? `journey=${registration.journey}` : "",
         registration.portal ? `portal=${registration.portal}` : "",
@@ -28,9 +39,14 @@ function logRegistration(
     ]
         .filter(Boolean)
         .join(", ");
+}
 
-    log.info(`Registered executor for ${route}`);
-    log.debug(
+function logRegistration(registration: ExecutorRegistration): void {
+    const route = buildRoute(registration);
+
+    emitFrameworkLog(LOG_LEVELS.DEBUG, `Registered executor for ${route}`);
+    emitFrameworkLog(
+        LOG_LEVELS.DEBUG,
         `Executor mapping -> ${route}, handler=${registration.executorName}`
     );
 }
@@ -48,15 +64,13 @@ function registerOne(
         executor: registration.executor,
     });
 
-    logRegistration(bootstrap, registration);
+    logRegistration(registration);
 }
 
 export function registerDefaultExecutors(
     bootstrap: ExecutionBootstrap
 ): void {
-    const log = bootstrap.log.child("register-defaults");
-
-    log.info("Registering default step executors...");
+    emitFrameworkLog(LOG_LEVELS.DEBUG, "Registering default step executors...");
 
     const registrations: ExecutorRegistration[] = [
         {
@@ -85,8 +99,12 @@ export function registerDefaultExecutors(
         registerOne(bootstrap, registration);
     });
 
-    log.info(`Default executor registration completed. Count=${registrations.length}`);
-    log.debug(
+    emitFrameworkLog(
+        LOG_LEVELS.DEBUG,
+        `Default executor registration completed. Count=${registrations.length}`
+    );
+    emitFrameworkLog(
+        LOG_LEVELS.DEBUG,
         `Registered actions: ${registrations.map((r) => r.action).join(", ")}`
     );
 }

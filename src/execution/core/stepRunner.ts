@@ -1,7 +1,9 @@
 // src/execution/core/stepRunner.ts
 
-import type { Logger } from "@utils/logger";
 import { nowIso } from "@utils/time";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
+import { createLogEvent, logEvent } from "@logging/log";
 import type { ScenarioStep } from "@execution/modes/e2e/scenario/types";
 import type { ExecutionContext } from "@execution/core/executionContext";
 import { addStepResult } from "@execution/core/executionContext";
@@ -44,6 +46,19 @@ function createStepDebugCollector() {
     };
 }
 
+function emitStepLog(args: {
+    logScope: string;
+    level: "debug" | "info" | "warn" | "error";
+    message: string;
+}): void {
+    logEvent(createLogEvent({
+        level: args.level,
+        category: LOG_CATEGORIES.TECHNICAL,
+        message: args.message,
+        scope: args.logScope,
+    }));
+}
+
 function buildFailureResult(args: {
     step: ScenarioStep;
     startedAt: string;
@@ -64,17 +79,38 @@ function buildFailureResult(args: {
     });
 }
 
+function buildOverrideResolved(
+    step: ScenarioStep,
+    payload: Record<string, unknown>
+): ResolvedOverride {
+    return {
+        testCaseId: step.testCaseId,
+        payload,
+        source: {
+            action: step.action,
+            sheetName: "data-mode",
+        },
+        sourceFileSheet: "data-mode",
+    };
+}
+
 export async function runStep(args: {
     context: ExecutionContext;
     step: ScenarioStep;
     registry: ExecutorRegistry;
     dataRegistry: StepDataResolverRegistry;
-    log: Logger;
+    logScope: string;
     overrideStepData?: Record<string, unknown>;
     mode?: "data" | "e2e";
 }): Promise<StepExecutionResult> {
     const startedAt = nowIso();
     const debug = createStepDebugCollector();
+
+    emitStepLog({
+        logScope: args.logScope,
+        level: LOG_LEVELS.DEBUG,
+        message: `Step started -> action=${args.step.action}, testCaseId=${args.step.testCaseId}`,
+    });
 
     try {
         const executor = getExecutor(args.registry, args.context, args.step);
@@ -86,34 +122,28 @@ export async function runStep(args: {
                 message: `No executor registered for step action="${args.step.action}"`,
                 debugLines: debug.all(),
             });
+
             addStepResult(args.context, result);
             return result;
         }
 
-        const resolved =
-            args.overrideStepData
-                ? ({
-                    testCaseId: args.step.testCaseId,
-                    payload: args.overrideStepData,
-                    source: {
-                        action: args.step.action,
-                        sheetName: "data-mode",
-                    },
-                    sourceFileSheet: "data-mode",
-                } as ResolvedOverride)
-                : resolveStepData({
-                    registry: args.dataRegistry,
-                    journey: args.context.scenario.journey,
-                    step: args.step,
-                    log: args.log,
-                    debugCollector: debug,
-                });
+        const resolved = args.overrideStepData
+            ? buildOverrideResolved(args.step, args.overrideStepData)
+            : resolveStepData({
+                registry: args.dataRegistry,
+                journey: args.context.scenario.journey,
+                step: args.step,
+                logScope: args.logScope,
+                debugCollector: debug,
+            });
 
         if (args.overrideStepData) {
             debug.push(
                 `Using override step data -> action=${args.step.action}, testCaseId=${args.step.testCaseId}`
             );
-            debug.push(`Resolved source -> sheet=data-mode, action=${args.step.action}`);
+            debug.push(
+                `Resolved source -> sheet=${resolved.sourceFileSheet}, action=${resolved.source.action}`
+            );
         }
 
         await executor({
