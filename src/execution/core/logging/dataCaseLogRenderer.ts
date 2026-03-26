@@ -2,13 +2,17 @@
 
 import { muted, success } from "@utils/cliFormat";
 import type { ExecutionScenario } from "@execution/modes/e2e/scenario/types";
-import type { ScenarioExecutionResult } from "@execution/core/result";
+import type {
+    ScenarioExecutionResult,
+    StepExecutionResult,
+} from "@execution/core/result";
 import { OUTPUT_KEYS } from "@execution/constants/outputKeys";
 import {
     collectFieldIfPresent,
     divider,
     field,
     renderFields,
+    safeText,
     statusText,
 } from "@execution/core/logging/shared";
 
@@ -20,6 +24,16 @@ function formatRequestPreview(value: unknown): string {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 }
 
+function getDebugLines(step?: StepExecutionResult): string[] {
+    const raw = step?.details?.debugLines;
+
+    if (!Array.isArray(raw)) {
+        return [];
+    }
+
+    return raw.map((item) => safeText(item).trim()).filter(Boolean);
+}
+
 export function renderDataCaseBlock(args: {
     scenario: ExecutionScenario;
     result: ScenarioExecutionResult;
@@ -27,6 +41,7 @@ export function renderDataCaseBlock(args: {
 }): string {
     const { scenario, result, duration } = args;
     const outputs = result.outputs ?? {};
+    const step = result.stepResults[0];
     const failedStep = result.stepResults.find((item) => item.status === "failed");
     const lines: string[] = [];
 
@@ -36,7 +51,6 @@ export function renderDataCaseBlock(args: {
             scenario.scenarioId
         )}====================`
     );
-
     lines.push(field("TestCaseId", scenario.scenarioId));
     lines.push(field("Journey", scenario.journey));
     lines.push(field("EntryPoint", scenario.entryPoint ?? "Direct"));
@@ -44,12 +58,15 @@ export function renderDataCaseBlock(args: {
 
     const detailFields: Array<[string, unknown]> = [];
 
+    getDebugLines(step).forEach((debugLine) => {
+        detailFields.push(["DEBUG", debugLine]);
+    });
+
     collectFieldIfPresent(
         detailFields,
         "PaymentMode",
         outputs[OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.PAYMENT_MODE]
     );
-
     collectFieldIfPresent(
         detailFields,
         "IQL",
@@ -62,34 +79,28 @@ export function renderDataCaseBlock(args: {
             : undefined;
 
     collectFieldIfPresent(detailFields, "Monthly Card", monthlyCard);
-
     collectFieldIfPresent(
         detailFields,
         "RequestType",
         outputs[OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.REQUEST_TYPE]
     );
-
-    const requestMessage =
-        outputs[OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.REQUEST_MESSAGE_FINAL];
-
     collectFieldIfPresent(
         detailFields,
         "RequestMessage",
-        formatRequestPreview(requestMessage)
+        formatRequestPreview(
+            outputs[OUTPUT_KEYS.NEW_BUSINESS.PCW_TOOL.REQUEST_MESSAGE_FINAL]
+        )
     );
-
     collectFieldIfPresent(
         detailFields,
         "CalculatedEmail",
         outputs[OUTPUT_KEYS.NEW_BUSINESS.CALCULATED_EMAIL]
     );
-
     collectFieldIfPresent(
         detailFields,
         "QuoteNumber",
         outputs[OUTPUT_KEYS.NEW_BUSINESS.QUOTE]
     );
-
     collectFieldIfPresent(
         detailFields,
         "PolicyNumber",
@@ -100,7 +111,7 @@ export function renderDataCaseBlock(args: {
         collectFieldIfPresent(detailFields, "Error", failedStep.message);
     }
 
-    lines.push(...renderFields(detailFields));
+    lines.push(...renderFields(detailFields, 16));
     lines.push("");
     lines.push(field("Status", statusText(result.status)));
     lines.push(field("Duration", duration));

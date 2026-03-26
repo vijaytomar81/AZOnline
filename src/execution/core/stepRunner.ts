@@ -28,12 +28,11 @@ type ResolvedOverride = {
     sourceFileSheet: string;
 };
 
-function createStepDebugCollector(enabled: boolean) {
+function createStepDebugCollector() {
     const debugLines: string[] = [];
 
     return {
         push(message: string): void {
-            if (!enabled) return;
             const text = String(message ?? "").trim();
             if (text) {
                 debugLines.push(text);
@@ -75,8 +74,7 @@ export async function runStep(args: {
     mode?: "data" | "e2e";
 }): Promise<StepExecutionResult> {
     const startedAt = nowIso();
-    const isE2E = args.mode === "e2e";
-    const debug = createStepDebugCollector(isE2E);
+    const debug = createStepDebugCollector();
 
     try {
         const executor = getExecutor(args.registry, args.context, args.step);
@@ -110,6 +108,13 @@ export async function runStep(args: {
                     log: args.log,
                     debugCollector: debug,
                 });
+
+        if (args.overrideStepData) {
+            debug.push(
+                `Using override step data -> action=${args.step.action}, testCaseId=${args.step.testCaseId}`
+            );
+            debug.push(`Resolved source -> sheet=data-mode, action=${args.step.action}`);
+        }
 
         await executor({
             context: args.context,
