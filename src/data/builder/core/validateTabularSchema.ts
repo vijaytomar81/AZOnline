@@ -9,7 +9,7 @@ import {
     collectSchemaFields,
     collectSchemaFieldsBySection,
     missingFields,
-} from "./schemaValidationShared";
+} from "./schemaValidation";
 
 function getHeaders(ws: ExcelJS.Worksheet): string[] {
     const maxCol = ws.columnCount || ws.actualColumnCount || 0;

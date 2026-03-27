@@ -11,7 +11,7 @@ import {
     collectSchemaFieldsBySection,
     expandRepeatedGroupFields,
     missingFields,
-} from "./schemaValidationShared";
+} from "./schemaValidation";
 
 function collectExcelFields(
     ws: ExcelJS.Worksheet,
