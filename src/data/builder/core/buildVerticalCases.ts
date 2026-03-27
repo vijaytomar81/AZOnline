@@ -4,8 +4,13 @@ import type ExcelJS from "exceljs";
 import type { DataSchema } from "../../data-definitions/types";
 import type { BuiltCase, DataBuilderContext, DataBuilderMeta } from "../types";
 import { DataBuilderError } from "../errors";
-import { buildRowIndex } from "./excelRuntime";
+import { buildRowIndex } from "./spreadsheet";
 import { buildPayload } from "./schemaRuntime";
+import { createBuiltCase } from "./buildCases/shared/createBuiltCase";
+import { emitLog } from "@data/builder/logging/emitLog";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { logBuiltVerticalCase } from "./buildCases/vertical/logBuiltVerticalCase";
+import { LOG_LEVELS } from "@logging/core/logLevels";
 
 type BuildVerticalCasesArgs = {
     ctx: DataBuilderContext;
@@ -14,34 +19,6 @@ type BuildVerticalCasesArgs = {
     schema: DataSchema;
     includeEmpty: boolean;
 };
-
-function getDescription(data: Record<string, any>): string | undefined {
-    return String(data.meta?.description ?? "").trim() || undefined;
-}
-
-function logVerticalCase(
-    ctx: DataBuilderContext,
-    builtCase: BuiltCase,
-    data: Record<string, any>
-): void {
-    const additionalDriversCount =
-        Number(data.additionalDrivers?.count ?? 0) || 0;
-    const policyHolderClaimsCount =
-        Number(data.policyHolderClaims?.count ?? 0) || 0;
-    const policyHolderConvictionsCount =
-        Number(data.policyHolderConvictions?.count ?? 0) || 0;
-
-    ctx.log.debug?.(
-        [
-            `Built case -> index=${builtCase.caseIndex}`,
-            `scriptId=${builtCase.scriptId ?? ""}`,
-            `scriptName=${builtCase.scriptName}`,
-            `policyHolderClaims=${policyHolderClaimsCount}`,
-            `policyHolderConvictions=${policyHolderConvictionsCount}`,
-            `additionalDrivers=${additionalDriversCount}`,
-        ].join(", ")
-    );
-}
 
 export function buildVerticalCases(
     args: BuildVerticalCasesArgs
@@ -63,7 +40,14 @@ export function buildVerticalCases(
 
     const rowIndex = buildRowIndex(ws, meta.fieldCol, meta.dataStartRow);
 
-    ctx.log.debug?.(`rowIndex size=${rowIndex.size}`);
+    if (ctx.data.verbose) {
+        emitLog({
+            scope: ctx.logScope,
+            category: LOG_CATEGORIES.PIPELINE,
+            level: LOG_LEVELS.DEBUG,
+            message: `rowIndex size=${rowIndex.size}`,
+        });
+    }
 
     return meta.caseMetas.map((m, idx) => {
         if (!m.col) {
@@ -88,15 +72,19 @@ export function buildVerticalCases(
             includeEmpty,
         });
 
-        const builtCase: BuiltCase = {
+        const builtCase = createBuiltCase({
             caseIndex: idx + 1,
             scriptName: m.scriptName,
             scriptId: m.scriptId,
-            description: getDescription(data),
             data,
-        };
+        });
 
-        logVerticalCase(ctx, builtCase, data);
+        logBuiltVerticalCase({
+            ctx,
+            builtCase,
+            data,
+        });
+
         return builtCase;
     });
 }

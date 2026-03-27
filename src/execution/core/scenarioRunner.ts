@@ -1,6 +1,5 @@
 // src/execution/core/scenarioRunner.ts
 
-import type { Logger } from "@utils/logger";
 import type { ExecutionScenario } from "@execution/modes/e2e/scenario/types";
 import type { ExecutorRegistry } from "@execution/core/registry";
 import type { StepDataResolverRegistry } from "@execution/runtime/resolveStepData";
@@ -9,9 +8,7 @@ import {
     closeBrowserSession,
     createBrowserSession,
 } from "@execution/core/browserSession";
-import {
-    createExecutionContext,
-} from "@execution/core/executionContext";
+import { createExecutionContext } from "@execution/core/executionContext";
 import {
     buildScenarioExecutionResult,
     type ScenarioExecutionResult,
@@ -22,7 +19,7 @@ export async function runScenario(args: {
     scenario: ExecutionScenario;
     registry: ExecutorRegistry;
     dataRegistry: StepDataResolverRegistry;
-    log: Logger;
+    logScope: string;
     overrideStepData?: Record<string, unknown>;
     mode?: "data" | "e2e";
     stopOnFailure?: boolean;
@@ -41,7 +38,7 @@ export async function runScenario(args: {
                 step,
                 registry: args.registry,
                 dataRegistry: args.dataRegistry,
-                log: args.log.child(`Step${step.stepNo}`),
+                logScope: `${args.logScope}:Step${step.stepNo}`,
                 overrideStepData: args.overrideStepData,
                 mode: args.mode,
             });

@@ -1,6 +1,8 @@
 // src/execution/core/bootstrap.ts
 
-import { createLogger, type Logger } from "@utils/logger";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
+import { createLogEvent, logEvent } from "@logging/log";
 import {
     createExecutorRegistry,
     type ExecutorRegistry,
@@ -16,19 +18,25 @@ import {
 import { registerDefaultExecutors } from "@execution/runtime/registerDefaults";
 
 export type ExecutionBootstrap = {
-    log: Logger;
     executorRegistry: ExecutorRegistry;
     stepDataRegistry: StepDataResolverRegistry;
 };
 
 export type BootstrapOptions = {
-    log?: Logger;
     registerDefaultSources?: boolean;
     registerDefaultExecutors?: boolean;
 };
 
-function createBootstrapLogger(log?: Logger): Logger {
-    return log ?? createLogger({ prefix: "[execution]", logLevel: "info" });
+function emitFrameworkLog(
+    level: "debug" | "info" | "warn" | "error",
+    message: string
+): void {
+    logEvent(createLogEvent({
+        level,
+        category: LOG_CATEGORIES.FRAMEWORK,
+        message,
+        scope: "run",
+    }));
 }
 
 function registerDefaultStepDataSources(
@@ -42,40 +50,58 @@ function registerDefaultStepDataSources(
     });
 }
 
+function shouldRegisterDefaultSources(opts: BootstrapOptions): boolean {
+    return opts.registerDefaultSources !== false;
+}
+
+function shouldRegisterDefaultExecutors(opts: BootstrapOptions): boolean {
+    return opts.registerDefaultExecutors !== false;
+}
+
 export function createExecutionBootstrap(
     opts: BootstrapOptions = {}
 ): ExecutionBootstrap {
-    const log = createBootstrapLogger(opts.log);
     const executorRegistry = createExecutorRegistry();
     const stepDataRegistry = createStepDataResolverRegistry();
 
     const bootstrap: ExecutionBootstrap = {
-        log,
         executorRegistry,
         stepDataRegistry,
     };
 
-    log.info("Initializing execution bootstrap...");
-    log.debug(
-        `Bootstrap options -> registerDefaultSources=${opts.registerDefaultSources !== false}, ` +
-        `registerDefaultExecutors=${opts.registerDefaultExecutors !== false}`
+    emitFrameworkLog(
+        LOG_LEVELS.DEBUG,
+        "Initializing execution bootstrap..."
+    );
+    emitFrameworkLog(
+        LOG_LEVELS.DEBUG,
+        `Bootstrap options -> registerDefaultSources=${shouldRegisterDefaultSources(opts)}, registerDefaultExecutors=${shouldRegisterDefaultExecutors(opts)}`
     );
 
-    if (opts.registerDefaultSources !== false) {
+    if (shouldRegisterDefaultSources(opts)) {
         registerDefaultStepDataSources(stepDataRegistry);
-        log.info("Default step data sources registered.");
-        log.debug(`Step data source count=${stepDataRegistry.sources.length}`);
+        emitFrameworkLog(
+            LOG_LEVELS.DEBUG,
+            "Default step data sources registered."
+        );
+        emitFrameworkLog(
+            LOG_LEVELS.DEBUG,
+            `Step data source count=${stepDataRegistry.sources.length}`
+        );
     }
 
-    if (opts.registerDefaultExecutors !== false) {
+    if (shouldRegisterDefaultExecutors(opts)) {
         registerDefaultExecutors(bootstrap);
-        log.info("Default step executors registered.");
+        emitFrameworkLog(
+            LOG_LEVELS.DEBUG,
+            "Default step executors registered."
+        );
     }
 
-    log.info("Execution bootstrap ready.");
-    log.debug(
-        `Bootstrap summary -> executorKeys=${Object.keys(executorRegistry).length}, ` +
-        `stepDataSources=${stepDataRegistry.sources.length}`
+    emitFrameworkLog(LOG_LEVELS.DEBUG, "Execution bootstrap ready.");
+    emitFrameworkLog(
+        LOG_LEVELS.DEBUG,
+        `Bootstrap summary -> executorKeys=${Object.keys(executorRegistry).length}, stepDataSources=${stepDataRegistry.sources.length}`
     );
 
     return bootstrap;
@@ -87,13 +113,13 @@ export function addStepDataSource(
 ): void {
     registerStepDataSource(bootstrap.stepDataRegistry, source);
 
-    bootstrap.log.info(
+    emitFrameworkLog(
+        LOG_LEVELS.DEBUG,
         `Step data source added for action=${source.action}, sheet=${source.sheetName}`
     );
-    bootstrap.log.debug(
-        `Step data source -> action=${source.action}, journey=${source.journey ?? ""}, ` +
-        `subType=${source.subType ?? ""}, schema=${source.schemaName ?? ""}, ` +
-        `sheet=${source.sheetName}`
+    emitFrameworkLog(
+        LOG_LEVELS.DEBUG,
+        `Step data source -> action=${source.action}, journey=${source.journey ?? ""}, subType=${source.subType ?? ""}, schema=${source.schemaName ?? ""}, sheet=${source.sheetName}`
     );
 }
 
@@ -118,10 +144,11 @@ export function addStepExecutor(args: {
         args.journey ? `journey=${args.journey}` : "",
         args.portal ? `portal=${args.portal}` : "",
         args.subType ? `subType=${args.subType}` : "",
-    ]
-        .filter(Boolean)
-        .join(", ");
+    ].filter(Boolean).join(", ");
 
-    args.bootstrap.log.info(`Step executor added for ${route}`);
-    args.bootstrap.log.debug(`Executor registry size=${Object.keys(args.bootstrap.executorRegistry).length}`);
+    emitFrameworkLog(LOG_LEVELS.DEBUG, `Step executor added for ${route}`);
+    emitFrameworkLog(
+        LOG_LEVELS.DEBUG,
+        `Executor registry size=${Object.keys(args.bootstrap.executorRegistry).length}`
+    );
 }

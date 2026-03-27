@@ -2,10 +2,13 @@
 
 import { AppError } from "@utils/errors";
 import { normalizeSpaces } from "@utils/text";
-import { getCasesFile } from "../../data/runtime/getCasesFile";
-import type { CasesFile } from "../../data/builder/types";
-import type { Logger } from "@utils/logger";
+import type { CasesFile } from "@data/builder/types";
 import type { ScenarioStep } from "@execution/modes/e2e/scenario/types";
+import {
+    emitResolverDebug,
+    getOrLoadCasesFile,
+    matchesSource,
+} from "./stepDataResolverUtils";
 
 export type StepDataSource = {
     action: string;
@@ -27,85 +30,9 @@ export type StepDataResolverRegistry = {
     cache: Map<string, CasesFile>;
 };
 
-type DebugCollector = {
+export type DebugCollector = {
     push: (message: string) => void;
 };
-
-function normalizeKey(value?: string): string {
-    return normalizeSpaces(String(value ?? ""))
-        .toLowerCase()
-        .replace(/\s+/g, "");
-}
-
-function emitDebug(
-    message: string,
-    log?: Logger,
-    debugCollector?: DebugCollector
-): void {
-    const text = normalizeSpaces(message);
-    if (!text) return;
-
-    if (debugCollector) {
-        debugCollector.push(text);
-        return;
-    }
-
-    log?.debug(text);
-}
-
-function buildCacheKey(source: StepDataSource): string {
-    return [
-        normalizeKey(source.action),
-        normalizeKey(source.schemaName),
-        normalizeKey(source.sheetName),
-    ].join("|");
-}
-
-function matchesSource(
-    step: ScenarioStep,
-    journey: string,
-    source: StepDataSource
-): boolean {
-    if (normalizeKey(step.action) !== normalizeKey(source.action)) {
-        return false;
-    }
-
-    if (source.journey && normalizeKey(journey) !== normalizeKey(source.journey)) {
-        return false;
-    }
-
-    if (source.subType && normalizeKey(step.subType) !== normalizeKey(source.subType)) {
-        return false;
-    }
-
-    return true;
-}
-
-function getOrLoadCasesFile(args: {
-    registry: StepDataResolverRegistry;
-    source: StepDataSource;
-    log?: Logger;
-    debugCollector?: DebugCollector;
-}): CasesFile {
-    const key = buildCacheKey(args.source);
-    const cached = args.registry.cache.get(key);
-
-    if (cached) {
-        emitDebug(`Step data cache hit -> key=${key}`, args.log, args.debugCollector);
-        return cached;
-    }
-
-    emitDebug(
-        `Step data cache miss -> key=${key}. Loading cases file...`,
-        args.log,
-        args.debugCollector
-    );
-
-    const loaded = getCasesFile(args.source.sheetName, args.source.schemaName);
-    args.registry.cache.set(key, loaded);
-
-    return loaded;
-}
 
 export function createStepDataResolverRegistry(): StepDataResolverRegistry {
     return {
@@ -125,20 +52,25 @@ export function resolveStepData(args: {
     registry: StepDataResolverRegistry;
     journey: string;
     step: ScenarioStep;
-    log?: Logger;
+    logScope: string;
     debugCollector?: DebugCollector;
 }): ResolvedStepData {
     const testCaseId = normalizeSpaces(args.step.testCaseId);
 
-    emitDebug(
-        `Resolving step data -> action=${args.step.action}, journey=${args.journey}, ` +
-        `subType=${args.step.subType ?? ""}, testCaseId=${testCaseId}`,
-        args.log,
-        args.debugCollector
-    );
+    emitResolverDebug({
+        message:
+            `Resolving step data -> action=${args.step.action}, journey=${args.journey}, ` +
+            `subType=${args.step.subType ?? ""}, testCaseId=${testCaseId}`,
+        logScope: args.logScope,
+        debugCollector: args.debugCollector,
+    });
 
     const source = args.registry.sources.find((item) =>
-        matchesSource(args.step, args.journey, item)
+        matchesSource({
+            step: args.step,
+            journey: args.journey,
+            source: item,
+        })
     );
 
     if (!source) {
@@ -158,18 +90,19 @@ export function resolveStepData(args: {
         });
     }
 
-    emitDebug(
-        `Matched step data source -> action=${source.action}, ` +
-        `journey=${source.journey ?? ""}, subType=${source.subType ?? ""}, ` +
-        `sheet=${source.sheetName}, schema=${source.schemaName ?? ""}`,
-        args.log,
-        args.debugCollector
-    );
+    emitResolverDebug({
+        message:
+            `Matched step data source -> action=${source.action}, ` +
+            `journey=${source.journey ?? ""}, subType=${source.subType ?? ""}, ` +
+            `sheet=${source.sheetName}, schema=${source.schemaName ?? ""}`,
+        logScope: args.logScope,
+        debugCollector: args.debugCollector,
+    });
 
     const casesFile = getOrLoadCasesFile({
         registry: args.registry,
         source,
-        log: args.log,
+        logScope: args.logScope,
         debugCollector: args.debugCollector,
     });
 
@@ -194,11 +127,11 @@ export function resolveStepData(args: {
         });
     }
 
-    emitDebug(
-        `Resolved test case -> scriptId=${hit.scriptId ?? ""}, scriptName=${hit.scriptName}`,
-        args.log,
-        args.debugCollector
-    );
+    emitResolverDebug({
+        message: `Resolved test case -> scriptId=${hit.scriptId ?? ""}, scriptName=${hit.scriptName}`,
+        logScope: args.logScope,
+        debugCollector: args.debugCollector,
+    });
 
     return {
         testCaseId,

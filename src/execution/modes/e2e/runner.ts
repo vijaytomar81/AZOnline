@@ -1,7 +1,9 @@
 // src/execution/modes/e2e/runner.ts
 
 import { AppError } from "@utils/errors";
-import { createLogger } from "@utils/logger";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
+import { createLogEvent, logEvent } from "@logging/log";
 import { createExecutionBootstrap } from "@execution/core/bootstrap";
 import { runCases } from "@execution/core/caseRunner";
 import { loadScenarioSheet } from "@execution/runtime/loadScenarioSheet";
@@ -18,33 +20,52 @@ export type RunE2EModeArgs = {
     verbose: boolean;
 };
 
+function emitFrameworkLog(
+    level: "debug" | "info" | "warn" | "error",
+    message: string
+): void {
+    logEvent(createLogEvent({
+        level,
+        category: LOG_CATEGORIES.FRAMEWORK,
+        message,
+        scope: "run",
+    }));
+}
+
 function filterScenarios(
     scenarios: ExecutionScenario[],
     selectedIds: string[]
 ): ExecutionScenario[] {
-    if (!selectedIds.length) return scenarios;
+    if (!selectedIds.length) {
+        return scenarios;
+    }
+
     const wanted = new Set(selectedIds);
     return scenarios.filter((item) => wanted.has(item.scenarioId));
 }
 
-export async function runE2EMode(args: RunE2EModeArgs): Promise<void> {
-    const log = createLogger({
-        prefix: "[execution]",
-        logLevel: args.verbose ? "debug" : "info",
-        withTimestamp: true,
-        logToFile: false,
+function ensureScenariosExist(scenarios: ExecutionScenario[]): void {
+    if (scenarios.length) {
+        return;
+    }
+
+    throw new AppError({
+        code: "NO_SCENARIOS_SELECTED",
+        stage: "scenario-selection",
+        source: "e2eRunner",
+        message: "No scenarios selected for execution.",
     });
+}
 
-    log.info(
-        `Mode -> e2e | excel=${args.excelPath} | sheet=${args.sheetName} | iterations=${args.iterations}`
-    );
-
-    const bootstrap = createExecutionBootstrap({ log });
-
+async function loadAndParseScenarios(args: {
+    excelPath: string;
+    sheetName: string;
+    includeDisabled: boolean;
+}): Promise<ExecutionScenario[]> {
     const loaded = await loadScenarioSheet({
         excelPath: args.excelPath,
         sheetName: args.sheetName,
-        log: log.child("loader"),
+        logScope: "execution:loader",
     });
 
     const parsed = parseScenarios(loaded.rows, {
@@ -53,15 +74,30 @@ export async function runE2EMode(args: RunE2EModeArgs): Promise<void> {
         failOnValidationErrors: true,
     });
 
-    const scenarios = filterScenarios(parsed.scenarios, args.selectedIds);
-    if (!scenarios.length) {
-        throw new AppError({
-            code: "NO_SCENARIOS_SELECTED",
-            stage: "scenario-selection",
-            source: "e2eRunner",
-            message: "No scenarios selected for execution.",
-        });
-    }
+    return parsed.scenarios;
+}
+
+export async function runE2EMode(args: RunE2EModeArgs): Promise<void> {
+    emitFrameworkLog(
+        LOG_LEVELS.INFO,
+        `Mode -> e2e | excel=${args.excelPath} | sheet=${args.sheetName} | iterations=${args.iterations}`
+    );
+
+    const bootstrap = createExecutionBootstrap();
+
+    const parsedScenarios = await loadAndParseScenarios({
+        excelPath: args.excelPath,
+        sheetName: args.sheetName,
+        includeDisabled: args.includeDisabled,
+    });
+
+    const scenarios = filterScenarios(parsedScenarios, args.selectedIds);
+    ensureScenariosExist(scenarios);
+
+    emitFrameworkLog(
+        LOG_LEVELS.INFO,
+        `E2E scenarios resolved -> count=${scenarios.length}`
+    );
 
     await runCases({
         mode: "e2e",
@@ -69,9 +105,9 @@ export async function runE2EMode(args: RunE2EModeArgs): Promise<void> {
         scenarios,
         iterations: args.iterations,
         parallel: args.parallel ?? 1,
+        verbose: args.verbose,
         sheet: args.sheetName,
         registry: bootstrap.executorRegistry,
         dataRegistry: bootstrap.stepDataRegistry,
-        log,
     });
 }

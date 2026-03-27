@@ -8,7 +8,3 @@ export class DataBuilderError extends AppError {
         this.name = "DataBuilderError";
     }
 }
-
-export function isDataBuilderError(error: unknown): error is DataBuilderError {
-    return error instanceof DataBuilderError;
-}

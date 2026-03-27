@@ -1,6 +1,5 @@
 // src/execution/core/caseRunner.ts
 
-import type { Logger } from "@utils/logger";
 import type { ExecutionScenario } from "@execution/modes/e2e/scenario/types";
 import type { ExecutorRegistry } from "@execution/core/registry";
 import type { StepDataResolverRegistry } from "@execution/runtime/resolveStepData";
@@ -24,9 +23,9 @@ type RunCasesArgs = {
     schema?: string;
     source?: string;
     sheet?: string;
+    verbose?: boolean;
     registry: ExecutorRegistry;
     dataRegistry: StepDataResolverRegistry;
-    log: Logger;
     resolveOverrideStepData?: (
         scenario: ExecutionScenario
     ) => Record<string, unknown> | undefined;
@@ -72,6 +71,10 @@ function expandScenarios(
     return runs;
 }
 
+function getScenarioScope(scenario: ExecutionScenario): string {
+    return `execution:${scenario.scenarioId}`;
+}
+
 export async function runCases(args: RunCasesArgs): Promise<void> {
     const startedAtMs = Date.now();
     const parallel = Math.max(1, args.parallel ?? 1);
@@ -91,34 +94,51 @@ export async function runCases(args: RunCasesArgs): Promise<void> {
         })
     );
 
-    const outputs = await runInBatches(runs, parallel, async (scenario): Promise<CaseRunOutput> => {
-        const caseStartedAtMs = Date.now();
+    const outputs = await runInBatches(
+        runs,
+        parallel,
+        async (scenario): Promise<CaseRunOutput> => {
+            const caseStartedAtMs = Date.now();
 
-        const result = await runScenario({
-            scenario,
-            registry: args.registry,
-            dataRegistry: args.dataRegistry,
-            log: args.log.child(scenario.scenarioId),
-            overrideStepData: args.resolveOverrideStepData?.(scenario),
-            mode: args.mode,
-        });
+            const result = await runScenario({
+                scenario,
+                registry: args.registry,
+                dataRegistry: args.dataRegistry,
+                logScope: getScenarioScope(scenario),
+                overrideStepData: args.resolveOverrideStepData?.(scenario),
+                mode: args.mode,
+            });
 
-        const duration = formatDuration(caseStartedAtMs);
-        const block =
-            args.mode === "data"
-                ? renderDataCaseBlock({ scenario, result, duration })
-                : renderE2EScenarioBlock({ scenario, result, duration });
+            const duration = formatDuration(caseStartedAtMs);
+            const block =
+                args.mode === "data"
+                    ? renderDataCaseBlock({
+                        scenario,
+                        result,
+                        duration,
+                        verbose: args.verbose,
+                    })
+                    : renderE2EScenarioBlock({
+                        scenario,
+                        result,
+                        duration,
+                        verbose: args.verbose,
+                    });
 
-        return { status: result.status, block };
-    });
+            return { status: result.status, block };
+        }
+    );
 
     let passed = 0;
     let failed = 0;
 
     for (const item of outputs) {
         console.log(item.block);
-        if (item.status === "passed") passed++;
-        else failed++;
+        if (item.status === "passed") {
+            passed++;
+        } else {
+            failed++;
+        }
     }
 
     console.log(

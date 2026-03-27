@@ -18,7 +18,10 @@ import {
 
 function formatRequestPreview(value: unknown): string {
     const text = String(value ?? "").trim();
-    if (!text) return "";
+
+    if (!text) {
+        return "";
+    }
 
     const maxLength = 100;
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
@@ -34,12 +37,24 @@ function getDebugLines(step?: StepExecutionResult): string[] {
     return raw.map((item) => safeText(item).trim()).filter(Boolean);
 }
 
+function shouldShowDebugLines(args: {
+    verbose?: boolean;
+    result: ScenarioExecutionResult;
+}): boolean {
+    if (args.verbose) {
+        return true;
+    }
+
+    return args.result.status === "failed";
+}
+
 export function renderDataCaseBlock(args: {
     scenario: ExecutionScenario;
     result: ScenarioExecutionResult;
     duration: string;
+    verbose?: boolean;
 }): string {
-    const { scenario, result, duration } = args;
+    const { scenario, result, duration, verbose } = args;
     const outputs = result.outputs ?? {};
     const step = result.stepResults[0];
     const failedStep = result.stepResults.find((item) => item.status === "failed");
@@ -58,9 +73,11 @@ export function renderDataCaseBlock(args: {
 
     const detailFields: Array<[string, unknown]> = [];
 
-    getDebugLines(step).forEach((debugLine) => {
-        detailFields.push(["DEBUG", debugLine]);
-    });
+    if (shouldShowDebugLines({ verbose, result })) {
+        getDebugLines(step).forEach((debugLine) => {
+            detailFields.push(["DEBUG", debugLine]);
+        });
+    }
 
     collectFieldIfPresent(
         detailFields,

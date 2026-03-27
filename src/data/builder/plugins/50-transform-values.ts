@@ -3,48 +3,10 @@
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
 import { DataBuilderError } from "../errors";
-
-function toNumberIfPossible(value: string): string | number {
-    const trimmed = value.trim();
-    if (trimmed === "") return "";
-    if (!/^-?\d+$/.test(trimmed)) return trimmed;
-
-    const parsed = Number(trimmed);
-    return Number.isSafeInteger(parsed) ? parsed : trimmed;
-}
-
-function transformNode(node: any, parentKey = ""): any {
-    if (Array.isArray(node)) {
-        return node.map((item) => transformNode(item));
-    }
-
-    if (!node || typeof node !== "object") {
-        if (typeof node === "string") {
-            if (parentKey === "count" || parentKey.endsWith("Count")) {
-                return toNumberIfPossible(node);
-            }
-            return node.trim();
-        }
-        return node;
-    }
-
-    const out: Record<string, any> = {};
-
-    for (const [key, value] of Object.entries(node)) {
-        if (typeof value === "string") {
-            if (key === "count" || key.endsWith("Count")) {
-                out[key] = toNumberIfPossible(value);
-            } else {
-                out[key] = value.trim();
-            }
-            continue;
-        }
-
-        out[key] = transformNode(value, key);
-    }
-
-    return out;
-}
+import { emitLog } from "@data/builder/logging/emitLog";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
+import { transformCasesFile } from "../core/transformValues";
 
 const plugin: PipelinePlugin = {
     name: "transform-values",
@@ -53,6 +15,7 @@ const plugin: PipelinePlugin = {
 
     run: async (ctx: DataBuilderContext) => {
         const casesFile = ctx.data.casesFile;
+        const scope = ctx.logScope;
 
         if (!casesFile) {
             throw new DataBuilderError({
@@ -63,23 +26,22 @@ const plugin: PipelinePlugin = {
             });
         }
 
-        let transformed = 0;
+        const result = transformCasesFile(casesFile);
+        ctx.data.casesFile = result.casesFile;
 
-        casesFile.cases = casesFile.cases.map((builtCase) => {
-            transformed++;
-            return {
-                ...builtCase,
-                data: transformNode(builtCase.data),
-            };
+        emitLog({
+            scope,
+            level: LOG_LEVELS.INFO,
+            category: LOG_CATEGORIES.PIPELINE,
+            message: `Value transformation applied to ${result.transformedCount} case(s).`,
         });
 
-        ctx.data.casesFile = {
-            ...casesFile,
-            caseCount: Number(casesFile.caseCount),
-        };
-
-        ctx.log.info(`Value transformation applied to ${transformed} case(s).`);
-        ctx.log.debug?.("Transforms: trim strings, convert count/count-like values to numbers.");
+        emitLog({
+            scope,
+            level: LOG_LEVELS.DEBUG,
+            category: LOG_CATEGORIES.PIPELINE,
+            message: "Transforms: trim strings, convert count/count-like values to numbers.",
+        });
     },
 };
 

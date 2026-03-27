@@ -32,20 +32,33 @@ function getStepDebugLines(step: StepExecutionResult): string[] {
         return [];
     }
 
-    return raw
-        .map((item) => safeText(item).trim())
-        .filter(Boolean);
+    return raw.map((item) => safeText(item).trim()).filter(Boolean);
 }
 
-function buildStepFields(
-    step: StepExecutionResult,
-    outputs: Record<string, unknown>
-): Array<[string, unknown]> {
+function shouldShowDebugLines(args: {
+    verbose?: boolean;
+    step: StepExecutionResult;
+}): boolean {
+    if (args.verbose) {
+        return true;
+    }
+
+    return args.step.status === "failed";
+}
+
+function buildStepFields(args: {
+    step: StepExecutionResult;
+    outputs: Record<string, unknown>;
+    verbose?: boolean;
+}): Array<[string, unknown]> {
+    const { step, outputs, verbose } = args;
     const stepFields: Array<[string, unknown]> = [];
 
-    getStepDebugLines(step).forEach((debugLine) => {
-        stepFields.push(["DEBUG", debugLine]);
-    });
+    if (shouldShowDebugLines({ verbose, step })) {
+        getStepDebugLines(step).forEach((debugLine) => {
+            stepFields.push(["DEBUG", debugLine]);
+        });
+    }
 
     stepFields.push(["Status", statusText(step.status)]);
     stepFields.push(["Duration", stepDuration(step)]);
@@ -80,15 +93,19 @@ function renderStepBlock(args: {
     index: number;
     total: number;
     outputs: Record<string, unknown>;
+    verbose?: boolean;
 }): string[] {
-    const { step, index, total, outputs } = args;
+    const { step, index, total, outputs, verbose } = args;
     const { branch, indent } = getTreeTokens(index, total);
     const testCaseId = safeText(step.details?.testCaseId ?? "");
     const lines: string[] = [];
 
     lines.push(`${branch} [STEP ${step.stepNo}] ${step.action} | TestCaseId=${testCaseId}`);
 
-    renderFields(buildStepFields(step, outputs), 16).forEach((line) => {
+    renderFields(
+        buildStepFields({ step, outputs, verbose }),
+        16
+    ).forEach((line) => {
         lines.push(`${indent}${line}`);
     });
 
@@ -103,8 +120,9 @@ export function renderE2EScenarioBlock(args: {
     scenario: ExecutionScenario;
     result: ScenarioExecutionResult;
     duration: string;
+    verbose?: boolean;
 }): string {
-    const { scenario, result, duration } = args;
+    const { scenario, result, duration, verbose } = args;
     const outputs = result.outputs ?? {};
     const lines: string[] = [];
 
@@ -127,6 +145,7 @@ export function renderE2EScenarioBlock(args: {
                 index,
                 total: result.stepResults.length,
                 outputs,
+                verbose,
             })
         );
     });
