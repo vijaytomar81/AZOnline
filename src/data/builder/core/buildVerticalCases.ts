@@ -6,6 +6,9 @@ import type { BuiltCase, DataBuilderContext, DataBuilderMeta } from "../types";
 import { DataBuilderError } from "../errors";
 import { buildRowIndex } from "./excelRuntime";
 import { buildPayload } from "./schemaRuntime";
+import { createLogEvent, logEvent } from "@logging/log";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
 
 type BuildVerticalCasesArgs = {
     ctx: DataBuilderContext;
@@ -14,6 +17,21 @@ type BuildVerticalCasesArgs = {
     schema: DataSchema;
     includeEmpty: boolean;
 };
+
+function emitLog(args: {
+    scope: string;
+    level: "debug" | "info" | "warn" | "error";
+    message: string;
+}): void {
+    logEvent(
+        createLogEvent({
+            level: args.level,
+            category: LOG_CATEGORIES.TECHNICAL,
+            message: args.message,
+            scope: args.scope,
+        })
+    );
+}
 
 function getDescription(data: Record<string, any>): string | undefined {
     return String(data.meta?.description ?? "").trim() || undefined;
@@ -24,6 +42,10 @@ function logVerticalCase(
     builtCase: BuiltCase,
     data: Record<string, any>
 ): void {
+    if (!ctx.data.verbose) {
+        return;
+    }
+
     const additionalDriversCount =
         Number(data.additionalDrivers?.count ?? 0) || 0;
     const policyHolderClaimsCount =
@@ -31,16 +53,18 @@ function logVerticalCase(
     const policyHolderConvictionsCount =
         Number(data.policyHolderConvictions?.count ?? 0) || 0;
 
-    ctx.log.debug?.(
-        [
+    emitLog({
+        scope: ctx.logScope,
+        level: LOG_LEVELS.DEBUG,
+        message: [
             `Built case -> index=${builtCase.caseIndex}`,
             `scriptId=${builtCase.scriptId ?? ""}`,
             `scriptName=${builtCase.scriptName}`,
             `policyHolderClaims=${policyHolderClaimsCount}`,
             `policyHolderConvictions=${policyHolderConvictionsCount}`,
             `additionalDrivers=${additionalDriversCount}`,
-        ].join(", ")
-    );
+        ].join(", "),
+    });
 }
 
 export function buildVerticalCases(
@@ -63,7 +87,13 @@ export function buildVerticalCases(
 
     const rowIndex = buildRowIndex(ws, meta.fieldCol, meta.dataStartRow);
 
-    ctx.log.debug?.(`rowIndex size=${rowIndex.size}`);
+    if (ctx.data.verbose) {
+        emitLog({
+            scope: ctx.logScope,
+            level: LOG_LEVELS.DEBUG,
+            message: `rowIndex size=${rowIndex.size}`,
+        });
+    }
 
     return meta.caseMetas.map((m, idx) => {
         if (!m.col) {

@@ -3,12 +3,26 @@
 import path from "node:path";
 import { getArg, hasFlag, normalizeArgv } from "@utils/argv";
 import { AppError } from "@utils/errors";
-import { printSection, printKeyValue, printSummary, success, printCommandTitle } from "@utils/cliFormat";
+import {
+    printSection,
+    printKeyValue,
+    printSummary,
+    success,
+    printCommandTitle,
+} from "@utils/cliFormat";
 import { startTimer } from "@utils/time";
-import { loadPluginsFromFolder, runDiscoveredPlugins } from "./core/pluginLoader";
-import { parseBuildArgs, createDataBuilderLogger } from "./cli";
+import {
+    loadPluginsFromFolder,
+    resolvePluginRunOrder,
+    runDiscoveredPlugins,
+} from "./core/pluginLoader";
+import { parseBuildArgs } from "./cli";
 import { listSchemas } from "../data-definitions";
 import type { DataBuilderContext } from "./types";
+import { setLogVerbose } from "@logging/core/logConfig";
+import { createLogEvent, logEvent } from "@logging/log";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
 
 type FailureContext = {
     excelPath: string;
@@ -20,6 +34,21 @@ type FailureContext = {
     strictValidation: string;
     verbose: string;
 };
+
+function emitFrameworkLog(args: {
+    scope: string;
+    level: "debug" | "info" | "warn" | "error";
+    message: string;
+}): void {
+    logEvent(
+        createLogEvent({
+            level: args.level,
+            category: LOG_CATEGORIES.FRAMEWORK,
+            message: args.message,
+            scope: args.scope,
+        })
+    );
+}
 
 function parseBoolean(v?: string): boolean {
     return ["true", "1", "yes", "y"].includes(String(v ?? "").toLowerCase());
@@ -37,8 +66,7 @@ function buildRawFailureContext(): FailureContext {
         hasFlag(argv, "--excludeEmptyFields") || parseBoolean(process.env.EXCLUDE_EMPTY_FIELDS);
     const strictValidation =
         hasFlag(argv, "--strictValidation") || parseBoolean(process.env.STRICT_VALIDATION);
-    const verbose =
-        hasFlag(argv, "--verbose") || parseBoolean(process.env.VERBOSE);
+    const verbose = hasFlag(argv, "--verbose") || parseBoolean(process.env.VERBOSE);
 
     return {
         excelPath: excelPath || "(not resolved)",
@@ -64,15 +92,27 @@ function printEnvironmentBlock(ctx: FailureContext): void {
     printKeyValue("verbose", ctx.verbose);
 }
 
+function printAvailableSchemas(): void {
+    printSection("Available Schemas");
+    console.log(listSchemas().join(", "));
+}
+
+function printPipelineOrder(pluginNames: string[]): void {
+    printSection("Pipeline order");
+    console.log(pluginNames.join(" -> "));
+}
+
 async function main() {
     printCommandTitle("DATA BUILDER", "dataBuilderIcon");
 
     const timer = startTimer();
     const args = parseBuildArgs();
-    const log = createDataBuilderLogger(args.verbose);
+    const logScope = "data-builder";
+
+    setLogVerbose(args.verbose);
 
     const ctx: DataBuilderContext = {
-        log,
+        logScope,
         data: {
             excelPath: args.excelPath,
             sheetName: args.sheetName,
@@ -96,8 +136,7 @@ async function main() {
         verbose: String(args.verbose),
     });
 
-    printSection("Available Schemas");
-    console.log(listSchemas().join(", "));
+    printAvailableSchemas();
 
     const pluginsDirAbs = path.join(process.cwd(), "src", "data", "builder", "plugins");
 
@@ -105,16 +144,21 @@ async function main() {
     const discovered = await loadPluginsFromFolder({
         pluginsDirAbs,
         verbose: args.verbose,
-        log: log.child("plugin-loader"),
+        logScope: `${logScope}:plugin-loader`,
     });
 
     const plugins = discovered.map((d) => d.plugin);
+    const orderedPlugins = resolvePluginRunOrder(plugins);
 
-    printSection("Pipeline order");
-    console.log(plugins.map((p) => p.name).join(" -> "));
+    printPipelineOrder(orderedPlugins.map((p) => p.name));
 
-    log.info("Starting schema-driven Data Builder...");
-    const ranNames = await runDiscoveredPlugins(ctx, plugins);
+    emitFrameworkLog({
+        scope: logScope,
+        level: LOG_LEVELS.INFO,
+        message: "Starting schema-driven Data Builder...",
+    });
+
+    const ranNames = await runDiscoveredPlugins(ctx, orderedPlugins);
 
     const absOut = ctx.data.absOut ?? "";
     const caseCount = ctx.data.casesFile?.caseCount ?? 0;
@@ -144,12 +188,17 @@ async function main() {
 }
 
 main().catch((e: unknown) => {
-    const log = createDataBuilderLogger(true);
     const raw = buildRawFailureContext();
+    const logScope = "data-builder";
+    const verbose = raw.verbose === "true";
 
-    const error = e instanceof AppError ? e : new AppError({ message: e instanceof Error ? e.message : String(e) });
+    setLogVerbose(verbose);
 
-    // do NOT print banner here again
+    const error =
+        e instanceof AppError
+            ? e
+            : new AppError({ message: e instanceof Error ? e.message : String(e) });
+
     printEnvironmentBlock(raw);
 
     printSection("Failure Stage");
@@ -164,6 +213,11 @@ main().catch((e: unknown) => {
         }
     }
 
-    log.error(error.message);
+    emitFrameworkLog({
+        scope: logScope,
+        level: LOG_LEVELS.ERROR,
+        message: error.message,
+    });
+
     process.exit(1);
 });

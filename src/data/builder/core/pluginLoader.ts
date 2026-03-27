@@ -6,13 +6,31 @@ import url from "node:url";
 import { createRequire } from "node:module";
 
 import type { PipelineContext, PipelinePlugin } from "./pipeline";
-import type { Logger } from "@utils/logger";
 import { DataBuilderError } from "../errors";
+import { createLogEvent, logEvent } from "@logging/log";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
 
 type DiscoveredPlugin = {
     file: string;
     plugin: PipelinePlugin;
 };
+
+function emitLog(args: {
+    scope: string;
+    category: typeof LOG_CATEGORIES[keyof typeof LOG_CATEGORIES];
+    level: "debug" | "info" | "warn" | "error";
+    message: string;
+}): void {
+    logEvent(
+        createLogEvent({
+            level: args.level,
+            category: args.category,
+            message: args.message,
+            scope: args.scope,
+        })
+    );
+}
 
 function isTsOrJs(file: string) {
     return file.endsWith(".ts") || file.endsWith(".js");
@@ -42,9 +60,14 @@ export async function loadPluginsFromFolder(opts: {
     pluginsDirAbs: string;
     verbose?: boolean;
     onlyNames?: string[];
-    log?: Logger;
+    logScope?: string;
 }): Promise<DiscoveredPlugin[]> {
-    const { pluginsDirAbs, verbose = false, onlyNames, log } = opts;
+    const {
+        pluginsDirAbs,
+        verbose = false,
+        onlyNames,
+        logScope = "data-builder:plugin-loader",
+    } = opts;
 
     if (!fs.existsSync(pluginsDirAbs)) {
         throw new DataBuilderError({
@@ -93,12 +116,26 @@ export async function loadPluginsFromFolder(opts: {
 
         const plugin = pickPluginExport(mod);
         if (!plugin) {
-            if (verbose) log?.debug(`Skipping ${path.basename(fileAbs)} (no plugin export found)`);
+            if (verbose) {
+                emitLog({
+                    scope: logScope,
+                    category: LOG_CATEGORIES.TECHNICAL,
+                    level: LOG_LEVELS.DEBUG,
+                    message: `Skipping ${path.basename(fileAbs)} (no plugin export found)`,
+                });
+            }
             continue;
         }
 
         if (onlyNames && onlyNames.length > 0 && !onlyNames.includes(plugin.name)) {
-            if (verbose) log?.debug(`Skipping ${plugin.name} (not in onlyNames allowlist)`);
+            if (verbose) {
+                emitLog({
+                    scope: logScope,
+                    category: LOG_CATEGORIES.TECHNICAL,
+                    level: LOG_LEVELS.DEBUG,
+                    message: `Skipping ${plugin.name} (not in onlyNames allowlist)`,
+                });
+            }
             continue;
         }
 
@@ -121,44 +158,75 @@ export async function loadPluginsFromFolder(opts: {
     }
 
     if (verbose) {
-        log?.debug(`Discovered plugins (${discovered.length}):`);
+        emitLog({
+            scope: logScope,
+            category: LOG_CATEGORIES.TECHNICAL,
+            level: LOG_LEVELS.DEBUG,
+            message: `Discovered plugins (${discovered.length}):`,
+        });
+
         for (const d of discovered) {
-            log?.debug(`- name=${d.plugin.name} file=${path.basename(d.file)}`);
+            emitLog({
+                scope: logScope,
+                category: LOG_CATEGORIES.TECHNICAL,
+                level: LOG_LEVELS.DEBUG,
+                message: `- name=${d.plugin.name} file=${path.basename(d.file)}`,
+            });
         }
     }
 
     return discovered;
 }
 
+export function resolvePluginRunOrder(
+    plugins: PipelinePlugin[]
+): PipelinePlugin[] {
+    return resolveRunOrderOrThrow(plugins);
+}
+
 export async function runDiscoveredPlugins(
     ctx: PipelineContext,
     plugins: PipelinePlugin[]
 ) {
-    const ordered = resolveRunOrderOrThrow(plugins);
+    const ordered = resolvePluginRunOrder(plugins);
     const verbose = !!ctx.data.verbose;
 
     if (verbose) {
-        ctx.log.info(`Run order: ${ordered.map((p) => p.name).join(" -> ")}`);
+        emitLog({
+            scope: ctx.logScope,
+            category: LOG_CATEGORIES.FRAMEWORK,
+            level: LOG_LEVELS.DEBUG,
+            message: `Run order: ${ordered.map((p) => p.name).join(" -> ")}`,
+        });
     }
 
     for (const p of ordered) {
-        const pluginLog = ctx.log.child(`plugin:${p.name}`);
         const pluginCtx = {
             ...ctx,
-            log: pluginLog,
+            logScope: `${ctx.logScope}:plugin:${p.name}`,
         };
 
         const started = Date.now();
 
         if (verbose) {
-            pluginLog.info(`Plugin start: ${p.name}`);
+            emitLog({
+                scope: pluginCtx.logScope,
+                category: LOG_CATEGORIES.TECHNICAL,
+                level: LOG_LEVELS.DEBUG,
+                message: `Plugin start: ${p.name}`,
+            });
         }
 
         await p.run(pluginCtx);
 
         if (verbose) {
             const ms = Date.now() - started;
-            pluginLog.info(`Plugin done: ${p.name} (${(ms / 1000).toFixed(2)}s)`);
+            emitLog({
+                scope: pluginCtx.logScope,
+                category: LOG_CATEGORIES.TECHNICAL,
+                level: LOG_LEVELS.DEBUG,
+                message: `Plugin done: ${p.name} (${(ms / 1000).toFixed(2)}s)`,
+            });
         }
     }
 

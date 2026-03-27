@@ -6,6 +6,24 @@ import ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
 import { normalizeSheetKey } from "@utils/text";
 import { DataBuilderError } from "../errors";
+import { createLogEvent, logEvent } from "@logging/log";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
+
+function emitLog(args: {
+    scope: string;
+    level: "debug" | "info" | "warn" | "error";
+    message: string;
+}): void {
+    logEvent(
+        createLogEvent({
+            level: args.level,
+            category: LOG_CATEGORIES.TECHNICAL,
+            message: args.message,
+            scope: args.scope,
+        })
+    );
+}
 
 function resolveWorksheet(
     workbook: ExcelJS.Workbook,
@@ -68,6 +86,7 @@ const plugin: PipelinePlugin = {
     run: async (ctx) => {
         const excelPath = String(ctx.data.excelPath ?? "").trim();
         const sheetName = String(ctx.data.sheetName ?? "").trim();
+        const logScope = ctx.logScope;
 
         if (!excelPath) {
             throw new DataBuilderError({
@@ -118,8 +137,17 @@ const plugin: PipelinePlugin = {
             });
         }
 
-        ctx.log.info(`Loading workbook: ${absExcel}`);
-        ctx.log.debug?.(`Workbook size: ${stat.size} bytes`);
+        emitLog({
+            scope: logScope,
+            level: LOG_LEVELS.INFO,
+            message: `Loading workbook: ${absExcel}`,
+        });
+
+        emitLog({
+            scope: logScope,
+            level: LOG_LEVELS.DEBUG,
+            message: `Workbook size: ${stat.size} bytes`,
+        });
 
         const wb = new ExcelJS.Workbook();
 
@@ -142,7 +170,11 @@ const plugin: PipelinePlugin = {
             ? wb.worksheets.map((w) => w.name)
             : [];
 
-        ctx.log.debug?.(`Workbook sheets: ${worksheetNames.join(", ") || "(none)"}`);
+        emitLog({
+            scope: logScope,
+            level: LOG_LEVELS.DEBUG,
+            message: `Workbook sheets: ${worksheetNames.join(", ") || "(none)"}`,
+        });
 
         if (!worksheetNames.length) {
             throw new DataBuilderError({
@@ -162,7 +194,11 @@ const plugin: PipelinePlugin = {
         ctx.data.sheet = ws;
         ctx.data.absExcel = absExcel;
 
-        ctx.log.info(`Loaded sheet: ${ws.name}`);
+        emitLog({
+            scope: logScope,
+            level: LOG_LEVELS.INFO,
+            message: `Loaded sheet: ${ws.name}`,
+        });
     },
 };
 

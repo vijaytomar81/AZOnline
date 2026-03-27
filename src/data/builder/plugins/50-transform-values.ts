@@ -3,6 +3,24 @@
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
 import { DataBuilderError } from "../errors";
+import { createLogEvent, logEvent } from "@logging/log";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
+
+function emitLog(args: {
+    scope: string;
+    level: "debug" | "info" | "warn" | "error";
+    message: string;
+}): void {
+    logEvent(
+        createLogEvent({
+            level: args.level,
+            category: LOG_CATEGORIES.TECHNICAL,
+            message: args.message,
+            scope: args.scope,
+        })
+    );
+}
 
 function toNumberIfPossible(value: string): string | number {
     const trimmed = value.trim();
@@ -53,6 +71,7 @@ const plugin: PipelinePlugin = {
 
     run: async (ctx: DataBuilderContext) => {
         const casesFile = ctx.data.casesFile;
+        const scope = ctx.logScope;
 
         if (!casesFile) {
             throw new DataBuilderError({
@@ -78,8 +97,17 @@ const plugin: PipelinePlugin = {
             caseCount: Number(casesFile.caseCount),
         };
 
-        ctx.log.info(`Value transformation applied to ${transformed} case(s).`);
-        ctx.log.debug?.("Transforms: trim strings, convert count/count-like values to numbers.");
+        emitLog({
+            scope,
+            level: LOG_LEVELS.INFO,
+            message: `Value transformation applied to ${transformed} case(s).`,
+        });
+
+        emitLog({
+            scope,
+            level: LOG_LEVELS.DEBUG,
+            message: "Transforms: trim strings, convert count/count-like values to numbers.",
+        });
     },
 };
 

@@ -7,34 +7,92 @@ import { detectLayout } from "../core/excelRuntime";
 import { validateTabularSchema } from "../core/validateTabularSchema";
 import { validateVerticalSchema } from "../core/validateVerticalSchema";
 import { DataBuilderError } from "../errors";
+import { createLogEvent, logEvent } from "@logging/log";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
 
-function logValidationSummary(
-    ctx: Parameters<PipelinePlugin["run"]>[0],
-    verbose: boolean
-) {
+function emitLog(args: {
+    scope: string;
+    level: "debug" | "info" | "warn" | "error";
+    message: string;
+}): void {
+    logEvent(
+        createLogEvent({
+            level: args.level,
+            category: LOG_CATEGORIES.TECHNICAL,
+            message: args.message,
+            scope: args.scope,
+        })
+    );
+}
+
+function logValidationSummary(ctx: Parameters<PipelinePlugin["run"]>[0]): void {
     const report = ctx.data.validationReport;
     if (!report) return;
 
-    ctx.log.info("Validation Summary");
-    ctx.log.info(`Schema: ${report.schemaName}`);
-    ctx.log.info(`Sheet: ${report.sheetName}`);
-    ctx.log.info(`Errors: ${report.summary.errorCount}`);
-    ctx.log.info("Missing Schema Fields in Excel");
-    ctx.log.info(
-        `  Required fields missing: ${report.missingSchemaFieldsInExcel.requiredFields.length}`
-    );
-    ctx.log.info(`  Total missing fields: ${report.summary.missingSchemaFieldsInExcelCount}`);
-    ctx.log.info("Missing Excel Fields in Schema");
-    ctx.log.info(`  Unmapped fields: ${report.summary.missingExcelFieldsInSchemaCount}`);
+    const scope = ctx.logScope;
 
-    if (!verbose) return;
+    emitLog({
+        scope,
+        level: LOG_LEVELS.DEBUG,
+        message: "Validation Summary",
+    });
+    emitLog({
+        scope,
+        level: LOG_LEVELS.DEBUG,
+        message: `Schema: ${report.schemaName}`,
+    });
+    emitLog({
+        scope,
+        level: LOG_LEVELS.DEBUG,
+        message: `Sheet: ${report.sheetName}`,
+    });
+    emitLog({
+        scope,
+        level: LOG_LEVELS.DEBUG,
+        message: `Errors: ${report.summary.errorCount}`,
+    });
+    emitLog({
+        scope,
+        level: LOG_LEVELS.DEBUG,
+        message: "Missing Schema Fields in Excel",
+    });
+    emitLog({
+        scope,
+        level: LOG_LEVELS.DEBUG,
+        message: `  Required fields missing: ${report.missingSchemaFieldsInExcel.requiredFields.length}`,
+    });
+    emitLog({
+        scope,
+        level: LOG_LEVELS.DEBUG,
+        message: `  Total missing fields: ${report.summary.missingSchemaFieldsInExcelCount}`,
+    });
+    emitLog({
+        scope,
+        level: LOG_LEVELS.DEBUG,
+        message: "Missing Excel Fields in Schema",
+    });
+    emitLog({
+        scope,
+        level: LOG_LEVELS.DEBUG,
+        message: `  Unmapped fields: ${report.summary.missingExcelFieldsInSchemaCount}`,
+    });
 
     const sections = Object.entries(report.missingSchemaFieldsInExcel.bySection);
     if (sections.length) {
-        ctx.log.info("  By section:");
+        emitLog({
+            scope,
+            level: LOG_LEVELS.DEBUG,
+            message: "  By section:",
+        });
+
         sections.forEach(([section, data]) => {
             const total = data.requiredFields.length + data.schemaMappingFields.length;
-            ctx.log.info(`    ${section}: ${total}`);
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: `    ${section}: ${total}`,
+            });
         });
     }
 }
@@ -43,21 +101,36 @@ function logVerboseDetails(ctx: Parameters<PipelinePlugin["run"]>[0]) {
     const report = ctx.data.validationReport;
     if (!report) return;
 
+    const scope = ctx.logScope;
     const sections = Object.entries(report.missingSchemaFieldsInExcel.bySection);
 
     sections.forEach(([section, data]) => {
-        data.requiredFields
-            .slice(0, 10)
-            .forEach((field) => ctx.log.warn(`[${section}] Missing required field: ${field}`));
+        data.requiredFields.slice(0, 10).forEach((field) =>
+            emitLog({
+                scope,
+                level: LOG_LEVELS.WARN,
+                message: `[${section}] Missing required field: ${field}`,
+            })
+        );
 
-        data.schemaMappingFields
-            .slice(0, 10)
-            .forEach((field) => ctx.log.debug?.(`[${section}] Missing mapped field: ${field}`));
+        data.schemaMappingFields.slice(0, 10).forEach((field) =>
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: `[${section}] Missing mapped field: ${field}`,
+            })
+        );
     });
 
     report.missingExcelFieldsInSchema.unusedExcelFields
         .slice(0, 10)
-        .forEach((field) => ctx.log.debug?.(`Unused Excel field: ${field}`));
+        .forEach((field) =>
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: `Unused Excel field: ${field}`,
+            })
+        );
 }
 
 const plugin: PipelinePlugin = {
@@ -105,10 +178,19 @@ const plugin: PipelinePlugin = {
 
         ctx.data.validationReport = report;
 
-        logValidationSummary(ctx, verbose);
+        if (verbose) {
+            logValidationSummary(ctx);
+        }
 
         if (report.errors.length) {
-            report.errors.slice(0, 20).forEach((error) => ctx.log.error(error));
+            report.errors.slice(0, 20).forEach((error) =>
+                emitLog({
+                    scope: ctx.logScope,
+                    level: LOG_LEVELS.ERROR,
+                    message: error,
+                })
+            );
+
             throw new DataBuilderError({
                 code: "SCHEMA_VALIDATION_FAILED",
                 stage: "validate-schema",
@@ -126,7 +208,11 @@ const plugin: PipelinePlugin = {
             logVerboseDetails(ctx);
         }
 
-        ctx.log.info("Validation completed ✅");
+        emitLog({
+            scope: ctx.logScope,
+            level: LOG_LEVELS.INFO,
+            message: "Validation completed ✅",
+        });
     },
 };
 

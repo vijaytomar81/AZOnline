@@ -4,19 +4,27 @@ import path from "node:path";
 import type { DataBuilderBaseArgs } from "./types";
 import { normalizeArgv, getArg, hasFlag } from "@utils/argv";
 import { printSection } from "@utils/cliFormat";
-import { createLogger } from "@utils/logger";
 import { getGeneratedSchemaDir, toRepoRelative } from "@utils/paths";
 import { usage } from "./help";
 import { resolveSchemaName } from "../data-definitions";
 import { DataBuilderError } from "./errors";
+import { createLogEvent, logEvent } from "@logging/log";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
 
-export function createDataBuilderLogger(verbose = false) {
-  return createLogger({
-    prefix: "[data-builder]",
-    logLevel: verbose ? "debug" : "info",
-    withTimestamp: true,
-    logToFile: false,
-  });
+function emitFrameworkLog(args: {
+  scope: string;
+  level: "debug" | "info" | "warn" | "error";
+  message: string;
+}): void {
+  logEvent(
+    createLogEvent({
+      level: args.level,
+      category: LOG_CATEGORIES.FRAMEWORK,
+      message: args.message,
+      scope: args.scope,
+    })
+  );
 }
 
 function parseBoolean(v?: string) {
@@ -30,11 +38,15 @@ function safeSheetFilename(name: string) {
 export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
   const argv = normalizeArgv(process.argv.slice(2));
   const verbose = hasFlag(argv, "--verbose") || parseBoolean(process.env.VERBOSE);
-  const log = createDataBuilderLogger(verbose);
+  const logScope = "data-builder";
 
   if (hasFlag(argv, "--help") || hasFlag(argv, "-h")) {
     printSection("Data Builder Help");
-    log.info(usage());
+    emitFrameworkLog({
+      scope: logScope,
+      level: LOG_LEVELS.INFO,
+      message: usage(),
+    });
     process.exit(0);
   }
 
@@ -86,7 +98,11 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
   }
 
   if (verbose) {
-    log.debug(`Resolved schema "${schemaName}" from sheet "${sheetName}"`);
+    emitFrameworkLog({
+      scope: logScope,
+      level: LOG_LEVELS.DEBUG,
+      message: `Resolved schema "${schemaName}" from sheet "${sheetName}"`,
+    });
   }
 
   const outRaw = String(getArg(argv, "--out") ?? process.env.OUT_PATH ?? "").trim();

@@ -7,6 +7,24 @@ import { getSchema } from "../../data-definitions";
 import { buildVerticalCases } from "../core/buildVerticalCases";
 import { buildTabularCases } from "../core/buildTabularCases";
 import { DataBuilderError } from "../errors";
+import { createLogEvent, logEvent } from "@logging/log";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
+
+function emitLog(args: {
+    scope: string;
+    level: "debug" | "info" | "warn" | "error";
+    message: string;
+}): void {
+    logEvent(
+        createLogEvent({
+            level: args.level,
+            category: LOG_CATEGORIES.TECHNICAL,
+            message: args.message,
+            scope: args.scope,
+        })
+    );
+}
 
 const plugin: PipelinePlugin = {
     name: "build-cases",
@@ -17,6 +35,8 @@ const plugin: PipelinePlugin = {
     run: async (ctx: DataBuilderContext) => {
         const ws = ctx.data.sheet as ExcelJS.Worksheet | undefined;
         const meta = ctx.data.meta;
+        const scope = ctx.logScope;
+        const verbose = !!ctx.data.verbose;
 
         if (!ws || !meta?.caseMetas?.length) {
             throw new DataBuilderError({
@@ -35,10 +55,28 @@ const plugin: PipelinePlugin = {
         const schema = getSchema(ctx.data.schemaName, ctx.data.sheetName);
         const includeEmpty = !ctx.data.excludeEmptyFields;
 
-        ctx.log.info(`Building cases with schema "${ctx.data.schemaName}"...`);
-        ctx.log.debug?.(`layout=${meta.layout}`);
-        ctx.log.debug?.(`includeEmpty=${includeEmpty}`);
-        ctx.log.debug?.(`cases to build=${meta.caseMetas.length}`);
+        if (verbose) {
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: `Building cases with schema "${ctx.data.schemaName}"...`,
+            });
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: `layout=${meta.layout}`,
+            });
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: `includeEmpty=${includeEmpty}`,
+            });
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: `cases to build=${meta.caseMetas.length}`,
+            });
+        }
 
         const cases =
             meta.layout === "tabular"
@@ -54,7 +92,12 @@ const plugin: PipelinePlugin = {
         };
 
         ctx.data.casesFile = casesFile;
-        ctx.log.info(`Cases built with schema "${ctx.data.schemaName}": ${cases.length}`);
+
+        emitLog({
+            scope,
+            level: LOG_LEVELS.INFO,
+            message: `Cases built with schema "${ctx.data.schemaName}": ${cases.length}`,
+        });
     },
 };
 

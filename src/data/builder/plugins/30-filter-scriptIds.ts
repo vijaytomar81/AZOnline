@@ -3,6 +3,24 @@
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
 import { DataBuilderError } from "../errors";
+import { createLogEvent, logEvent } from "@logging/log";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
+
+function emitLog(args: {
+    scope: string;
+    level: "debug" | "info" | "warn" | "error";
+    message: string;
+}): void {
+    logEvent(
+        createLogEvent({
+            level: args.level,
+            category: LOG_CATEGORIES.TECHNICAL,
+            message: args.message,
+            scope: args.scope,
+        })
+    );
+}
 
 function expandScriptIdFilter(raw: string): Set<string> {
     const result = new Set<string>();
@@ -52,6 +70,7 @@ const plugin: PipelinePlugin = {
 
     run: async (ctx: DataBuilderContext) => {
         const casesFile = ctx.data.casesFile;
+        const scope = ctx.logScope;
 
         if (!casesFile) {
             throw new DataBuilderError({
@@ -65,7 +84,11 @@ const plugin: PipelinePlugin = {
         const rawFilter = String(ctx.data.scriptIdFilter ?? "").trim();
 
         if (!rawFilter) {
-            ctx.log.info("No scriptId filter provided. Keeping all cases.");
+            emitLog({
+                scope,
+                level: LOG_LEVELS.INFO,
+                message: "No scriptId filter provided. Keeping all cases.",
+            });
             return;
         }
 
@@ -81,7 +104,11 @@ const plugin: PipelinePlugin = {
             });
         }
 
-        ctx.log.info(`Filtering script IDs: ${rawFilter}`);
+        emitLog({
+            scope,
+            level: LOG_LEVELS.INFO,
+            message: `Filtering script IDs: ${rawFilter}`,
+        });
 
         const before = casesFile.cases.length;
 
@@ -109,7 +136,11 @@ const plugin: PipelinePlugin = {
         casesFile.cases = filtered;
         casesFile.caseCount = filtered.length;
 
-        ctx.log.info(`Cases after filter: ${casesFile.caseCount} (from ${before})`);
+        emitLog({
+            scope,
+            level: LOG_LEVELS.INFO,
+            message: `Cases after filter: ${casesFile.caseCount} (from ${before})`,
+        });
     },
 };
 

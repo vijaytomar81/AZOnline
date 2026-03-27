@@ -12,6 +12,24 @@ import {
 } from "../core/excelRuntime";
 import { normalizeHeaderKey, normalizeSpaces } from "@utils/text";
 import { DataBuilderError } from "../errors";
+import { createLogEvent, logEvent } from "@logging/log";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
+
+function emitLog(args: {
+    scope: string;
+    level: "debug" | "info" | "warn" | "error";
+    message: string;
+}): void {
+    logEvent(
+        createLogEvent({
+            level: args.level,
+            category: LOG_CATEGORIES.TECHNICAL,
+            message: args.message,
+            scope: args.scope,
+        })
+    );
+}
 
 function getHeaderRow(ws: ExcelJS.Worksheet, rowNo: number): string[] {
     const maxCol = ws.columnCount || ws.actualColumnCount || 0;
@@ -71,6 +89,9 @@ const plugin: PipelinePlugin = {
 
     run: async (ctx) => {
         const ws = ctx.data.sheet as ExcelJS.Worksheet | undefined;
+        const scope = ctx.logScope;
+        const verbose = !!ctx.data.verbose;
+
         if (!ws) {
             throw new DataBuilderError({
                 code: "SHEET_NOT_LOADED",
@@ -84,15 +105,32 @@ const plugin: PipelinePlugin = {
         if (tabularMeta) {
             ctx.data.meta = tabularMeta;
 
-            ctx.log.info(`Metadata extracted. Cases detected: ${tabularMeta.caseMetas.length}`);
-            ctx.log.debug?.(`Detected layout -> tabular`);
-            ctx.log.debug?.(`Tabular headers -> ${tabularMeta.tabularHeaders?.join(", ") ?? ""}`);
-
-            tabularMeta.caseMetas.forEach((m) => {
-                ctx.log.debug?.(
-                    `Case meta -> row=${m.row}, scriptId=${m.scriptId}, scriptName=${m.scriptName}`
-                );
+            emitLog({
+                scope,
+                level: LOG_LEVELS.INFO,
+                message: `Metadata extracted. Cases detected: ${tabularMeta.caseMetas.length}`,
             });
+
+            if (verbose) {
+                emitLog({
+                    scope,
+                    level: LOG_LEVELS.DEBUG,
+                    message: "Detected layout -> tabular",
+                });
+                emitLog({
+                    scope,
+                    level: LOG_LEVELS.DEBUG,
+                    message: `Tabular headers -> ${tabularMeta.tabularHeaders?.join(", ") ?? ""}`,
+                });
+
+                tabularMeta.caseMetas.forEach((m) => {
+                    emitLog({
+                        scope,
+                        level: LOG_LEVELS.DEBUG,
+                        message: `Case meta -> row=${m.row}, scriptId=${m.scriptId}, scriptName=${m.scriptName}`,
+                    });
+                });
+            }
 
             return;
         }
@@ -133,20 +171,57 @@ const plugin: PipelinePlugin = {
             caseMetas,
         };
 
-        ctx.log.info(`Metadata extracted. Cases detected: ${caseMetas.length}`);
-        ctx.log.debug?.(`Detected layout -> vertical`);
-        ctx.log.debug?.(`Detected layout -> dataStartRow=${layout.dataStartRow}`);
-        ctx.log.debug?.(`Detected layout -> fieldCol=${layout.fieldCol}`);
-        ctx.log.debug?.(`Detected layout -> caseStartCol=${layout.caseStartCol}`);
-        ctx.log.debug?.(`ScriptId row=${scriptIdRow}`);
-        ctx.log.debug?.(`ScriptName row=${scriptNameRow}`);
-        ctx.log.debug?.(`Case columns detected=${caseCols.length}`);
-
-        caseMetas.forEach((m) => {
-            ctx.log.debug?.(
-                `Case meta -> col=${m.col}, scriptId=${m.scriptId}, scriptName=${m.scriptName}`
-            );
+        emitLog({
+            scope,
+            level: LOG_LEVELS.INFO,
+            message: `Metadata extracted. Cases detected: ${caseMetas.length}`,
         });
+
+        if (verbose) {
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: "Detected layout -> vertical",
+            });
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: `Detected layout -> dataStartRow=${layout.dataStartRow}`,
+            });
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: `Detected layout -> fieldCol=${layout.fieldCol}`,
+            });
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: `Detected layout -> caseStartCol=${layout.caseStartCol}`,
+            });
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: `ScriptId row=${scriptIdRow}`,
+            });
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: `ScriptName row=${scriptNameRow}`,
+            });
+            emitLog({
+                scope,
+                level: LOG_LEVELS.DEBUG,
+                message: `Case columns detected=${caseCols.length}`,
+            });
+
+            caseMetas.forEach((m) => {
+                emitLog({
+                    scope,
+                    level: LOG_LEVELS.DEBUG,
+                    message: `Case meta -> col=${m.col}, scriptId=${m.scriptId}, scriptName=${m.scriptName}`,
+                });
+            });
+        }
     },
 };
 

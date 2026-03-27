@@ -6,6 +6,9 @@ import type { DataSchema } from "../../data-definitions/types";
 import type { BuiltCase, DataBuilderContext, DataBuilderMeta } from "../types";
 import { DataBuilderError } from "../errors";
 import { cellToString, norm } from "./excelRuntime";
+import { createLogEvent, logEvent } from "@logging/log";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
 
 type BuildTabularCasesArgs = {
     ctx: DataBuilderContext;
@@ -14,6 +17,21 @@ type BuildTabularCasesArgs = {
     schema: DataSchema;
     includeEmpty: boolean;
 };
+
+function emitLog(args: {
+    scope: string;
+    level: "debug" | "info" | "warn" | "error";
+    message: string;
+}): void {
+    logEvent(
+        createLogEvent({
+            level: args.level,
+            category: LOG_CATEGORIES.TECHNICAL,
+            message: args.message,
+            scope: args.scope,
+        })
+    );
+}
 
 function isLeaf(node: unknown): node is Record<string, string> {
     return (
@@ -53,7 +71,9 @@ function buildLeafFromRow(
 
     for (const [jsonKey, excelField] of Object.entries(mapping)) {
         const value = readRowValue(rowMap, excelField);
-        if (!includeEmpty && value === "") continue;
+        if (!includeEmpty && value === "") {
+            continue;
+        }
         out[jsonKey] = value;
     }
 
@@ -70,7 +90,9 @@ function buildGroupFromRow(
     for (const [key, child] of Object.entries(node)) {
         if (isLeaf(child)) {
             const leaf = buildLeafFromRow(child, rowMap, includeEmpty);
-            if (Object.keys(leaf).length) out[key] = leaf;
+            if (Object.keys(leaf).length) {
+                out[key] = leaf;
+            }
             continue;
         }
 
@@ -80,7 +102,9 @@ function buildGroupFromRow(
             includeEmpty
         );
 
-        if (Object.keys(nested).length) out[key] = nested;
+        if (Object.keys(nested).length) {
+            out[key] = nested;
+        }
     }
 
     return out;
@@ -88,6 +112,27 @@ function buildGroupFromRow(
 
 function getDescription(data: Record<string, any>): string | undefined {
     return String(data.meta?.description ?? "").trim() || undefined;
+}
+
+function logBuiltCase(
+    ctx: DataBuilderContext,
+    builtCase: BuiltCase,
+    row: number
+): void {
+    if (!ctx.data.verbose) {
+        return;
+    }
+
+    emitLog({
+        scope: ctx.logScope,
+        level: LOG_LEVELS.DEBUG,
+        message: [
+            `Built case -> index=${builtCase.caseIndex}`,
+            `row=${row}`,
+            `scriptId=${builtCase.scriptId ?? ""}`,
+            `scriptName=${builtCase.scriptName}`,
+        ].join(", "),
+    });
 }
 
 export function buildTabularCases(
@@ -127,15 +172,7 @@ export function buildTabularCases(
             data,
         };
 
-        ctx.log.debug?.(
-            [
-                `Built case -> index=${builtCase.caseIndex}`,
-                `row=${m.row}`,
-                `scriptId=${builtCase.scriptId ?? ""}`,
-                `scriptName=${builtCase.scriptName}`,
-            ].join(", ")
-        );
-
+        logBuiltCase(ctx, builtCase, m.row);
         return builtCase;
     });
 }

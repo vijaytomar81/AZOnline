@@ -13,6 +13,24 @@ import {
 } from "@utils/paths";
 import { upsertGeneratedManifestItem } from "@data/runtime/generatedManifest";
 import { DataBuilderError } from "../errors";
+import { createLogEvent, logEvent } from "@logging/log";
+import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { LOG_LEVELS } from "@logging/core/logLevels";
+
+function emitLog(args: {
+  scope: string;
+  level: "debug" | "info" | "warn" | "error";
+  message: string;
+}): void {
+  logEvent(
+    createLogEvent({
+      level: args.level,
+      category: LOG_CATEGORIES.TECHNICAL,
+      message: args.message,
+      scope: args.scope,
+    })
+  );
+}
 
 function safeSheetFilename(name: string) {
   return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
@@ -46,6 +64,8 @@ const plugin: PipelinePlugin = {
 
   run: async (ctx: DataBuilderContext) => {
     const casesFile = ctx.data.casesFile;
+    const scope = ctx.logScope;
+
     if (!casesFile) {
       throw new DataBuilderError({
         code: "CASES_FILE_MISSING",
@@ -129,7 +149,12 @@ const plugin: PipelinePlugin = {
         );
 
         ctx.data.validationReport.reportPath = writtenReportPath;
-        ctx.log.info(`Validation report written: ${writtenReportPath}`);
+
+        emitLog({
+          scope,
+          level: LOG_LEVELS.INFO,
+          message: `Validation report written: ${writtenReportPath}`,
+        });
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         throw new DataBuilderError({
@@ -155,11 +180,25 @@ const plugin: PipelinePlugin = {
       caseCount: Number(casesFile.caseCount ?? casesFile.cases?.length ?? 0),
     });
 
-    ctx.log.info(`JSON written: ${writtenJsonPath}`);
-    ctx.log.debug?.(`cases=${casesFile.caseCount}`);
-    ctx.log.debug?.(
-      `generatedArtifacts.withTimestamp=${executionConfig.generatedArtifacts.withTimestamp}, archiveDir=${DATA_GENERATED_ARCHIVE_DIR}, maxToKeep=${executionConfig.generatedArtifacts.maxToKeep}`
-    );
+    emitLog({
+      scope,
+      level: LOG_LEVELS.INFO,
+      message: `JSON written: ${writtenJsonPath}`,
+    });
+
+    emitLog({
+      scope,
+      level: LOG_LEVELS.DEBUG,
+      message: `cases=${casesFile.caseCount}`,
+    });
+
+    emitLog({
+      scope,
+      level: LOG_LEVELS.DEBUG,
+      message:
+        `generatedArtifacts.withTimestamp=${executionConfig.generatedArtifacts.withTimestamp}, ` +
+        `archiveDir=${DATA_GENERATED_ARCHIVE_DIR}, maxToKeep=${executionConfig.generatedArtifacts.maxToKeep}`,
+    });
   },
 };
 

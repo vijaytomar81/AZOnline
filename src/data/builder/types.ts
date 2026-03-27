@@ -1,5 +1,4 @@
 // src/data/builder/types.ts
-import type { Logger } from "@utils/logger";
 
 export type ScriptIdFilter = string;
 
@@ -41,18 +40,14 @@ export type ValidationReport = {
     mode: "normal" | "strict";
     generatedAt: string;
     reportPath?: string;
-
     errors: string[];
-
     missingSchemaFieldsInExcel: {
         requiredFields: string[];
         bySection: Record<string, SectionFieldGroup>;
     };
-
     missingExcelFieldsInSchema: {
         unusedExcelFields: string[];
     };
-
     summary: {
         errorCount: number;
         missingSchemaFieldsInExcelCount: number;
@@ -90,6 +85,6 @@ export type DataBuilderData = DataBuilderBaseArgs & {
 };
 
 export type DataBuilderContext = {
-    log: Logger;
+    logScope: string;
     data: DataBuilderData;
 };
