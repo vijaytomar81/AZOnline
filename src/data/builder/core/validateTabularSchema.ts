@@ -9,6 +9,7 @@ import {
     collectSchemaFields,
     collectSchemaFieldsBySection,
     missingFields,
+    collectTabularExcelFields,
 } from "./schemaValidation";
 
 function getHeaders(ws: ExcelJS.Worksheet): string[] {
@@ -19,21 +20,6 @@ function getHeaders(ws: ExcelJS.Worksheet): string[] {
     ).filter(Boolean);
 }
 
-function buildHeaderRows(headers: string[]) {
-    const rows = new Map<string, number>();
-    const duplicates: string[] = [];
-    const seen = new Set<string>();
-
-    headers.forEach((header) => {
-        const key = normalizeHeaderKey(header);
-        if (seen.has(key)) duplicates.push(header);
-        seen.add(key);
-        rows.set(key, 1);
-    });
-
-    return { rows, duplicates };
-}
-
 export function validateTabularSchema(args: {
     ws: ExcelJS.Worksheet;
     schema: DataSchema;
@@ -42,8 +28,7 @@ export function validateTabularSchema(args: {
     strict: boolean;
 }) {
     const { ws, schema, schemaName, sheetName, strict } = args;
-    const headers = getHeaders(ws);
-    const { rows, duplicates } = buildHeaderRows(headers);
+    const { rows, duplicates } = collectTabularExcelFields(ws);
 
     const schemaFields = new Set<string>();
     const sectionFields: Record<string, Set<string>> = {};

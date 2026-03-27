@@ -11,29 +11,8 @@ import {
     collectSchemaFieldsBySection,
     expandRepeatedGroupFields,
     missingFields,
+    collectVerticalExcelFields,
 } from "./schemaValidation";
-
-function collectExcelFields(
-    ws: ExcelJS.Worksheet,
-    fieldCol: number,
-    dataStartRow: number
-) {
-    const rows = buildRowIndex(ws, fieldCol, dataStartRow);
-    const duplicates: string[] = [];
-    const seen = new Set<string>();
-    const maxRow = ws.rowCount || ws.actualRowCount || 0;
-
-    for (let r = dataStartRow; r <= maxRow; r++) {
-        const raw = norm(cellToString(ws.getCell(r, fieldCol).value));
-        if (!raw) continue;
-
-        const key = normKey(raw);
-        if (seen.has(key)) duplicates.push(raw);
-        seen.add(key);
-    }
-
-    return { rows, duplicates };
-}
 
 export function validateVerticalSchema(args: {
     ws: ExcelJS.Worksheet;
@@ -45,7 +24,7 @@ export function validateVerticalSchema(args: {
     dataStartRow: number;
 }) {
     const { ws, schema, schemaName, sheetName, strict, fieldCol, dataStartRow } = args;
-    const { rows, duplicates } = collectExcelFields(ws, fieldCol, dataStartRow);
+    const { rows, duplicates } = collectVerticalExcelFields(ws, fieldCol, dataStartRow);
 
     const schemaFields = new Set<string>();
     const sectionFields: Record<string, Set<string>> = {};

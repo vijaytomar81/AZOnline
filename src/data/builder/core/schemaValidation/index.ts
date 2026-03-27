@@ -12,3 +12,5 @@ export {
     missingFields,
 } from "./computeMissingFields";
 export { buildValidationReport } from "./buildValidationReport";
+export { collectVerticalExcelFields } from "./collectVerticalExcelFields";
+export { collectTabularExcelFields } from "./collectTabularExcelFields";
