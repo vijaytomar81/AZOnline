@@ -2,7 +2,7 @@
 
 import type ExcelJS from "exceljs";
 import type { DataSchema } from "../../data-definitions/types";
-import { buildRowIndex, cellToString, norm, normKey } from "./excelRuntime";
+import { buildRowIndex, cellToString, norm, normKey } from "./spreadsheet";
 import {
     addFields,
     buildSectionBuckets,

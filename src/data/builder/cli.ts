@@ -8,24 +8,9 @@ import { getGeneratedSchemaDir, toRepoRelative } from "@utils/paths";
 import { usage } from "./help";
 import { resolveSchemaName } from "../data-definitions";
 import { DataBuilderError } from "./errors";
-import { createLogEvent, logEvent } from "@logging/log";
+import { emitLog } from "@data/builder/logging/emitLog";
 import { LOG_CATEGORIES } from "@logging/core/logCategories";
 import { LOG_LEVELS } from "@logging/core/logLevels";
-
-function emitFrameworkLog(args: {
-  scope: string;
-  level: "debug" | "info" | "warn" | "error";
-  message: string;
-}): void {
-  logEvent(
-    createLogEvent({
-      level: args.level,
-      category: LOG_CATEGORIES.FRAMEWORK,
-      message: args.message,
-      scope: args.scope,
-    })
-  );
-}
 
 function parseBoolean(v?: string) {
   return ["true", "1", "yes", "y"].includes(String(v ?? "").toLowerCase());
@@ -42,10 +27,11 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
 
   if (hasFlag(argv, "--help") || hasFlag(argv, "-h")) {
     printSection("Data Builder Help");
-    emitFrameworkLog({
+    emitLog({
       scope: logScope,
       level: LOG_LEVELS.INFO,
       message: usage(),
+      category: LOG_CATEGORIES.FRAMEWORK,
     });
     process.exit(0);
   }
@@ -98,10 +84,11 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
   }
 
   if (verbose) {
-    emitFrameworkLog({
+    emitLog({
       scope: logScope,
       level: LOG_LEVELS.DEBUG,
       message: `Resolved schema "${schemaName}" from sheet "${sheetName}"`,
+      category: LOG_CATEGORIES.FRAMEWORK,
     });
   }
 

@@ -3,24 +3,9 @@
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
 import { DataBuilderError } from "../errors";
-import { createLogEvent, logEvent } from "@logging/log";
+import { emitLog } from "@data/builder/logging/emitLog";
 import { LOG_CATEGORIES } from "@logging/core/logCategories";
 import { LOG_LEVELS } from "@logging/core/logLevels";
-
-function emitLog(args: {
-    scope: string;
-    level: "debug" | "info" | "warn" | "error";
-    message: string;
-}): void {
-    logEvent(
-        createLogEvent({
-            level: args.level,
-            category: LOG_CATEGORIES.TECHNICAL,
-            message: args.message,
-            scope: args.scope,
-        })
-    );
-}
 
 function expandScriptIdFilter(raw: string): Set<string> {
     const result = new Set<string>();
@@ -87,6 +72,7 @@ const plugin: PipelinePlugin = {
             emitLog({
                 scope,
                 level: LOG_LEVELS.INFO,
+                category: LOG_CATEGORIES.PIPELINE,
                 message: "No scriptId filter provided. Keeping all cases.",
             });
             return;
@@ -107,6 +93,7 @@ const plugin: PipelinePlugin = {
         emitLog({
             scope,
             level: LOG_LEVELS.INFO,
+            category: LOG_CATEGORIES.PIPELINE,
             message: `Filtering script IDs: ${rawFilter}`,
         });
 
@@ -139,6 +126,7 @@ const plugin: PipelinePlugin = {
         emitLog({
             scope,
             level: LOG_LEVELS.INFO,
+            category: LOG_CATEGORIES.PIPELINE,
             message: `Cases after filter: ${casesFile.caseCount} (from ${before})`,
         });
     },

@@ -7,24 +7,9 @@ import { getSchema } from "../../data-definitions";
 import { buildVerticalCases } from "../core/buildVerticalCases";
 import { buildTabularCases } from "../core/buildTabularCases";
 import { DataBuilderError } from "../errors";
-import { createLogEvent, logEvent } from "@logging/log";
+import { emitLog } from "@data/builder/logging/emitLog";
 import { LOG_CATEGORIES } from "@logging/core/logCategories";
 import { LOG_LEVELS } from "@logging/core/logLevels";
-
-function emitLog(args: {
-    scope: string;
-    level: "debug" | "info" | "warn" | "error";
-    message: string;
-}): void {
-    logEvent(
-        createLogEvent({
-            level: args.level,
-            category: LOG_CATEGORIES.TECHNICAL,
-            message: args.message,
-            scope: args.scope,
-        })
-    );
-}
 
 const plugin: PipelinePlugin = {
     name: "build-cases",
@@ -59,21 +44,25 @@ const plugin: PipelinePlugin = {
             emitLog({
                 scope,
                 level: LOG_LEVELS.DEBUG,
+                category: LOG_CATEGORIES.PIPELINE,
                 message: `Building cases with schema "${ctx.data.schemaName}"...`,
             });
             emitLog({
                 scope,
                 level: LOG_LEVELS.DEBUG,
+                category: LOG_CATEGORIES.PIPELINE,
                 message: `layout=${meta.layout}`,
             });
             emitLog({
                 scope,
                 level: LOG_LEVELS.DEBUG,
+                category: LOG_CATEGORIES.PIPELINE,
                 message: `includeEmpty=${includeEmpty}`,
             });
             emitLog({
                 scope,
                 level: LOG_LEVELS.DEBUG,
+                category: LOG_CATEGORIES.PIPELINE,
                 message: `cases to build=${meta.caseMetas.length}`,
             });
         }
@@ -96,6 +85,7 @@ const plugin: PipelinePlugin = {
         emitLog({
             scope,
             level: LOG_LEVELS.INFO,
+            category: LOG_CATEGORIES.PIPELINE,
             message: `Cases built with schema "${ctx.data.schemaName}": ${cases.length}`,
         });
     },

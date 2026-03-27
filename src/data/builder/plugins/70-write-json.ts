@@ -1,55 +1,20 @@
 // src/data/builder/plugins/70-write-json.ts
 
-import path from "node:path";
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
 import { executionConfig } from "../../../config/execution.config";
-import { writeArtifactJson } from "@utils/artifacts";
-import {
-  DATA_DOMAINS,
-  DATA_GENERATED_ARCHIVE_DIR,
-  ROOT,
-  getGeneratedSchemaDir,
-} from "@utils/paths";
-import { upsertGeneratedManifestItem } from "@data/runtime/generatedManifest";
-import { DataBuilderError } from "../errors";
-import { createLogEvent, logEvent } from "@logging/log";
+import { DATA_GENERATED_ARCHIVE_DIR } from "@utils/paths";
+import { emitLog } from "@data/builder/logging/emitLog";
 import { LOG_CATEGORIES } from "@logging/core/logCategories";
 import { LOG_LEVELS } from "@logging/core/logLevels";
-
-function emitLog(args: {
-  scope: string;
-  level: "debug" | "info" | "warn" | "error";
-  message: string;
-}): void {
-  logEvent(
-    createLogEvent({
-      level: args.level,
-      category: LOG_CATEGORIES.TECHNICAL,
-      message: args.message,
-      scope: args.scope,
-    })
-  );
-}
-
-function safeSheetFilename(name: string) {
-  return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "Sheet";
-}
-
-function isLikelyDir(p: string): boolean {
-  const normalized = p.replace(/\\/g, "/").trim();
-  if (!normalized) return true;
-  if (normalized.endsWith("/")) return true;
-  if (normalized.endsWith("\\")) return true;
-  return path.extname(normalized) === "";
-}
-
-function getDefaultOutputPath(schemaName: string, sheetName: string): string {
-  return path.join(
-    getGeneratedSchemaDir(schemaName),
-    `${safeSheetFilename(sheetName)}.json`
-  );
-}
+import { resolveWriteJsonInputs } from "../core/writeJson/resolveWriteJsonInputs";
+import { resolveOutputPath } from "../core/writeJson/resolveOutputPath";
+import {
+  writeCasesJson,
+  type ArtifactWriteOptions,
+} from "../core/writeJson/writeCasesJson";
+import { writeValidationReport } from "../core/writeJson/writeValidationReport";
+import { updateGeneratedManifest } from "../core/writeJson/updateGeneratedManifest";
 
 const plugin: PipelinePlugin = {
   name: "write-json",
@@ -63,141 +28,84 @@ const plugin: PipelinePlugin = {
   provides: ["absOut"],
 
   run: async (ctx: DataBuilderContext) => {
-    const casesFile = ctx.data.casesFile;
     const scope = ctx.logScope;
 
-    if (!casesFile) {
-      throw new DataBuilderError({
-        code: "CASES_FILE_MISSING",
-        stage: "write-json",
-        source: "70-write-json",
-        message: "casesFile missing. build-cases must run before write-json.",
-      });
-    }
+    const { casesFile, sheetName, schemaName } = resolveWriteJsonInputs({
+      casesFile: ctx.data.casesFile,
+      sheetName: ctx.data.sheetName,
+      schemaName: ctx.data.schemaName,
+    });
 
-    const sheetName = String(casesFile.sheet ?? ctx.data.sheetName ?? "").trim();
-    if (!sheetName) {
-      throw new DataBuilderError({
-        code: "SHEET_NAME_MISSING",
-        stage: "write-json",
-        source: "70-write-json",
-        message: "sheetName missing.",
-      });
-    }
+    const { absBaseOut } = resolveOutputPath({
+      outputPath: ctx.data.outputPath,
+      schemaName,
+      sheetName,
+    });
 
-    const schemaName = String(ctx.data.schemaName ?? "").trim();
-    if (!schemaName) {
-      throw new DataBuilderError({
-        code: "SCHEMA_NAME_MISSING",
-        stage: "write-json",
-        source: "70-write-json",
-        message: "schemaName missing. Ensure schema is resolved before write-json.",
-      });
-    }
-
-    const outRaw = String(ctx.data.outputPath ?? "").trim();
-    const configuredPath = outRaw || getDefaultOutputPath(schemaName, sheetName);
-
-    let targetPath = configuredPath;
-    if (isLikelyDir(configuredPath)) {
-      targetPath = path.join(
-        configuredPath,
-        `${safeSheetFilename(sheetName)}.json`
-      );
-    }
-
-    const absBaseOut = path.isAbsolute(targetPath)
-      ? targetPath
-      : path.join(ROOT, targetPath);
-
-    const artifactOpts = {
+    const artifactOpts: ArtifactWriteOptions = {
       withTimestamp: executionConfig.generatedArtifacts.withTimestamp,
       archiveDirPath: DATA_GENERATED_ARCHIVE_DIR,
       maxToKeep: executionConfig.generatedArtifacts.maxToKeep,
       pretty: true,
     };
 
-    let writtenJsonPath = "";
-    let writtenReportPath = "";
+    const writtenJsonPath = writeCasesJson({
+      absBaseOut,
+      casesFile,
+      artifactOpts,
+      sheetName,
+      schemaName,
+    });
 
-    try {
-      writtenJsonPath = writeArtifactJson(absBaseOut, casesFile, artifactOpts);
-      ctx.data.absOut = writtenJsonPath;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new DataBuilderError({
-        code: "JSON_WRITE_FAILED",
-        stage: "write-json",
-        source: "70-write-json",
-        message: `Failed to write cases JSON: ${message}`,
-        context: {
-          targetPath: absBaseOut,
-          sheetName,
-          schemaName,
-        },
+    ctx.data.absOut = writtenJsonPath;
+
+    const writtenReportPath = writeValidationReport({
+      absBaseOut,
+      validationReport: ctx.data.validationReport,
+      artifactOpts,
+      sheetName,
+      schemaName,
+    });
+
+    if (writtenReportPath) {
+      emitLog({
+        scope,
+        level: LOG_LEVELS.INFO,
+        category: LOG_CATEGORIES.PIPELINE,
+        message: `Validation report written: ${writtenReportPath}`,
       });
     }
 
-    if (ctx.data.validationReport) {
-      const baseReportPath = absBaseOut.replace(/\.json$/i, ".validation.json");
-
-      try {
-        writtenReportPath = writeArtifactJson(
-          baseReportPath,
-          ctx.data.validationReport,
-          artifactOpts
-        );
-
-        ctx.data.validationReport.reportPath = writtenReportPath;
-
-        emitLog({
-          scope,
-          level: LOG_LEVELS.INFO,
-          message: `Validation report written: ${writtenReportPath}`,
-        });
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        throw new DataBuilderError({
-          code: "VALIDATION_REPORT_WRITE_FAILED",
-          stage: "write-json",
-          source: "70-write-json",
-          message: `Failed to write validation report: ${message}`,
-          context: {
-            targetPath: baseReportPath,
-            sheetName,
-            schemaName,
-          },
-        });
-      }
-    }
-
-    upsertGeneratedManifestItem({
-      domain: DATA_DOMAINS.NEW_BUSINESS,
+    updateGeneratedManifest({
       sheetName,
       schemaName,
-      filePath: writtenJsonPath,
-      validationReportPath: writtenReportPath || undefined,
-      caseCount: Number(casesFile.caseCount ?? casesFile.cases?.length ?? 0),
+      writtenJsonPath,
+      writtenReportPath,
+      casesFile,
     });
 
     emitLog({
       scope,
       level: LOG_LEVELS.INFO,
+      category: LOG_CATEGORIES.PIPELINE,
       message: `JSON written: ${writtenJsonPath}`,
     });
 
     emitLog({
       scope,
       level: LOG_LEVELS.DEBUG,
+      category: LOG_CATEGORIES.PIPELINE,
       message: `cases=${casesFile.caseCount}`,
     });
 
     emitLog({
       scope,
       level: LOG_LEVELS.DEBUG,
+      category: LOG_CATEGORIES.PIPELINE,
       message:
         `generatedArtifacts.withTimestamp=${executionConfig.generatedArtifacts.withTimestamp}, ` +
-        `archiveDir=${DATA_GENERATED_ARCHIVE_DIR}, maxToKeep=${executionConfig.generatedArtifacts.maxToKeep}`,
+        `archiveDir=${DATA_GENERATED_ARCHIVE_DIR}, ` +
+        `maxToKeep=${executionConfig.generatedArtifacts.maxToKeep}`,
     });
   },
 };

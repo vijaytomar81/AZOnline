@@ -5,7 +5,7 @@ import type {
     RepeatedGroup,
     SchemaGroupMap,
 } from "../../data-definitions/types";
-import { cellToString, norm, normKey } from "./excelRuntime";
+import { cellToString, norm, normKey } from "./spreadsheet";
 
 type BuildOpts = {
     ws: ExcelJS.Worksheet;

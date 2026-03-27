@@ -5,7 +5,7 @@ import type {
     SchemaGroupMap,
 } from "../../data-definitions/types";
 import type { SectionFieldGroup, ValidationReport } from "../types";
-import { normKey } from "./excelRuntime";
+import { normKey } from "./spreadsheet";
 
 export function collectSchemaFields(obj: unknown, out: Set<string>) {
     if (!obj || typeof obj !== "object") return;
