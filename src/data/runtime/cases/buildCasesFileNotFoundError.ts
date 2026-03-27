@@ -1,7 +1,7 @@
-// src/data/runtime/buildCasesFileNotFoundError.ts
+// src/data/runtime/cases/buildCasesFileNotFoundError.ts
 
-import { DataBuilderError } from "../builder/errors";
-import { findGeneratedManifestItem } from "@data/runtime/generatedManifest";
+import { DataBuilderError } from "../../builder/errors";
+import { findGeneratedManifestItem } from "@data/runtime/manifest/generatedManifest";
 
 export function buildCasesFileNotFoundError(args: {
     sheetName: string;

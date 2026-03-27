@@ -1,8 +1,8 @@
-// src/data/runtime/getCasesFile.ts
+// src/data/runtime/cases/getCasesFile.ts
 
 import fs from "node:fs";
-import { resolveSchemaName } from "../data-definitions";
-import type { CasesFile } from "../builder/types";
+import { resolveSchemaName } from "../../data-definitions";
+import type { CasesFile } from "../../builder/types";
 import { resolveCasesFilePath } from "./resolveCasesFilePath";
 
 export function getCasesFile(

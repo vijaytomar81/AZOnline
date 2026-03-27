@@ -1,4 +1,4 @@
-// src/data/runtime/resolveExplicitCasesFile.ts
+// src/data/runtime/cases/resolveExplicitCasesFile.ts
 
 import path from "node:path";
 import { ROOT } from "@utils/paths";

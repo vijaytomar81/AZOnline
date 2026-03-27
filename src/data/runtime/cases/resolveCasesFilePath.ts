@@ -1,11 +1,11 @@
-// src/data/runtime/resolveCasesFilePath.ts
+// src/data/runtime/cases/resolveCasesFilePath.ts
 
 import fs from "node:fs";
-import { resolveSchemaName } from "../data-definitions";
+import { resolveSchemaName } from "../../data-definitions";
 import {
     findGeneratedManifestItem,
     resolveManifestFilePath,
-} from "@data/runtime/generatedManifest";
+} from "@data/runtime/manifest/generatedManifest";
 import { resolveExplicitCasesFile } from "./resolveExplicitCasesFile";
 import { buildCasesFileNotFoundError } from "./buildCasesFileNotFoundError";
 

@@ -1,7 +1,7 @@
-// src/data/runtime/loadCases.ts
+// src/data/runtime/cases/loadCases.ts
 
-import type { CasesFile, BuiltCase } from "../builder/types";
-import { DataBuilderError } from "../builder/errors";
+import type { CasesFile, BuiltCase } from "../../builder/types";
+import { DataBuilderError } from "../../builder/errors";
 import { getCasesFile } from "./getCasesFile";
 import { resolveCasesFilePath } from "./resolveCasesFilePath";
 

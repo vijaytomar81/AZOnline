@@ -1,6 +1,6 @@
-// src/data/runtime/selectCases.ts
+// src/data/runtime/cases/selectCases.ts
 
-import { DataBuilderError } from "../builder/errors";
+import { DataBuilderError } from "../../builder/errors";
 import { loadCases, CaseObject } from "./loadCases";
 
 export function selectCases(

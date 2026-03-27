@@ -1,7 +1,7 @@
 // src/data/builder/core/writeJson/updateGeneratedManifest.ts
 
 import { DATA_DOMAINS } from "@utils/paths";
-import { upsertGeneratedManifestItem } from "@data/runtime/generatedManifest";
+import { upsertGeneratedManifestItem } from "@data/runtime/manifest/generatedManifest";
 import type { CasesFile } from "../../types";
 
 export function updateGeneratedManifest(args: {

@@ -4,7 +4,7 @@ import { LOG_CATEGORIES } from "@logging/core/logCategories";
 import { LOG_LEVELS } from "@logging/core/logLevels";
 import { createLogEvent, logEvent } from "@logging/log";
 import { resolveSchemaName } from "@data/data-definitions";
-import { getCasesFile } from "@data/runtime/getCasesFile";
+import { getCasesFile } from "@data/runtime/cases/getCasesFile";
 import { normalizeJourney } from "@config/domain/journey.config";
 import { createExecutionBootstrap } from "@execution/core/bootstrap";
 import { runCases } from "@execution/core/caseRunner";
