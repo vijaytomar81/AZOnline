@@ -71,7 +71,7 @@ const plugin: PipelinePlugin = {
       emitLog({
         scope,
         level: LOG_LEVELS.INFO,
-        category: LOG_CATEGORIES.PIPELINE,
+        category: LOG_CATEGORIES.ARTIFACT,
         message: `Validation report written: ${writtenReportPath}`,
       });
     }
@@ -87,21 +87,21 @@ const plugin: PipelinePlugin = {
     emitLog({
       scope,
       level: LOG_LEVELS.INFO,
-      category: LOG_CATEGORIES.PIPELINE,
+      category: LOG_CATEGORIES.ARTIFACT,
       message: `JSON written: ${writtenJsonPath}`,
     });
 
     emitLog({
       scope,
       level: LOG_LEVELS.DEBUG,
-      category: LOG_CATEGORIES.PIPELINE,
+      category: LOG_CATEGORIES.ARTIFACT,
       message: `cases=${casesFile.caseCount}`,
     });
 
     emitLog({
       scope,
       level: LOG_LEVELS.DEBUG,
-      category: LOG_CATEGORIES.PIPELINE,
+      category: LOG_CATEGORIES.ARTIFACT,
       message:
         `generatedArtifacts.withTimestamp=${executionConfig.generatedArtifacts.withTimestamp}, ` +
         `archiveDir=${DATA_GENERATED_ARCHIVE_DIR}, ` +
