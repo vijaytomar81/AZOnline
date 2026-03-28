@@ -4,7 +4,7 @@ import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
 import { executionConfig } from "../../../config/execution.config";
 import { DATA_GENERATED_ARCHIVE_DIR } from "@utils/paths";
-import { emitLog } from "@data/builder/logging/emitLog";
+import { emitLog } from "@logging/emitLog";
 import { LOG_CATEGORIES } from "@logging/core/logCategories";
 import { LOG_LEVELS } from "@logging/core/logLevels";
 import { resolveWriteJsonInputs } from "../core/writeJson/resolveWriteJsonInputs";

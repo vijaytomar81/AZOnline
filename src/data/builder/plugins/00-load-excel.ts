@@ -1,7 +1,7 @@
 // src/data/builder/plugins/00-load-excel.ts
 
 import type { PipelinePlugin } from "../core/pipeline";
-import { emitLog } from "@data/builder/logging/emitLog";
+import { emitLog } from "@logging/emitLog";
 import { LOG_CATEGORIES } from "@logging/core/logCategories";
 import { LOG_LEVELS } from "@logging/core/logLevels";
 import { resolveExcelPath } from "../core/loadExcel/resolveExcelPath";

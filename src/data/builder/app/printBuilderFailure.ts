@@ -3,7 +3,7 @@
 import { AppError } from "@utils/errors";
 import { printKeyValue, printSection } from "@utils/cliFormat";
 import { setLogVerbose } from "@logging/core/logConfig";
-import { emitLog } from "@data/builder/logging/emitLog";
+import { emitLog } from "@logging/emitLog";
 import { LOG_CATEGORIES } from "@logging/core/logCategories";
 import { LOG_LEVELS } from "@logging/core/logLevels";
 import type { FailureContext } from "./buildFailureContext";

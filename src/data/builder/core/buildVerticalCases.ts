@@ -7,7 +7,7 @@ import { DataBuilderError } from "../errors";
 import { buildRowIndex } from "./spreadsheet";
 import { buildPayload } from "./schemaRuntime";
 import { createBuiltCase } from "./buildCases/shared/createBuiltCase";
-import { emitLog } from "@data/builder/logging/emitLog";
+import { emitLog } from "@logging/emitLog";
 import { LOG_CATEGORIES } from "@logging/core/logCategories";
 import { logBuiltVerticalCase } from "./buildCases/vertical/logBuiltVerticalCase";
 import { LOG_LEVELS } from "@logging/core/logLevels";
