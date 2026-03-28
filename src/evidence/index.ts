@@ -1,0 +1,65 @@
+// src/evidence/index.ts
+
+export { EVIDENCE_LABELS } from "./constants/evidenceLabels";
+
+export type { EvidenceEntry } from "./contracts/EvidenceEntry";
+export type { EvidenceLabel } from "./contracts/EvidenceLabel";
+export type { EvidenceStore } from "./contracts/EvidenceStore";
+export type { EvidenceValue } from "./contracts/EvidenceValue";
+
+export { createEvidenceStore } from "./core/createEvidenceStore";
+export { InMemoryEvidenceStore } from "./core/InMemoryEvidenceStore";
+
+export type { EvidenceRunInfo } from "./runtime/EvidenceRunInfo";
+export type { EvidenceContext } from "./runtime/EvidenceContext";
+export { createEvidenceContext } from "./runtime/createEvidenceContext";
+
+export type {
+    EvidenceArtifactPaths,
+} from "./artifacts/contracts/EvidenceArtifactPaths";
+
+export type {
+    EvidenceArtifactWriter,
+    EvidenceArtifactWriteResult,
+} from "./artifacts/contracts/EvidenceArtifactWriter";
+
+export { buildEvidenceArtifactPath } from "./artifacts/paths/buildEvidenceArtifactPath";
+
+export { buildEvidenceJson } from "./artifacts/json/buildEvidenceJson";
+
+export {
+    buildEvidenceMetadata,
+    type BuildEvidenceMetadataInput,
+    type EvidenceExecutionStatus,
+} from "./artifacts/json/buildEvidenceMetadata";
+
+export {
+    WriteEvidenceJsonArtifact,
+    writeEvidenceJsonArtifact,
+    type WriteEvidenceJsonArtifactInput,
+} from "./artifacts/json/writeEvidenceJsonArtifact";
+
+export {
+    buildRunEvidence,
+    type RunEvidence,
+    type RunEvidenceCaseMap,
+} from "./artifacts/run/buildRunEvidence";
+
+export {
+    writeWorkerEvidenceArtifact,
+    type WriteWorkerEvidenceArtifactInput,
+    type WriteWorkerEvidenceArtifactResult,
+    type WorkerEvidenceArtifact,
+} from "./artifacts/run/writeWorkerEvidenceArtifact";
+
+export {
+    mergeWorkerEvidence,
+    type MergeWorkerEvidenceInput,
+    type MergeWorkerEvidenceResult,
+} from "./artifacts/run/mergeWorkerEvidence";
+
+// src/evidence/index.ts
+
+export type { EvidenceArtifactConfig } from "./config/EvidenceArtifactConfig";
+export { resolveEvidenceArtifactConfig } from "./config/resolveEvidenceArtifactConfig";
+
