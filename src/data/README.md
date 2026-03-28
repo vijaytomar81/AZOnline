@@ -108,9 +108,11 @@ Example:
 | PCW-Tool | pcw_tool |
 | CNF | cnf |
 
-Defined in the current schema registry / resolver under:
+Defined under:
 
-    src/data/data-definitions
+```
+src/data/data-definitions
+```
 
 ---
 
@@ -118,39 +120,29 @@ Defined in the current schema registry / resolver under:
 
 ## Test Data JSON
 
-Generated under schema-specific folders:
-
-    src/data/generated/new-business/<schema>/<Sheet>.json
-    src/data/generated/new-business/<schema>/<Sheet>_<timestamp>.json
-
-Example:
-
-    src/data/generated/new-business/direct/FlowNB_20260324_124611_785.json
-    src/data/generated/new-business/pcw-tool/PCW-Tool_20260324_183426_963.json
+```
+src/data/generated/new-business/<schema>/<Sheet>.json
+src/data/generated/new-business/<schema>/<Sheet>_<timestamp>.json
+```
 
 ---
 
 ## Validation Report
 
-Generated alongside the JSON:
-
-    src/data/generated/new-business/<schema>/<Sheet>.validation.json
-    src/data/generated/new-business/<schema>/<Sheet>.validation_<timestamp>.json
-
-Example:
-
-    src/data/generated/new-business/direct/FlowNB.validation_20260324_124611_786.json
-    src/data/generated/new-business/pcw-tool/PCW-Tool.validation_20260324_183426_963.json
+```
+src/data/generated/new-business/<schema>/<Sheet>.validation.json
+src/data/generated/new-business/<schema>/<Sheet>.validation_<timestamp>.json
+```
 
 ---
 
 ## Generated Manifest
 
-A central manifest is also maintained:
+```
+src/data/generated/index.json
+```
 
-    src/data/generated/index.json
-
-This stores:
+Stores:
 
 - logical key
 - sheet name
@@ -160,51 +152,29 @@ This stores:
 - case count
 - generated timestamp
 
-Execution now uses this manifest as the **source of truth** for locating generated data.
-
 ---
 
 # 6. Artifact Handling
 
-## Modes
+## Timestamp Mode
 
-### Timestamp Mode
-
-If enabled:
-
-    <name>_yyyymmdd_hhmmss_mmm.json
-
-Example:
-
-    FlowNB_20260324_124611_785.json
-
-### Non-Timestamp Mode
-
-If disabled:
-
-    FlowNB.json
+```
+<name>_yyyymmdd_hhmmss_mmm.json
+```
 
 ---
 
 ## Archive Folder
 
-Archived artifacts are stored under:
+```
+src/data/generated/archive/
+```
 
-    src/data/generated/archive/
+Organized by:
 
-In practice, archive is organized by domain and schema.
-
-Example:
-
-    src/data/generated/archive/new-business/direct/
-    src/data/generated/archive/new-business/pcw-tool/
-
-Behavior:
-
-- existing active files are moved to archive before new write
-- archive folders are auto-created
-- matching archive files may be replaced
-- only latest N archived files are retained
+```
+new-business/<schema>/
+```
 
 ---
 
@@ -212,58 +182,26 @@ Behavior:
 
 Defined in:
 
-    src/config/execution.config.ts
-
-Current shape:
-
-    executionConfig.generatedArtifacts = {
-      withTimestamp: boolean,
-      maxToKeep: number
-    }
-
-ENV:
-
-    ARTIFACTS_WITH_TIMESTAMP=true
-    MAX_ARTIFACTS_TO_KEEP=30
+```
+src/config/execution.config.ts
+```
 
 ---
 
 # 7. Manifest Design
 
-The generated manifest is key-based, not array-based.
+Key format:
 
-Example key:
-
-    new-business:pcw_tool:PCW-Tool
-
-Example structure:
-
-~~~json
-{
-  "generatedAt": "2026-03-24T23:23:05.165Z",
-  "data": {
-    "new-business:pcw_tool:PCW-Tool": {
-      "key": "new-business:pcw_tool:PCW-Tool",
-      "domain": "new-business",
-      "sheetName": "PCW-Tool",
-      "schemaName": "pcw_tool",
-      "filePath": "src/data/generated/new-business/pcw-tool/PCW-Tool_20260325_002225_270.json",
-      "validationReportPath": "src/data/generated/new-business/pcw-tool/PCW-Tool.validation_20260325_002225_271.json",
-      "caseCount": 2,
-      "generatedAt": "2026-03-24T23:22:25.271Z"
-    }
-  }
-}
-~~~
-
-Manifest key format:
-
-    <domain>:<schemaName>:<sheetName>
+```
+<domain>:<schemaName>:<sheetName>
+```
 
 Example:
 
-    new-business:direct:FlowNB
-    new-business:pcw_tool:PCW-Tool
+```
+new-business:direct:FlowNB
+new-business:pcw_tool:PCW-Tool
+```
 
 ---
 
@@ -272,38 +210,36 @@ Example:
 Execution resolves generated data in this order:
 
 1. explicit `CASES_FILE`
-2. generated manifest (`src/data/generated/index.json`)
+2. manifest lookup via runtime module
 
-Folder scanning fallback has been removed.  
-This means the manifest is now the authoritative lookup mechanism for generated test data.
+The manifest is the **single source of truth**.
 
 ---
 
 # 9. Schema System
 
-The schema system supports:
-
-- field mapping
-- nested structure
-- repeated groups
-- section-aware validation
-- schema-driven case building
-
 Defined under:
 
-    src/data/data-definitions
+```
+src/data/data-definitions
+```
+
+Supports:
+
+- nested groups
+- repeated groups
+- required/optional fields
+- section-based validation
 
 ---
 
-# 10. Data Builder Pipeline
+# 10. Data Builder Pipeline (Plugin-Based)
 
 ~~~mermaid
 flowchart TD
 
-    subgraph Business Data Layouts
-        A1[Tabular Layout<br/>Direct / FlowNB]
-        A2[Vertical Layout<br/>PCW Tool]
-    end
+    A1[Tabular Layout]
+    A2[Vertical Layout]
 
     A1 --> B[load-excel]
     A2 --> B
@@ -316,53 +252,36 @@ flowchart TD
     G --> H[write-json]
 
     H --> I[Generated JSON]
-    H --> J[Validation Report JSON]
-    H --> K[index.json Manifest]
+    H --> J[Validation Report]
+    H --> K[Manifest]
 ~~~
 
 ---
 
 # 11. Validation System
 
-Validation report structure:
-
 ~~~json
 {
   "errors": [],
-  "missingSchemaFieldsInExcel": {
-    "requiredFields": [],
-    "bySection": {}
-  },
-  "missingExcelFieldsInSchema": {
-    "unusedExcelFields": []
-  },
-  "summary": {
-    "errorCount": 0,
-    "missingSchemaFieldsInExcelCount": 0,
-    "missingExcelFieldsInSchemaCount": 0
-  }
+  "missingSchemaFieldsInExcel": {},
+  "missingExcelFieldsInSchema": {},
+  "summary": {}
 }
 ~~~
 
-Validation helps detect:
+Detects:
 
+- missing fields
+- duplicate fields (strict mode)
 - schema mismatches
-- missing required Excel fields
-- unused Excel fields
-- structural issues before runtime
 
 ---
 
 # 12. CLI Usage
 
-Basic usage:
-
-    npm run data -- --excel file.xlsx --sheet FlowNB
-
-Examples:
-
-    npm run data -- --excel "sampleData/New Business.xlsx" --sheet FlowNB
-    npm run data -- --excel "sampleData/New Business.xlsx" --sheet "PCW-Tool"
+```
+npm run data -- --excel file.xlsx --sheet FlowNB
+```
 
 ---
 
@@ -390,81 +309,80 @@ Examples:
 
 # 15. Strict Validation
 
-Normal validation includes:
-
-- required field validation
-- mapping validation
-- schema vs Excel consistency checks
-
-Strict validation can additionally enforce:
+Adds:
 
 - duplicate checks
-- repeated group consistency
-- stricter schema completeness rules
+- stricter schema enforcement
+- stronger consistency guarantees
 
 ---
 
 # 16. Example Commands
 
-    npm run data -- --excel file.xlsx --sheet FlowNB
-    npm run data -- --excel "sampleData/New Business.xlsx" --sheet "PCW-Tool"
-    npm run data:build:strict
-    npm run data:build:noEmpty:strict
+```
+npm run data -- --excel file.xlsx --sheet FlowNB
+npm run data -- --excel "sampleData/New Business.xlsx" --sheet "PCW-Tool"
+npm run data:build:strict
+npm run data:build:noEmpty:strict
+```
 
 ---
 
 # 17. Adding New Journeys
 
-To add a new journey:
-
-1. add or update schema definition
-2. update schema resolution / aliases
-3. run builder for the target sheet
-4. verify generated JSON + validation report + manifest entry
+1. add or update schema
+2. update sheet alias mapping
+3. run builder
+4. verify JSON + validation + manifest
 
 ---
 
 # 18. Utilities
 
-Common utility support lives under:
-
-    src/utils
+```
+src/utils
+```
 
 Includes:
 
 - logging
 - CLI parsing
 - timers
-- file helpers
-- artifact handling
-- path resolution
+- file utilities
+- path helpers
 
 ---
 
 # 19. Design Principles
 
-The Data Builder is designed to be:
+The Data Builder is:
 
 - schema-driven
 - plugin-based
+- modular
 - scalable
 - business-friendly
 - automation-ready
-- manifest-backed for runtime resolution
+- manifest-backed
 
 ---
 
-# 20. Summary
+# 20. Plugin Architecture
 
-The Data Builder provides a scalable pipeline for converting Excel test data into structured JSON.
+The Data Builder runs as a **plugin pipeline**.
 
-It enables:
+Each plugin:
 
-- business-friendly test data maintenance
-- schema-driven automation
-- consistent test structures
-- scalable testing
-- deterministic runtime resolution through manifest lookup
+- declares `requires`
+- declares `provides`
+- executes in dependency order
+- runs with shared context
+
+Core flow:
+
+```
+pluginDiscovery → pluginOrder → pluginExecutor
+```
 
 ---
 
@@ -474,20 +392,26 @@ It enables:
 flowchart LR
 
     subgraph Business_Data_Layouts
-        A0[Tabular Layout<br/>Direct / FlowNB]
-        A00[Vertical Layout<br/>PCW Tool]
+        A0[Tabular Layout]
+        A00[Vertical Layout]
     end
 
     subgraph CLI
         A[index.ts]
-        A1[cli.ts]
+        A1[cli/index.ts]
     end
 
     subgraph Core
-        B1[pluginLoader.ts]
-        B2[pipeline.ts]
-        B3[schemaRuntime.ts]
-        B4[excelRuntime.ts]
+        B1[pluginDiscovery.ts]
+        B2[pluginOrder.ts]
+        B3[pluginExecutor.ts]
+        B4[pipeline.ts]
+
+        B5[spreadsheet/*]
+        B6[schemaValidation/*]
+        B7[extractMeta/*]
+        B8[buildCases/*]
+        B9[writeJson/*]
     end
 
     subgraph Schema
@@ -506,22 +430,16 @@ flowchart LR
         D7[70-write-json]
     end
 
-    subgraph Utilities
-        E1[src/utils/fs.ts]
-        E2[src/utils/artifacts.ts]
-        E3[src/utils/paths.ts]
-    end
-
     subgraph Runtime
-        R1[src/data/runtime/generatedManifest.ts]
-        R2[src/data/runtime/getCasesFile.ts]
+        R1[manifest/*]
+        R2[cases/*]
     end
 
     subgraph Output
-        F1[src/data/generated/new-business/*/*.json]
-        F2[src/data/generated/new-business/*/*.validation.json]
-        F3[src/data/generated/archive/*]
-        F4[src/data/generated/index.json]
+        F1[generated JSON]
+        F2[validation JSON]
+        F3[archive]
+        F4[index.json]
     end
 
     A0 --> D1
@@ -538,23 +456,6 @@ flowchart LR
     D4 --> D5
     D5 --> D6
     D6 --> D7
-
-    C1 --> D2
-    C2 --> D2
-    C3 --> D2
-
-    C1 --> D4
-    C2 --> D4
-    C3 --> D4
-
-    B3 --> D4
-    B4 --> D2
-    B4 --> D3
-    B4 --> D4
-
-    E1 --> E2
-    E2 --> D7
-    E3 --> D7
 
     D7 --> F1
     D7 --> F2

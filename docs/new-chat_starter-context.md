@@ -1,3 +1,5 @@
+I am working on a Playwright automation framework with the following architecture:
+
 # ChatGPT Context — Playwright Automation Framework
 
 This document provides **context for AI assistants (such as ChatGPT)** to understand the automation framework used in this repository.
@@ -514,3 +516,51 @@ Provides structured logging across framework.
 - consistent structure across layers
 
 ---
+
+---
+
+## 🔧 Current Development Context
+
+Current focus:
+- Data layer is completed and refactored
+- Working on execution layer refactor
+- Introducing evidence system (generic key-value based)
+
+Architecture principles:
+- Single responsibility per file
+- Max ~200 LOC per file
+- Separate orchestration from logic
+- Avoid duplication (DRY)
+- Keep pure logic isolated from side effects
+- No tight coupling between layers (data / execution / evidence)
+
+---
+
+## 🎯 What I need help with
+
+[DESCRIBE YOUR TASK CLEARLY]
+
+---
+
+## 📌 Constraints
+
+- Follow existing folder structure
+- Do NOT introduce tight coupling
+- Keep code modular and scalable
+- Prefer composition over monolith files
+- Maintain consistency with existing patterns
+
+---
+
+## 📁 Relevant Files (if needed)
+
+[PASTE FILES OR SNIPPETS HERE]
+
+---
+
+## ✅ Expected Output
+
+- Clear explanation
+- Proposed folder structure (if refactor)
+- Code split into small files (<200 LOC each)
+- Clean, production-ready TypeScript
