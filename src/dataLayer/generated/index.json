@@ -6,8 +6,8 @@
       "domain": "new-business",
       "sheetName": "FlowNB",
       "schemaName": "direct",
-      "filePath": "src/data/generated/new-business/direct/FlowNB_20260328_185023_490.json",
-      "validationReportPath": "src/data/generated/new-business/direct/FlowNB.validation_20260328_185023_491.json",
+      "filePath": "src/dataLayer/generated/new-business/direct/FlowNB_20260328_185023_490.json",
+      "validationReportPath": "src/dataLayer/generated/new-business/direct/FlowNB.validation_20260328_185023_491.json",
       "caseCount": 3,
       "generatedAt": "2026-03-28T17:50:23.491Z"
     },
@@ -16,8 +16,8 @@
       "domain": "new-business",
       "sheetName": "PCW-Tool",
       "schemaName": "pcw_tool",
-      "filePath": "src/data/generated/new-business/pcw-tool/PCW-Tool_20260327_225051_076.json",
-      "validationReportPath": "src/data/generated/new-business/pcw-tool/PCW-Tool.validation_20260327_225051_076.json",
+      "filePath": "src/dataLayer/generated/new-business/pcw-tool/PCW-Tool_20260327_225051_076.json",
+      "validationReportPath": "src/dataLayer/generated/new-business/pcw-tool/PCW-Tool.validation_20260327_225051_076.json",
       "caseCount": 2,
       "generatedAt": "2026-03-27T21:50:51.076Z"
     }

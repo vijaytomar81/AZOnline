@@ -2,6 +2,7 @@
 
 import { buildCalculatedEmail } from "@utils/calculatedEmail";
 import { nowIso } from "@utils/time";
+import { AppError } from "@utils/errors";
 import { OUTPUT_KEYS } from "@executionLayer/constants/outputKeys";
 import { setContextOutput } from "@executionLayer/core/context";
 import type { BusinessJourneyExecutor } from "@businessJourneys/shared";
@@ -22,6 +23,15 @@ export const runNewBusiness: BusinessJourneyExecutor = async ({
     item,
     itemData,
 }) => {
+    if (!context.page) {
+        throw new AppError({
+            code: "PAGE_MISSING",
+            stage: "business-journey",
+            source: "runNewBusiness",
+            message: "Browser page is missing in execution context.",
+        });
+    }
+
     const payload = itemData ?? {};
     const scenarioJourney = context.scenario.journey || "Direct";
     const entryPoint = context.scenario.entryPoint ?? "Direct";
@@ -33,6 +43,8 @@ export const runNewBusiness: BusinessJourneyExecutor = async ({
         startFrom: entryPoint,
     });
 
+    const openedUrl = context.page.url();
+
     setContextOutput(
         context,
         OUTPUT_KEYS.NEW_BUSINESS.LAST_ACTION,
@@ -42,6 +54,11 @@ export const runNewBusiness: BusinessJourneyExecutor = async ({
         context,
         OUTPUT_KEYS.NEW_BUSINESS.START_FROM,
         entryPoint
+    );
+    setContextOutput(
+        context,
+        OUTPUT_KEYS.NEW_BUSINESS.OPENED_URL,
+        openedUrl
     );
 
     captureBusinessOutputs({
