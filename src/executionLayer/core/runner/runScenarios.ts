@@ -1,6 +1,13 @@
 // src/executionLayer/core/runner/runScenarios.ts
 
 import {
+    cleanupOldEvidenceRuns,
+    finalizeRunEvidence,
+    resolveEvidenceArtifactConfig,
+} from "@/evidence";
+import { executionConfig } from "@config/execution.config";
+import { resolveRunId } from "@executionLayer/runtime/resolveRunId";
+import {
     formatDuration,
     renderExecutionHeader,
     renderExecutionSummary,
@@ -17,6 +24,10 @@ export async function runScenarios(
     const startedAtMs = Date.now();
     const parallel = Math.max(1, args.parallel ?? 1);
     const runs = expandScenarios(args.scenarios, args.iterations);
+    const runId = args.runId ?? resolveRunId();
+    const evidenceConfig = resolveEvidenceArtifactConfig();
+    const evidenceOutputRoot =
+        args.evidenceOutputRoot ?? evidenceConfig.outputRoot;
 
     console.log(
         renderExecutionHeader({
@@ -38,7 +49,12 @@ export async function runScenarios(
         async (scenario) =>
             runScenarioWorker({
                 scenario,
-                runArgs: args,
+                runArgs: {
+                    ...args,
+                    runId,
+                    workerId: args.workerId ?? "worker-0",
+                    evidenceOutputRoot,
+                },
             })
     );
 
@@ -48,12 +64,41 @@ export async function runScenarios(
 
     const { passed, failed } = countExecutionStatuses(outputs);
 
+    let finalEvidence:
+        | {
+              baseDir: string;
+              passedEvidencePath: string;
+              failedEvidencePath?: string;
+          }
+        | undefined;
+
+    if (executionConfig.generatedEvidenceArtifacts.enabled) {
+        finalEvidence = await finalizeRunEvidence({
+            runId,
+            outputRoot: evidenceOutputRoot,
+            cleanupTemporaryArtifacts:
+                executionConfig.generatedEvidenceArtifacts.cleanupTemporaryFilesAfterMerge,
+            keepFailedEvidenceFileOnlyWhenNeeded:
+                executionConfig.generatedEvidenceArtifacts.keepFailedEvidenceFileOnlyWhenNeeded,
+        });
+
+        await cleanupOldEvidenceRuns({
+            outputRoot: evidenceOutputRoot,
+            maxToKeep: executionConfig.generatedEvidenceArtifacts.maxToKeep,
+            excludeRunIds: [runId],
+        });
+    }
+
     console.log(
         renderExecutionSummary({
             total: runs.length,
             passed,
             failed,
             totalTime: formatDuration(startedAtMs),
+            runId,
+            evidenceDir: finalEvidence?.baseDir,
+            passedEvidencePath: finalEvidence?.passedEvidencePath,
+            failedEvidencePath: finalEvidence?.failedEvidencePath,
         })
     );
 }

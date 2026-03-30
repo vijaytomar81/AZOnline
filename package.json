@@ -16,6 +16,7 @@
     "data:build:noEmpty:strict": "npm run data -- --excludeEmptyFields --strictValidation",
     "data:build:noEmpty:strict:verbose": "npm run data -- --excludeEmptyFields --strictValidation --verbose",
     "data:help": "npm run data -- --help",
+    
     "data:direct": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"FlowNB\"",
     "data:pcw": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"PCW-Tool\"",
     "data:verbose:direct": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"FlowNB\" --verbose",

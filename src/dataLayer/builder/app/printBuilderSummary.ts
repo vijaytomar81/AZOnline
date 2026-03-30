@@ -1,7 +1,17 @@
 // src/dataLayer/builder/app/printBuilderSummary.ts
 
+import path from "node:path";
 import { printSummary, success } from "@utils/cliFormat";
+import { toRepoRelative } from "@utils/paths";
 import type { DataBuilderContext } from "../types";
+
+function toDisplayPath(filePath?: string): string {
+    if (!filePath || filePath === "(not generated)") {
+        return filePath || "(not generated)";
+    }
+
+    return toRepoRelative(filePath);
+}
 
 export function printBuilderSummary(args: {
     ctx: DataBuilderContext;
@@ -30,8 +40,8 @@ export function printBuilderSummary(args: {
             ["Strict validation", strictValidation ? "true" : "false"],
             ["Plugins executed", pluginsExecuted],
             ["Cases generated", caseCount],
-            ["Test Data Output file", absOut || "(not set)"],
-            ["Validation - Report", validationPath],
+            ["Test Data Output file", absOut ? toDisplayPath(absOut) : "(not set)"],
+            ["Validation - Report", toDisplayPath(validationPath)],
             ["Validation - Total errors", errorCount],
             [
                 "Validation - Warnings - Schema mapping fields missing in Excel",

@@ -13,6 +13,9 @@ export type RunScenariosArgs = ExecutionPlan & {
     resolveOverrideItemData?: (
         scenario: ExecutionScenario
     ) => Record<string, unknown> | undefined;
+    runId?: string;
+    workerId?: string;
+    evidenceOutputRoot?: string;
 };
 
 export type RunOutput = {

@@ -1,5 +1,6 @@
 // src/executionLayer/core/scenario/runExecutionScenario.ts
 
+import { writeScenarioEvidence } from "@executionLayer/reporting";
 import type {
     ExecutionScenario,
     ExecutionScenarioResult,
@@ -23,6 +24,9 @@ export async function runExecutionScenario(args: {
     logScope: string;
     overrideItemData?: Record<string, unknown>;
     stopOnFailure?: boolean;
+    runId?: string;
+    workerId?: string;
+    evidenceOutputRoot?: string;
 }): Promise<ExecutionScenarioResult> {
     const context = createScenarioExecutionContext(args.scenario);
     let session: BrowserSession | undefined;
@@ -43,5 +47,15 @@ export async function runExecutionScenario(args: {
         await closeBrowserSession(session);
     }
 
-    return buildScenarioExecutionResult(context);
+    const result = buildScenarioExecutionResult(context);
+
+    await writeScenarioEvidence({
+        context,
+        result,
+        runId: args.runId ?? "local-run",
+        workerId: args.workerId ?? "worker-0",
+        outputRoot: args.evidenceOutputRoot,
+    });
+
+    return result;
 }

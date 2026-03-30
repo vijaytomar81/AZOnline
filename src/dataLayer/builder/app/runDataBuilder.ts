@@ -3,6 +3,7 @@
 import path from "node:path";
 import { printCommandTitle } from "@utils/cliFormat";
 import { startTimer } from "@utils/time";
+import { DATA_BUILDER_PLUGINS_DIR } from "@utils/paths";
 import { listSchemas } from "../../data-definitions";
 import { parseBuildArgs } from "../cli";
 import type { DataBuilderContext } from "../types";
@@ -58,13 +59,7 @@ export async function runDataBuilder(): Promise<void> {
 
     printAvailableSchemas(listSchemas());
 
-    const pluginsDirAbs = path.join(
-        process.cwd(),
-        "src",
-        "data",
-        "builder",
-        "plugins"
-    );
+    const pluginsDirAbs = DATA_BUILDER_PLUGINS_DIR;
 
     console.log("");
     console.log("Scanning plugins");

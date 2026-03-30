@@ -43,9 +43,9 @@ const plugin: PipelinePlugin = {
     });
 
     const artifactOpts: ArtifactWriteOptions = {
-      withTimestamp: executionConfig.generatedArtifacts.withTimestamp,
+      withTimestamp: executionConfig.generatedDataArtifacts.withTimestamp,
       archiveDirPath: DATA_GENERATED_ARCHIVE_DIR,
-      maxToKeep: executionConfig.generatedArtifacts.maxToKeep,
+      maxToKeep: executionConfig.generatedDataArtifacts.maxToKeep,
       pretty: true,
     };
 
@@ -103,9 +103,9 @@ const plugin: PipelinePlugin = {
       level: LOG_LEVELS.DEBUG,
       category: LOG_CATEGORIES.ARTIFACT,
       message:
-        `generatedArtifacts.withTimestamp=${executionConfig.generatedArtifacts.withTimestamp}, ` +
+        `generatedArtifacts.withTimestamp=${executionConfig.generatedDataArtifacts.withTimestamp}, ` +
         `archiveDir=${DATA_GENERATED_ARCHIVE_DIR}, ` +
-        `maxToKeep=${executionConfig.generatedArtifacts.maxToKeep}`,
+        `maxToKeep=${executionConfig.generatedDataArtifacts.maxToKeep}`,
     });
   },
 };

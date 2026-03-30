@@ -46,6 +46,12 @@ export {
 } from "./artifacts/run/buildRunEvidence";
 
 export {
+    buildFinalEvidenceFiles,
+    type FinalEvidenceCases,
+    type FinalEvidenceFiles,
+} from "./artifacts/run/buildFinalEvidenceFiles";
+
+export {
     writeWorkerEvidenceArtifact,
     type WriteWorkerEvidenceArtifactInput,
     type WriteWorkerEvidenceArtifactResult,
@@ -58,6 +64,16 @@ export {
     type MergeWorkerEvidenceResult,
 } from "./artifacts/run/mergeWorkerEvidence";
 
+export {
+    finalizeRunEvidence,
+    type FinalizeRunEvidenceInput,
+    type FinalizeRunEvidenceResult,
+} from "./artifacts/run/finalizeRunEvidence";
+
+export {
+    cleanupOldEvidenceRuns,
+    type CleanupOldEvidenceRunsInput,
+} from "./artifacts/run/cleanupOldEvidenceRuns";
+
 export type { EvidenceArtifactConfig } from "./config/EvidenceArtifactConfig";
 export { resolveEvidenceArtifactConfig } from "./config/resolveEvidenceArtifactConfig";
-

@@ -8,4 +8,5 @@ export { loadAndParseScenarios } from "./loadAndParseScenarios";
 export { runE2EMode } from "./runE2EMode";
 export { printE2EModeHelp } from "./help";
 
+export * from "./schema";
 export * from "./scenario";

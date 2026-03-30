@@ -1,7 +1,8 @@
 // src/executionLayer/runtime/scenarioSheet/buildScenarioHeaders.ts
 
 import type ExcelJS from "exceljs";
-import { normalizeHeaderKey, normalizeSpaces } from "@utils/text";
+import { normalizeSpaces } from "@utils/text";
+import { normalizeE2EHeader } from "@executionLayer/mode/e2e/schema";
 import { validateTemplateHeaders } from "@executionLayer/mode/e2e/scenario/template";
 
 function cellToString(value: unknown): string {
@@ -32,44 +33,13 @@ function getHeaders(worksheet: ExcelJS.Worksheet): string[] {
     );
 }
 
-function buildCanonicalHeaders(): Map<string, string> {
-    const baseHeaders = [
-        "ScenarioId",
-        "ScenarioName",
-        "Journey",
-        "PolicyContext",
-        "EntryPoint",
-        "PolicyNumber",
-        "LoginId",
-        "Password",
-        "Description",
-        "Execute",
-        "TotalItems",
-    ];
-
-    const map = new Map<string, string>();
-
-    baseHeaders.forEach((header) => {
-        map.set(normalizeHeaderKey(header), header);
-    });
-
-    for (let itemNo = 1; itemNo <= 20; itemNo++) {
-        ["Action", "SubType", "Portal", "TestCaseRef"].forEach((suffix) => {
-            const header = `Item${itemNo}${suffix}`;
-            map.set(normalizeHeaderKey(header), header);
-        });
-    }
-
-    return map;
-}
-
 export function buildScenarioHeaders(
     worksheet: ExcelJS.Worksheet
 ): string[] {
     const rawHeaders = getHeaders(worksheet);
-    validateTemplateHeaders(rawHeaders);
+    const normalizedHeaders = rawHeaders.map(normalizeE2EHeader);
 
-    const canonicalHeaders = buildCanonicalHeaders();
+    validateTemplateHeaders(normalizedHeaders);
 
-    return rawHeaders.map((header) => canonicalHeaders.get(header) ?? header);
+    return normalizedHeaders;
 }

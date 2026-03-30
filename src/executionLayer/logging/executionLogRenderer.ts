@@ -50,17 +50,39 @@ export function renderExecutionSummary(args: {
     passed: number;
     failed: number;
     totalTime: string;
+    runId?: string;
+    evidenceDir?: string;
+    passedEvidencePath?: string;
+    failedEvidencePath?: string;
 }): string {
     const lines: string[] = [];
 
     lines.push("");
     lines.push("====================[SUMMARY]====================");
+
+    if (args.runId) {
+        lines.push(field("Run Id", muted(args.runId)));
+    }
+
     lines.push(field("Total", muted(String(args.total))));
     lines.push(field("Passed", success(String(args.passed))));
     lines.push(
         field("Failed", args.failed > 0 ? failure(String(args.failed)) : success("0"))
     );
     lines.push(field("Total Time", muted(args.totalTime)));
+
+    if (args.evidenceDir) {
+        lines.push(field("Evidence Dir", muted(args.evidenceDir)));
+    }
+
+    if (args.passedEvidencePath) {
+        lines.push(field("Passed Evidence", muted(args.passedEvidencePath)));
+    }
+
+    if (args.failedEvidencePath) {
+        lines.push(field("Failed Evidence", muted(args.failedEvidencePath)));
+    }
+
     lines.push("================================================");
 
     return lines.join("\n");
