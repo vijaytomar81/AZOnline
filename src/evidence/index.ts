@@ -58,8 +58,6 @@ export {
     type MergeWorkerEvidenceResult,
 } from "./artifacts/run/mergeWorkerEvidence";
 
-// src/evidence/index.ts
-
 export type { EvidenceArtifactConfig } from "./config/EvidenceArtifactConfig";
 export { resolveEvidenceArtifactConfig } from "./config/resolveEvidenceArtifactConfig";
 

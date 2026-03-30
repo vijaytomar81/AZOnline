@@ -8,6 +8,7 @@ export const OUTPUT_KEYS = {
         CALCULATED_EMAIL: "newBusiness.calculatedEmailId",
         QUOTE: "newBusiness.quoteNumber",
         POLICY: "newBusiness.policyNumber",
+        PREMIUM: "newBusiness.premium",
         OPENED_URL: "newBusiness.openedUrl",
         LAST_ACTION: "lastAction",
         LAST_JOURNEY: "lastJourney",
