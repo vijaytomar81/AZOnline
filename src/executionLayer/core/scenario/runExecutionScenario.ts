@@ -1,0 +1,47 @@
+// src/executionLayer/core/scenario/runExecutionScenario.ts
+
+import type {
+    ExecutionScenario,
+    ExecutionScenarioResult,
+} from "@executionLayer/contracts";
+import type { ExecutorRegistry } from "@executionLayer/core/registry";
+import type { ExecutionItemDataRegistry } from "@executionLayer/runtime/itemData";
+import {
+    attachBrowserSession,
+    closeBrowserSession,
+    createBrowserSession,
+    type BrowserSession,
+} from "@executionLayer/core/browser";
+import { buildScenarioExecutionResult } from "./buildScenarioExecutionResult";
+import { createScenarioExecutionContext } from "./createScenarioExecutionContext";
+import { runScenarioItems } from "./runScenarioItems";
+
+export async function runExecutionScenario(args: {
+    scenario: ExecutionScenario;
+    registry: ExecutorRegistry;
+    executionItemDataRegistry: ExecutionItemDataRegistry;
+    logScope: string;
+    overrideItemData?: Record<string, unknown>;
+    stopOnFailure?: boolean;
+}): Promise<ExecutionScenarioResult> {
+    const context = createScenarioExecutionContext(args.scenario);
+    let session: BrowserSession | undefined;
+
+    try {
+        session = await createBrowserSession();
+        attachBrowserSession(context, session);
+
+        await runScenarioItems({
+            context,
+            registry: args.registry,
+            executionItemDataRegistry: args.executionItemDataRegistry,
+            logScope: args.logScope,
+            overrideItemData: args.overrideItemData,
+            stopOnFailure: args.stopOnFailure,
+        });
+    } finally {
+        await closeBrowserSession(session);
+    }
+
+    return buildScenarioExecutionResult(context);
+}

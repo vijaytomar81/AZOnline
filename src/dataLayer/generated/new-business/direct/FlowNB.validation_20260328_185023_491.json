@@ -1,0 +1,71 @@
+{
+  "schemaName": "direct",
+  "sheetName": "FlowNB",
+  "mode": "normal",
+  "generatedAt": "2026-03-28T17:50:23.487Z",
+  "errors": [],
+  "missingSchemaFieldsInExcel": {
+    "requiredFields": [],
+    "bySection": {
+      "additionalDrivers": {
+        "requiredFields": [],
+        "schemaMappingFields": [
+          "AD1HomeOwnership",
+          "AD1ChildrenUnder16",
+          "AD1LicencePart3",
+          "AD1LicencePart4",
+          "AD1UnspentNonDrivingConvictions",
+          "AD1OtherVehicleUsage",
+          "AD1NamedDriverExperience",
+          "AD1NamedDriverExperienceYears",
+          "AD2HomeOwnership",
+          "AD2ChildrenUnder16",
+          "AD2LicencePart3",
+          "AD2LicencePart4",
+          "AD2UnspentNonDrivingConvictions",
+          "AD2OtherVehicleUsage",
+          "AD2NamedDriverExperience",
+          "AD2NamedDriverExperienceYears",
+          "AD3HomeOwnership",
+          "AD3ChildrenUnder16",
+          "AD3LicencePart3",
+          "AD3LicencePart4",
+          "AD3UnspentNonDrivingConvictions",
+          "AD3OtherVehicleUsage",
+          "AD3NamedDriverExperience",
+          "AD3NamedDriverExperienceYears",
+          "AD4HomeOwnership",
+          "AD4ChildrenUnder16",
+          "AD4LicencePart3",
+          "AD4LicencePart4",
+          "AD4UnspentNonDrivingConvictions",
+          "AD4OtherVehicleUsage",
+          "AD4NamedDriverExperience",
+          "AD4NamedDriverExperienceYears",
+          "AD5HomeOwnership",
+          "AD5ChildrenUnder16",
+          "AD5LicencePart3",
+          "AD5LicencePart4",
+          "AD5UnspentNonDrivingConvictions",
+          "AD5OtherVehicleUsage",
+          "AD5NamedDriverExperience",
+          "AD5NamedDriverExperienceYears"
+        ]
+      }
+    }
+  },
+  "missingExcelFieldsInSchema": {
+    "unusedExcelFields": [
+      "ad1othercarsdriven",
+      "ad2othercarsdriven",
+      "ad3othercarsdriven",
+      "ad4othercarsdriven",
+      "ad5othercarsdriven"
+    ]
+  },
+  "summary": {
+    "errorCount": 0,
+    "missingSchemaFieldsInExcelCount": 40,
+    "missingExcelFieldsInSchemaCount": 5
+  }
+}

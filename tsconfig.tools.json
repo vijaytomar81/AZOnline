@@ -4,9 +4,11 @@
     "noEmit": true
   },
   "include": [
-    "src/tools/page-scanner/**/*.ts",
-    "src/tools/page-elements-generator/**/*.ts",
-    "src/tools/page-elements-validator/**/*.ts"
+    "src/pageObjectTools/page-scanner/**/*.ts",
+    "src/pageObjectTools/page-object-generator/**/*.ts",
+    "src/pageObjectTools/page-object-validator/**/*.ts",
+    "src/pageObjectTools/page-object-repair/**/*.ts",
+    "src/pageObjectTools/page-object-common/**/*.ts"
   ],
   "exclude": [
     "node_modules",

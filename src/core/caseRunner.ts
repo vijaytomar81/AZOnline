@@ -1,7 +1,7 @@
 // src/core/caseRunner.ts
 import type { Page } from "@playwright/test";
 
-import { PageManager } from "../pages";
+import { PageManager } from "../pageObjects";
 import { createLogger } from "@utils/logger";
 import {
     printSection,
