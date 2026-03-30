@@ -10,6 +10,7 @@ import { runScenarios } from "@executionLayer/core/runner";
 import { registerDefaultExecutors } from "@executionLayer/runtime/defaults";
 import { buildDataScenarios } from "./buildDataScenarios";
 import type { DataModeArgs } from "./types";
+import { environments } from "@config/environments";
 
 export async function runDataMode(
     args: DataModeArgs
@@ -42,7 +43,7 @@ export async function runDataMode(
 
     await runScenarios({
         mode: "data",
-        environment: process.env.ENV ?? "DEV",
+        environment: environments.defaultEnv,
         scenarios,
         iterations: args.iterations ?? 1,
         parallel: args.parallel ?? 1,

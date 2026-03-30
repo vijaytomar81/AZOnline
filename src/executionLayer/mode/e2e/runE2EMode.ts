@@ -10,6 +10,7 @@ import { ensureScenariosExist } from "./ensureScenariosExist";
 import { filterScenarios } from "./filterScenarios";
 import { loadAndParseScenarios } from "./loadAndParseScenarios";
 import type { RunE2EModeArgs } from "./types";
+import { environments } from "@config/environments";
 
 export async function runE2EMode(
     args: RunE2EModeArgs
@@ -43,7 +44,7 @@ export async function runE2EMode(
 
     await runScenarios({
         mode: "e2e",
-        environment: process.env.ENV ?? "DEV",
+        environment: environments.defaultEnv,
         scenarios,
         iterations: args.iterations,
         parallel: args.parallel ?? 1,

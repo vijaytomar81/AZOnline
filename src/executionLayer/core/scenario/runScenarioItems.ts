@@ -12,20 +12,58 @@ import { createExecutionItemResult } from "@executionLayer/core/result";
 import type { ExecutionItemDataRegistry } from "@executionLayer/runtime/itemData";
 import { runExecutionItem } from "@executionLayer/core/item";
 
-function createNotExecutedItemResult(item: ExecutionItem): ExecutionItemResult {
+function buildNotExecutedReason(args: {
+    context: ExecutionContext;
+    failedItem: ExecutionItem;
+    failedResult: ExecutionItemResult;
+}): string {
+    const scenarioId = args.context.scenario.scenarioId;
+    const scenarioName = args.context.scenario.scenarioName;
+    const failedMessage =
+        args.failedResult.message?.trim() ||
+        "Previous item failed.";
+
+    return [
+        `Not executed because one of the previous item failed.`,
+        `[ScenarioId="${scenarioId}"`,
+        ` | FailedItemNo=${args.failedItem.itemNo}`,
+        ` | FailedAction="${args.failedItem.action}"`,
+        ` | FailedTestCaseRef="${args.failedItem.testCaseRef}"]`,
+    ].join(" ");
+}
+
+function createNotExecutedItemResult(args: {
+    context: ExecutionContext;
+    item: ExecutionItem;
+    failedItem: ExecutionItem;
+    failedResult: ExecutionItemResult;
+}): ExecutionItemResult {
     const timestamp = nowIso();
+    const errorDetails = buildNotExecutedReason({
+        context: args.context,
+        failedItem: args.failedItem,
+        failedResult: args.failedResult,
+    });
 
     return createExecutionItemResult({
-        itemNo: item.itemNo,
-        action: item.action,
+        itemNo: args.item.itemNo,
+        action: args.item.action,
         status: "not_executed",
         startedAt: timestamp,
         finishedAt: timestamp,
-        message: "Not executed because a previous item failed.",
+        message: errorDetails,
         details: {
-            testCaseRef: item.testCaseRef,
+            testCaseRef: args.item.testCaseRef,
             outputs: {},
-            errorDetails: "Not executed because a previous item failed.",
+            errorDetails,
+            blockedBy: {
+                scenarioId: args.context.scenario.scenarioId,
+                scenarioName: args.context.scenario.scenarioName,
+                itemNo: args.failedItem.itemNo,
+                action: args.failedItem.action,
+                testCaseRef: args.failedItem.testCaseRef,
+                reason: args.failedResult.message ?? "",
+            },
         },
     });
 }
@@ -57,7 +95,12 @@ export async function runScenarioItems(args: {
             for (let skippedIndex = index + 1; skippedIndex < items.length; skippedIndex++) {
                 addExecutionItemResult(
                     args.context,
-                    createNotExecutedItemResult(items[skippedIndex])
+                    createNotExecutedItemResult({
+                        context: args.context,
+                        item: items[skippedIndex],
+                        failedItem: item,
+                        failedResult: result,
+                    })
                 );
             }
 
