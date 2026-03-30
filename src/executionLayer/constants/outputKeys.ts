@@ -4,7 +4,6 @@ export const OUTPUT_KEYS = {
     NEW_BUSINESS: {
         START_FROM: "newBusiness.startFrom",
         JOURNEY: "newBusiness.journey",
-        PAYLOAD: "newBusiness.payload",
         CALCULATED_EMAIL: "newBusiness.calculatedEmailId",
         QUOTE: "newBusiness.quoteNumber",
         POLICY: "newBusiness.policyNumber",
@@ -19,7 +18,6 @@ export const OUTPUT_KEYS = {
             REQUEST_TYPE: "newBusiness.pcwTool.requestType",
             REQUEST_MESSAGE_RAW: "newBusiness.pcwTool.requestMessage.raw",
             REQUEST_MESSAGE_FINAL: "newBusiness.pcwTool.requestMessage.final",
-            PAYLOAD: "newBusiness.pcwTool.payload",
         },
     },
 } as const;

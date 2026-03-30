@@ -1,6 +1,6 @@
 // src/executionLayer/contracts/ExecutionResult.ts
 
-export type ExecutionItemStatus = "passed" | "failed" | "skipped";
+export type ExecutionItemStatus = "passed" | "failed" | "skipped" | "not_executed";
 export type ExecutionScenarioStatus = "passed" | "failed";
 
 export type ExecutionItemDetails = {

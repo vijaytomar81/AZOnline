@@ -72,11 +72,4 @@ export function captureBusinessOutputs(
         );
     }
 
-    if (values.payload) {
-        setContextOutput(
-            context,
-            OUTPUT_KEYS.NEW_BUSINESS.PAYLOAD,
-            values.payload
-        );
-    }
 }

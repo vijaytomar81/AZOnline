@@ -21,10 +21,13 @@ import type { RunScenariosArgs } from "./types";
 export async function runScenarios(
     args: RunScenariosArgs
 ): Promise<void> {
-    const startedAtMs = Date.now();
+    const startedAtMs = Date.now();                     // ✅ for duration
+    const startedAt = new Date().toISOString();         // ✅ for summary
+
     const parallel = Math.max(1, args.parallel ?? 1);
     const runs = expandScenarios(args.scenarios, args.iterations);
     const runId = args.runId ?? resolveRunId();
+
     const evidenceConfig = resolveEvidenceArtifactConfig();
     const evidenceOutputRoot =
         args.evidenceOutputRoot ?? evidenceConfig.outputRoot;
@@ -64,12 +67,15 @@ export async function runScenarios(
 
     const { passed, failed } = countExecutionStatuses(outputs);
 
+    const totalTime = formatDuration(startedAtMs);      // ✅ computed here
+    const finishedAt = new Date().toISOString();        // ✅ end timestamp
+
     let finalEvidence:
         | {
-              baseDir: string;
-              passedEvidencePath: string;
-              failedEvidencePath?: string;
-          }
+            baseDir: string;
+            passedEvidencePath: string;
+            failedEvidencePath?: string;
+        }
         | undefined;
 
     if (executionConfig.generatedEvidenceArtifacts.enabled) {
@@ -80,6 +86,20 @@ export async function runScenarios(
                 executionConfig.generatedEvidenceArtifacts.cleanupTemporaryFilesAfterMerge,
             keepFailedEvidenceFileOnlyWhenNeeded:
                 executionConfig.generatedEvidenceArtifacts.keepFailedEvidenceFileOnlyWhenNeeded,
+
+            // ✅ NEW: metadata for Excel + JSON
+            metadata: {
+                mode: args.mode,
+                environment: args.environment,
+                totalTime,
+                startedAt,
+                finishedAt,
+                totalItems: runs.length,
+                passedItems: passed,
+                failedItems: failed,
+                notExecutedItems:
+                    runs.length - (passed + failed), // safe fallback
+            },
         });
 
         await cleanupOldEvidenceRuns({
@@ -94,11 +114,9 @@ export async function runScenarios(
             total: runs.length,
             passed,
             failed,
-            totalTime: formatDuration(startedAtMs),
+            totalTime,
             runId,
             evidenceDir: finalEvidence?.baseDir,
-            passedEvidencePath: finalEvidence?.passedEvidencePath,
-            failedEvidencePath: finalEvidence?.failedEvidencePath,
         })
     );
 }

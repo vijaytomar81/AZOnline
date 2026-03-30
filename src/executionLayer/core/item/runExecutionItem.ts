@@ -9,6 +9,10 @@ import type { ExecutionItemResult } from "@executionLayer/contracts";
 import { buildExecutionItemFailureResult } from "./buildExecutionItemFailureResult";
 import { createExecutionItemDebugCollector } from "./createExecutionItemDebugCollector";
 import { createExecutionItemSuccessResult } from "./createExecutionItemSuccessResult";
+import {
+    cloneExecutionOutputs,
+    diffExecutionOutputs,
+} from "./diffExecutionOutputs";
 import { getExecutionItemExecutor } from "./getExecutionItemExecutor";
 import { resolveExecutionItemData } from "./resolveExecutionItemData";
 import type { RunExecutionItemArgs } from "./types";
@@ -25,6 +29,8 @@ async function executeItem(args: {
         category: LOG_CATEGORIES.TECHNICAL,
         message: `Execution item started -> action=${args.runArgs.item.action}, testCaseRef=${args.runArgs.item.testCaseRef}`,
     });
+
+    const outputsBefore = cloneExecutionOutputs(args.runArgs.context.outputs);
 
     const executorLookup = getExecutionItemExecutor({
         runArgs: args.runArgs,
@@ -45,18 +51,39 @@ async function executeItem(args: {
         overrideItemData: args.runArgs.overrideItemData,
     });
 
-    await executorLookup.executor({
-        context: args.runArgs.context,
-        item: args.runArgs.item,
-        itemData: resolved.payload,
-    });
+    try {
+        await executorLookup.executor({
+            context: args.runArgs.context,
+            item: args.runArgs.item,
+            itemData: resolved.payload,
+        });
 
-    return createExecutionItemSuccessResult({
-        item: args.runArgs.item,
-        startedAt: args.startedAt,
-        resolved,
-        debugLines: debug.all(),
-    });
+        const outputs = diffExecutionOutputs({
+            before: outputsBefore,
+            after: args.runArgs.context.outputs,
+        });
+
+        return createExecutionItemSuccessResult({
+            item: args.runArgs.item,
+            startedAt: args.startedAt,
+            resolved,
+            outputs,
+        });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+
+        const outputs = diffExecutionOutputs({
+            before: outputsBefore,
+            after: args.runArgs.context.outputs,
+        });
+
+        return buildExecutionItemFailureResult({
+            item: args.runArgs.item,
+            startedAt: args.startedAt,
+            message,
+            outputs,
+        });
+    }
 }
 
 export async function runExecutionItem(
@@ -79,7 +106,7 @@ export async function runExecutionItem(
             item: args.item,
             startedAt,
             message,
-            debugLines: [],
+            outputs: {},
         });
 
         addExecutionItemResult(args.context, result);

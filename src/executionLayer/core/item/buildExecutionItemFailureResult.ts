@@ -11,7 +11,7 @@ export function buildExecutionItemFailureResult(args: {
     item: ExecutionItem;
     startedAt: string;
     message: string;
-    debugLines?: string[];
+    outputs?: Record<string, unknown>;
 }): ExecutionItemResult {
     return createExecutionItemResult({
         itemNo: args.item.itemNo,
@@ -22,7 +22,8 @@ export function buildExecutionItemFailureResult(args: {
         message: args.message,
         details: {
             testCaseRef: args.item.testCaseRef,
-            debugLines: args.debugLines ?? [],
+            outputs: args.outputs ?? {},
+            errorDetails: args.message,
         },
     });
 }

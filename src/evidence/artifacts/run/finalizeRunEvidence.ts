@@ -4,12 +4,14 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { mergeWorkerEvidence } from "./mergeWorkerEvidence";
 import { buildFinalEvidenceFiles } from "./buildFinalEvidenceFiles";
+import { writeExecutionEvidenceExcel } from "../excel/writeExecutionEvidenceExcel";
 
 export type FinalizeRunEvidenceInput = {
     runId: string;
     outputRoot?: string;
     cleanupTemporaryArtifacts?: boolean;
     keepFailedEvidenceFileOnlyWhenNeeded?: boolean;
+    metadata?: Record<string, unknown>;
 };
 
 export type FinalizeRunEvidenceResult = {
@@ -17,9 +19,15 @@ export type FinalizeRunEvidenceResult = {
     metadataPath: string;
     passedEvidencePath: string;
     failedEvidencePath?: string;
+    excelPath: string;
     passedCount: number;
     failedCount: number;
     totalCount: number;
+};
+
+type FinalEvidenceFile = {
+    runId: string;
+    cases: Record<string, Record<string, unknown>>;
 };
 
 function buildFinalPaths(runId: string, outputRoot = "results/evidence") {
@@ -54,7 +62,12 @@ async function cleanupTemporaryArtifacts(baseDir: string): Promise<void> {
     await Promise.all(
         entries
             .filter((name) => /^worker-\d+$/.test(name) || name === "worker-artifacts")
-            .map((name) => fs.rm(path.join(baseDir, name), { recursive: true, force: true }))
+            .map((name) =>
+                fs.rm(path.join(baseDir, name), {
+                    recursive: true,
+                    force: true,
+                })
+            )
     );
 }
 
@@ -76,28 +89,52 @@ export async function finalizeRunEvidence(
     const failedCount = Object.keys(failedCases).length;
     const totalCount = passedCount + failedCount;
 
-    await writeJsonFile(paths.passedEvidencePath, {
+    const passedEvidence: FinalEvidenceFile = {
         runId: input.runId,
         cases: passedCases,
-    });
+    };
 
-    const shouldKeepFailedFile =
+    const failedEvidence: FinalEvidenceFile = {
+        runId: input.runId,
+        cases: failedCases,
+    };
+
+    await writeJsonFile(paths.passedEvidencePath, passedEvidence);
+
+    const shouldKeepFailedFileOnlyWhenNeeded =
         input.keepFailedEvidenceFileOnlyWhenNeeded !== false;
 
-    if (failedCount > 0 || !shouldKeepFailedFile) {
-        await writeJsonFile(paths.failedEvidencePath, {
-            runId: input.runId,
-            cases: failedCases,
-        });
+    if (failedCount > 0 || !shouldKeepFailedFileOnlyWhenNeeded) {
+        await writeJsonFile(paths.failedEvidencePath, failedEvidence);
     } else {
         await removeFileIfExists(paths.failedEvidencePath);
     }
 
-    await writeJsonFile(paths.metadataPath, {
+    const metadata = {
         runId: input.runId,
         totalCount,
         passedCount,
         failedCount,
+        ...input.metadata,
+        evidenceDir: paths.baseDir,
+        passedEvidencePath: paths.passedEvidencePath,
+        failedEvidencePath:
+            failedCount > 0 || !shouldKeepFailedFileOnlyWhenNeeded
+                ? paths.failedEvidencePath
+                : "",
+    };
+
+    await writeJsonFile(paths.metadataPath, metadata);
+
+    const excel = await writeExecutionEvidenceExcel({
+        runId: input.runId,
+        baseDir: paths.baseDir,
+        metadata,
+        passedEvidence,
+        failedEvidence:
+            failedCount > 0 || !shouldKeepFailedFileOnlyWhenNeeded
+                ? failedEvidence
+                : undefined,
     });
 
     await removeFileIfExists(path.join(paths.baseDir, "evidence.json"));
@@ -111,9 +148,10 @@ export async function finalizeRunEvidence(
         metadataPath: paths.metadataPath,
         passedEvidencePath: paths.passedEvidencePath,
         failedEvidencePath:
-            failedCount > 0 || !shouldKeepFailedFile
+            failedCount > 0 || !shouldKeepFailedFileOnlyWhenNeeded
                 ? paths.failedEvidencePath
                 : undefined,
+        excelPath: excel.filePath,
         passedCount,
         failedCount,
         totalCount,

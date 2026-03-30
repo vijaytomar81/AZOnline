@@ -14,9 +14,7 @@ export type { EvidenceRunInfo } from "./runtime/EvidenceRunInfo";
 export type { EvidenceContext } from "./runtime/EvidenceContext";
 export { createEvidenceContext } from "./runtime/createEvidenceContext";
 
-export type {
-    EvidenceArtifactPaths,
-} from "./artifacts/contracts/EvidenceArtifactPaths";
+export type { EvidenceArtifactPaths } from "./artifacts/contracts/EvidenceArtifactPaths";
 
 export type {
     EvidenceArtifactWriter,
@@ -24,7 +22,6 @@ export type {
 } from "./artifacts/contracts/EvidenceArtifactWriter";
 
 export { buildEvidenceArtifactPath } from "./artifacts/paths/buildEvidenceArtifactPath";
-
 export { buildEvidenceJson } from "./artifacts/json/buildEvidenceJson";
 
 export {
@@ -74,6 +71,27 @@ export {
     cleanupOldEvidenceRuns,
     type CleanupOldEvidenceRunsInput,
 } from "./artifacts/run/cleanupOldEvidenceRuns";
+
+export type { FlattenedOutputKey } from "./artifacts/excel/flattenOutputKeys";
+export { flattenOutputKeys } from "./artifacts/excel/flattenOutputKeys";
+
+export { prettifyExcelColumn } from "./artifacts/excel/prettifyExcelColumn";
+
+export type { ExecutionExcelColumn } from "./artifacts/excel/executionExcelColumns";
+export { EXECUTION_EXCEL_COLUMNS } from "./artifacts/excel/executionExcelColumns";
+
+export type {
+    SummaryRow,
+    ExecutionCaseRow,
+    BuildExecutionExcelRowsInput,
+} from "./artifacts/excel/buildExecutionExcelRows";
+export { buildExecutionExcelRows } from "./artifacts/excel/buildExecutionExcelRows";
+
+export type {
+    WriteExecutionEvidenceExcelInput,
+    WriteExecutionEvidenceExcelResult,
+} from "./artifacts/excel/writeExecutionEvidenceExcel";
+export { writeExecutionEvidenceExcel } from "./artifacts/excel/writeExecutionEvidenceExcel";
 
 export type { EvidenceArtifactConfig } from "./config/EvidenceArtifactConfig";
 export { resolveEvidenceArtifactConfig } from "./config/resolveEvidenceArtifactConfig";

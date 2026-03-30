@@ -12,7 +12,7 @@ export function createExecutionItemSuccessResult(args: {
     item: ExecutionItem;
     startedAt: string;
     resolved: ResolvedExecutionItemData;
-    debugLines: string[];
+    outputs: Record<string, unknown>;
 }): ExecutionItemResult {
     return createExecutionItemResult({
         itemNo: args.item.itemNo,
@@ -22,9 +22,8 @@ export function createExecutionItemSuccessResult(args: {
         finishedAt: nowIso(),
         details: {
             testCaseRef: args.resolved.testCaseRef,
-            sourceSheet: args.resolved.sourceFileSheet,
-            sourceAction: args.resolved.source.action,
-            debugLines: args.debugLines,
+            outputs: args.outputs,
+            errorDetails: "",
         },
     });
 }

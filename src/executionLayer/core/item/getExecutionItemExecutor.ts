@@ -29,7 +29,7 @@ export function getExecutionItemExecutor(args: {
                 item: args.runArgs.item,
                 startedAt: args.startedAt,
                 message: `No executor registered for execution item action="${args.runArgs.item.action}"`,
-                debugLines: args.debugLines,
+                outputs: {},
             }),
         };
     }
