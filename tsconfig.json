@@ -57,6 +57,9 @@
       ],
       "@logging/*": [
         "src/logging/*"
+      ],
+      "@evidence/*": [
+        "src/evidence/*"
       ]
     }
   },
