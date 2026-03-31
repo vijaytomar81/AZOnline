@@ -69,10 +69,20 @@ export function generatePageManagerFromEntries(
     lines.push(`type PageFactory<T> = () => T;`);
     lines.push(``);
     lines.push(`export class PageManager {`);
+    lines.push(`    private readonly cache = new Map<string, unknown>();`);
+    lines.push(``);
     lines.push(`    constructor(private readonly page: Page) {}`);
     lines.push(``);
-    lines.push(`    private get<T>(_key: string, factory: PageFactory<T>): T {`);
-    lines.push(`        return factory();`);
+    lines.push(`    private get<T>(key: string, factory: PageFactory<T>): T {`);
+    lines.push(`        const existing = this.cache.get(key) as T | undefined;`);
+    lines.push(``);
+    lines.push(`        if (existing) {`);
+    lines.push(`            return existing;`);
+    lines.push(`        }`);
+    lines.push(``);
+    lines.push(`        const created = factory();`);
+    lines.push(`        this.cache.set(key, created);`);
+    lines.push(`        return created;`);
     lines.push(`    }`);
     lines.push(``);
 

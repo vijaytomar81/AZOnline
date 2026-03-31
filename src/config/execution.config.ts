@@ -17,6 +17,25 @@ export type ExecutionConfig = {
     video: "on" | "off" | "retain-on-failure";
     trace: "on" | "off" | "retain-on-failure";
   };
+  automation: {
+    selfHeal: {
+      runtimeEnabled: boolean;
+      writeEnabled: boolean;
+    };
+    diagnostics: {
+      screenshotOnFailure: boolean;
+      pageScanOnLocatorFailure: boolean;
+      pageScanCdpUrl?: string;
+      pageScanOutDir: string;
+      pageScanVerbose: boolean;
+      pageScanMergeIntoExistingPageMap: boolean;
+    };
+    waits: {
+      actionTimeoutMs: number;
+      pageReadyTimeoutMs: number;
+      overlayTimeoutMs: number;
+    };
+  };
   generatedDataArtifacts: {
     withTimestamp: boolean;
     maxToKeep: number;
@@ -46,6 +65,32 @@ export const executionConfig: ExecutionConfig = {
     screenshot: envString("SCREENSHOT", "only-on-failure") as any,
     video: envString("VIDEO", "retain-on-failure") as any,
     trace: envString("TRACE", "retain-on-failure") as any,
+  },
+
+  automation: {
+    selfHeal: {
+      runtimeEnabled: envBool("SELF_HEAL", false),
+      writeEnabled: envBool("SELF_HEAL_WRITE", false),
+    },
+    diagnostics: {
+      screenshotOnFailure: envBool("SCREENSHOT_ON_FAILURE", true),
+      pageScanOnLocatorFailure: envBool(
+        "PAGE_SCAN_ON_LOCATOR_FAILURE",
+        true
+      ),
+      pageScanCdpUrl: envString("PAGE_SCAN_CDP_URL", ""),
+      pageScanOutDir: envString("PAGE_SCAN_OUT_DIR", "results/evidence/page-scans"),
+      pageScanVerbose: envBool("PAGE_SCAN_VERBOSE", false),
+      pageScanMergeIntoExistingPageMap: envBool(
+        "PAGE_SCAN_MERGE_INTO_EXISTING_PAGE_MAP",
+        false
+      ),
+    },
+    waits: {
+      actionTimeoutMs: envNumber("ACTION_TIMEOUT", 10_000),
+      pageReadyTimeoutMs: envNumber("PAGE_READY_TIMEOUT", 10_000),
+      overlayTimeoutMs: envNumber("OVERLAY_TIMEOUT", 1_000),
+    },
   },
 
   generatedDataArtifacts: {
