@@ -20,7 +20,10 @@ type EvidenceItemResult = {
     outputs: Record<string, unknown>;
 };
 
+export type SummaryRowKind = "title" | "section" | "data" | "spacer";
+
 export type SummaryRow = {
+    kind: SummaryRowKind;
     Field: string;
     Value: string | number;
 };
@@ -54,12 +57,26 @@ function getNumberOrBlank(value: unknown): number | string {
 
 function createSummaryRow(
     field: string,
-    value: string | number
+    value: string | number,
+    kind: SummaryRowKind = "data"
 ): SummaryRow {
     return {
+        kind,
         Field: field,
         Value: value,
     };
+}
+
+function createSectionRow(title: string): SummaryRow {
+    return createSummaryRow(title, "", "section");
+}
+
+function createSpacerRow(): SummaryRow {
+    return createSummaryRow("", "", "spacer");
+}
+
+function createTitleRow(title: string): SummaryRow {
+    return createSummaryRow(title, "", "title");
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -128,8 +145,6 @@ function buildRowsFromCases(cases: EvidenceCases): ExecutionCaseRow[] {
     return rows;
 }
 
-// src/evidence/artifacts/excel/buildExecutionExcelRows.ts
-
 export function buildExecutionExcelRows(
     input: BuildExecutionExcelRowsInput
 ): {
@@ -164,53 +179,50 @@ export function buildExecutionExcelRows(
     const passRate =
         totalItems > 0 ? `${((passedCount / totalItems) * 100).toFixed(2)}%` : "0%";
 
-    // ✅ Extract runtime safely
-    const runtimeInfo = (input.metadata.runtimeInfo ?? {}) as Record<string, any>;
-    const system = runtimeInfo.system ?? {};
-    const browser = runtimeInfo.browser ?? {};
+    const runtimeInfo = asRecord(input.metadata.runtimeInfo);
+    const system = asRecord(runtimeInfo.system);
+    const browser = asRecord(runtimeInfo.browser);
 
     const summaryRows: SummaryRow[] = [
-        createSummaryRow("Run Id", input.runId),
+        createTitleRow("Execution Summary"),
+        createSpacerRow(),
 
+        createSectionRow("Run"),
+        createSummaryRow("Run Id", input.runId),
         createSummaryRow("Mode", getString(input.metadata.mode)),
         createSummaryRow("Environment", getString(input.metadata.environment)),
+        createSummaryRow(
+            "Evidence Directory",
+            getString(input.metadata.evidenceDir)
+        ),
+        createSpacerRow(),
 
-        // =============================
-        // 🖥 SYSTEM INFO
-        // =============================
+        createSectionRow("Runtime"),
         createSummaryRow("Machine Name", getString(system.machineName)),
         createSummaryRow("User", getString(system.user)),
         createSummaryRow("Platform", getString(system.platform)),
         createSummaryRow("OS Version", getString(system.osVersion)),
+        createSpacerRow(),
 
-        // =============================
-        // 🌐 BROWSER INFO
-        // =============================
+        createSectionRow("Browser"),
         createSummaryRow("Browser", getString(browser.name)),
         createSummaryRow("Browser Channel", getString(browser.channel)),
         createSummaryRow("Browser Version", getString(browser.version)),
         createSummaryRow("Headless", getString(browser.headless)),
+        createSpacerRow(),
 
-        // =============================
-        // 📊 EXECUTION STATS
-        // =============================
+        createSectionRow("Results"),
         createSummaryRow("Total Items", totalItems),
         createSummaryRow("Passed", passedCount),
         createSummaryRow("Failed", failedCount),
         createSummaryRow("Not Executed", notExecutedCount),
         createSummaryRow("Pass Rate (%)", passRate),
+        createSpacerRow(),
 
-        // =============================
-        // ⏱ TIMING
-        // =============================
+        createSectionRow("Timing"),
         createSummaryRow("Execution Time", getString(input.metadata.totalTime)),
         createSummaryRow("Started At", getString(input.metadata.startedAt)),
         createSummaryRow("Finished At", getString(input.metadata.finishedAt)),
-
-        createSummaryRow(
-            "Evidence Directory",
-            getString(input.metadata.evidenceDir)
-        ),
     ];
 
     return {

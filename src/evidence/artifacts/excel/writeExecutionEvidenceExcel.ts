@@ -3,7 +3,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import ExcelJS from "exceljs";
-import { buildExecutionExcelRows } from "./buildExecutionExcelRows";
+import {
+    buildExecutionExcelRows,
+    type SummaryRow,
+} from "./buildExecutionExcelRows";
 
 type EvidenceCase = Record<string, unknown>;
 type EvidenceFile = {
@@ -67,6 +70,114 @@ function styleHeaderRow(
     });
 }
 
+function addSummarySheet(
+    workbook: ExcelJS.Workbook,
+    rows: SummaryRow[]
+): void {
+    const worksheet = workbook.addWorksheet("Summary");
+
+    worksheet.columns = [
+        { header: "Field", key: "Field", width: 26 },
+        { header: "Value", key: "Value", width: 74 },
+    ];
+
+    rows.forEach((row) => {
+        const excelRow = worksheet.addRow({
+            Field: row.Field,
+            Value: row.Value,
+        });
+
+        if (row.kind === "title") {
+            worksheet.mergeCells(`A${excelRow.number}:B${excelRow.number}`);
+            const cell = worksheet.getCell(`A${excelRow.number}`);
+            cell.value = row.Field;
+            cell.font = {
+                bold: true,
+                size: 16,
+                color: { argb: "FFFFFFFF" },
+            };
+            cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "1F4E78" },
+            };
+            cell.alignment = {
+                vertical: "middle",
+                horizontal: "center",
+            };
+            excelRow.height = 24;
+            return;
+        }
+
+        if (row.kind === "section") {
+            worksheet.mergeCells(`A${excelRow.number}:B${excelRow.number}`);
+            const cell = worksheet.getCell(`A${excelRow.number}`);
+            cell.value = row.Field.toUpperCase();
+            cell.font = {
+                bold: true,
+                color: { argb: "FFFFFFFF" },
+            };
+            cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "5B7DB1" },
+            };
+            cell.alignment = {
+                vertical: "middle",
+                horizontal: "left",
+            };
+            return;
+        }
+
+        if (row.kind === "spacer") {
+            worksheet.getRow(excelRow.number).height = 8;
+            return;
+        }
+
+        const fieldCell = worksheet.getCell(`A${excelRow.number}`);
+        const valueCell = worksheet.getCell(`B${excelRow.number}`);
+
+        fieldCell.font = { bold: true };
+        fieldCell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFF3F6FA" },
+        };
+
+        fieldCell.border = {
+            top: { style: "thin", color: { argb: "FFE0E0E0" } },
+            left: { style: "thin", color: { argb: "FFE0E0E0" } },
+            bottom: { style: "thin", color: { argb: "FFE0E0E0" } },
+            right: { style: "thin", color: { argb: "FFE0E0E0" } },
+        };
+
+        valueCell.border = {
+            top: { style: "thin", color: { argb: "FFE0E0E0" } },
+            left: { style: "thin", color: { argb: "FFE0E0E0" } },
+            bottom: { style: "thin", color: { argb: "FFE0E0E0" } },
+            right: { style: "thin", color: { argb: "FFE0E0E0" } },
+        };
+
+        if (row.Field === "Passed") {
+            valueCell.font = { bold: true, color: { argb: "FF2E7D32" } };
+        }
+
+        if (row.Field === "Failed") {
+            valueCell.font = { bold: true, color: { argb: "FFC62828" } };
+        }
+
+        if (row.Field === "Not Executed") {
+            valueCell.font = { bold: true, color: { argb: "FFEF6C00" } };
+        }
+
+        if (row.Field === "Pass Rate (%)") {
+            valueCell.font = { bold: true };
+        }
+    });
+
+    worksheet.views = [{ state: "frozen", ySplit: 1 }];
+}
+
 function addSheetFromRows<T extends Record<string, unknown>>(
     workbook: ExcelJS.Workbook,
     sheetName: string,
@@ -94,8 +205,9 @@ function addSheetFromRows<T extends Record<string, unknown>>(
     worksheet.autoFilter = {
         from: "A1",
         to: `${worksheet.getRow(1).cellCount > 0
-            ? worksheet.getRow(1).getCell(worksheet.getRow(1).cellCount).address
-            : "A1"}`
+                ? worksheet.getRow(1).getCell(worksheet.getRow(1).cellCount).address
+                : "A1"
+            }`,
     };
 }
 
@@ -112,7 +224,7 @@ export async function writeExecutionEvidenceExcel(
         failedEvidence: input.failedEvidence,
     });
 
-    addSheetFromRows(workbook, "Summary", rows.summaryRows);
+    addSummarySheet(workbook, rows.summaryRows);
     addSheetFromRows(workbook, "Passed", rows.passedRows);
     addSheetFromRows(workbook, "Failed", rows.failedRows);
     addSheetFromRows(workbook, "Not Executed", rows.notExecutedRows);
