@@ -1,6 +1,11 @@
 // src/evidence/artifacts/excel/buildExecutionExcelRows.ts
 
-import { EXECUTION_EXCEL_COLUMNS } from "./executionExcelColumns";
+import type { ExecutionCaseRow } from "./buildExecutionItemRows";
+import { buildExecutionItemRows } from "./buildExecutionItemRows";
+import {
+    buildExecutionSummaryRows,
+    type SummaryRow,
+} from "./buildExecutionSummaryRows";
 
 type EvidenceCase = Record<string, unknown>;
 type EvidenceCases = Record<string, EvidenceCase>;
@@ -8,27 +13,6 @@ type EvidenceFile = {
     runId: string;
     cases: EvidenceCases;
 };
-
-type EvidenceItemResult = {
-    itemNo: number;
-    action: string;
-    testCaseRef: string;
-    status: string;
-    startedAt: string;
-    finishedAt: string;
-    errorDetails: string;
-    outputs: Record<string, unknown>;
-};
-
-export type SummaryRowKind = "title" | "section" | "data" | "spacer";
-
-export type SummaryRow = {
-    kind: SummaryRowKind;
-    Field: string;
-    Value: string | number;
-};
-
-export type ExecutionCaseRow = Record<string, string | number>;
 
 export type BuildExecutionExcelRowsInput = {
     runId: string;
@@ -39,110 +23,6 @@ export type BuildExecutionExcelRowsInput = {
 
 function getString(value: unknown): string {
     return String(value ?? "");
-}
-
-function getNumberOrBlank(value: unknown): number | string {
-    if (typeof value === "number") {
-        return value;
-    }
-
-    const text = String(value ?? "").trim();
-    if (!text) {
-        return "";
-    }
-
-    const parsed = Number(text);
-    return Number.isFinite(parsed) ? parsed : text;
-}
-
-function createSummaryRow(
-    field: string,
-    value: string | number,
-    kind: SummaryRowKind = "data"
-): SummaryRow {
-    return {
-        kind,
-        Field: field,
-        Value: value,
-    };
-}
-
-function createSectionRow(title: string): SummaryRow {
-    return createSummaryRow(title, "", "section");
-}
-
-function createSpacerRow(): SummaryRow {
-    return createSummaryRow("", "", "spacer");
-}
-
-function createTitleRow(title: string): SummaryRow {
-    return createSummaryRow(title, "", "title");
-}
-
-function asRecord(value: unknown): Record<string, unknown> {
-    if (value && typeof value === "object" && !Array.isArray(value)) {
-        return value as Record<string, unknown>;
-    }
-
-    return {};
-}
-
-function asItemResults(value: unknown): EvidenceItemResult[] {
-    if (!Array.isArray(value)) {
-        return [];
-    }
-
-    return value as EvidenceItemResult[];
-}
-
-function buildItemRow(
-    scenarioId: string,
-    scenario: EvidenceCase,
-    item: EvidenceItemResult
-): ExecutionCaseRow {
-    const row: ExecutionCaseRow = {};
-
-    EXECUTION_EXCEL_COLUMNS.forEach((column) => {
-        if (column.kind === "scenario") {
-            const value =
-                column.sourceKey === "scenarioId"
-                    ? scenario.scenarioId ?? scenarioId
-                    : scenario[column.sourceKey];
-
-            row[column.header] = getString(value);
-            return;
-        }
-
-        if (column.kind === "item") {
-            const value = (item as unknown as Record<string, unknown>)[column.sourceKey];
-
-            row[column.header] =
-                column.sourceKey === "itemNo"
-                    ? getNumberOrBlank(value)
-                    : getString(value);
-
-            return;
-        }
-
-        const outputs = asRecord(item.outputs);
-        row[column.header] = getString(outputs[column.sourceKey]);
-    });
-
-    return row;
-}
-
-function buildRowsFromCases(cases: EvidenceCases): ExecutionCaseRow[] {
-    const rows: ExecutionCaseRow[] = [];
-
-    Object.entries(cases).forEach(([scenarioId, scenario]) => {
-        const itemResults = asItemResults(scenario.itemResults);
-
-        itemResults.forEach((item) => {
-            rows.push(buildItemRow(scenarioId, scenario, item));
-        });
-    });
-
-    return rows;
 }
 
 export function buildExecutionExcelRows(
@@ -158,7 +38,7 @@ export function buildExecutionExcelRows(
         ...(input.failedEvidence?.cases ?? {}),
     };
 
-    const allRows = buildRowsFromCases(allCases);
+    const allRows = buildExecutionItemRows(allCases);
 
     const passedRows = allRows.filter(
         (row) => getString(row["Item Status"]).toLowerCase() === "passed"
@@ -172,58 +52,14 @@ export function buildExecutionExcelRows(
         (row) => getString(row["Item Status"]).toLowerCase() === "not_executed"
     );
 
-    const totalItems = allRows.length;
-    const passedCount = passedRows.length;
-    const failedCount = failedRows.length;
-    const notExecutedCount = notExecutedRows.length;
-    const passRate =
-        totalItems > 0 ? `${((passedCount / totalItems) * 100).toFixed(2)}%` : "0%";
-
-    const runtimeInfo = asRecord(input.metadata.runtimeInfo);
-    const system = asRecord(runtimeInfo.system);
-    const browser = asRecord(runtimeInfo.browser);
-
-    const summaryRows: SummaryRow[] = [
-        createTitleRow("Execution Summary"),
-        createSpacerRow(),
-
-        createSectionRow("Run"),
-        createSummaryRow("Run Id", input.runId),
-        createSummaryRow("Mode", getString(input.metadata.mode)),
-        createSummaryRow("Environment", getString(input.metadata.environment)),
-        createSummaryRow(
-            "Evidence Directory",
-            getString(input.metadata.evidenceDir)
-        ),
-        createSpacerRow(),
-
-        createSectionRow("Runtime"),
-        createSummaryRow("Machine Name", getString(system.machineName)),
-        createSummaryRow("User", getString(system.user)),
-        createSummaryRow("Platform", getString(system.platform)),
-        createSummaryRow("OS Version", getString(system.osVersion)),
-        createSpacerRow(),
-
-        createSectionRow("Browser"),
-        createSummaryRow("Browser", getString(browser.name)),
-        createSummaryRow("Browser Channel", getString(browser.channel)),
-        createSummaryRow("Browser Version", getString(browser.version)),
-        createSummaryRow("Headless", getString(browser.headless)),
-        createSpacerRow(),
-
-        createSectionRow("Results"),
-        createSummaryRow("Total Items", totalItems),
-        createSummaryRow("Passed", passedCount),
-        createSummaryRow("Failed", failedCount),
-        createSummaryRow("Not Executed", notExecutedCount),
-        createSummaryRow("Pass Rate (%)", passRate),
-        createSpacerRow(),
-
-        createSectionRow("Timing"),
-        createSummaryRow("Execution Time", getString(input.metadata.totalTime)),
-        createSummaryRow("Started At", getString(input.metadata.startedAt)),
-        createSummaryRow("Finished At", getString(input.metadata.finishedAt)),
-    ];
+    const summaryRows = buildExecutionSummaryRows({
+        runId: input.runId,
+        metadata: input.metadata,
+        totalItems: allRows.length,
+        passed: passedRows.length,
+        failed: failedRows.length,
+        notExecuted: notExecutedRows.length,
+    });
 
     return {
         summaryRows,

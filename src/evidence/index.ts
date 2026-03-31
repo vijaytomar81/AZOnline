@@ -80,12 +80,21 @@ export { prettifyExcelColumn } from "./artifacts/excel/prettifyExcelColumn";
 export type { ExecutionExcelColumn } from "./artifacts/excel/executionExcelColumns";
 export { EXECUTION_EXCEL_COLUMNS } from "./artifacts/excel/executionExcelColumns";
 
+export type { ExecutionCaseRow } from "./artifacts/excel/buildExecutionItemRows";
+export { buildExecutionItemRows } from "./artifacts/excel/buildExecutionItemRows";
+
 export type {
     SummaryRow,
-    ExecutionCaseRow,
-    BuildExecutionExcelRowsInput,
-} from "./artifacts/excel/buildExecutionExcelRows";
+    SummaryRowKind,
+} from "./artifacts/excel/buildExecutionSummaryRows";
+export { buildExecutionSummaryRows } from "./artifacts/excel/buildExecutionSummaryRows";
+
+export type { BuildExecutionExcelRowsInput } from "./artifacts/excel/buildExecutionExcelRows";
 export { buildExecutionExcelRows } from "./artifacts/excel/buildExecutionExcelRows";
+
+export { autoFitExecutionSheetColumns } from "./artifacts/excel/autoFitExecutionSheetColumns";
+export { styleExecutionSheet } from "./artifacts/excel/styleExecutionSheet";
+export { writeExecutionSummarySheet } from "./artifacts/excel/writeExecutionSummarySheet";
 
 export type {
     WriteExecutionEvidenceExcelInput,

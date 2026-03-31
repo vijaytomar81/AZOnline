@@ -3,10 +3,11 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import ExcelJS from "exceljs";
-import {
-    buildExecutionExcelRows,
-    type SummaryRow,
-} from "./buildExecutionExcelRows";
+import { autoFitExecutionSheetColumns } from "./autoFitExecutionSheetColumns";
+import { buildExecutionExcelRows } from "./buildExecutionExcelRows";
+import type { ExecutionCaseRow } from "./buildExecutionItemRows";
+import { styleExecutionSheet } from "./styleExecutionSheet";
+import { writeExecutionSummarySheet } from "./writeExecutionSummarySheet";
 
 type EvidenceCase = Record<string, unknown>;
 type EvidenceFile = {
@@ -26,189 +27,40 @@ export type WriteExecutionEvidenceExcelResult = {
     filePath: string;
 };
 
-function getHeaderColor(sheetName: string): string {
-    switch (sheetName) {
-        case "Summary":
-            return "1F4E78";
-        case "Passed":
-            return "2E7D32";
-        case "Failed":
-            return "C62828";
-        case "Not Executed":
-            return "EF6C00";
-        default:
-            return "4F81BD";
-    }
-}
-
-function styleHeaderRow(
-    worksheet: ExcelJS.Worksheet,
-    sheetName: string
-): void {
-    const headerColor = getHeaderColor(sheetName);
-
-    worksheet.getRow(1).eachCell((cell) => {
-        cell.font = {
-            bold: true,
-            color: { argb: "FFFFFFFF" },
-        };
-        cell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: headerColor },
-        };
-        cell.alignment = {
-            vertical: "middle",
-            horizontal: "center",
-        };
-        cell.border = {
-            top: { style: "thin", color: { argb: "FFBFBFBF" } },
-            left: { style: "thin", color: { argb: "FFBFBFBF" } },
-            bottom: { style: "thin", color: { argb: "FFBFBFBF" } },
-            right: { style: "thin", color: { argb: "FFBFBFBF" } },
-        };
-    });
-}
-
-function addSummarySheet(
-    workbook: ExcelJS.Workbook,
-    rows: SummaryRow[]
-): void {
-    const worksheet = workbook.addWorksheet("Summary");
-
-    worksheet.columns = [
-        { header: "Field", key: "Field", width: 26 },
-        { header: "Value", key: "Value", width: 74 },
-    ];
-
-    rows.forEach((row) => {
-        const excelRow = worksheet.addRow({
-            Field: row.Field,
-            Value: row.Value,
-        });
-
-        if (row.kind === "title") {
-            worksheet.mergeCells(`A${excelRow.number}:B${excelRow.number}`);
-            const cell = worksheet.getCell(`A${excelRow.number}`);
-            cell.value = row.Field;
-            cell.font = {
-                bold: true,
-                size: 16,
-                color: { argb: "FFFFFFFF" },
-            };
-            cell.fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "1F4E78" },
-            };
-            cell.alignment = {
-                vertical: "middle",
-                horizontal: "center",
-            };
-            excelRow.height = 24;
-            return;
-        }
-
-        if (row.kind === "section") {
-            worksheet.mergeCells(`A${excelRow.number}:B${excelRow.number}`);
-            const cell = worksheet.getCell(`A${excelRow.number}`);
-            cell.value = row.Field.toUpperCase();
-            cell.font = {
-                bold: true,
-                color: { argb: "FFFFFFFF" },
-            };
-            cell.fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "5B7DB1" },
-            };
-            cell.alignment = {
-                vertical: "middle",
-                horizontal: "left",
-            };
-            return;
-        }
-
-        if (row.kind === "spacer") {
-            worksheet.getRow(excelRow.number).height = 8;
-            return;
-        }
-
-        const fieldCell = worksheet.getCell(`A${excelRow.number}`);
-        const valueCell = worksheet.getCell(`B${excelRow.number}`);
-
-        fieldCell.font = { bold: true };
-        fieldCell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "FFF3F6FA" },
-        };
-
-        fieldCell.border = {
-            top: { style: "thin", color: { argb: "FFE0E0E0" } },
-            left: { style: "thin", color: { argb: "FFE0E0E0" } },
-            bottom: { style: "thin", color: { argb: "FFE0E0E0" } },
-            right: { style: "thin", color: { argb: "FFE0E0E0" } },
-        };
-
-        valueCell.border = {
-            top: { style: "thin", color: { argb: "FFE0E0E0" } },
-            left: { style: "thin", color: { argb: "FFE0E0E0" } },
-            bottom: { style: "thin", color: { argb: "FFE0E0E0" } },
-            right: { style: "thin", color: { argb: "FFE0E0E0" } },
-        };
-
-        if (row.Field === "Passed") {
-            valueCell.font = { bold: true, color: { argb: "FF2E7D32" } };
-        }
-
-        if (row.Field === "Failed") {
-            valueCell.font = { bold: true, color: { argb: "FFC62828" } };
-        }
-
-        if (row.Field === "Not Executed") {
-            valueCell.font = { bold: true, color: { argb: "FFEF6C00" } };
-        }
-
-        if (row.Field === "Pass Rate (%)") {
-            valueCell.font = { bold: true };
-        }
-    });
-
-    worksheet.views = [{ state: "frozen", ySplit: 1 }];
-}
-
-function addSheetFromRows<T extends Record<string, unknown>>(
+function addExecutionDataSheet(
     workbook: ExcelJS.Workbook,
     sheetName: string,
-    rows: T[]
+    rows: ExecutionCaseRow[]
 ): void {
     const worksheet = workbook.addWorksheet(sheetName);
 
     if (!rows.length) {
-        worksheet.addRow(["No data"]);
-        worksheet.getRow(1).font = { italic: true };
+        worksheet.columns = [
+            { header: "Message", key: "Message", width: 20 },
+        ];
+        worksheet.addRow({ Message: "No data" });
+        worksheet.getRow(1).font = {
+            bold: true,
+            color: { argb: "FFFFFFFF" },
+        };
+        worksheet.getCell("A2").font = { italic: true };
+        styleExecutionSheet(worksheet, sheetName);
         return;
     }
 
-    const columns = Object.keys(rows[0]).map((key) => ({
+    worksheet.columns = Object.keys(rows[0]).map((key) => ({
         header: key,
         key,
-        width: Math.max(16, key.length + 2),
+        width: 18,
     }));
 
-    worksheet.columns = columns;
     rows.forEach((row) => worksheet.addRow(row));
 
-    styleHeaderRow(worksheet, sheetName);
-    worksheet.views = [{ state: "frozen", ySplit: 1 }];
-    worksheet.autoFilter = {
-        from: "A1",
-        to: `${worksheet.getRow(1).cellCount > 0
-                ? worksheet.getRow(1).getCell(worksheet.getRow(1).cellCount).address
-                : "A1"
-            }`,
-    };
+    styleExecutionSheet(worksheet, sheetName);
+    autoFitExecutionSheetColumns(worksheet, {
+        minWidth: 12,
+        maxWidth: 48,
+    });
 }
 
 export async function writeExecutionEvidenceExcel(
@@ -224,10 +76,10 @@ export async function writeExecutionEvidenceExcel(
         failedEvidence: input.failedEvidence,
     });
 
-    addSummarySheet(workbook, rows.summaryRows);
-    addSheetFromRows(workbook, "Passed", rows.passedRows);
-    addSheetFromRows(workbook, "Failed", rows.failedRows);
-    addSheetFromRows(workbook, "Not Executed", rows.notExecutedRows);
+    writeExecutionSummarySheet(workbook, rows.summaryRows);
+    addExecutionDataSheet(workbook, "Passed", rows.passedRows);
+    addExecutionDataSheet(workbook, "Failed", rows.failedRows);
+    addExecutionDataSheet(workbook, "Not Executed", rows.notExecutedRows);
 
     await fs.mkdir(input.baseDir, { recursive: true });
     await workbook.xlsx.writeFile(filePath);
