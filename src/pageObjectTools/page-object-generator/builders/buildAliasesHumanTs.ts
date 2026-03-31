@@ -2,6 +2,10 @@
 
 import type { PageMap } from "../generator/types";
 import { isValidTsIdentifier } from "@utils/ts";
+import {
+    headerFilePath,
+    getPageObjectFileParts,
+} from "../utils/buildGeneratedHeader";
 
 function toPropertyAccess(objectName: string, key: string): string {
     return isValidTsIdentifier(key)
@@ -14,8 +18,10 @@ export function buildAliasesHumanTs(pageMap: PageMap): string {
 
     const keys = Object.keys(pageMap.elements).sort((a, b) => a.localeCompare(b));
 
-    lines.push(`// src/pages/objects/${pageMap.pageKey.split(".").join("/")}/aliases.ts`);
-    lines.push(`// HUMAN-MAINTAINED FILE`);
+    lines.push(
+        headerFilePath(getPageObjectFileParts(pageMap.pageKey, "aliases.ts"))
+    );
+
     lines.push(`// pageKey: ${pageMap.pageKey}`);
     lines.push(`//`);
     lines.push(`// This file is safe to edit.`);

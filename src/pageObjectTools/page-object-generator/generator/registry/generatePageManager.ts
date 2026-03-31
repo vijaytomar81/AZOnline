@@ -6,6 +6,11 @@ import { safeReadText, safeWriteText } from "@utils/fs";
 import { PAGE_OBJECTS_ROOT_DIR } from "@utils/paths";
 import { toCamelFromText } from "@utils/text";
 import type { PageManifestEntry } from "../pageManifest";
+import {
+    headerFilePath,
+    headerGeneratedFromManifest,
+    getPageManagerFileParts,
+} from "../../utils/buildGeneratedHeader";
 
 export type GeneratePageManagerResult = {
     changed: boolean;
@@ -58,8 +63,9 @@ export function generatePageManagerFromEntries(
     const byProduct = groupEntriesByProduct(sortedEntries);
 
     const lines: string[] = [];
-    lines.push(`// src/pages/pageManager.ts`);
-    lines.push(`// AUTO-GENERATED from src/pages/.manifest/`);
+    lines.push(headerFilePath(getPageManagerFileParts()));
+    lines.push(headerGeneratedFromManifest());
+    
     lines.push(``);
     lines.push(`import type { Page } from "@playwright/test";`);
     lines.push(...importLines);

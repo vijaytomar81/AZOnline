@@ -5,6 +5,11 @@ import path from "node:path";
 import { safeReadText, safeWriteText } from "@utils/fs";
 import { PAGE_OBJECTS_ROOT_DIR } from "@utils/paths";
 import type { PageManifestEntry } from "../pageManifest";
+import {
+    headerFilePath,
+    headerGeneratedFromManifest,
+    getIndexFileParts,
+} from "../../utils/buildGeneratedHeader";
 
 export type GeneratePagesIndexResult = {
     changed: boolean;
@@ -29,8 +34,9 @@ export function generatePagesIndexFromEntries(
     ];
 
     const lines: string[] = [];
-    lines.push(`// src/pages/index.ts`);
-    lines.push(`// AUTO-GENERATED from src/pages/.manifest/`);
+    lines.push(headerFilePath(getIndexFileParts()));
+    lines.push(headerGeneratedFromManifest());
+
     lines.push(``);
     lines.push(...exportLines);
     lines.push(``);

@@ -27,10 +27,8 @@ import {
     type RepairPageReport,
     type RepairRunReport,
 } from "./report";
+import { PAGE_MANIFEST_DIR, PAGE_MANIFEST_INDEX_FILE, PAGE_MANIFEST_PAGES_DIR } from "@utils/paths";
 
-const MANIFEST_DIR = path.join(process.cwd(), "src", "pages", ".manifest");
-const MANIFEST_INDEX = path.join(MANIFEST_DIR, "index.json");
-const MANIFEST_PAGES_DIR = path.join(MANIFEST_DIR, "pages");
 
 export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunReport> {
     const log = opts.log;
@@ -38,8 +36,8 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
     const manifestLog = log.child("manifest");
     const endRun = log.time("elements-generator");
 
-    ensureDir(MANIFEST_DIR);
-    ensureDir(MANIFEST_PAGES_DIR);
+    ensureDir(PAGE_MANIFEST_DIR);
+    ensureDir(PAGE_MANIFEST_PAGES_DIR);
 
     const mapFiles = readAllPageMapFiles(opts.mapsDir);
     const pageReports: RepairPageReport[] = [];
@@ -49,7 +47,7 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
     for (const file of mapFiles) {
         const loaded = loadPageMapFile(opts.mapsDir, file);
         const oldEntry = loadPageManifestEntry(
-            pageKeyToManifestFile(MANIFEST_PAGES_DIR, loaded.pageMap.pageKey)
+            pageKeyToManifestFile(PAGE_MANIFEST_PAGES_DIR, loaded.pageMap.pageKey)
         );
 
         const context = buildPageGenerationContext({
@@ -109,7 +107,7 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
         });
 
         savePageManifestEntry(
-            pageKeyToManifestFile(MANIFEST_PAGES_DIR, context.pageMap.pageKey),
+            pageKeyToManifestFile(PAGE_MANIFEST_PAGES_DIR, context.pageMap.pageKey),
             buildPageManifestEntry({
                 pageMap: context.pageMap,
                 artifact: context.artifact,
@@ -126,18 +124,18 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
         pageReports.push(report);
     }
 
-    const removed = removeMissingPageManifestEntries(MANIFEST_PAGES_DIR, validPageKeys);
+    const removed = removeMissingPageManifestEntries(PAGE_MANIFEST_PAGES_DIR, validPageKeys);
     if (removed > 0) {
         manifestLog.info(`Removed ${removed} stale page manifest entr${removed === 1 ? "y" : "ies"}.`);
     }
 
-    saveManifestIndex(MANIFEST_INDEX, validPageKeys);
-    manifestLog.info(`Manifest index updated: ${MANIFEST_INDEX}`);
+    saveManifestIndex(PAGE_MANIFEST_INDEX_FILE, validPageKeys);
+    manifestLog.info(`Manifest index updated: ${PAGE_MANIFEST_INDEX_FILE}`);
 
-    const syncRes = generatePageRegistryFromManifest(MANIFEST_DIR, opts.pageRegistryDir);
+    const syncRes = generatePageRegistryFromManifest(PAGE_MANIFEST_DIR, opts.pageRegistryDir);
     applyRegistryStatusToReports(pageReports, syncRes);
 
-    registryLog.info(`Registry synced from manifest: ${MANIFEST_DIR}`);
+    registryLog.info(`Registry synced from manifest: ${PAGE_MANIFEST_DIR}`);
     log.info(`Processed pages: ${processed}`);
 
     const summary = buildRunSummary({

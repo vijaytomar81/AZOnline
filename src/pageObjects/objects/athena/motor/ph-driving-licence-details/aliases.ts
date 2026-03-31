@@ -1,5 +1,4 @@
 // src/pageObjects/objects/athena/motor/ph-driving-licence-details/aliases.ts
-// HUMAN-MAINTAINED FILE
 // pageKey: athena.motor.ph-driving-licence-details
 //
 // This file is safe to edit.

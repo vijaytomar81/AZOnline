@@ -1,6 +1,6 @@
 // src/pageObjects/objects/athena/common/login-or-registration/aliases.generated.ts
-// REPAIRED FILE
 // pageKey: athena.common.login-or-registration
+// scannedAt: 2026-03-09T12:48:41.552Z
 
 import type { ElementKey } from "./elements";
 

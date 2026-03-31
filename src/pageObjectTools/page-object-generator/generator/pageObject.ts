@@ -28,13 +28,33 @@ function parseElementTypes(elementsTs: string): ElementTypeMap {
 function methodLinesFor(aliasKey: string, elementType: string): string[] {
     switch ((elementType || "").toLowerCase()) {
         case "input":
-            return [`  async ${aliasKey}(value: string) {`, `    await this.fillAlias("${aliasKey}", value);`, `  }`];
+            return [
+                `  async ${aliasKey}(value: string) {`,
+                `    await this.actions.fillByAlias(aliases, elements, "${aliasKey}", value);`,
+                `  }`,
+            ];
+
         case "select":
-            return [`  async ${aliasKey}(value: string) {`, `    await this.selectOptionAlias("${aliasKey}", value);`, `  }`];
+            return [
+                `  async ${aliasKey}(value: string) {`,
+                `    await this.actions.selectOptionByAlias(aliases, elements, "${aliasKey}", value);`,
+                `  }`,
+            ];
+
         case "checkbox":
-            return [`  async ${aliasKey}(checked: boolean = true) {`, `    await this.setCheckedAlias("${aliasKey}", checked);`, `  }`];
+            return [
+                `  async ${aliasKey}(checked: boolean = true) {`,
+                `    const { locator } = await this.resolveAliasLocator(aliases, elements, "${aliasKey}");`,
+                `    await locator.setChecked(checked);`,
+                `  }`,
+            ];
+
         default:
-            return [`  async ${aliasKey}() {`, `    await this.clickAlias("${aliasKey}");`, `  }`];
+            return [
+                `  async ${aliasKey}() {`,
+                `    await this.actions.clickByAlias(aliases, elements, "${aliasKey}");`,
+                `  }`,
+            ];
     }
 }
 

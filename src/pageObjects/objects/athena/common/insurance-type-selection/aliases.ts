@@ -1,5 +1,4 @@
 // src/pageObjects/objects/athena/common/insurance-type-selection/aliases.ts
-// HUMAN-MAINTAINED FILE
 // pageKey: athena.common.insurance-type-selection
 //
 // This file is safe to edit.

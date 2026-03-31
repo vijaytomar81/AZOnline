@@ -2,6 +2,10 @@
 
 import type { PageMap } from "../generator/types";
 import { toPascal } from "@utils/ts";
+import {
+    headerFilePath,
+    getPageObjectFileParts,
+} from "../utils/buildGeneratedHeader";
 
 export function buildPageTsStub(pageMap: PageMap): string {
     const pageKey = pageMap.pageKey;
@@ -10,17 +14,18 @@ export function buildPageTsStub(pageMap: PageMap): string {
 
     const lines: string[] = [];
 
-    lines.push(`// src/pages/objects/${pageKey.split(".").join("/")}/${className}.ts`);
-    lines.push(`// AUTO-SCAFFOLDED (create-only) by src/tools/page-elements-generator/builders/buildPageTsStub.ts`);
+    lines.push(
+        headerFilePath(getPageObjectFileParts(pageKey, `${className}.ts`))
+    );
+
     lines.push(`// pageKey: ${pageKey}`);
     lines.push(``);
-    lines.push(`import type { Page } from "@playwright/test";`);
+    lines.push(`import type { Locator, Page } from "@playwright/test";`);
     lines.push(`import { expect } from "@playwright/test";`);
     lines.push(`import { BasePage } from "@automation/base";`);
     lines.push(`import { elements } from "./elements";`);
     lines.push(`import { aliases } from "./aliases";`);
     lines.push(`import { pageMeta } from "./aliases.generated";`);
-    lines.push(`import type { AliasKey } from "./aliases";`);
     lines.push(``);
     lines.push(`const PAGE_KEY = ${JSON.stringify(pageKey)} as const;`);
     lines.push(``);
@@ -30,7 +35,7 @@ export function buildPageTsStub(pageMap: PageMap): string {
     lines.push(`  }`);
     lines.push(``);
     lines.push(`  async waitUntilReady() {`);
-    lines.push(`    const readinessLocators = [];`);
+    lines.push(`    const readinessLocators: Locator[] = [];`);
     lines.push(``);
     lines.push(`    await this.waitForStandardReady({`);
     lines.push(`      expectedUrlPart: pageMeta.urlPath || undefined,`);
@@ -60,19 +65,7 @@ export function buildPageTsStub(pageMap: PageMap): string {
     lines.push(`    }`);
     lines.push(`  }`);
     lines.push(``);
-    lines.push(`  protected async clickAlias(aliasKey: AliasKey) {`);
-    lines.push(`    await this.actions.clickByAlias(aliases, elements, aliasKey);`);
-    lines.push(`  }`);
-    lines.push(``);
-    lines.push(`  protected async fillAlias(aliasKey: AliasKey, value: string) {`);
-    lines.push(`    await this.actions.fillByAlias(aliases, elements, aliasKey, value);`);
-    lines.push(`  }`);
-    lines.push(``);
-    lines.push(`  protected async selectOptionAlias(aliasKey: AliasKey, value: string) {`);
-    lines.push(`    await this.actions.selectOptionByAlias(aliases, elements, aliasKey, value);`);
-    lines.push(`  }`);
-    lines.push(``);
-    lines.push(`  protected async setCheckedAlias(aliasKey: AliasKey, checked: boolean = true) {`);
+    lines.push(`  protected async setCheckedAlias(aliasKey: keyof typeof aliases, checked: boolean = true) {`);
     lines.push(`    const { locator } = await this.resolveAliasLocator(aliases, elements, aliasKey);`);
     lines.push(`    await locator.setChecked(checked);`);
     lines.push(`  }`);
