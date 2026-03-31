@@ -10,4 +10,7 @@ export function attachBrowserSession(
     context.browser = session.browser;
     context.browserContext = session.browserContext;
     context.page = session.page;
+
+    // ✅ ADD THIS LINE
+    context.browserInfo = session.info;
 }

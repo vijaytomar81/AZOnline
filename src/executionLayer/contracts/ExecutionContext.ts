@@ -3,6 +3,7 @@
 import type { Browser, BrowserContext, Page } from "@playwright/test";
 import type { ExecutionScenario } from "./ExecutionScenario";
 import type { ExecutionItemResult } from "./ExecutionResult";
+import type { BrowserInfo } from "@executionLayer/core/browser/types";
 
 export type ExecutionContext = {
     scenario: ExecutionScenario;
@@ -11,7 +12,10 @@ export type ExecutionContext = {
     currentTransactionId?: string;
     outputs: Record<string, unknown>;
     itemResults: ExecutionItemResult[];
+
     browser?: Browser;
     browserContext?: BrowserContext;
     page?: Page;
+
+    browserInfo?: BrowserInfo;
 };

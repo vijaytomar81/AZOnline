@@ -128,6 +128,8 @@ function buildRowsFromCases(cases: EvidenceCases): ExecutionCaseRow[] {
     return rows;
 }
 
+// src/evidence/artifacts/excel/buildExecutionExcelRows.ts
+
 export function buildExecutionExcelRows(
     input: BuildExecutionExcelRowsInput
 ): {
@@ -162,17 +164,45 @@ export function buildExecutionExcelRows(
     const passRate =
         totalItems > 0 ? `${((passedCount / totalItems) * 100).toFixed(2)}%` : "0%";
 
+    // ✅ Extract runtime safely
+    const runtimeInfo = (input.metadata.runtimeInfo ?? {}) as Record<string, any>;
+    const system = runtimeInfo.system ?? {};
+    const browser = runtimeInfo.browser ?? {};
+
     const summaryRows: SummaryRow[] = [
         createSummaryRow("Run Id", input.runId),
+
         createSummaryRow("Mode", getString(input.metadata.mode)),
         createSummaryRow("Environment", getString(input.metadata.environment)),
 
+        // =============================
+        // 🖥 SYSTEM INFO
+        // =============================
+        createSummaryRow("Machine Name", getString(system.machineName)),
+        createSummaryRow("User", getString(system.user)),
+        createSummaryRow("Platform", getString(system.platform)),
+        createSummaryRow("OS Version", getString(system.osVersion)),
+
+        // =============================
+        // 🌐 BROWSER INFO
+        // =============================
+        createSummaryRow("Browser", getString(browser.name)),
+        createSummaryRow("Browser Channel", getString(browser.channel)),
+        createSummaryRow("Browser Version", getString(browser.version)),
+        createSummaryRow("Headless", getString(browser.headless)),
+
+        // =============================
+        // 📊 EXECUTION STATS
+        // =============================
         createSummaryRow("Total Items", totalItems),
         createSummaryRow("Passed", passedCount),
         createSummaryRow("Failed", failedCount),
         createSummaryRow("Not Executed", notExecutedCount),
         createSummaryRow("Pass Rate (%)", passRate),
 
+        // =============================
+        // ⏱ TIMING
+        // =============================
         createSummaryRow("Execution Time", getString(input.metadata.totalTime)),
         createSummaryRow("Started At", getString(input.metadata.startedAt)),
         createSummaryRow("Finished At", getString(input.metadata.finishedAt)),

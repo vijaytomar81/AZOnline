@@ -1,5 +1,7 @@
 // src/executionLayer/core/runner/runScenarios.ts
 
+import { createRuntimeInfo } from "@utils/runtimeInfo";
+import type { RuntimeBrowserInfo } from "@utils/runtimeInfo";
 import {
     cleanupOldEvidenceRuns,
     finalizeRunEvidence,
@@ -79,6 +81,17 @@ export async function runScenarios(
         | undefined;
 
     if (executionConfig.generatedEvidenceArtifacts.enabled) {
+        // ✅ STEP 1: extract browser
+        const browserInfo = outputs.find((o) => o.browser)?.browser as
+            | import("@utils/runtimeInfo").RuntimeBrowserInfo
+            | undefined;
+
+        // ✅ STEP 2: create runtimeInfo
+        const runtimeInfo = createRuntimeInfo({
+            browser: browserInfo,
+        });
+
+        // ✅ STEP 3: use it
         finalEvidence = await finalizeRunEvidence({
             runId,
             outputRoot: evidenceOutputRoot,
@@ -87,7 +100,6 @@ export async function runScenarios(
             keepFailedEvidenceFileOnlyWhenNeeded:
                 executionConfig.generatedEvidenceArtifacts.keepFailedEvidenceFileOnlyWhenNeeded,
 
-            // ✅ NEW: metadata for Excel + JSON
             metadata: {
                 mode: args.mode,
                 environment: args.environment,
@@ -98,7 +110,9 @@ export async function runScenarios(
                 passedItems: passed,
                 failedItems: failed,
                 notExecutedItems:
-                    runs.length - (passed + failed), // safe fallback
+                    runs.length - (passed + failed),
+
+                runtimeInfo, // ✅ now defined
             },
         });
 

@@ -21,4 +21,5 @@ export type RunScenariosArgs = ExecutionPlan & {
 export type RunOutput = {
     status: "passed" | "failed";
     block: string;
+    browser?: unknown;
 };

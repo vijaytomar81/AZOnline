@@ -33,5 +33,6 @@ export async function runScenarioWorker(args: {
             duration: formatDuration(startedAtMs),
             verbose: args.runArgs.verbose,
         }),
+        browser: (result as any).browser,
     };
 }
