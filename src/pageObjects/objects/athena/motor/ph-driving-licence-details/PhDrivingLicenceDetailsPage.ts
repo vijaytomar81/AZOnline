@@ -16,7 +16,11 @@ export class PhDrivingLicenceDetailsPage extends BasePage {
   }
 
   async waitUntilReady() {
-    const readinessLocators: Locator[] = [];
+    const readinessLocators: Locator[] = await Promise.all([
+      this.resolveAliasLocator(aliases, elements, aliasKeys.inputFirstName).then((result) => result.locator),
+      this.resolveAliasLocator(aliases, elements, aliasKeys.inputLastName).then((result) => result.locator),
+      this.resolveAliasLocator(aliases, elements, aliasKeys.buttonNavigatorNext).then((result) => result.locator),
+    ]);
 
     await this.waitForStandardReady({
       expectedUrlPart: pageMeta.urlPath || undefined,
@@ -46,7 +50,19 @@ export class PhDrivingLicenceDetailsPage extends BasePage {
     }
   }
 
-  protected async setCheckedAlias(aliasKey: keyof typeof aliases, checked: boolean = true) {
+  protected async clickAliasKey(aliasKey: keyof typeof aliases) {
+    await this.actions.clickByAlias(aliases, elements, aliasKey);
+  }
+
+  protected async fillAliasKey(aliasKey: keyof typeof aliases, value: string) {
+    await this.actions.fillByAlias(aliases, elements, aliasKey, value);
+  }
+
+  protected async selectAliasKey(aliasKey: keyof typeof aliases, value: string) {
+    await this.actions.selectOptionByAlias(aliases, elements, aliasKey, value);
+  }
+
+  protected async setCheckedAliasKey(aliasKey: keyof typeof aliases, checked: boolean = true) {
     const { locator } = await this.resolveAliasLocator(aliases, elements, aliasKey);
     await locator.setChecked(checked);
   }
@@ -55,199 +71,199 @@ export class PhDrivingLicenceDetailsPage extends BasePage {
   // This region is auto-managed. Do not edit by hand.
 
   async buttonAddAnotherConviction() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.buttonAddAnotherConviction);
+  await this.clickAliasKey(aliasKeys.buttonAddAnotherConviction);
   }
 
   async buttonFindAddress() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.buttonFindAddress);
+  await this.clickAliasKey(aliasKeys.buttonFindAddress);
   }
 
   async buttonNavigatorBack() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.buttonNavigatorBack);
+  await this.clickAliasKey(aliasKeys.buttonNavigatorBack);
   }
 
   async buttonNavigatorNext() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.buttonNavigatorNext);
+  await this.clickAliasKey(aliasKeys.buttonNavigatorNext);
   }
 
   async groupRadioConviction0ResultedToABan() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.groupRadioConviction0ResultedToABan);
+  await this.clickAliasKey(aliasKeys.groupRadioConviction0ResultedToABan);
   }
 
   async groupRadioConviction1ResultedToABan() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.groupRadioConviction1ResultedToABan);
+  await this.clickAliasKey(aliasKeys.groupRadioConviction1ResultedToABan);
   }
 
   async groupRadioConviction2ResultedToABan() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.groupRadioConviction2ResultedToABan);
+  await this.clickAliasKey(aliasKeys.groupRadioConviction2ResultedToABan);
   }
 
   async groupRadioDrivingLicenceHandy() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.groupRadioDrivingLicenceHandy);
+  await this.clickAliasKey(aliasKeys.groupRadioDrivingLicenceHandy);
   }
 
   async groupRadioDrivingLicenceTypes() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.groupRadioDrivingLicenceTypes);
+  await this.clickAliasKey(aliasKeys.groupRadioDrivingLicenceTypes);
   }
 
   async groupRadioHasConvictionsQuestion() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.groupRadioHasConvictionsQuestion);
+  await this.clickAliasKey(aliasKeys.groupRadioHasConvictionsQuestion);
   }
 
   async inputAddressLookupWidgetAddressLookupQuestionInputBuilding(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.inputAddressLookupWidgetAddressLookupQuestionInputBuilding, value);
+  await this.fillAliasKey(aliasKeys.inputAddressLookupWidgetAddressLookupQuestionInputBuilding, value);
   }
 
   async inputAddressLookupWidgetAddressLookupQuestionInputPostcode(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.inputAddressLookupWidgetAddressLookupQuestionInputPostcode, value);
+  await this.fillAliasKey(aliasKeys.inputAddressLookupWidgetAddressLookupQuestionInputPostcode, value);
   }
 
   async inputConviction1DateMonth(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.inputConviction1DateMonth, value);
+  await this.fillAliasKey(aliasKeys.inputConviction1DateMonth, value);
   }
 
   async inputConviction1DateYear(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.inputConviction1DateYear, value);
+  await this.fillAliasKey(aliasKeys.inputConviction1DateYear, value);
   }
 
   async inputConviction2DateMonth(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.inputConviction2DateMonth, value);
+  await this.fillAliasKey(aliasKeys.inputConviction2DateMonth, value);
   }
 
   async inputConviction2DateYear(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.inputConviction2DateYear, value);
+  await this.fillAliasKey(aliasKeys.inputConviction2DateYear, value);
   }
 
   async inputConviction3DateMonth(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.inputConviction3DateMonth, value);
+  await this.fillAliasKey(aliasKeys.inputConviction3DateMonth, value);
   }
 
   async inputConviction3DateYear(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.inputConviction3DateYear, value);
+  await this.fillAliasKey(aliasKeys.inputConviction3DateYear, value);
   }
 
   async inputDateOfBirthDay(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.inputDateOfBirthDay, value);
+  await this.fillAliasKey(aliasKeys.inputDateOfBirthDay, value);
   }
 
   async inputDateOfBirthMonth(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.inputDateOfBirthMonth, value);
+  await this.fillAliasKey(aliasKeys.inputDateOfBirthMonth, value);
   }
 
   async inputDateOfBirthYear(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.inputDateOfBirthYear, value);
+  await this.fillAliasKey(aliasKeys.inputDateOfBirthYear, value);
   }
 
   async inputFirstName(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.inputFirstName, value);
+  await this.fillAliasKey(aliasKeys.inputFirstName, value);
   }
 
   async inputLastName(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.inputLastName, value);
+  await this.fillAliasKey(aliasKeys.inputLastName, value);
   }
 
   async linkRemoveConviction() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.linkRemoveConviction);
+  await this.clickAliasKey(aliasKeys.linkRemoveConviction);
   }
 
   async linkRemoveConviction2() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.linkRemoveConviction2);
+  await this.clickAliasKey(aliasKeys.linkRemoveConviction2);
   }
 
   async linkRemoveConviction3() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.linkRemoveConviction3);
+  await this.clickAliasKey(aliasKeys.linkRemoveConviction3);
   }
 
   async linkToAllianzHomePage() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.linkToAllianzHomePage);
+  await this.clickAliasKey(aliasKeys.linkToAllianzHomePage);
   }
 
   async radioConviction0ResultedToABanno() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioConviction0ResultedToABanno);
+  await this.clickAliasKey(aliasKeys.radioConviction0ResultedToABanno);
   }
 
   async radioConviction0ResultedToABanyes() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioConviction0ResultedToABanyes);
+  await this.clickAliasKey(aliasKeys.radioConviction0ResultedToABanyes);
   }
 
   async radioConviction1ResultedToABanno() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioConviction1ResultedToABanno);
+  await this.clickAliasKey(aliasKeys.radioConviction1ResultedToABanno);
   }
 
   async radioConviction1ResultedToABanyes() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioConviction1ResultedToABanyes);
+  await this.clickAliasKey(aliasKeys.radioConviction1ResultedToABanyes);
   }
 
   async radioConviction2ResultedToABanno() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioConviction2ResultedToABanno);
+  await this.clickAliasKey(aliasKeys.radioConviction2ResultedToABanno);
   }
 
   async radioConviction2ResultedToABanyes() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioConviction2ResultedToABanyes);
+  await this.clickAliasKey(aliasKeys.radioConviction2ResultedToABanyes);
   }
 
   async radioDrivingLicenceHandyno() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioDrivingLicenceHandyno);
+  await this.clickAliasKey(aliasKeys.radioDrivingLicenceHandyno);
   }
 
   async radioDrivingLicenceHandyyes() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioDrivingLicenceHandyyes);
+  await this.clickAliasKey(aliasKeys.radioDrivingLicenceHandyyes);
   }
 
   async radioDrivingLicenceTypeseuFull() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioDrivingLicenceTypeseuFull);
+  await this.clickAliasKey(aliasKeys.radioDrivingLicenceTypeseuFull);
   }
 
   async radioDrivingLicenceTypeseuProvisional() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioDrivingLicenceTypeseuProvisional);
+  await this.clickAliasKey(aliasKeys.radioDrivingLicenceTypeseuProvisional);
   }
 
   async radioDrivingLicenceTypesother() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioDrivingLicenceTypesother);
+  await this.clickAliasKey(aliasKeys.radioDrivingLicenceTypesother);
   }
 
   async radioDrivingLicenceTypesukFull() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioDrivingLicenceTypesukFull);
+  await this.clickAliasKey(aliasKeys.radioDrivingLicenceTypesukFull);
   }
 
   async radioDrivingLicenceTypesukFullAutomaticOnly() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioDrivingLicenceTypesukFullAutomaticOnly);
+  await this.clickAliasKey(aliasKeys.radioDrivingLicenceTypesukFullAutomaticOnly);
   }
 
   async radioDrivingLicenceTypesukProvisional() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioDrivingLicenceTypesukProvisional);
+  await this.clickAliasKey(aliasKeys.radioDrivingLicenceTypesukProvisional);
   }
 
   async radioHasConvictionsQuestionno() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioHasConvictionsQuestionno);
+  await this.clickAliasKey(aliasKeys.radioHasConvictionsQuestionno);
   }
 
   async radioHasConvictionsQuestionyes() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.radioHasConvictionsQuestionyes);
+  await this.clickAliasKey(aliasKeys.radioHasConvictionsQuestionyes);
   }
 
   async searchSelectTheConvictionCode(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.searchSelectTheConvictionCode, value);
+  await this.fillAliasKey(aliasKeys.searchSelectTheConvictionCode, value);
   }
 
   async searchSelectTheConvictionCode2(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.searchSelectTheConvictionCode2, value);
+  await this.fillAliasKey(aliasKeys.searchSelectTheConvictionCode2, value);
   }
 
   async searchSelectTheConvictionCode3(value: string) {
-  await this.actions.fillByAlias(aliases, elements, aliasKeys.searchSelectTheConvictionCode3, value);
+  await this.fillAliasKey(aliasKeys.searchSelectTheConvictionCode3, value);
   }
 
   async selectAddressLookupQuestionInput(value: string) {
-  await this.actions.selectOptionByAlias(aliases, elements, aliasKeys.selectAddressLookupQuestionInput, value);
+  await this.selectAliasKey(aliasKeys.selectAddressLookupQuestionInput, value);
   }
 
   async selectDrivingExpirience(value: string) {
-  await this.actions.selectOptionByAlias(aliases, elements, aliasKeys.selectDrivingExpirience, value);
+  await this.selectAliasKey(aliasKeys.selectDrivingExpirience, value);
   }
 
   async selectTitleQuestion(value: string) {
-  await this.actions.selectOptionByAlias(aliases, elements, aliasKeys.selectTitleQuestion, value);
+  await this.selectAliasKey(aliasKeys.selectTitleQuestion, value);
   }
 
   // </scanner:aliases>

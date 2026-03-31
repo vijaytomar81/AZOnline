@@ -16,7 +16,11 @@ export class LoginOrRegistrationPage extends BasePage {
   }
 
   async waitUntilReady() {
-    const readinessLocators: Locator[] = [];
+    const readinessLocators: Locator[] = await Promise.all([
+      this.resolveAliasLocator(aliases, elements, aliasKeys.logIn).then((result) => result.locator),
+      this.resolveAliasLocator(aliases, elements, aliasKeys.register).then((result) => result.locator),
+      this.resolveAliasLocator(aliases, elements, aliasKeys.skipThisStepILlRegisterLater).then((result) => result.locator),
+    ]);
 
     await this.waitForStandardReady({
       expectedUrlPart: pageMeta.urlPath || undefined,
@@ -46,7 +50,19 @@ export class LoginOrRegistrationPage extends BasePage {
     }
   }
 
-  protected async setCheckedAlias(aliasKey: keyof typeof aliases, checked: boolean = true) {
+  protected async clickAliasKey(aliasKey: keyof typeof aliases) {
+    await this.actions.clickByAlias(aliases, elements, aliasKey);
+  }
+
+  protected async fillAliasKey(aliasKey: keyof typeof aliases, value: string) {
+    await this.actions.fillByAlias(aliases, elements, aliasKey, value);
+  }
+
+  protected async selectAliasKey(aliasKey: keyof typeof aliases, value: string) {
+    await this.actions.selectOptionByAlias(aliases, elements, aliasKey, value);
+  }
+
+  protected async setCheckedAliasKey(aliasKey: keyof typeof aliases, checked: boolean = true) {
     const { locator } = await this.resolveAliasLocator(aliases, elements, aliasKey);
     await locator.setChecked(checked);
   }
@@ -55,19 +71,19 @@ export class LoginOrRegistrationPage extends BasePage {
   // This region is auto-managed. Do not edit by hand.
 
   async linkToAllianzHomePage() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.linkToAllianzHomePage);
+  await this.clickAliasKey(aliasKeys.linkToAllianzHomePage);
   }
 
   async logIn() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.logIn);
+  await this.clickAliasKey(aliasKeys.logIn);
   }
 
   async register() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.register);
+  await this.clickAliasKey(aliasKeys.register);
   }
 
   async skipThisStepILlRegisterLater() {
-  await this.actions.clickByAlias(aliases, elements, aliasKeys.skipThisStepILlRegisterLater);
+  await this.clickAliasKey(aliasKeys.skipThisStepILlRegisterLater);
   }
 
   // </scanner:aliases>

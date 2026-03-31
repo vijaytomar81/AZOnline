@@ -4,6 +4,12 @@
   "urlPath": "/products",
   "scannedAt": "2026-03-13T10:57:20.737Z",
   "title": "Get a new quote or view saved quotes",
+  "readiness": {
+    "recommendedAliases": [
+      "linkCarQuote",
+      "linkHomeQuote"
+    ]
+  },
   "elements": {
     "linkToAllianzHomePage": {
       "type": "link",

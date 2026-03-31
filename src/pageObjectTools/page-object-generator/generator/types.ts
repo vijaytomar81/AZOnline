@@ -11,12 +11,17 @@ export type PageMapElement = {
     options?: Record<string, string>;
 };
 
+export type PageMapReadiness = {
+    recommendedAliases: string[];
+};
+
 export type PageMap = {
     pageKey: string;
     scannedAt?: string;
     url?: string;
     urlPath?: string;
     title?: string;
+    readiness?: PageMapReadiness;
     elements: Record<string, PageMapElement>;
 };
 

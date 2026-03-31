@@ -13,6 +13,7 @@ import { getSmartElementKey } from "../getSmartElementsKey";
 import { appendGroupedRadioCheckboxEntries } from "./groupControls";
 import { classifyElementType } from "./classifyElementType";
 import { buildStableElementKey } from "./buildStableElementKey";
+import { pickReadinessAliases } from "./pickReadinessAliases";
 
 function toPageMapEntry(
     el: ScannedElement,
@@ -122,6 +123,16 @@ export function buildPageMap(params: {
     }
 
     appendGroupedRadioCheckboxEntries(pageMap, builtElements);
+
+    pageMap.readiness = {
+        recommendedAliases: pickReadinessAliases(pageMap),
+    };
+
+    if (verbose && onDebug) {
+        onDebug(
+            `READINESS=${pageMap.readiness.recommendedAliases.join(", ")}`
+        );
+    }
 
     return pageMap;
 }

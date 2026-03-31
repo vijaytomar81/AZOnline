@@ -7,6 +7,26 @@ import {
     getPageObjectFileParts,
 } from "../utils/buildGeneratedHeader";
 
+function buildReadinessLocatorLines(pageMap: PageMap): string[] {
+    const aliases = pageMap.readiness?.recommendedAliases ?? [];
+
+    if (aliases.length === 0) {
+        return [`    const readinessLocators: Locator[] = [];`];
+    }
+
+    const lines: string[] = [];
+    lines.push(`    const readinessLocators: Locator[] = await Promise.all([`);
+
+    for (const alias of aliases) {
+        lines.push(
+            `      this.resolveAliasLocator(aliases, elements, aliasKeys.${alias}).then((result) => result.locator),`
+        );
+    }
+
+    lines.push(`    ]);`);
+    return lines;
+}
+
 export function buildPageTsStub(pageMap: PageMap): string {
     const pageKey = pageMap.pageKey;
     const lastSeg = pageKey.split(".").slice(-1)[0] || "page";
@@ -35,7 +55,7 @@ export function buildPageTsStub(pageMap: PageMap): string {
     lines.push(`  }`);
     lines.push(``);
     lines.push(`  async waitUntilReady() {`);
-    lines.push(`    const readinessLocators: Locator[] = [];`);
+    lines.push(...buildReadinessLocatorLines(pageMap));
     lines.push(``);
     lines.push(`    await this.waitForStandardReady({`);
     lines.push(`      expectedUrlPart: pageMeta.urlPath || undefined,`);
@@ -65,7 +85,19 @@ export function buildPageTsStub(pageMap: PageMap): string {
     lines.push(`    }`);
     lines.push(`  }`);
     lines.push(``);
-    lines.push(`  protected async setCheckedAlias(aliasKey: keyof typeof aliases, checked: boolean = true) {`);
+    lines.push(`  protected async clickAliasKey(aliasKey: keyof typeof aliases) {`);
+    lines.push(`    await this.actions.clickByAlias(aliases, elements, aliasKey);`);
+    lines.push(`  }`);
+    lines.push(``);
+    lines.push(`  protected async fillAliasKey(aliasKey: keyof typeof aliases, value: string) {`);
+    lines.push(`    await this.actions.fillByAlias(aliases, elements, aliasKey, value);`);
+    lines.push(`  }`);
+    lines.push(``);
+    lines.push(`  protected async selectAliasKey(aliasKey: keyof typeof aliases, value: string) {`);
+    lines.push(`    await this.actions.selectOptionByAlias(aliases, elements, aliasKey, value);`);
+    lines.push(`  }`);
+    lines.push(``);
+    lines.push(`  protected async setCheckedAliasKey(aliasKey: keyof typeof aliases, checked: boolean = true) {`);
     lines.push(`    const { locator } = await this.resolveAliasLocator(aliases, elements, aliasKey);`);
     lines.push(`    await locator.setChecked(checked);`);
     lines.push(`  }`);

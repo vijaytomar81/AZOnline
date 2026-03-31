@@ -49,13 +49,13 @@ flowchart LR
 
 ```
 src
-├── pages
+├── pageObjects
 │   ├── maps
 │   ├── objects
 │   ├── index.ts
 │   └── pageManager.ts
 │
-├── tools
+├── pageObjectTools
 │   ├── page-scanner
 │   ├── page-object-generator
 │   ├── page-object-validator
@@ -131,8 +131,8 @@ The manifest is used for:
 Two registry files expose page objects to tests.
 
 ```
-src/pages/index.ts
-src/pages/pageManager.ts
+src/pageObjects/index.ts
+src/pageObjects/pageManager.ts
 ```
 
 ### index.ts
@@ -389,7 +389,7 @@ npm run repair:run:verbose
 Common utilities used by all tools:
 
 ```
-src/tools/page-object-common
+src/pageObjectTools/page-object-common
 ```
 
 Files include:
