@@ -43,9 +43,14 @@ export const aliases = {
   skipThisStepILlRegisterLater: aliasesGenerated.skipThisStepILlRegisterLater,
 } as const satisfies Record<string, ElementKey>;
 
-// Primary type used by Page Objects (business alias keys)
+export const aliasKeys = {
+  linkToAllianzHomePage: "linkToAllianzHomePage",
+  logIn: "logIn",
+  register: "register",
+  skipThisStepILlRegisterLater: "skipThisStepILlRegisterLater",
+} as const satisfies Record<keyof typeof aliases, keyof typeof aliases>;
+
 export type AliasKey = keyof typeof aliases;
 
-// Optional: includes generated element keys too (useful for debugging/tools)
 export const allAliases = { ...aliasesGenerated, ...aliases } as const;
 export type AnyAliasKey = keyof typeof allAliases;

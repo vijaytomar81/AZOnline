@@ -69,10 +69,21 @@ export function buildAliasesHumanTs(pageMap: PageMap): string {
 
     lines.push(`} as const satisfies Record<string, ElementKey>;`);
     lines.push(``);
-    lines.push(`// Primary type used by Page Objects (business alias keys)`);
+
+    // NEW: strongly typed alias keys for generator usage
+    lines.push(`export const aliasKeys = {`);
+
+    for (const k of keys) {
+        const prop = isValidTsIdentifier(k) ? k : JSON.stringify(k);
+        lines.push(`  ${prop}: ${JSON.stringify(k)},`);
+    }
+
+    lines.push(`} as const satisfies Record<keyof typeof aliases, keyof typeof aliases>;`);
+    lines.push(``);
+
+    // Primary type used by Page Objects (business alias keys)
     lines.push(`export type AliasKey = keyof typeof aliases;`);
     lines.push(``);
-    lines.push(`// Optional: includes generated element keys too (useful for debugging/tools)`);
     lines.push(`export const allAliases = { ...aliasesGenerated, ...aliases } as const;`);
     lines.push(`export type AnyAliasKey = keyof typeof allAliases;`);
 

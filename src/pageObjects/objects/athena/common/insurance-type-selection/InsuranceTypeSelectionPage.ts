@@ -5,7 +5,7 @@ import type { Locator, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import { BasePage } from "@automation/base";
 import { elements } from "./elements";
-import { aliases } from "./aliases";
+import { aliases, aliasKeys } from "./aliases";
 import { pageMeta } from "./aliases.generated";
 
 const PAGE_KEY = "athena.common.insurance-type-selection" as const;
@@ -55,31 +55,31 @@ export class InsuranceTypeSelectionPage extends BasePage {
   // This region is auto-managed. Do not edit by hand.
 
   async buttonInputBack() {
-  await this.actions.clickByAlias(aliases, elements, "buttonInputBack");
+  await this.actions.clickByAlias(aliases, elements, aliasKeys.buttonInputBack);
   }
 
   async linkCarQuote() {
-  await this.actions.clickByAlias(aliases, elements, "linkCarQuote");
+  await this.actions.clickByAlias(aliases, elements, aliasKeys.linkCarQuote);
   }
 
   async linkHomeQuote() {
-  await this.actions.clickByAlias(aliases, elements, "linkHomeQuote");
+  await this.actions.clickByAlias(aliases, elements, aliasKeys.linkHomeQuote);
   }
 
   async linkInputBack() {
-  await this.actions.clickByAlias(aliases, elements, "linkInputBack");
+  await this.actions.clickByAlias(aliases, elements, aliasKeys.linkInputBack);
   }
 
   async linkLetUsKnow() {
-  await this.actions.clickByAlias(aliases, elements, "linkLetUsKnow");
+  await this.actions.clickByAlias(aliases, elements, aliasKeys.linkLetUsKnow);
   }
 
   async linkTermsAndConditionsApply() {
-  await this.actions.clickByAlias(aliases, elements, "linkTermsAndConditionsApply");
+  await this.actions.clickByAlias(aliases, elements, aliasKeys.linkTermsAndConditionsApply);
   }
 
   async linkToAllianzHomePage() {
-  await this.actions.clickByAlias(aliases, elements, "linkToAllianzHomePage");
+  await this.actions.clickByAlias(aliases, elements, aliasKeys.linkToAllianzHomePage);
   }
 
   // </scanner:aliases>

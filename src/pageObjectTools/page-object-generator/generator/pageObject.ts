@@ -26,25 +26,27 @@ function parseElementTypes(elementsTs: string): ElementTypeMap {
 }
 
 function methodLinesFor(aliasKey: string, elementType: string): string[] {
+    const keyRef = `aliasKeys.${aliasKey}`;
+
     switch ((elementType || "").toLowerCase()) {
         case "input":
             return [
                 `  async ${aliasKey}(value: string) {`,
-                `    await this.actions.fillByAlias(aliases, elements, "${aliasKey}", value);`,
+                `    await this.actions.fillByAlias(aliases, elements, ${keyRef}, value);`,
                 `  }`,
             ];
 
         case "select":
             return [
                 `  async ${aliasKey}(value: string) {`,
-                `    await this.actions.selectOptionByAlias(aliases, elements, "${aliasKey}", value);`,
+                `    await this.actions.selectOptionByAlias(aliases, elements, ${keyRef}, value);`,
                 `  }`,
             ];
 
         case "checkbox":
             return [
                 `  async ${aliasKey}(checked: boolean = true) {`,
-                `    const { locator } = await this.resolveAliasLocator(aliases, elements, "${aliasKey}");`,
+                `    const { locator } = await this.resolveAliasLocator(aliases, elements, ${keyRef});`,
                 `    await locator.setChecked(checked);`,
                 `  }`,
             ];
@@ -52,7 +54,7 @@ function methodLinesFor(aliasKey: string, elementType: string): string[] {
         default:
             return [
                 `  async ${aliasKey}() {`,
-                `    await this.actions.clickByAlias(aliases, elements, "${aliasKey}");`,
+                `    await this.actions.clickByAlias(aliases, elements, ${keyRef});`,
                 `  }`,
             ];
     }

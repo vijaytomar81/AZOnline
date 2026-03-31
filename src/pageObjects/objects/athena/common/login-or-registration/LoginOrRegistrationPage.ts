@@ -5,7 +5,7 @@ import type { Locator, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import { BasePage } from "@automation/base";
 import { elements } from "./elements";
-import { aliases } from "./aliases";
+import { aliases, aliasKeys } from "./aliases";
 import { pageMeta } from "./aliases.generated";
 
 const PAGE_KEY = "athena.common.login-or-registration" as const;
@@ -55,19 +55,19 @@ export class LoginOrRegistrationPage extends BasePage {
   // This region is auto-managed. Do not edit by hand.
 
   async linkToAllianzHomePage() {
-  await this.actions.clickByAlias(aliases, elements, "linkToAllianzHomePage");
+  await this.actions.clickByAlias(aliases, elements, aliasKeys.linkToAllianzHomePage);
   }
 
   async logIn() {
-  await this.actions.clickByAlias(aliases, elements, "logIn");
+  await this.actions.clickByAlias(aliases, elements, aliasKeys.logIn);
   }
 
   async register() {
-  await this.actions.clickByAlias(aliases, elements, "register");
+  await this.actions.clickByAlias(aliases, elements, aliasKeys.register);
   }
 
   async skipThisStepILlRegisterLater() {
-  await this.actions.clickByAlias(aliases, elements, "skipThisStepILlRegisterLater");
+  await this.actions.clickByAlias(aliases, elements, aliasKeys.skipThisStepILlRegisterLater);
   }
 
   // </scanner:aliases>

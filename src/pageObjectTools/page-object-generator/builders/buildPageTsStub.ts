@@ -24,7 +24,7 @@ export function buildPageTsStub(pageMap: PageMap): string {
     lines.push(`import { expect } from "@playwright/test";`);
     lines.push(`import { BasePage } from "@automation/base";`);
     lines.push(`import { elements } from "./elements";`);
-    lines.push(`import { aliases } from "./aliases";`);
+    lines.push(`import { aliases, aliasKeys } from "./aliases";`);
     lines.push(`import { pageMeta } from "./aliases.generated";`);
     lines.push(``);
     lines.push(`const PAGE_KEY = ${JSON.stringify(pageKey)} as const;`);
