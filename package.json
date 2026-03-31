@@ -6,7 +6,7 @@
     "test:e2e": "playwright test",
     "e2e": "npm run data:build -- && npm run test:e2e",
 
-    "data": "node -r ts-node/register -r tsconfig-paths/register src/data/builder/index.ts",
+    "data": "node -r ts-node/register -r tsconfig-paths/register src/dataLayer/builder/index.ts",
     "data:build": "npm run data --",
     "data:build:verbose": "npm run data -- --verbose",
     "data:build:strict": "npm run data -- --strictValidation",
@@ -19,11 +19,10 @@
     
     "data:direct": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"FlowNB\"",
     "data:pcw": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"PCW-Tool\"",
-
     "data:verbose:direct": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"FlowNB\" --verbose",
     "data:verbose:pcw": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"PCW-Tool\" --verbose",
 
-    "execution": "node -r ts-node/register -r tsconfig-paths/register src/execution/index.ts",
+    "execution": "node -r ts-node/register -r tsconfig-paths/register src/executionLayer/cli/main.ts",
     "execution:run": "npm run execution --",
     "execution:verbose": "npm run execution -- --verbose",
     "execution:help": "npm run execution -- --help",
@@ -31,45 +30,42 @@
     "smoke:direct": "npm run execution -- --mode data --source \"FlowNB\"",
     "smoke:pcw": "npm run execution -- --mode data --source \"PCW-Tool\"",
     "smoke:e2e": "npm run execution -- --mode e2e --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\"",
-
     "smoke:verbose:direct": "npm run execution -- --mode data --source \"FlowNB\" --verbose",
     "smoke:verbose:pcw": "npm run execution -- --mode data --source \"PCW-Tool\" --verbose",
     "smoke:verbose:e2e": "npm run execution -- --mode e2e --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\" --verbose",
-
     "smoke:direct:loop": "npm run execution -- --mode data --source \"FlowNB\" --iterations 2 --verbose",
     "smoke:pcw:loop": "npm run execution -- --mode data --source \"PCW-Tool\" --iterations 2 --verbose",
-
     "smoke:help": "npm run execution -- --mode e2e --help",
     "smoke:data:help": "npm run execution -- --mode data --help",
 
-    "scan": "node -r ts-node/register -r tsconfig-paths/register src/tools/page-scanner/cli.ts",
+    "scan": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/page-scanner/cli.ts",
     "scan:page": "npm run scan -- scan",
     "scan:page:verbose": "npm run scan -- scan --verbose",
     "scan:page:merge": "npm run scan -- scan --merge",
     "scan:page:merge:verbose": "npm run scan -- scan --merge --verbose",
     "scan:help": "npm run scan -- help",
 
-    "generator": "node -r ts-node/register -r tsconfig-paths/register src/tools/page-object-generator/cli.ts",
+    "generator": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/page-object-generator/cli.ts",
     "generator:elements": "npm run generator -- generate --merge",
     "generator:elements:verbose": "npm run generator -- generate --merge --verbose",
     "generator:elements:changed": "npm run generator -- generate --changedOnly --merge",
     "generator:elements:changed:verbose": "npm run generator -- generate --changedOnly --merge --verbose",
     "generator:help": "npm run generator -- help",
 
-    "validator": "node -r ts-node/register -r tsconfig-paths/register src/tools/page-object-validator/cli.ts",
+    "validator": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/page-object-validator/cli.ts",
     "validator:check": "npm run validator -- validate",
     "validator:check:verbose": "npm run validator -- validate --verbose",
     "validator:check:strict": "npm run validator -- validate --strict",
     "validator:check:strict:verbose": "npm run validator -- validate --strict --verbose",
     "validator:help": "npm run validator -- help",
 
-    "repair": "node -r ts-node/register -r tsconfig-paths/register src/tools/page-object-repair/cli.ts",
+    "repair": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/page-object-repair/cli.ts",
     "repair:run": "npm run repair -- repair",
     "repair:run:verbose": "npm run repair -- repair --verbose",
     "repair:help": "npm run repair -- help",
 
-    "headers:check": "node -r ts-node/register -r tsconfig-paths/register src/tools/file-header-checker/cli.ts --checkMode",
-    "headers:fix": "node -r ts-node/register -r tsconfig-paths/register src/tools/file-header-checker/cli.ts",
+    "headers:check": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/file-header-checker/cli.ts --checkMode",
+    "headers:fix": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/file-header-checker/cli.ts",
 
     "check:types": "tsc --noEmit",
     "tools:tsc": "tsc -p tsconfig.tools.json --noEmit",
@@ -100,6 +96,7 @@
   "devDependencies": {
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.3.0",
+    "@types/xml2js": "^0.4.14",
     "allure-playwright": "^3.5.0",
     "ts-node": "^10.9.2",
     "ts-prune": "^0.10.3",
@@ -109,6 +106,7 @@
   "dependencies": {
     "@google-cloud/local-auth": "^3.0.1",
     "exceljs": "^4.1.1",
-    "googleapis": "^171.4.0"
+    "googleapis": "^171.4.0",
+    "xml2js": "^0.6.2"
   }
 }

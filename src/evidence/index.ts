@@ -14,9 +14,7 @@ export type { EvidenceRunInfo } from "./runtime/EvidenceRunInfo";
 export type { EvidenceContext } from "./runtime/EvidenceContext";
 export { createEvidenceContext } from "./runtime/createEvidenceContext";
 
-export type {
-    EvidenceArtifactPaths,
-} from "./artifacts/contracts/EvidenceArtifactPaths";
+export type { EvidenceArtifactPaths } from "./artifacts/contracts/EvidenceArtifactPaths";
 
 export type {
     EvidenceArtifactWriter,
@@ -24,7 +22,6 @@ export type {
 } from "./artifacts/contracts/EvidenceArtifactWriter";
 
 export { buildEvidenceArtifactPath } from "./artifacts/paths/buildEvidenceArtifactPath";
-
 export { buildEvidenceJson } from "./artifacts/json/buildEvidenceJson";
 
 export {
@@ -46,6 +43,12 @@ export {
 } from "./artifacts/run/buildRunEvidence";
 
 export {
+    buildFinalEvidenceFiles,
+    type FinalEvidenceCases,
+    type FinalEvidenceFiles,
+} from "./artifacts/run/buildFinalEvidenceFiles";
+
+export {
     writeWorkerEvidenceArtifact,
     type WriteWorkerEvidenceArtifactInput,
     type WriteWorkerEvidenceArtifactResult,
@@ -58,8 +61,46 @@ export {
     type MergeWorkerEvidenceResult,
 } from "./artifacts/run/mergeWorkerEvidence";
 
-// src/evidence/index.ts
+export {
+    finalizeRunEvidence,
+    type FinalizeRunEvidenceInput,
+    type FinalizeRunEvidenceResult,
+} from "./artifacts/run/finalizeRunEvidence";
+
+export {
+    cleanupOldEvidenceRuns,
+    type CleanupOldEvidenceRunsInput,
+} from "./artifacts/run/cleanupOldEvidenceRuns";
+
+export type { FlattenedOutputKey } from "./artifacts/excel/flattenOutputKeys";
+export { flattenOutputKeys } from "./artifacts/excel/flattenOutputKeys";
+
+export { prettifyExcelColumn } from "./artifacts/excel/prettifyExcelColumn";
+
+export type { ExecutionExcelColumn } from "./artifacts/excel/executionExcelColumns";
+export { EXECUTION_EXCEL_COLUMNS } from "./artifacts/excel/executionExcelColumns";
+
+export type { ExecutionCaseRow } from "./artifacts/excel/buildExecutionItemRows";
+export { buildExecutionItemRows } from "./artifacts/excel/buildExecutionItemRows";
+
+export type {
+    SummaryRow,
+    SummaryRowKind,
+} from "./artifacts/excel/buildExecutionSummaryRows";
+export { buildExecutionSummaryRows } from "./artifacts/excel/buildExecutionSummaryRows";
+
+export type { BuildExecutionExcelRowsInput } from "./artifacts/excel/buildExecutionExcelRows";
+export { buildExecutionExcelRows } from "./artifacts/excel/buildExecutionExcelRows";
+
+export { autoFitExecutionSheetColumns } from "./artifacts/excel/autoFitExecutionSheetColumns";
+export { styleExecutionSheet } from "./artifacts/excel/styleExecutionSheet";
+export { writeExecutionSummarySheet } from "./artifacts/excel/writeExecutionSummarySheet";
+
+export type {
+    WriteExecutionEvidenceExcelInput,
+    WriteExecutionEvidenceExcelResult,
+} from "./artifacts/excel/writeExecutionEvidenceExcel";
+export { writeExecutionEvidenceExcel } from "./artifacts/excel/writeExecutionEvidenceExcel";
 
 export type { EvidenceArtifactConfig } from "./config/EvidenceArtifactConfig";
 export { resolveEvidenceArtifactConfig } from "./config/resolveEvidenceArtifactConfig";
-

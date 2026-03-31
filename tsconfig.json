@@ -22,32 +22,44 @@
       "@/*": [
         "src/*"
       ],
-      "@pages/*": [
-        "src/pages/*"
+      "@pageObjects/*": [
+        "src/pageObjects/*"
       ],
       "@page-maps/*": [
-        "src/pages/maps/*"
+        "src/pageObjects/maps/*"
       ],
       "@page-objects/*": [
-        "src/pages/objects/*"
+        "src/pageObjects/objects/*"
       ],
       "@page-manifest/*": [
-        "src/pages/.manifest/*"
+        "src/pageObjects/.manifest/*"
+      ],
+      "@pageActions/*": [
+        "src/pageActions/*"
+      ],
+      "@pageObjectTools/*": [
+        "src/pageObjectTools/*"
       ],
       "@utils/*": [
         "src/utils/*"
       ],
-      "@data/*": [
-        "src/data/*"
+      "@dataLayer/*": [
+        "src/dataLayer/*"
       ],
-      "@execution/*": [
-        "src/execution/*"
+      "@executionLayer/*": [
+        "src/executionLayer/*"
+      ],
+      "@businessJourneys/*": [
+        "src/businessJourneys/*"
       ],
       "@config/*": [
         "src/config/*"
       ],
       "@logging/*": [
         "src/logging/*"
+      ],
+      "@evidence/*": [
+        "src/evidence/*"
       ]
     }
   },
