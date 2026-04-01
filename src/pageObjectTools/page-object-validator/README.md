@@ -65,7 +65,7 @@ The validator analyzes several framework components.
 Location:
 
 ```
-src/pages/objects
+src/pageObjects/objects
 ```
 
 Files include:
@@ -84,7 +84,7 @@ PageObject.ts
 Location:
 
 ```
-src/pages
+src/pageObjects
 ```
 
 Files:
@@ -101,13 +101,13 @@ pageManager.ts
 Location:
 
 ```
-src/pages/.manifest
+src/pageObjects/.manifest
 ```
 
 Structure:
 
 ```
-src/pages/.manifest
+src/pageObjects/.manifest
 ├── index.json
 └── pages/*.json
 ```
@@ -119,7 +119,7 @@ src/pages/.manifest
 Location:
 
 ```
-src/pages/maps
+src/pageObjects/maps
 ```
 
 Page maps provide metadata used during validation checks.
@@ -236,8 +236,8 @@ Validates page registry files.
 Checks include:
 
 ```
-src/pages/index.ts
-src/pages/pageManager.ts
+src/pageObjects/index.ts
+src/pageObjects/pageManager.ts
 ```
 
 The validator ensures:
@@ -267,13 +267,13 @@ The validator checks the **manifest metadata system**.
 Location:
 
 ```
-src/pages/.manifest
+src/pageObjects/.manifest
 ```
 
 Structure:
 
 ```
-src/pages/.manifest
+src/pageObjects/.manifest
 ├── index.json
 └── pages
     ├── <pageKey>.json
@@ -302,8 +302,8 @@ Registry files are validated to ensure page objects are accessible to the framew
 Registry files:
 
 ```
-src/pages/index.ts
-src/pages/pageManager.ts
+src/pageObjects/index.ts
+src/pageObjects/pageManager.ts
 ```
 
 Validator checks include:
@@ -390,7 +390,8 @@ Examples:
 ```
 @page-objects/*
 @page-maps/*
-@pages/*
+@pageObjects/*
+@page-manifest/*
 ```
 
 These aliases are configured in `tsconfig.json`.
@@ -447,7 +448,7 @@ npm run repair:run
 The validator relies on shared utilities located in:
 
 ```
-src/tools/page-object-common
+src/pageObjectTools/page-object-common
 ```
 
 Utilities include:
