@@ -1,0 +1,130 @@
+{
+  "pageKey": "athena.common.manage-cookies",
+  "url": "https://customer-portal-lv-test.athenapaas.com/",
+  "urlPath": "/",
+  "scannedAt": "2026-04-01T10:40:09.711Z",
+  "title": "Allianz login page",
+  "elements": {
+    "linkReferToOurCookiePolicy": {
+      "type": "link",
+      "preferred": "css=a[aria-label=\"More information about your privacy, opens in a new tab\"]",
+      "fallbacks": [
+        "role=link[name=/Refer to our Cookie Policy/i]",
+        "text=/Refer to our Cookie Policy/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": null,
+        "name": "More information about your privacy, opens in a new tab",
+        "text": "Refer to our Cookie Policy",
+        "labelText": null,
+        "ariaLabel": "More information about your privacy, opens in a new tab",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://www.allianz.co.uk/cookie-policy.html",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "onetrust-policy-text",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "4a6bfe8b0467"
+    },
+    "buttonManageCookies": {
+      "type": "button",
+      "preferred": "css=#onetrust-pc-btn-handler",
+      "fallbacks": [
+        "css=button[aria-label=\"Manage Cookies, Opens the preference center dialog\"]",
+        "role=button[name=/Manage Cookies/i]",
+        "text=/Manage Cookies/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": "onetrust-pc-btn-handler",
+        "name": "Manage Cookies, Opens the preference center dialog",
+        "text": "Manage Cookies",
+        "labelText": null,
+        "ariaLabel": "Manage Cookies, Opens the preference center dialog",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "onetrust-button-group",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "0f178472591e"
+    },
+    "buttonRejectAll": {
+      "type": "button",
+      "preferred": "css=#onetrust-reject-all-handler",
+      "fallbacks": [
+        "role=button[name=/Reject All/i]",
+        "text=/Reject All/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": "onetrust-reject-all-handler",
+        "name": "Reject All",
+        "text": "Reject All",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "onetrust-button-group",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "8baf8f002fbf"
+    },
+    "buttonAcceptAll": {
+      "type": "button",
+      "preferred": "css=#onetrust-accept-btn-handler",
+      "fallbacks": [
+        "role=button[name=/Accept All/i]",
+        "text=/Accept All/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": "onetrust-accept-btn-handler",
+        "name": "Accept All",
+        "text": "Accept All",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": "onetrust-button-group",
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "8d1fd9e1bf53"
+    }
+  }
+}
