@@ -90,7 +90,7 @@ PageObject.ts
 Location:
 
 ```
-src/pages
+src/pageObjectss
 ```
 
 Files:
@@ -107,13 +107,13 @@ pageManager.ts
 Location:
 
 ```
-src/pages/.manifest
+src/pageObjectss/.manifest
 ```
 
 Structure:
 
 ```
-src/pages/.manifest
+src/pageObjectss/.manifest
 ├── index.json
 └── pages/*.json
 ```
@@ -129,8 +129,8 @@ The repair tool updates files when inconsistencies are detected.
 Possible repaired files include:
 
 ```
-src/pages/.manifest/index.json
-src/pages/.manifest/pages/*.json
+src/pageObjects/.manifest/index.json
+src/pageObjects/.manifest/pages/*.json
 ```
 
 Repair operations **do not modify developer-written page object logic**.
@@ -198,13 +198,13 @@ The repair tool works directly with the **page manifest system**.
 Location:
 
 ```
-src/pages/.manifest
+src/pageObjects/.manifest
 ```
 
 Structure:
 
 ```
-src/pages/.manifest
+src/pageObjects/.manifest
 ├── index.json
 └── pages
     ├── <pageKey>.json
@@ -235,8 +235,8 @@ However, it ensures metadata used by the registry remains valid.
 Registry files:
 
 ```
-src/pages/index.ts
-src/pages/pageManager.ts
+src/pageObjects/index.ts
+src/pageObjects/pageManager.ts
 ```
 
 ---
@@ -299,7 +299,7 @@ Example:
 
 ```
 @page-objects/*
-@pages/*
+@pageObjects/*
 ```
 
 Configured in `tsconfig.json`.
@@ -346,7 +346,7 @@ npm run validator:check
 The repair tool relies on shared utilities located in:
 
 ```
-src/tools/page-object-common
+src/pageObjectTools/page-object-common
 ```
 
 Utilities include:
