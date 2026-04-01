@@ -64,23 +64,10 @@ function buildRuleTitle(
 function buildRuleNode(
     groupKey: RuleGroupBucket["key"],
     rule: ValidationRuleExecutionResult,
-    verbose: boolean
-): TreeNode | null {
+    _verbose: boolean
+): TreeNode {
     const warnings = countValidationWarnings(rule.issues);
     const errors = countValidationErrors(rule.issues);
-    const hasIssues = warnings > 0 || errors > 0;
-
-    if (!verbose && !hasIssues) {
-        if (groupKey === "pageChain") {
-            return {
-                severity: "success",
-                title: buildRuleTitle(groupKey, rule.ruleId),
-                summary: buildRuleSummary(rule),
-            };
-        }
-
-        return null;
-    }
 
     return {
         severity: ruleSeverity(errors > 0, warnings > 0),
@@ -102,19 +89,10 @@ function buildGroupNode(group: RuleGroupBucket, verbose: boolean): TreeNode {
         (sum, rule) => sum + countValidationErrors(rule.issues),
         0
     );
-    const hasIssues = warnings > 0 || errors > 0;
 
-    if (!verbose && !hasIssues) {
-        return {
-            severity: "success",
-            title: strong(group.key),
-            summary: buildGroupSummary(group),
-        };
-    }
-
-    const children = group.rules
-        .map((rule) => buildRuleNode(group.key, rule, verbose))
-        .filter((node): node is TreeNode => Boolean(node));
+    const children = group.rules.map((rule) =>
+        buildRuleNode(group.key, rule, verbose)
+    );
 
     return {
         severity: ruleSeverity(errors > 0, warnings > 0),
