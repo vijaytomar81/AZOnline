@@ -1,70 +1,119 @@
+# ▶️ Test Execution Flow
 
-# Test Execution Flow
-
-This document explains how tests are executed in the framework.
-
-Execution is powered by:
-
-- Playwright
-- Case Runner
-- Page Manager
-- Page Objects
+This document explains how tests execute within the automation framework.
 
 ---
 
-# Test Execution Flow
+## Execution Pipeline
 
 ```mermaid
-
-sequenceDiagram
-    participant User
-    participant Script as package.json / scripts/e2e.js
-    participant PW as Playwright
-    participant Runner as caseRunner
-    participant Data as Case JSON
-    participant PM as pageManager
-    participant Page as PageObject
-    participant Base as basePage
-    participant Browser as Browser
-    participant Report as results/reports
-
-    User->>Script: Run test command
-    Script->>PW: Start execution
-    PW->>Runner: Execute test case
-    Runner->>Data: Load case data
-    Data-->>Runner: Case payload
-    Runner->>PM: Get page object
-    PM-->>Runner: Page instance
-    Runner->>Page: Execute business flow
-    Page->>Base: Reusable actions
-    Base->>Browser: Interact with UI
-    Browser-->>Base: DOM/state response
-    Base-->>Page: Action result
-    Page-->>Runner: Step completion
-    Runner->>Report: Publish result
-    PW->>Report: Generate artifacts
-```
----
-
-
-# Execution Flow (Simplified)
-
-```mermaid
-
 flowchart LR
 
-CMD["npm run e2e"] --> PW["Playwright"]
-PW --> TEST["Test Spec"]
-TEST --> DATA["Case JSON"]
-TEST --> RUN["caseRunner"]
+A[Page Maps] --> B[Generator]
+B --> C[Artifacts]
+C --> D[Validator]
 
-RUN --> PM["pageManager"]
-PM --> PO["Page Object"]
-PO --> BASE["basePage"]
-BASE --> LOC["locatorEngine"]
-BASE --> FX["pageFx"]
-BASE --> UI["Browser UI"]
+D -->|FAIL| E[Repair]
+E --> D
 
-RUN --> RES["results/"]
-RUN --> REP["reports/"]
+D -->|PASS| F[Test Execution]
+F --> G[Results]
 ```
+
+---
+
+## Step-by-Step Flow
+
+### 1. Generator
+- Builds artifacts from page maps
+
+---
+
+### 2. Validator
+- Ensures:
+  - mappings are correct
+  - structure is valid
+  - registry is consistent
+
+---
+
+### 3. Repair (if needed)
+- Fixes detected inconsistencies
+- Re-runs validator
+
+---
+
+### 4. Test Execution
+- Uses:
+  - PageManager
+  - PageObjects
+  - Aliases
+
+---
+
+## Runtime Flow
+
+```mermaid
+flowchart TD
+
+T[Test Case]
+CR[Case Runner]
+PM[PageManager]
+PO[PageObject]
+BP[BasePage]
+
+T --> CR
+CR --> PM
+PM --> PO
+PO --> BP
+```
+
+---
+
+## Page Access Pattern
+
+```ts
+pageManager.athena.loginOrRegistration.login()
+```
+
+---
+
+## Key Guarantees
+
+- Tests run only on validated structure
+- No broken mappings at runtime
+- Consistent page access
+
+---
+
+## Failure Handling
+
+| Stage | Action |
+|------|--------|
+| Generator fails | fix page map |
+| Validator fails | run repair |
+| Repair fails | manual intervention |
+
+---
+
+## CI Flow
+
+```
+generator → validator (strict) → test
+```
+
+Repair should NOT run in CI.
+
+---
+
+## Summary
+
+Execution ensures:
+
+- reliability
+- predictability
+- consistency
+
+👉 Validator is the gatekeeper  
+👉 Repair is the safety net  
+👉 Generator is the source builder  
