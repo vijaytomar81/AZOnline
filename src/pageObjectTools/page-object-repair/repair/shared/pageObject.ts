@@ -8,10 +8,12 @@ import type { AliasPair } from "./aliases";
 import type { ElementInfo } from "./elements";
 
 function methodLines(aliasKey: string, type: string): string[] {
+    const keyRef = `aliasKeys.${aliasKey}`;
+
     if (type === "input") {
         return [
             `  async ${aliasKey}(value: string) {`,
-            `    await this.fillAlias("${aliasKey}", value);`,
+            `    await this.fillAliasKey(${keyRef}, value);`,
             `  }`,
         ];
     }
@@ -19,7 +21,7 @@ function methodLines(aliasKey: string, type: string): string[] {
     if (type === "select") {
         return [
             `  async ${aliasKey}(value: string) {`,
-            `    await this.selectOptionAlias("${aliasKey}", value);`,
+            `    await this.selectAliasKey(${keyRef}, value);`,
             `  }`,
         ];
     }
@@ -27,14 +29,14 @@ function methodLines(aliasKey: string, type: string): string[] {
     if (type === "checkbox") {
         return [
             `  async ${aliasKey}(checked: boolean = true) {`,
-            `    await this.setCheckedAlias("${aliasKey}", checked);`,
+            `    await this.setCheckedAliasKey(${keyRef}, checked);`,
             `  }`,
         ];
     }
 
     return [
         `  async ${aliasKey}() {`,
-        `    await this.clickAlias("${aliasKey}");`,
+        `    await this.clickAliasKey(${keyRef});`,
         `  }`,
     ];
 }
@@ -54,10 +56,16 @@ export function writeManagedRegion(params: {
     const startToken = `// <scanner:aliases>`;
     const endToken = `// </scanner:aliases>`;
 
-    const regionLines: string[] = [startToken, `  // This region is auto-managed. Do not edit by hand.`, ``];
+    const regionLines: string[] = [
+        startToken,
+        `  // This region is auto-managed. Do not edit by hand.`,
+        ``,
+    ];
 
     for (const pair of aliasPairs.sort((a, b) => a.aliasKey.localeCompare(b.aliasKey))) {
-        regionLines.push(...methodLines(pair.aliasKey, elementTypeByKey.get(pair.generatedKey) ?? "button"));
+        regionLines.push(
+            ...methodLines(pair.aliasKey, elementTypeByKey.get(pair.generatedKey) ?? "button")
+        );
         regionLines.push(``);
     }
 
@@ -69,30 +77,77 @@ export function writeManagedRegion(params: {
         const className = classNameFromPageKey(pageKey);
         const lines = [
             `// ${toRepoRelative(pageObjectPath)}`,
-            `import type { Page } from "@playwright/test";`,
-            `import { basePage } from "@/core/basePage";`,
-            `import { elements } from "./elements";`,
-            `import { aliases } from "./aliases";`,
-            `import type { AliasKey } from "./aliases";`,
+            `// pageKey: ${pageKey}`,
             ``,
-            `export class ${className} extends basePage {`,
+            `import type { Locator, Page } from "@playwright/test";`,
+            `import { expect } from "@playwright/test";`,
+            `import { BasePage } from "@automation/base";`,
+            `import { elements } from "./elements";`,
+            `import { aliases, aliasKeys } from "./aliases";`,
+            `import { pageMeta } from "./aliases.generated";`,
+            ``,
+            `const PAGE_KEY = ${JSON.stringify(pageKey)} as const;`,
+            ``,
+            `export class ${className} extends BasePage {`,
             `  constructor(page: Page) {`,
-            `    super(page, ${JSON.stringify(pageKey)});`,
+            `    super(page, PAGE_KEY);`,
             `  }`,
             ``,
-            `  protected async clickAlias(aliasKey: AliasKey) { await this.clickByAlias(aliases, elements, aliasKey); }`,
-            `  protected async fillAlias(aliasKey: AliasKey, value: string) { await this.fillByAlias(aliases, elements, aliasKey, value); }`,
-            `  protected async selectOptionAlias(aliasKey: AliasKey, value: string) { await this.selectOptionByAlias(aliases, elements, aliasKey, value); }`,
-            `  protected async setCheckedAlias(aliasKey: AliasKey, checked: boolean = true) {`,
-            `    const { locator } = await this.resolveByAlias(aliases, elements, aliasKey);`,
+            `  async waitUntilReady() {`,
+            `    const readinessLocators: Locator[] = [];`,
+            ``,
+            `    await this.waitForStandardReady({`,
+            `      expectedUrlPart: pageMeta.urlPath || undefined,`,
+            `      readinessLocators,`,
+            `      dismissOverlays: true,`,
+            `      waitForNetworkIdle: false,`,
+            `    });`,
+            ``,
+            `    if ((pageMeta as any).titleRe) {`,
+            `      await expect(this.page).toHaveTitle((pageMeta as any).titleRe);`,
+            `    } else if ((pageMeta as any).title) {`,
+            `      await expect(this.page).toHaveTitle((pageMeta as any).title);`,
+            `    }`,
+            `  }`,
+            ``,
+            `  async assertOnPage() {`,
+            `    if (pageMeta.urlRe) {`,
+            `      await expect(this.page).toHaveURL(pageMeta.urlRe);`,
+            `    } else if (pageMeta.urlPath) {`,
+            `      await expect(this.page).toHaveURL(new RegExp(pageMeta.urlPath));`,
+            `    }`,
+            ``,
+            `    if ((pageMeta as any).titleRe) {`,
+            `      await expect(this.page).toHaveTitle((pageMeta as any).titleRe);`,
+            `    } else if ((pageMeta as any).title) {`,
+            `      await expect(this.page).toHaveTitle((pageMeta as any).title);`,
+            `    }`,
+            `  }`,
+            ``,
+            `  protected async clickAliasKey(aliasKey: keyof typeof aliases) {`,
+            `    await this.actions.clickByAlias(aliases, elements, aliasKey);`,
+            `  }`,
+            ``,
+            `  protected async fillAliasKey(aliasKey: keyof typeof aliases, value: string) {`,
+            `    await this.actions.fillByAlias(aliases, elements, aliasKey, value);`,
+            `  }`,
+            ``,
+            `  protected async selectAliasKey(aliasKey: keyof typeof aliases, value: string) {`,
+            `    await this.actions.selectOptionByAlias(aliases, elements, aliasKey, value);`,
+            `  }`,
+            ``,
+            `  protected async setCheckedAliasKey(aliasKey: keyof typeof aliases, checked: boolean = true) {`,
+            `    const { locator } = await this.resolveAliasLocator(aliases, elements, aliasKey);`,
             `    await locator.setChecked(checked);`,
             `  }`,
             ``,
             region,
             ``,
+            `  // You can add custom business logic methods below (safe zone).`,
             `}`,
             ``,
         ];
+
         fs.writeFileSync(pageObjectPath, lines.join("\n"), "utf8");
         return;
     }
