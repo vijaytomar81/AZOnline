@@ -45,6 +45,63 @@ flowchart LR
 
 ---
 
+# Validator ↔ Repair ↔ Generator Parity
+
+To ensure long-term stability, the framework maintains strict alignment between:
+
+- Generator (builds artifacts)
+- Validator (detects issues)
+- Repair (fixes issues)
+
+---
+
+## Parity Matrix
+
+| Contract | Generator | Validator | Repair | Notes |
+|----------|----------|----------|--------|------|
+| elements → aliases.generated | ✔ | ✔ | ✔ | fully auto-managed |
+| aliases.generated → aliases | ✔ | ✔ | ✔ | fully auto-managed |
+| aliases → PageObject methods | ✔ | ✔ | ✔ | managed region only |
+| PageObject structure | ✔ | ✔ | ✔ | enforced |
+| PageObject readiness | ✔ | ✔ | ✔ | metadata-driven |
+| page-map schema | ✔ | ✔ | ✖ | source-of-truth |
+| manifest metadata | ✔ | ✔ | ✔ | repair rebuilds |
+| index.ts exports | ✔ | ✔ | ✔ | registry sync |
+| pageManager.ts | ✔ | ✔ | ✔ | registry sync |
+
+---
+
+# Pre-Execution Quality Gate
+
+The framework enforces a **quality gate before test execution**.
+
+```mermaid
+flowchart LR
+
+    A[Generator] --> B[Validator]
+    B -->|FAIL| C[Repair]
+    C --> B
+    B -->|PASS| D[Test Execution]
+```
+
+---
+
+## Recommended Script
+
+```json
+"test:e2e": "npm run generator:elements && npm run validator:check || (npm run repair:run && npm run validator:check) && npm run headers:fix && playwright test"
+```
+
+---
+
+## Strict Mode (CI)
+
+```json
+"test:e2e:ci": "npm run generator:elements && npm run validator:check:strict && playwright test"
+```
+
+---
+
 # Project Structure
 
 ```
@@ -222,8 +279,6 @@ Example:
 
 ## Start Browser (CDP Mode)
 
-Example:
-
 ```powershell
 $profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
 Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "--remote-debugging-port=9222 --user-data-dir=$profile"
@@ -312,28 +367,6 @@ conventions
 
 ---
 
-## Validator Architecture
-
-```mermaid
-flowchart LR
-
-    A[Page Objects]
-    B[Validator]
-
-    A --> B
-
-    B --> C[environment rules]
-    B --> D[source rules]
-    B --> E[outputs rules]
-    B --> F[pageChain rules]
-    B --> G[manifest rules]
-    B --> H[registry rules]
-    B --> I[hygiene rules]
-    B --> J[conventions rules]
-```
-
----
-
 ## Validator Commands
 
 ```
@@ -354,25 +387,6 @@ It repairs:
 - registry exports
 - page-object structure
 
-Repair operations are derived from **actual artifacts and metadata**.
-
----
-
-## Repair Flow
-
-```mermaid
-flowchart TD
-
-    A[Validator detects issue]
-    B[Repair Tool]
-
-    A --> B
-
-    B --> C[Rebuild Manifest]
-    B --> D[Fix Registry]
-    B --> E[Repair Artifacts]
-```
-
 ---
 
 ## Repair Commands
@@ -384,44 +398,7 @@ npm run repair:run:verbose
 
 ---
 
-# Shared Utilities
-
-Common utilities used by all tools:
-
-```
-src/pageObjectTools/page-object-common
-```
-
-Files include:
-
-```
-extractTsObjectKeys.ts
-pagePaths.ts
-readPageMap.ts
-tsObjectParser.ts
-```
-
-These utilities provide:
-
-- page-map loading
-- TypeScript object parsing
-- artifact path resolution
-- shared helper logic
-
----
-
 # Typical Workflow
-
-Developer workflow:
-
-```
-1. Scan page
-2. Generate page objects
-3. Validate framework
-4. Repair if necessary
-```
-
-Example:
 
 ```
 npm run scan:page
@@ -463,14 +440,12 @@ flowchart LR
 
 # Benefits of This Architecture
 
-This framework provides:
+- automatic page discovery  
+- deterministic page-object generation  
+- strict validation layer  
+- automated repair capability  
+- scalable automation architecture  
 
-- automatic page discovery
-- deterministic page-object generation
-- strict validation layer
-- automated repair capability
-- scalable automation architecture
-
-It allows large automation projects to remain **stable, maintainable, and easy to extend**.
+This framework keeps automation **stable, maintainable, and future-proof**.
 
 ---
