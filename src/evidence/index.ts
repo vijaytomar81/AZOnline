@@ -101,6 +101,3 @@ export type {
     WriteExecutionEvidenceExcelResult,
 } from "./artifacts/excel/writeExecutionEvidenceExcel";
 export { writeExecutionEvidenceExcel } from "./artifacts/excel/writeExecutionEvidenceExcel";
-
-export type { EvidenceArtifactConfig } from "./config/EvidenceArtifactConfig";
-export { resolveEvidenceArtifactConfig } from "./config/resolveEvidenceArtifactConfig";
