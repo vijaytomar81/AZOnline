@@ -1,8 +1,7 @@
 // src/automation/base/AutomationPageDriver.ts
 
 import type { Locator } from "@playwright/test";
-import type { AliasMap } from "@core/basePage";
-import type { ElementDef } from "@core/locatorEngine";
+import type { AliasMap, ElementDef } from "@automation/engine";
 
 export type ElementsMap = Record<string, ElementDef>;
 

@@ -1,7 +1,7 @@
 // src/automation/base/BaseReads.ts
 
 import { executionConfig } from "@config/execution.config";
-import type { AliasMap } from "@core/basePage";
+import type { AliasMap } from "@automation/engine";
 import type {
     AutomationPageDriver,
     ElementsMap,

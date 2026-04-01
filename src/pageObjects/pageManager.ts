@@ -4,6 +4,7 @@
 import type { Page } from "@playwright/test";
 import { InsuranceTypeSelectionPage } from "@page-objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage";
 import { LoginOrRegistrationPage } from "@page-objects/athena/common/login-or-registration/LoginOrRegistrationPage";
+import { ManageCookiesPage } from "@page-objects/athena/common/manage-cookies/ManageCookiesPage";
 import { PhDrivingLicenceDetailsPage } from "@page-objects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage";
 
 type PageFactory<T> = () => T;
@@ -29,6 +30,7 @@ export class PageManager {
         return {
             insuranceTypeSelection: this.get("athena.insuranceTypeSelection", () => new InsuranceTypeSelectionPage(this.page)),
             loginOrRegistration: this.get("athena.loginOrRegistration", () => new LoginOrRegistrationPage(this.page)),
+            manageCookies: this.get("athena.manageCookies", () => new ManageCookiesPage(this.page)),
             phDrivingLicenceDetails: this.get("athena.phDrivingLicenceDetails", () => new PhDrivingLicenceDetailsPage(this.page)),
         };
     }
