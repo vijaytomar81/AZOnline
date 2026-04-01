@@ -71,7 +71,7 @@ The repair tool reads several framework artifacts.
 Location:
 
 ```
-src/pages/objects
+src/pageObjects/objects
 ```
 
 Artifacts include:
