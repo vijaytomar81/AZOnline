@@ -22,9 +22,6 @@
       "@/*": [
         "src/*"
       ],
-      "@core/*": [
-        "src/core/*"
-      ],
       "@automation/*": [
         "src/automation/*"
       ],
