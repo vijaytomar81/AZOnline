@@ -61,8 +61,12 @@ export const repairPageManager: RepairRule = {
             ...oldState.keys.map((value) => `key:${value}`),
         ].sort((a, b) => a.localeCompare(b));
 
-        const newImports = entries.map((x) => x.importPath).sort((a, b) => a.localeCompare(b));
-        const newKeys = entries.map((x) => `${x.product}.${x.member}`).sort((a, b) => a.localeCompare(b));
+        const newImports = entries
+            .map((x) => x.importPath)
+            .sort((a, b) => a.localeCompare(b));
+        const newKeys = entries
+            .map((x) => `${x.product}.${x.member}`)
+            .sort((a, b) => a.localeCompare(b));
 
         const newValues = [
             ...newImports.map((value) => `import:${value}`),
@@ -73,7 +77,15 @@ export const repairPageManager: RepairRule = {
             return { changedFiles: 0, repairedPages: 0, reportNodes: [] };
         }
 
-        fs.writeFileSync(filePath, buildPageManagerContent(ctx.pageObjectsDir, ctx.mapsDir), "utf8");
+        fs.writeFileSync(
+            filePath,
+            buildPageManagerContent(
+                ctx.pageObjectsDir,
+                ctx.mapsDir,
+                ctx.pageRegistryDir
+            ),
+            "utf8"
+        );
 
         const reportNodes: TreeNode[] = [
             {

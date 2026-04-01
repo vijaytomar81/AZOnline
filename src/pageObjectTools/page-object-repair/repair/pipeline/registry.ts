@@ -5,6 +5,7 @@ import { repairManifest } from "../rules/manifest/repairManifest";
 import { repairAliasesToPageObject } from "../rules/pageChain/repairAliasesToPageObject";
 import { repairElementsToGeneratedAliases } from "../rules/pageChain/repairElementsToGeneratedAliases";
 import { repairGeneratedAliasesToAliases } from "../rules/pageChain/repairGeneratedAliasesToAliases";
+import { repairPageObjectReadiness } from "../rules/pageChain/repairPageObjectReadiness";
 import { repairIndexExports } from "../rules/registry/repairIndexExports";
 import { repairPageManager } from "../rules/registry/repairPageManager";
 
@@ -16,6 +17,7 @@ export const REPAIR_RULES: RepairRule[] = [
     repairElementsToGeneratedAliases,
     repairGeneratedAliasesToAliases,
     repairAliasesToPageObject,
+    repairPageObjectReadiness,
     repairManifest,
     repairIndexExports,
     repairPageManager,
