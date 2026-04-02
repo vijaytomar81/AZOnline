@@ -12,6 +12,7 @@ export function buildEvidenceRunInfo(args: {
     runId: string;
     workerId?: string;
     outputRoot?: string;
+    retryIndex?: number;
 }): EvidenceRunInfo {
     return {
         runId: args.runId,
@@ -19,5 +20,6 @@ export function buildEvidenceRunInfo(args: {
         testCaseId: args.context.scenario.scenarioId,
         suiteName: args.context.scenario.scenarioName,
         outputRoot: args.outputRoot,
+        retryIndex: args.retryIndex,
     };
 }
