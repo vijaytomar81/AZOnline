@@ -19,11 +19,8 @@ export type BuildExecutionExcelRowsInput = {
     metadata: Record<string, unknown>;
     passedEvidence: EvidenceFile;
     failedEvidence?: EvidenceFile;
+    notExecutedEvidence?: EvidenceFile;
 };
-
-function getString(value: unknown): string {
-    return String(value ?? "");
-}
 
 export function buildExecutionExcelRows(
     input: BuildExecutionExcelRowsInput
@@ -33,29 +30,19 @@ export function buildExecutionExcelRows(
     failedRows: ExecutionCaseRow[];
     notExecutedRows: ExecutionCaseRow[];
 } {
-    const allCases = {
-        ...(input.passedEvidence?.cases ?? {}),
-        ...(input.failedEvidence?.cases ?? {}),
-    };
-
-    const allRows = buildExecutionItemRows(allCases);
-
-    const passedRows = allRows.filter(
-        (row) => getString(row["Item Status"]).toLowerCase() === "passed"
+    const passedRows = buildExecutionItemRows(input.passedEvidence?.cases ?? {});
+    const failedRows = buildExecutionItemRows(input.failedEvidence?.cases ?? {});
+    const notExecutedRows = buildExecutionItemRows(
+        input.notExecutedEvidence?.cases ?? {}
     );
 
-    const failedRows = allRows.filter(
-        (row) => getString(row["Item Status"]).toLowerCase() === "failed"
-    );
-
-    const notExecutedRows = allRows.filter(
-        (row) => getString(row["Item Status"]).toLowerCase() === "not_executed"
-    );
+    const totalItems =
+        passedRows.length + failedRows.length + notExecutedRows.length;
 
     const summaryRows = buildExecutionSummaryRows({
         runId: input.runId,
         metadata: input.metadata,
-        totalItems: allRows.length,
+        totalItems,
         passed: passedRows.length,
         failed: failedRows.length,
         notExecuted: notExecutedRows.length,

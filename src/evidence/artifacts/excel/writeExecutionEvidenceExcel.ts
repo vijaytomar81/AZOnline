@@ -21,6 +21,7 @@ export type WriteExecutionEvidenceExcelInput = {
     metadata: Record<string, unknown>;
     passedEvidence: EvidenceFile;
     failedEvidence?: EvidenceFile;
+    notExecutedEvidence?: EvidenceFile;
 };
 
 export type WriteExecutionEvidenceExcelResult = {
@@ -35,9 +36,7 @@ function addExecutionDataSheet(
     const worksheet = workbook.addWorksheet(sheetName);
 
     if (!rows.length) {
-        worksheet.columns = [
-            { header: "Message", key: "Message", width: 20 },
-        ];
+        worksheet.columns = [{ header: "Message", key: "Message", width: 20 }];
         worksheet.addRow({ Message: "No data" });
         worksheet.getRow(1).font = {
             bold: true,
@@ -63,17 +62,36 @@ function addExecutionDataSheet(
     });
 }
 
+function buildSafeTimestamp(value: unknown): string {
+    const raw =
+        typeof value === "string" && value.trim()
+            ? value.trim()
+            : new Date().toISOString();
+
+    const digits = raw.replace(/\D/g, "");
+    const padded = `${digits}00000000000000`;
+
+    return `${padded.slice(0, 8)}_${padded.slice(8, 14)}`;
+}
+
 export async function writeExecutionEvidenceExcel(
     input: WriteExecutionEvidenceExcelInput
 ): Promise<WriteExecutionEvidenceExcelResult> {
     const workbook = new ExcelJS.Workbook();
-    const filePath = path.join(input.baseDir, "execution-summary.xlsx");
+    const timestamp = buildSafeTimestamp(
+        input.metadata.finishedAt ?? input.metadata.finalizedAt
+    );
+    const filePath = path.join(
+        input.baseDir,
+        `execution-summary_${timestamp}.xlsx`
+    );
 
     const rows = buildExecutionExcelRows({
         runId: input.runId,
         metadata: input.metadata,
         passedEvidence: input.passedEvidence,
         failedEvidence: input.failedEvidence,
+        notExecutedEvidence: input.notExecutedEvidence,
     });
 
     writeExecutionSummarySheet(workbook, rows.summaryRows);

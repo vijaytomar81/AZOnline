@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { mergeWorkerEvidence } from "./mergeWorkerEvidence";
 import { buildFinalEvidenceFiles } from "./buildFinalEvidenceFiles";
+import { promoteWorkerPageScans } from "./promoteWorkerPageScans";
 import { writeExecutionEvidenceExcel } from "../excel/writeExecutionEvidenceExcel";
 import { EVIDENCE_OUTPUT_ROOT } from "@utils/paths";
 
@@ -20,9 +21,11 @@ export type FinalizeRunEvidenceResult = {
     metadataPath: string;
     passedEvidencePath: string;
     failedEvidencePath?: string;
+    notExecutedEvidencePath?: string;
     excelPath: string;
     passedCount: number;
     failedCount: number;
+    notExecutedCount: number;
     totalCount: number;
 };
 
@@ -39,6 +42,7 @@ function buildFinalPaths(runId: string, outputRoot = "results/evidence") {
         metadataPath: path.join(baseDir, "metadata.json"),
         passedEvidencePath: path.join(baseDir, "passed-evidence.json"),
         failedEvidencePath: path.join(baseDir, "failed-evidence.json"),
+        notExecutedEvidencePath: path.join(baseDir, "not-executed-evidence.json"),
     };
 }
 
@@ -87,10 +91,18 @@ export async function finalizeRunEvidence(
         cleanupWorkerArtifacts: false,
     });
 
-    const { passedCases, failedCases } = buildFinalEvidenceFiles(merged.runEvidence);
+    const promotedPageScans = await promoteWorkerPageScans({
+        runId: input.runId,
+        outputRoot,
+    });
+
+    const { passedCases, failedCases, notExecutedCases } =
+        buildFinalEvidenceFiles(merged.runEvidence);
+
     const passedCount = Object.keys(passedCases).length;
     const failedCount = Object.keys(failedCases).length;
-    const totalCount = passedCount + failedCount;
+    const notExecutedCount = Object.keys(notExecutedCases).length;
+    const totalCount = passedCount + failedCount + notExecutedCount;
 
     const passedEvidence: FinalEvidenceFile = {
         runId: input.runId,
@@ -100,6 +112,11 @@ export async function finalizeRunEvidence(
     const failedEvidence: FinalEvidenceFile = {
         runId: input.runId,
         cases: failedCases,
+    };
+
+    const notExecutedEvidence: FinalEvidenceFile = {
+        runId: input.runId,
+        cases: notExecutedCases,
     };
 
     await writeJsonFile(paths.passedEvidencePath, passedEvidence);
@@ -113,6 +130,12 @@ export async function finalizeRunEvidence(
         await removeFileIfExists(paths.failedEvidencePath);
     }
 
+    if (notExecutedCount > 0) {
+        await writeJsonFile(paths.notExecutedEvidencePath, notExecutedEvidence);
+    } else {
+        await removeFileIfExists(paths.notExecutedEvidencePath);
+    }
+
     const metadata = {
         ...merged.metadata,
         ...input.metadata,
@@ -120,12 +143,17 @@ export async function finalizeRunEvidence(
         totalCount,
         passedCount,
         failedCount,
+        notExecutedCount,
         evidenceDir: paths.baseDir,
         passedEvidencePath: paths.passedEvidencePath,
         failedEvidencePath:
             failedCount > 0 || !keepFailedOnlyWhenNeeded
                 ? paths.failedEvidencePath
                 : "",
+        notExecutedEvidencePath:
+            notExecutedCount > 0 ? paths.notExecutedEvidencePath : "",
+        pageScansDir: promotedPageScans.pageScansDir,
+        promotedPageScanCount: promotedPageScans.promotedFileCount,
     };
 
     await writeJsonFile(paths.metadataPath, metadata);
@@ -139,6 +167,8 @@ export async function finalizeRunEvidence(
             failedCount > 0 || !keepFailedOnlyWhenNeeded
                 ? failedEvidence
                 : undefined,
+        notExecutedEvidence:
+            notExecutedCount > 0 ? notExecutedEvidence : undefined,
     });
 
     await removeFileIfExists(path.join(paths.baseDir, "evidence.json"));
@@ -155,9 +185,12 @@ export async function finalizeRunEvidence(
             failedCount > 0 || !keepFailedOnlyWhenNeeded
                 ? paths.failedEvidencePath
                 : undefined,
+        notExecutedEvidencePath:
+            notExecutedCount > 0 ? paths.notExecutedEvidencePath : undefined,
         excelPath: excel.filePath,
         passedCount,
         failedCount,
+        notExecutedCount,
         totalCount,
     };
 }
