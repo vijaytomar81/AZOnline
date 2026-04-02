@@ -37,7 +37,7 @@ type FinalEvidenceFile = {
 function buildArtifactTimestamp(value?: string): string {
     const raw = value?.trim() || new Date().toISOString();
     const digits = raw.replace(/\D/g, "");
-    const padded = `${digits}00000000000000}`;
+    const padded = `${digits}00000000000000`;
     const safe = padded.slice(0, 14);
     return `${safe.slice(0, 8)}_${safe.slice(8, 14)}`;
 }
@@ -51,7 +51,10 @@ function buildFinalPaths(
 
     return {
         baseDir,
-        metadataPath: path.join(baseDir, "metadata.json"),
+        metadataPath: path.join(
+            baseDir,
+            `metadata_${artifactTimestamp}.json`
+        ),
         passedEvidencePath: path.join(
             baseDir,
             `passed-evidence_${artifactTimestamp}.json`
@@ -204,6 +207,7 @@ export async function finalizeRunEvidence(
     });
 
     await removeFileIfExists(path.join(paths.baseDir, "evidence.json"));
+    await removeFileIfExists(path.join(paths.baseDir, "metadata.json"));
 
     if (input.cleanupTemporaryArtifacts === true) {
         await cleanupTemporaryArtifacts(paths.baseDir);

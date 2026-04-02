@@ -101,7 +101,7 @@ export const executionConfig: ExecutionConfig = {
   generatedEvidenceArtifacts: {
     enabled: envBool("EVIDENCE_ENABLED", true),
     withTimestamp: envBool("EVIDENCE_WITH_TIMESTAMP", true),
-    maxToKeep: envNumber("MAX_EVIDENCE_RUNS_TO_KEEP", 30),
+    maxToKeep: envNumber("MAX_EVIDENCE_RUNS_TO_KEEP", 5),
     keepFailedEvidenceFileOnlyWhenNeeded: envBool(
       "KEEP_FAILED_EVIDENCE_FILE_ONLY_WHEN_NEEDED",
       true
