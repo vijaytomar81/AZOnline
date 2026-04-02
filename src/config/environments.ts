@@ -7,7 +7,7 @@ export type PcwUrls = Record<PcwKey, string>;
 export type TargetEnvUrls = {
   customerPortalUrl: string;
   supportPortalUrl: string;
-  aggTestToolUrl: string;
+  pcwTestToolUrl: string;
   backdatingToolUrl: string;
 };
 
@@ -34,25 +34,25 @@ export const environments: EnvironmentsConfig = {
     azOnlineDev: {
       customerPortalUrl: 'REPLACE_ME',
       supportPortalUrl: 'REPLACE_ME',
-      aggTestToolUrl: 'REPLACE_ME',
+      pcwTestToolUrl: 'REPLACE_ME',
       backdatingToolUrl: 'REPLACE_ME'
     },
     azOnlineTest: {
       customerPortalUrl: "https://customer-portal-lv-test.athenapaas.com",
       supportPortalUrl: "https://support-portal-lv-demo.athenapaas.com",
-      aggTestToolUrl: "https://aggregator-test-portal-lv-test.athenapaas.com",
+      pcwTestToolUrl: "https://aggregator-test-portal-lv-test.athenapaas.com",
       backdatingToolUrl: "https://backdating-tool-lv-test.athenapaas.com"
     },
     azOnlineDemo: {
       customerPortalUrl: 'REPLACE_ME',
       supportPortalUrl: 'REPLACE_ME',
-      aggTestToolUrl: 'REPLACE_ME',
+      pcwTestToolUrl: 'REPLACE_ME',
       backdatingToolUrl: 'REPLACE_ME'
     },
     azOnlineNft: {
       customerPortalUrl: 'REPLACE_ME',
       supportPortalUrl: 'REPLACE_ME',
-      aggTestToolUrl: 'REPLACE_ME',
+      pcwTestToolUrl: 'REPLACE_ME',
       backdatingToolUrl: 'REPLACE_ME'
     }
   }
