@@ -15,6 +15,7 @@ type CompactItemResult = {
     finishedAt: string;
     errorDetails: string;
     outputs: Record<string, unknown>;
+    pageScans: string[];
 };
 
 function setIfDefined(
@@ -58,6 +59,17 @@ function getItemErrorDetails(item: Record<string, unknown>): string {
     return asString(details.errorDetails || item.message);
 }
 
+function getItemPageScans(item: Record<string, unknown>): string[] {
+    const details = getItemDetails(item);
+    const scans = details.pageScans;
+
+    if (!Array.isArray(scans)) {
+        return [];
+    }
+
+    return scans.map((value) => String(value));
+}
+
 function buildCompactItemResults(
     result: ExecutionScenarioResult
 ): CompactItemResult[] {
@@ -73,6 +85,7 @@ function buildCompactItemResults(
             finishedAt: asString(raw.finishedAt),
             errorDetails: getItemErrorDetails(raw),
             outputs: getItemOutputs(raw),
+            pageScans: getItemPageScans(raw),
         };
     });
 }
