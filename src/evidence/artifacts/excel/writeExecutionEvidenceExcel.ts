@@ -79,7 +79,9 @@ export async function writeExecutionEvidenceExcel(
 ): Promise<WriteExecutionEvidenceExcelResult> {
     const workbook = new ExcelJS.Workbook();
     const timestamp = buildSafeTimestamp(
-        input.metadata.finishedAt ?? input.metadata.finalizedAt
+        input.metadata.artifactTimestamp ??
+            input.metadata.finishedAt ??
+            input.metadata.finalizedAt
     );
     const filePath = path.join(
         input.baseDir,

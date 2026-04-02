@@ -34,15 +34,36 @@ type FinalEvidenceFile = {
     cases: Record<string, Record<string, unknown>>;
 };
 
-function buildFinalPaths(runId: string, outputRoot = "results/evidence") {
+function buildArtifactTimestamp(value?: string): string {
+    const raw = value?.trim() || new Date().toISOString();
+    const digits = raw.replace(/\D/g, "");
+    const padded = `${digits}00000000000000}`;
+    const safe = padded.slice(0, 14);
+    return `${safe.slice(0, 8)}_${safe.slice(8, 14)}`;
+}
+
+function buildFinalPaths(
+    runId: string,
+    artifactTimestamp: string,
+    outputRoot = "results/evidence"
+) {
     const baseDir = path.join(outputRoot, runId);
 
     return {
         baseDir,
         metadataPath: path.join(baseDir, "metadata.json"),
-        passedEvidencePath: path.join(baseDir, "passed-evidence.json"),
-        failedEvidencePath: path.join(baseDir, "failed-evidence.json"),
-        notExecutedEvidencePath: path.join(baseDir, "not-executed-evidence.json"),
+        passedEvidencePath: path.join(
+            baseDir,
+            `passed-evidence_${artifactTimestamp}.json`
+        ),
+        failedEvidencePath: path.join(
+            baseDir,
+            `failed-evidence_${artifactTimestamp}.json`
+        ),
+        notExecutedEvidencePath: path.join(
+            baseDir,
+            `not-executed-evidence_${artifactTimestamp}.json`
+        ),
     };
 }
 
@@ -83,13 +104,23 @@ export async function finalizeRunEvidence(
     input: FinalizeRunEvidenceInput
 ): Promise<FinalizeRunEvidenceResult> {
     const outputRoot = input.outputRoot ?? EVIDENCE_OUTPUT_ROOT;
-    const paths = buildFinalPaths(input.runId, outputRoot);
 
     const merged = await mergeWorkerEvidence({
         runId: input.runId,
         outputRoot,
         cleanupWorkerArtifacts: false,
     });
+
+    const artifactTimestamp = buildArtifactTimestamp(
+        String(
+            input.metadata?.finishedAt ??
+                input.metadata?.finalizedAt ??
+                merged.metadata.finalizedAt ??
+                ""
+        )
+    );
+
+    const paths = buildFinalPaths(input.runId, artifactTimestamp, outputRoot);
 
     const promotedPageScans = await promoteWorkerPageScans({
         runId: input.runId,
@@ -140,6 +171,7 @@ export async function finalizeRunEvidence(
         ...merged.metadata,
         ...input.metadata,
         outputRoot,
+        artifactTimestamp,
         totalCount,
         passedCount,
         failedCount,
