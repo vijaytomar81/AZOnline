@@ -24,6 +24,7 @@ export function createExecutionItemSuccessResult(args: {
             testCaseRef: args.resolved.testCaseRef,
             outputs: args.outputs,
             errorDetails: "",
+            pageScans: [],
         },
     });
 }

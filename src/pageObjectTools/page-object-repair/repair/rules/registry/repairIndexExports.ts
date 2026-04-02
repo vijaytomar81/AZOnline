@@ -60,7 +60,15 @@ export const repairIndexExports: RepairRule = {
             return { changedFiles: 0, repairedPages: 0, reportNodes: [] };
         }
 
-        fs.writeFileSync(filePath, buildIndexFileContent(ctx.pageObjectsDir, ctx.mapsDir), "utf8");
+        fs.writeFileSync(
+            filePath,
+            buildIndexFileContent(
+                ctx.pageObjectsDir,
+                ctx.mapsDir,
+                ctx.pageRegistryDir
+            ),
+            "utf8"
+        );
 
         const reportNodes: TreeNode[] = [
             {

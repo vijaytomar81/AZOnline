@@ -3,11 +3,15 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { buildRunEvidence, type RunEvidence } from "./buildRunEvidence";
+import { EVIDENCE_OUTPUT_ROOT } from "@utils/paths";
 
 type WorkerEvidenceArtifact = {
     runId: string;
     workerId: string;
-    cases: Record<string, Record<string, unknown>>;
+    testCaseId: string;
+    retryIndex: number;
+    writtenAt: string;
+    caseEvidence: Record<string, unknown>;
 };
 
 export type MergeWorkerEvidenceInput = {
@@ -16,13 +20,26 @@ export type MergeWorkerEvidenceInput = {
     cleanupWorkerArtifacts?: boolean;
 };
 
+export type MergeWorkerEvidenceMetadata = {
+    runId: string;
+    workerArtifactCount: number;
+    mergedCaseCount: number;
+    corruptedArtifactCount: number;
+    duplicateCaseCount: number;
+    cleanupWorkerArtifacts: boolean;
+    finalizedAt: string;
+};
+
 export type MergeWorkerEvidenceResult = {
     evidencePath: string;
     metadataPath: string;
     runEvidence: RunEvidence;
+    metadata: MergeWorkerEvidenceMetadata;
 };
 
-function buildRunPaths(runId: string, outputRoot = "results/evidence") {
+const DEFAULT_OUTPUT_ROOT = "results/evidence";
+
+function buildRunPaths(runId: string, outputRoot = DEFAULT_OUTPUT_ROOT) {
     const baseDir = path.join(outputRoot, runId);
 
     return {
@@ -33,41 +50,99 @@ function buildRunPaths(runId: string, outputRoot = "results/evidence") {
     };
 }
 
-async function readWorkerArtifacts(
-    directoryPath: string,
-): Promise<WorkerEvidenceArtifact[]> {
-    let files: string[] = [];
+async function collectJsonFiles(dirPath: string): Promise<string[]> {
+    let entries: Array<import("node:fs").Dirent> = [];
 
     try {
-        files = await fs.readdir(directoryPath);
+        entries = await fs.readdir(dirPath, { withFileTypes: true });
     } catch {
         return [];
     }
 
-    const jsonFiles = files.filter((file) => file.endsWith(".json")).sort();
-    const artifacts: WorkerEvidenceArtifact[] = [];
+    const nested = await Promise.all(
+        entries.map(async (entry) => {
+            const fullPath = path.join(dirPath, entry.name);
 
-    for (const fileName of jsonFiles) {
-        const filePath = path.join(directoryPath, fileName);
-        const raw = await fs.readFile(filePath, "utf8");
-        artifacts.push(JSON.parse(raw) as WorkerEvidenceArtifact);
-    }
+            if (entry.isDirectory()) {
+                return collectJsonFiles(fullPath);
+            }
 
-    return artifacts;
+            return entry.isFile() && entry.name.endsWith(".json")
+                ? [fullPath]
+                : [];
+        })
+    );
+
+    return nested.flat().sort((a, b) => a.localeCompare(b));
 }
 
-function mergeCases(
-    artifacts: WorkerEvidenceArtifact[],
-): Record<string, Record<string, unknown>> {
-    const merged: Record<string, Record<string, unknown>> = {};
+async function readWorkerArtifacts(filePaths: string[]): Promise<{
+    artifacts: WorkerEvidenceArtifact[];
+    corruptedFiles: string[];
+}> {
+    const artifacts: WorkerEvidenceArtifact[] = [];
+    const corruptedFiles: string[] = [];
 
-    for (const artifact of artifacts) {
-        for (const [testCaseId, caseEvidence] of Object.entries(artifact.cases)) {
-            merged[testCaseId] = { ...caseEvidence };
+    for (const filePath of filePaths) {
+        try {
+            const raw = await fs.readFile(filePath, "utf8");
+            const parsed = JSON.parse(raw) as WorkerEvidenceArtifact;
+
+            if (
+                !parsed ||
+                typeof parsed.runId !== "string" ||
+                typeof parsed.testCaseId !== "string" ||
+                typeof parsed.caseEvidence !== "object" ||
+                parsed.caseEvidence === null
+            ) {
+                corruptedFiles.push(filePath);
+                continue;
+            }
+
+            artifacts.push(parsed);
+        } catch {
+            corruptedFiles.push(filePath);
         }
     }
 
-    return merged;
+    return { artifacts, corruptedFiles };
+}
+
+function mergeCases(
+    runId: string,
+    artifacts: WorkerEvidenceArtifact[]
+): {
+    mergedCases: Record<string, Record<string, unknown>>;
+    duplicateCaseCount: number;
+} {
+    const sortedArtifacts = [...artifacts].sort((a, b) => {
+        if (a.testCaseId !== b.testCaseId) {
+            return a.testCaseId.localeCompare(b.testCaseId);
+        }
+
+        if (a.retryIndex !== b.retryIndex) {
+            return a.retryIndex - b.retryIndex;
+        }
+
+        return a.writtenAt.localeCompare(b.writtenAt);
+    });
+
+    const mergedCases: Record<string, Record<string, unknown>> = {};
+    let duplicateCaseCount = 0;
+
+    for (const artifact of sortedArtifacts) {
+        if (artifact.runId !== runId) {
+            continue;
+        }
+
+        if (mergedCases[artifact.testCaseId]) {
+            duplicateCaseCount += 1;
+        }
+
+        mergedCases[artifact.testCaseId] = { ...artifact.caseEvidence };
+    }
+
+    return { mergedCases, duplicateCaseCount };
 }
 
 async function writeJsonFile(filePath: string, content: unknown): Promise<void> {
@@ -80,19 +155,26 @@ async function cleanupDirectory(directoryPath: string): Promise<void> {
 }
 
 export async function mergeWorkerEvidence(
-    input: MergeWorkerEvidenceInput,
+    input: MergeWorkerEvidenceInput
 ): Promise<MergeWorkerEvidenceResult> {
-    const outputRoot = input.outputRoot ?? "results/evidence";
+    const outputRoot = input.outputRoot ?? EVIDENCE_OUTPUT_ROOT;
     const paths = buildRunPaths(input.runId, outputRoot);
-    const artifacts = await readWorkerArtifacts(paths.workerArtifactsDir);
-    const mergedCases = mergeCases(artifacts);
+
+    const workerArtifactFiles = await collectJsonFiles(paths.workerArtifactsDir);
+    const { artifacts, corruptedFiles } = await readWorkerArtifacts(
+        workerArtifactFiles
+    );
+    const { mergedCases, duplicateCaseCount } = mergeCases(input.runId, artifacts);
     const runEvidence = buildRunEvidence(input.runId, mergedCases);
 
-    const metadata = {
+    const metadata: MergeWorkerEvidenceMetadata = {
         runId: input.runId,
         workerArtifactCount: artifacts.length,
-        caseCount: Object.keys(runEvidence.cases).length,
+        mergedCaseCount: Object.keys(runEvidence.cases).length,
+        corruptedArtifactCount: corruptedFiles.length,
+        duplicateCaseCount,
         cleanupWorkerArtifacts: input.cleanupWorkerArtifacts ?? false,
+        finalizedAt: new Date().toISOString(),
     };
 
     await writeJsonFile(paths.evidencePath, runEvidence);
@@ -106,5 +188,6 @@ export async function mergeWorkerEvidence(
         evidencePath: paths.evidencePath,
         metadataPath: paths.metadataPath,
         runEvidence,
+        metadata,
     };
 }

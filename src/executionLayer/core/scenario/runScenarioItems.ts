@@ -18,7 +18,6 @@ function buildNotExecutedReason(args: {
     failedResult: ExecutionItemResult;
 }): string {
     const scenarioId = args.context.scenario.scenarioId;
-    const scenarioName = args.context.scenario.scenarioName;
     const failedMessage =
         args.failedResult.message?.trim() ||
         "Previous item failed.";
@@ -56,6 +55,7 @@ function createNotExecutedItemResult(args: {
             testCaseRef: args.item.testCaseRef,
             outputs: {},
             errorDetails,
+            pageScans: [],
             blockedBy: {
                 scenarioId: args.context.scenario.scenarioId,
                 scenarioName: args.context.scenario.scenarioName,
@@ -92,7 +92,11 @@ export async function runScenarioItems(args: {
         });
 
         if (stopOnFailure && result.status === "failed") {
-            for (let skippedIndex = index + 1; skippedIndex < items.length; skippedIndex++) {
+            for (
+                let skippedIndex = index + 1;
+                skippedIndex < items.length;
+                skippedIndex++
+            ) {
                 addExecutionItemResult(
                     args.context,
                     createNotExecutedItemResult({

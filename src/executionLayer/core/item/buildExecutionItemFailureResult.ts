@@ -12,6 +12,7 @@ export function buildExecutionItemFailureResult(args: {
     startedAt: string;
     message: string;
     outputs?: Record<string, unknown>;
+    pageScans?: string[];
 }): ExecutionItemResult {
     return createExecutionItemResult({
         itemNo: args.item.itemNo,
@@ -24,6 +25,7 @@ export function buildExecutionItemFailureResult(args: {
             testCaseRef: args.item.testCaseRef,
             outputs: args.outputs ?? {},
             errorDetails: args.message,
+            pageScans: args.pageScans ?? [],
         },
     });
 }

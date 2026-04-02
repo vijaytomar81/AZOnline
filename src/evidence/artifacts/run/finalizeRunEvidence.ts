@@ -4,7 +4,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { mergeWorkerEvidence } from "./mergeWorkerEvidence";
 import { buildFinalEvidenceFiles } from "./buildFinalEvidenceFiles";
+import { promoteWorkerPageScans } from "./promoteWorkerPageScans";
 import { writeExecutionEvidenceExcel } from "../excel/writeExecutionEvidenceExcel";
+import { EVIDENCE_OUTPUT_ROOT } from "@utils/paths";
 
 export type FinalizeRunEvidenceInput = {
     runId: string;
@@ -19,9 +21,11 @@ export type FinalizeRunEvidenceResult = {
     metadataPath: string;
     passedEvidencePath: string;
     failedEvidencePath?: string;
+    notExecutedEvidencePath?: string;
     excelPath: string;
     passedCount: number;
     failedCount: number;
+    notExecutedCount: number;
     totalCount: number;
 };
 
@@ -30,14 +34,39 @@ type FinalEvidenceFile = {
     cases: Record<string, Record<string, unknown>>;
 };
 
-function buildFinalPaths(runId: string, outputRoot = "results/evidence") {
+function buildArtifactTimestamp(value?: string): string {
+    const raw = value?.trim() || new Date().toISOString();
+    const digits = raw.replace(/\D/g, "");
+    const padded = `${digits}00000000000000`;
+    const safe = padded.slice(0, 14);
+    return `${safe.slice(0, 8)}_${safe.slice(8, 14)}`;
+}
+
+function buildFinalPaths(
+    runId: string,
+    artifactTimestamp: string,
+    outputRoot = "results/evidence"
+) {
     const baseDir = path.join(outputRoot, runId);
 
     return {
         baseDir,
-        metadataPath: path.join(baseDir, "metadata.json"),
-        passedEvidencePath: path.join(baseDir, "passed-evidence.json"),
-        failedEvidencePath: path.join(baseDir, "failed-evidence.json"),
+        metadataPath: path.join(
+            baseDir,
+            `metadata_${artifactTimestamp}.json`
+        ),
+        passedEvidencePath: path.join(
+            baseDir,
+            `passed-evidence_${artifactTimestamp}.json`
+        ),
+        failedEvidencePath: path.join(
+            baseDir,
+            `failed-evidence_${artifactTimestamp}.json`
+        ),
+        notExecutedEvidencePath: path.join(
+            baseDir,
+            `not-executed-evidence_${artifactTimestamp}.json`
+        ),
     };
 }
 
@@ -61,7 +90,10 @@ async function cleanupTemporaryArtifacts(baseDir: string): Promise<void> {
 
     await Promise.all(
         entries
-            .filter((name) => /^worker-\d+$/.test(name) || name === "worker-artifacts")
+            .filter(
+                (name) =>
+                    name === "worker-artifacts" || /^worker-\d+$/.test(name)
+            )
             .map((name) =>
                 fs.rm(path.join(baseDir, name), {
                     recursive: true,
@@ -74,8 +106,7 @@ async function cleanupTemporaryArtifacts(baseDir: string): Promise<void> {
 export async function finalizeRunEvidence(
     input: FinalizeRunEvidenceInput
 ): Promise<FinalizeRunEvidenceResult> {
-    const outputRoot = input.outputRoot ?? "results/evidence";
-    const paths = buildFinalPaths(input.runId, outputRoot);
+    const outputRoot = input.outputRoot ?? EVIDENCE_OUTPUT_ROOT;
 
     const merged = await mergeWorkerEvidence({
         runId: input.runId,
@@ -83,11 +114,29 @@ export async function finalizeRunEvidence(
         cleanupWorkerArtifacts: false,
     });
 
-    const { passedCases, failedCases } = buildFinalEvidenceFiles(merged.runEvidence);
+    const artifactTimestamp = buildArtifactTimestamp(
+        String(
+            input.metadata?.finishedAt ??
+                input.metadata?.finalizedAt ??
+                merged.metadata.finalizedAt ??
+                ""
+        )
+    );
+
+    const paths = buildFinalPaths(input.runId, artifactTimestamp, outputRoot);
+
+    const promotedPageScans = await promoteWorkerPageScans({
+        runId: input.runId,
+        outputRoot,
+    });
+
+    const { passedCases, failedCases, notExecutedCases } =
+        buildFinalEvidenceFiles(merged.runEvidence);
 
     const passedCount = Object.keys(passedCases).length;
     const failedCount = Object.keys(failedCases).length;
-    const totalCount = passedCount + failedCount;
+    const notExecutedCount = Object.keys(notExecutedCases).length;
+    const totalCount = passedCount + failedCount + notExecutedCount;
 
     const passedEvidence: FinalEvidenceFile = {
         runId: input.runId,
@@ -99,29 +148,47 @@ export async function finalizeRunEvidence(
         cases: failedCases,
     };
 
+    const notExecutedEvidence: FinalEvidenceFile = {
+        runId: input.runId,
+        cases: notExecutedCases,
+    };
+
     await writeJsonFile(paths.passedEvidencePath, passedEvidence);
 
-    const shouldKeepFailedFileOnlyWhenNeeded =
+    const keepFailedOnlyWhenNeeded =
         input.keepFailedEvidenceFileOnlyWhenNeeded !== false;
 
-    if (failedCount > 0 || !shouldKeepFailedFileOnlyWhenNeeded) {
+    if (failedCount > 0 || !keepFailedOnlyWhenNeeded) {
         await writeJsonFile(paths.failedEvidencePath, failedEvidence);
     } else {
         await removeFileIfExists(paths.failedEvidencePath);
     }
 
+    if (notExecutedCount > 0) {
+        await writeJsonFile(paths.notExecutedEvidencePath, notExecutedEvidence);
+    } else {
+        await removeFileIfExists(paths.notExecutedEvidencePath);
+    }
+
     const metadata = {
-        runId: input.runId,
+        ...merged.metadata,
+        ...input.metadata,
+        outputRoot,
+        artifactTimestamp,
         totalCount,
         passedCount,
         failedCount,
-        ...input.metadata,
+        notExecutedCount,
         evidenceDir: paths.baseDir,
         passedEvidencePath: paths.passedEvidencePath,
         failedEvidencePath:
-            failedCount > 0 || !shouldKeepFailedFileOnlyWhenNeeded
+            failedCount > 0 || !keepFailedOnlyWhenNeeded
                 ? paths.failedEvidencePath
                 : "",
+        notExecutedEvidencePath:
+            notExecutedCount > 0 ? paths.notExecutedEvidencePath : "",
+        pageScansDir: promotedPageScans.pageScansDir,
+        promotedPageScanCount: promotedPageScans.promotedFileCount,
     };
 
     await writeJsonFile(paths.metadataPath, metadata);
@@ -132,14 +199,17 @@ export async function finalizeRunEvidence(
         metadata,
         passedEvidence,
         failedEvidence:
-            failedCount > 0 || !shouldKeepFailedFileOnlyWhenNeeded
+            failedCount > 0 || !keepFailedOnlyWhenNeeded
                 ? failedEvidence
                 : undefined,
+        notExecutedEvidence:
+            notExecutedCount > 0 ? notExecutedEvidence : undefined,
     });
 
     await removeFileIfExists(path.join(paths.baseDir, "evidence.json"));
+    await removeFileIfExists(path.join(paths.baseDir, "metadata.json"));
 
-    if (input.cleanupTemporaryArtifacts !== false) {
+    if (input.cleanupTemporaryArtifacts === true) {
         await cleanupTemporaryArtifacts(paths.baseDir);
     }
 
@@ -148,12 +218,15 @@ export async function finalizeRunEvidence(
         metadataPath: paths.metadataPath,
         passedEvidencePath: paths.passedEvidencePath,
         failedEvidencePath:
-            failedCount > 0 || !shouldKeepFailedFileOnlyWhenNeeded
+            failedCount > 0 || !keepFailedOnlyWhenNeeded
                 ? paths.failedEvidencePath
                 : undefined,
+        notExecutedEvidencePath:
+            notExecutedCount > 0 ? paths.notExecutedEvidencePath : undefined,
         excelPath: excel.filePath,
         passedCount,
         failedCount,
+        notExecutedCount,
         totalCount,
     };
 }

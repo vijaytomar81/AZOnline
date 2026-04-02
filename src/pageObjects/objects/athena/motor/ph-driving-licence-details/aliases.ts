@@ -1,5 +1,4 @@
 // src/pageObjects/objects/athena/motor/ph-driving-licence-details/aliases.ts
-// HUMAN-MAINTAINED FILE
 // pageKey: athena.motor.ph-driving-licence-details
 //
 // This file is safe to edit.
@@ -89,9 +88,59 @@ export const aliases = {
   selectTitleQuestion: aliasesGenerated.selectTitleQuestion,
 } as const satisfies Record<string, ElementKey>;
 
-// Primary type used by Page Objects (business alias keys)
+export const aliasKeys = {
+  buttonAddAnotherConviction: "buttonAddAnotherConviction",
+  buttonFindAddress: "buttonFindAddress",
+  buttonNavigatorBack: "buttonNavigatorBack",
+  buttonNavigatorNext: "buttonNavigatorNext",
+  groupRadioConviction0ResultedToABan: "groupRadioConviction0ResultedToABan",
+  groupRadioConviction1ResultedToABan: "groupRadioConviction1ResultedToABan",
+  groupRadioConviction2ResultedToABan: "groupRadioConviction2ResultedToABan",
+  groupRadioDrivingLicenceHandy: "groupRadioDrivingLicenceHandy",
+  groupRadioDrivingLicenceTypes: "groupRadioDrivingLicenceTypes",
+  groupRadioHasConvictionsQuestion: "groupRadioHasConvictionsQuestion",
+  inputAddressLookupWidgetAddressLookupQuestionInputBuilding: "inputAddressLookupWidgetAddressLookupQuestionInputBuilding",
+  inputAddressLookupWidgetAddressLookupQuestionInputPostcode: "inputAddressLookupWidgetAddressLookupQuestionInputPostcode",
+  inputConviction1DateMonth: "inputConviction1DateMonth",
+  inputConviction1DateYear: "inputConviction1DateYear",
+  inputConviction2DateMonth: "inputConviction2DateMonth",
+  inputConviction2DateYear: "inputConviction2DateYear",
+  inputConviction3DateMonth: "inputConviction3DateMonth",
+  inputConviction3DateYear: "inputConviction3DateYear",
+  inputDateOfBirthDay: "inputDateOfBirthDay",
+  inputDateOfBirthMonth: "inputDateOfBirthMonth",
+  inputDateOfBirthYear: "inputDateOfBirthYear",
+  inputFirstName: "inputFirstName",
+  inputLastName: "inputLastName",
+  linkRemoveConviction: "linkRemoveConviction",
+  linkRemoveConviction2: "linkRemoveConviction2",
+  linkRemoveConviction3: "linkRemoveConviction3",
+  linkToAllianzHomePage: "linkToAllianzHomePage",
+  radioConviction0ResultedToABanno: "radioConviction0ResultedToABanno",
+  radioConviction0ResultedToABanyes: "radioConviction0ResultedToABanyes",
+  radioConviction1ResultedToABanno: "radioConviction1ResultedToABanno",
+  radioConviction1ResultedToABanyes: "radioConviction1ResultedToABanyes",
+  radioConviction2ResultedToABanno: "radioConviction2ResultedToABanno",
+  radioConviction2ResultedToABanyes: "radioConviction2ResultedToABanyes",
+  radioDrivingLicenceHandyno: "radioDrivingLicenceHandyno",
+  radioDrivingLicenceHandyyes: "radioDrivingLicenceHandyyes",
+  radioDrivingLicenceTypeseuFull: "radioDrivingLicenceTypeseuFull",
+  radioDrivingLicenceTypeseuProvisional: "radioDrivingLicenceTypeseuProvisional",
+  radioDrivingLicenceTypesother: "radioDrivingLicenceTypesother",
+  radioDrivingLicenceTypesukFull: "radioDrivingLicenceTypesukFull",
+  radioDrivingLicenceTypesukFullAutomaticOnly: "radioDrivingLicenceTypesukFullAutomaticOnly",
+  radioDrivingLicenceTypesukProvisional: "radioDrivingLicenceTypesukProvisional",
+  radioHasConvictionsQuestionno: "radioHasConvictionsQuestionno",
+  radioHasConvictionsQuestionyes: "radioHasConvictionsQuestionyes",
+  searchSelectTheConvictionCode: "searchSelectTheConvictionCode",
+  searchSelectTheConvictionCode2: "searchSelectTheConvictionCode2",
+  searchSelectTheConvictionCode3: "searchSelectTheConvictionCode3",
+  selectAddressLookupQuestionInput: "selectAddressLookupQuestionInput",
+  selectDrivingExpirience: "selectDrivingExpirience",
+  selectTitleQuestion: "selectTitleQuestion",
+} as const satisfies Record<keyof typeof aliases, keyof typeof aliases>;
+
 export type AliasKey = keyof typeof aliases;
 
-// Optional: includes generated element keys too (useful for debugging/tools)
 export const allAliases = { ...aliasesGenerated, ...aliases } as const;
 export type AnyAliasKey = keyof typeof allAliases;

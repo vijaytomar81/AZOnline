@@ -2,7 +2,11 @@
 
 import fs from "node:fs";
 
-import { getPageArtifactPaths, getPageManagerFile } from "@/pageObjectTools/page-object-common/pagePaths";
+import { toRepoRelative } from "@utils/paths";
+import {
+    getPageArtifactPaths,
+    getPageManagerFile,
+} from "@/pageObjectTools/page-object-common/pagePaths";
 import { loadAllPageMaps } from "@/pageObjectTools/page-object-common/readPageMap";
 
 type PageManagerEntry = {
@@ -26,7 +30,10 @@ function toCamel(input: string): string {
     return pascal ? pascal.charAt(0).toLowerCase() + pascal.slice(1) : input;
 }
 
-export function buildPageManagerEntries(pageObjectsDir: string, mapsDir: string): PageManagerEntry[] {
+export function buildPageManagerEntries(
+    pageObjectsDir: string,
+    mapsDir: string
+): PageManagerEntry[] {
     return loadAllPageMaps(mapsDir).map((item) => {
         const pageKey = item.pageMap.pageKey;
         const parts = pageKey.split(".");
@@ -45,7 +52,11 @@ export function buildPageManagerEntries(pageObjectsDir: string, mapsDir: string)
     });
 }
 
-export function buildPageManagerContent(pageObjectsDir: string, mapsDir: string): string {
+export function buildPageManagerContent(
+    pageObjectsDir: string,
+    mapsDir: string,
+    pageRegistryDir: string
+): string {
     const entries = buildPageManagerEntries(pageObjectsDir, mapsDir).sort((a, b) =>
         a.pageKey.localeCompare(b.pageKey)
     );
@@ -57,11 +68,16 @@ export function buildPageManagerContent(pageObjectsDir: string, mapsDir: string)
         byProduct.set(entry.product, list);
     }
 
+    const filePath = getPageManagerFile(pageRegistryDir);
     const lines: string[] = [];
+
+    lines.push(`// ${toRepoRelative(filePath)}`);
     lines.push(`import type { Page } from "@playwright/test";`);
+
     for (const entry of entries) {
         lines.push(`import { ${entry.className} } from "${entry.importPath}";`);
     }
+
     lines.push(``);
     lines.push(`export class PageManager {`);
     lines.push(`  readonly page: Page;`);
@@ -77,14 +93,20 @@ export function buildPageManagerContent(pageObjectsDir: string, mapsDir: string)
     lines.push(`  }`);
     lines.push(``);
 
-    for (const [product, productEntries] of [...byProduct.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+    for (const [product, productEntries] of [...byProduct.entries()].sort(([a], [b]) =>
+        a.localeCompare(b)
+    )) {
         lines.push(`  get ${product}() {`);
         lines.push(`    return {`);
-        for (const entry of productEntries.sort((a, b) => a.member.localeCompare(b.member))) {
+
+        for (const entry of productEntries.sort((a, b) =>
+            a.member.localeCompare(b.member)
+        )) {
             lines.push(
                 `      ${entry.member}: this.get("${entry.product}.${entry.member}", () => new ${entry.className}(this.page)),`
             );
         }
+
         lines.push(`    };`);
         lines.push(`  }`);
         lines.push(``);
@@ -96,7 +118,9 @@ export function buildPageManagerContent(pageObjectsDir: string, mapsDir: string)
     return lines.join("\n");
 }
 
-export function readActualPageManagerState(pageRegistryDir: string): { imports: string[]; keys: string[] } {
+export function readActualPageManagerState(
+    pageRegistryDir: string
+): { imports: string[]; keys: string[] } {
     const filePath = getPageManagerFile(pageRegistryDir);
     if (!fs.existsSync(filePath)) return { imports: [], keys: [] };
 

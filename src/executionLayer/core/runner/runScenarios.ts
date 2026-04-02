@@ -5,7 +5,6 @@ import type { RuntimeBrowserInfo } from "@utils/runtimeInfo";
 import {
     cleanupOldEvidenceRuns,
     finalizeRunEvidence,
-    resolveEvidenceArtifactConfig,
 } from "@/evidence";
 import { executionConfig } from "@config/execution.config";
 import { resolveRunId } from "@executionLayer/runtime/resolveRunId";
@@ -23,16 +22,14 @@ import type { RunScenariosArgs } from "./types";
 export async function runScenarios(
     args: RunScenariosArgs
 ): Promise<void> {
-    const startedAtMs = Date.now();                     // ✅ for duration
-    const startedAt = new Date().toISOString();         // ✅ for summary
+    const startedAtMs = Date.now();
+    const startedAt = new Date().toISOString();
 
     const parallel = Math.max(1, args.parallel ?? 1);
     const runs = expandScenarios(args.scenarios, args.iterations);
     const runId = args.runId ?? resolveRunId();
 
-    const evidenceConfig = resolveEvidenceArtifactConfig();
-    const evidenceOutputRoot =
-        args.evidenceOutputRoot ?? evidenceConfig.outputRoot;
+    const evidenceOutputRoot = args.evidenceOutputRoot;
 
     console.log(
         renderExecutionHeader({
@@ -69,8 +66,8 @@ export async function runScenarios(
 
     const { passed, failed } = countExecutionStatuses(outputs);
 
-    const totalTime = formatDuration(startedAtMs);      // ✅ computed here
-    const finishedAt = new Date().toISOString();        // ✅ end timestamp
+    const totalTime = formatDuration(startedAtMs);
+    const finishedAt = new Date().toISOString();
 
     let finalEvidence:
         | {
@@ -81,17 +78,14 @@ export async function runScenarios(
         | undefined;
 
     if (executionConfig.generatedEvidenceArtifacts.enabled) {
-        // ✅ STEP 1: extract browser
         const browserInfo = outputs.find((o) => o.browser)?.browser as
-            | import("@utils/runtimeInfo").RuntimeBrowserInfo
+            | RuntimeBrowserInfo
             | undefined;
 
-        // ✅ STEP 2: create runtimeInfo
         const runtimeInfo = createRuntimeInfo({
             browser: browserInfo,
         });
 
-        // ✅ STEP 3: use it
         finalEvidence = await finalizeRunEvidence({
             runId,
             outputRoot: evidenceOutputRoot,
@@ -99,7 +93,6 @@ export async function runScenarios(
                 executionConfig.generatedEvidenceArtifacts.cleanupTemporaryFilesAfterMerge,
             keepFailedEvidenceFileOnlyWhenNeeded:
                 executionConfig.generatedEvidenceArtifacts.keepFailedEvidenceFileOnlyWhenNeeded,
-
             metadata: {
                 mode: args.mode,
                 environment: args.environment,
@@ -109,15 +102,13 @@ export async function runScenarios(
                 totalItems: runs.length,
                 passedItems: passed,
                 failedItems: failed,
-                notExecutedItems:
-                    runs.length - (passed + failed),
-
-                runtimeInfo, // ✅ now defined
+                notExecutedItems: runs.length - (passed + failed),
+                runtimeInfo,
             },
         });
 
         await cleanupOldEvidenceRuns({
-            outputRoot: evidenceOutputRoot,
+            outputRoot: args.evidenceOutputRoot,
             maxToKeep: executionConfig.generatedEvidenceArtifacts.maxToKeep,
             excludeRunIds: [runId],
         });

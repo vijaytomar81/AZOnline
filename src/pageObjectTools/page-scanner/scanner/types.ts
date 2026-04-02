@@ -100,12 +100,17 @@ export type PageMapGroupEntry = {
 
 export type PageMapEntry = PageMapElementEntry | PageMapGroupEntry;
 
+export type PageMapReadiness = {
+    recommendedAliases: string[];
+};
+
 export type PageMap = {
     pageKey: string;
     url: string;
     urlPath?: string;
     title?: string;
     scannedAt: string;
+    readiness?: PageMapReadiness;
     elements: Record<string, PageMapEntry>;
 };
 

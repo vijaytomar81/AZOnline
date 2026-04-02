@@ -149,6 +149,48 @@ export const BUSINESS_JOURNEYS_DIR = path.join(
 export const PAGE_ACTIONS_DIR = path.join(SRC_DIR, "pageActions");
 
 /* =========================================================
+ * 🤖 AUTOMATION DOMAIN
+ * ======================================================= */
+
+export const AUTOMATION_DIR = path.join(SRC_DIR, "automation");
+
+export const AUTOMATION_BASE_DIR = path.join(
+    AUTOMATION_DIR,
+    "base"
+);
+export const AUTOMATION_CONTROLS_DIR = path.join(
+    AUTOMATION_DIR,
+    "controls"
+);
+export const AUTOMATION_NAVIGATION_DIR = path.join(
+    AUTOMATION_DIR,
+    "navigation"
+);
+export const AUTOMATION_DIAGNOSTICS_DIR = path.join(
+    AUTOMATION_DIR,
+    "diagnostics"
+);
+export const AUTOMATION_RUNTIME_DIR = path.join(
+    AUTOMATION_DIR,
+    "runtime"
+);
+export const AUTOMATION_ASSERTIONS_DIR = path.join(
+    AUTOMATION_DIR,
+    "assertions"
+);
+export const AUTOMATION_TYPES_DIR = path.join(
+    AUTOMATION_DIR,
+    "types"
+);
+
+/* =========================================================
+ * 🧾 Evidence
+ * ======================================================= */
+
+export const EVIDENCE_OUTPUT_ROOT = path.join("results", "evidence");
+
+
+/* =========================================================
  * 🧾 LOG FILES
  * ======================================================= */
 

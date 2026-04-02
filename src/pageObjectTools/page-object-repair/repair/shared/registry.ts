@@ -2,7 +2,11 @@
 
 import fs from "node:fs";
 
-import { getIndexFile, getPageArtifactPaths } from "@/pageObjectTools/page-object-common/pagePaths";
+import { toRepoRelative } from "@utils/paths";
+import {
+    getIndexFile,
+    getPageArtifactPaths,
+} from "@/pageObjectTools/page-object-common/pagePaths";
 import { loadAllPageMaps } from "@/pageObjectTools/page-object-common/readPageMap";
 
 export function extractIndexExportPaths(tsText: string): string[] {
@@ -12,7 +16,10 @@ export function extractIndexExportPaths(tsText: string): string[] {
         .sort((a, b) => a.localeCompare(b));
 }
 
-export function buildExpectedIndexExports(pageObjectsDir: string, mapsDir: string): string[] {
+export function buildExpectedIndexExports(
+    pageObjectsDir: string,
+    mapsDir: string
+): string[] {
     return loadAllPageMaps(mapsDir)
         .map((item) => {
             const artifact = getPageArtifactPaths(pageObjectsDir, item.pageMap.pageKey);
@@ -25,19 +32,28 @@ export function buildExpectedIndexExports(pageObjectsDir: string, mapsDir: strin
         .sort((a, b) => a.localeCompare(b));
 }
 
-export function buildIndexFileContent(pageObjectsDir: string, mapsDir: string): string {
+export function buildIndexFileContent(
+    pageObjectsDir: string,
+    mapsDir: string,
+    pageRegistryDir: string
+): string {
     const exportPaths = buildExpectedIndexExports(pageObjectsDir, mapsDir);
+    const filePath = getIndexFile(pageRegistryDir);
     const lines: string[] = [];
 
+    lines.push(`// ${toRepoRelative(filePath)}`);
+    lines.push(`// AUTO-GENERATED from src/pageObjects/.manifest/`);
+    lines.push(``);
     lines.push(`export { PageManager } from "./pageManager";`);
     lines.push(``);
     lines.push(`// Export individual pages too (optional, but useful sometimes)`);
     lines.push(``);
+
     for (const exportPath of exportPaths) {
         lines.push(`export * from "${exportPath}";`);
     }
-    lines.push(``);
 
+    lines.push(``);
     return lines.join("\n");
 }
 

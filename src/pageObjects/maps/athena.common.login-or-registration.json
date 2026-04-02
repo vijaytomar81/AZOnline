@@ -4,6 +4,13 @@
   "urlPath": "/",
   "scannedAt": "2026-03-09T12:48:41.552Z",
   "title": "Allianz login page",
+  "readiness": {
+    "recommendedAliases": [
+      "logIn",
+      "register",
+      "skipThisStepILlRegisterLater"
+    ]
+  },
   "elements": {
     "linkToAllianzHomePage": {
       "type": "link",

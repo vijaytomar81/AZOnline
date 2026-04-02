@@ -2,9 +2,10 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import { EVIDENCE_OUTPUT_ROOT } from "@utils/paths";
 
 export type CleanupOldEvidenceRunsInput = {
-    outputRoot: string;
+    outputRoot?: string;
     maxToKeep: number;
     excludeRunIds?: string[];
 };
@@ -54,9 +55,10 @@ async function readRunDirectories(
 export async function cleanupOldEvidenceRuns(
     input: CleanupOldEvidenceRunsInput
 ): Promise<void> {
+    const outputRoot = input.outputRoot ?? EVIDENCE_OUTPUT_ROOT;
     const maxToKeep = Math.max(1, input.maxToKeep);
     const excluded = new Set(input.excludeRunIds ?? []);
-    const directories = await readRunDirectories(input.outputRoot);
+    const directories = await readRunDirectories(outputRoot);
 
     const kept: DirectoryEntryInfo[] = [];
     const removable: DirectoryEntryInfo[] = [];

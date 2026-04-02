@@ -4,6 +4,13 @@
   "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/drivingLicenceScan/69b442a3e1389c2e75667e1d",
   "scannedAt": "2026-03-13T17:03:49.922Z",
   "title": "Driving licence details",
+  "readiness": {
+    "recommendedAliases": [
+      "inputFirstName",
+      "inputLastName",
+      "buttonNavigatorNext"
+    ]
+  },
   "elements": {
     "linkToAllianzHomePage": {
       "type": "link",

@@ -46,10 +46,10 @@
     "scan:help": "npm run scan -- help",
 
     "generator": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/page-object-generator/cli.ts",
-    "generator:elements": "npm run generator -- generate --merge",
-    "generator:elements:verbose": "npm run generator -- generate --merge --verbose",
-    "generator:elements:changed": "npm run generator -- generate --changedOnly --merge",
-    "generator:elements:changed:verbose": "npm run generator -- generate --changedOnly --merge --verbose",
+    "generator:pageobjects": "npm run generator -- generate --merge",
+    "generator:pageobjects:verbose": "npm run generator -- generate --merge --verbose",
+    "generator:pageobjects:changed": "npm run generator -- generate --changedOnly --merge",
+    "generator:pageobjects:changed:verbose": "npm run generator -- generate --changedOnly --merge --verbose",
     "generator:help": "npm run generator -- help",
 
     "validator": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/page-object-validator/cli.ts",

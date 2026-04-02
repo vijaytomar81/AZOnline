@@ -4,17 +4,7 @@ import { EXECUTION_EXCEL_COLUMNS } from "./executionExcelColumns";
 
 type EvidenceCase = Record<string, unknown>;
 type EvidenceCases = Record<string, EvidenceCase>;
-
-type EvidenceItemResult = {
-    itemNo: number;
-    action: string;
-    testCaseRef: string;
-    status: string;
-    startedAt: string;
-    finishedAt: string;
-    errorDetails: string;
-    outputs: Record<string, unknown>;
-};
+type EvidenceItemResult = Record<string, unknown>;
 
 export type ExecutionCaseRow = Record<string, string | number>;
 
@@ -39,7 +29,9 @@ function asRecord(value: unknown): Record<string, unknown> {
 }
 
 function asItemResults(value: unknown): EvidenceItemResult[] {
-    return Array.isArray(value) ? (value as EvidenceItemResult[]) : [];
+    return Array.isArray(value)
+        ? value.map((item) => asRecord(item))
+        : [];
 }
 
 function buildItemRow(
@@ -48,6 +40,7 @@ function buildItemRow(
     item: EvidenceItemResult
 ): ExecutionCaseRow {
     const row: ExecutionCaseRow = {};
+    const outputs = asRecord(item.outputs);
 
     EXECUTION_EXCEL_COLUMNS.forEach((column) => {
         if (column.kind === "scenario") {
@@ -61,17 +54,14 @@ function buildItemRow(
         }
 
         if (column.kind === "item") {
-            const value = (item as unknown as Record<string, unknown>)[column.sourceKey];
-
+            const value = item[column.sourceKey];
             row[column.header] =
                 column.sourceKey === "itemNo"
                     ? getNumberOrBlank(value)
                     : getString(value);
-
             return;
         }
 
-        const outputs = asRecord(item.outputs);
         row[column.header] = getString(outputs[column.sourceKey]);
     });
 

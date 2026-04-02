@@ -17,6 +17,25 @@ export type ExecutionConfig = {
     video: "on" | "off" | "retain-on-failure";
     trace: "on" | "off" | "retain-on-failure";
   };
+  automation: {
+    selfHeal: {
+      runtimeEnabled: boolean;
+      writeEnabled: boolean;
+    };
+    diagnostics: {
+      screenshotOnFailure: boolean;
+      pageScanOnLocatorFailure: boolean;
+      pageScanCdpUrl?: string;
+      pageScanOutDir: string;
+      pageScanVerbose: boolean;
+      pageScanMergeIntoExistingPageMap: boolean;
+    };
+    waits: {
+      actionTimeoutMs: number;
+      pageReadyTimeoutMs: number;
+      overlayTimeoutMs: number;
+    };
+  };
   generatedDataArtifacts: {
     withTimestamp: boolean;
     maxToKeep: number;
@@ -48,6 +67,32 @@ export const executionConfig: ExecutionConfig = {
     trace: envString("TRACE", "retain-on-failure") as any,
   },
 
+  automation: {
+    selfHeal: {
+      runtimeEnabled: envBool("SELF_HEAL", false),
+      writeEnabled: envBool("SELF_HEAL_WRITE", false),
+    },
+    diagnostics: {
+      screenshotOnFailure: envBool("SCREENSHOT_ON_FAILURE", true),
+      pageScanOnLocatorFailure: envBool(
+        "PAGE_SCAN_ON_LOCATOR_FAILURE",
+        true
+      ),
+      pageScanCdpUrl: envString("PAGE_SCAN_CDP_URL", ""),
+      pageScanOutDir: envString("PAGE_SCAN_OUT_DIR", "results/evidence/page-scans"),
+      pageScanVerbose: envBool("PAGE_SCAN_VERBOSE", false),
+      pageScanMergeIntoExistingPageMap: envBool(
+        "PAGE_SCAN_MERGE_INTO_EXISTING_PAGE_MAP",
+        false
+      ),
+    },
+    waits: {
+      actionTimeoutMs: envNumber("ACTION_TIMEOUT", 10_000),
+      pageReadyTimeoutMs: envNumber("PAGE_READY_TIMEOUT", 10_000),
+      overlayTimeoutMs: envNumber("OVERLAY_TIMEOUT", 1_000),
+    },
+  },
+
   generatedDataArtifacts: {
     withTimestamp: envBool("ARTIFACTS_WITH_TIMESTAMP", true),
     maxToKeep: envNumber("MAX_ARTIFACTS_TO_KEEP", 30),
@@ -56,7 +101,7 @@ export const executionConfig: ExecutionConfig = {
   generatedEvidenceArtifacts: {
     enabled: envBool("EVIDENCE_ENABLED", true),
     withTimestamp: envBool("EVIDENCE_WITH_TIMESTAMP", true),
-    maxToKeep: envNumber("MAX_EVIDENCE_RUNS_TO_KEEP", 30),
+    maxToKeep: envNumber("MAX_EVIDENCE_RUNS_TO_KEEP", 5),
     keepFailedEvidenceFileOnlyWhenNeeded: envBool(
       "KEEP_FAILED_EVIDENCE_FILE_ONLY_WHEN_NEEDED",
       true
