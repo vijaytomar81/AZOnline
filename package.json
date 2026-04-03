@@ -5,7 +5,7 @@
   "scripts": {
     "test:e2e": "playwright test",
     "e2e": "npm run data:build -- && npm run test:e2e",
-
+    
     "data": "node -r ts-node/register -r tsconfig-paths/register src/dataLayer/builder/index.ts",
     "data:build": "npm run data --",
     "data:build:verbose": "npm run data -- --verbose",
@@ -16,7 +16,6 @@
     "data:build:noEmpty:strict": "npm run data -- --excludeEmptyFields --strictValidation",
     "data:build:noEmpty:strict:verbose": "npm run data -- --excludeEmptyFields --strictValidation --verbose",
     "data:help": "npm run data -- --help",
-    
     "data:direct": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"FlowNB\"",
     "data:pcw": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"PCW-Tool\"",
     "data:verbose:direct": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"FlowNB\" --verbose",
@@ -30,7 +29,6 @@
     "smoke:direct": "npm run execution -- --mode data --source \"FlowNB\" --application AzOnline --product Motor",
     "smoke:pcw": "npm run execution -- --mode data --source \"PCW-Tool\" --application AzOnline --product Motor",
     "smoke:e2e": "npm run execution -- --mode e2e --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\" --application AzOnline --product Motor",
-
     "smoke:verbose:direct": "npm run execution -- --mode data --source \"FlowNB\" --verbose",
     "smoke:verbose:pcw": "npm run execution -- --mode data --source \"PCW-Tool\" --verbose",
     "smoke:verbose:e2e": "npm run execution -- --mode e2e --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\" --verbose",
@@ -69,6 +67,15 @@
     "pageactions:generate": "npm run generator:pageactions",
     "pageactions:generate:verbose": "npm run generator:pageactions -- --verbose",
 
+    "validator:pageactions": "node -r ts-node/register -r tsconfig-paths/register src/pageActionTools/page-action-validator/cli.ts validate",
+    "pageactions:validate": "npm run validator:pageactions",
+    "pageactions:validate:verbose": "npm run validator:pageactions -- --verbose",
+    "pageactions:validate:strict": "npm run validator:pageactions -- --strict",
+
+    "repair:pageactions": "node -r ts-node/register -r tsconfig-paths/register src/pageActionTools/page-action-repair/cli.ts repair",
+    "pageactions:repair": "npm run repair:pageactions",
+    "pageactions:repair:verbose": "npm run repair:pageactions -- --verbose",
+
     "headers:check": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/file-header-checker/cli.ts --checkMode",
     "headers:fix": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/file-header-checker/cli.ts",
 
@@ -78,7 +85,7 @@
 
     "ci:check": "npm run check:types && npm run tools:tsc && npm run headers:check && npm run validator:check:strict",
     "ci:check:verbose": "npm run check:types && npm run tools:tsc && npm run headers:check && npm run validator:check:strict:verbose",
-
+    
     "results:clean": "node scripts/clean-results.js",
     "reports:clean": "node scripts/clean-reports.js",
     "allure:generate": "allure generate results/allure-results -o reports/allure-report --clean",
