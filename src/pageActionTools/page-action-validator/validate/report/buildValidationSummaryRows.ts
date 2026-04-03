@@ -10,6 +10,7 @@ export function buildValidationSummaryRows(results: ValidationRuleResult[]): {
 } {
     const counts = countValidationIssues(results);
     const exitCode = counts.totalErrors > 0 ? 1 : 0;
+
     const resultText =
         counts.totalErrors > 0
             ? "ISSUES FOUND"
