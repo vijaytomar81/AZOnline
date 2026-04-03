@@ -245,7 +245,7 @@ This layer provides:
 
 ```mermaid
 
-flowchart TD
+flowchart LR
 
     A["Execution Layer<br/>(Data Mode / E2E Mode)"]
     B["Scenario (normalized)<br/><br/>application? (optional)<br/>product? (optional)<br/>journey<br/>entryPoint"]
