@@ -27,9 +27,10 @@
     "execution:verbose": "npm run execution -- --verbose",
     "execution:help": "npm run execution -- --help",
 
-    "smoke:direct": "npm run execution -- --mode data --source \"FlowNB\"",
-    "smoke:pcw": "npm run execution -- --mode data --source \"PCW-Tool\"",
-    "smoke:e2e": "npm run execution -- --mode e2e --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\"",
+    "smoke:direct": "npm run execution -- --mode data --source \"FlowNB\" --application AzOnline --product Motor",
+    "smoke:pcw": "npm run execution -- --mode data --source \"PCW-Tool\" --application AzOnline --product Motor",
+    "smoke:e2e": "npm run execution -- --mode e2e --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\" --application AzOnline --product Motor",
+
     "smoke:verbose:direct": "npm run execution -- --mode data --source \"FlowNB\" --verbose",
     "smoke:verbose:pcw": "npm run execution -- --mode data --source \"PCW-Tool\" --verbose",
     "smoke:verbose:e2e": "npm run execution -- --mode e2e --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\" --verbose",

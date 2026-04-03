@@ -30,8 +30,11 @@ export async function runDataMode(
     registerDefaultExecutors(bootstrap);
 
     const { scenarios, overrideByScenarioId } = buildDataScenarios({
+        source: args.source,
         schemaName,
         casesFile,
+        application: args.application,
+        product: args.product,
     });
 
     emitLog({

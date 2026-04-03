@@ -6,6 +6,7 @@ import { AppError } from "@utils/errors";
 import { OUTPUT_KEYS } from "@executionLayer/constants/outputKeys";
 import { setContextOutput } from "@executionLayer/core/context";
 import type { BusinessJourneyExecutor } from "@businessJourneys/shared";
+import { resolveStartUrl } from "@config/domain/resolveStartUrl";
 import { captureBusinessOutputs } from "./captureBusinessOutputs";
 
 function buildPolicyNumber(): string {
@@ -35,6 +36,18 @@ export const runNewBusiness: BusinessJourneyExecutor = async ({
     const payload = itemData ?? {};
     const scenarioJourney = context.scenario.journey || "Direct";
     const entryPoint = context.scenario.entryPoint ?? "Direct";
+
+    const startUrl = resolveStartUrl({
+        journey: scenarioJourney as any,
+        policyContext: context.scenario.policyContext,
+        entryPoint,
+        application: context.scenario.application,
+        product: context.scenario.product,
+    });
+
+    await context.page.goto(startUrl, {
+        waitUntil: "domcontentloaded",
+    });
 
     const quoteNumber = buildQuoteNumber();
     const policyNumber = buildPolicyNumber();

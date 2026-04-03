@@ -30,6 +30,8 @@ export async function runE2EMode(
         excelPath: args.excelPath,
         sheetName: args.sheetName,
         includeDisabled: args.includeDisabled,
+        application: args.application,
+        product: args.product,
     });
 
     const scenarios = filterScenarios(parsedScenarios, args.selectedIds);

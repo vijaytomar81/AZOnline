@@ -2,7 +2,14 @@
 
 import { AppError } from "@utils/errors";
 import type { ExecutionScenario } from "@executionLayer/contracts";
-import type { RawExecutionScenarioRow, ScenarioValidationResult } from "../types";
+import type {
+    Application,
+    Product,
+} from "@config/domain/routing.config";
+import type {
+    RawExecutionScenarioRow,
+    ScenarioValidationResult,
+} from "../types";
 import { normalizeScenarioList } from "../normalize";
 import { validateScenarioList } from "../validate";
 import { validateScenarioTemplates } from "../template";
@@ -20,6 +27,8 @@ export type ParseScenariosOptions = {
     includeDisabled?: boolean;
     failOnTemplateErrors?: boolean;
     failOnValidationErrors?: boolean;
+    application?: Application;
+    product?: Product;
 };
 
 export function parseScenarios(
@@ -43,7 +52,11 @@ export function parseScenarios(
         });
     }
 
-    const normalized = normalizeScenarioList(rows);
+    const normalized = normalizeScenarioList(rows, {
+        application: opts.application,
+        product: opts.product,
+    });
+
     const scenarios = filterDisabledScenarios(normalized, !!opts.includeDisabled);
     const validation = validateScenarioList(scenarios);
 

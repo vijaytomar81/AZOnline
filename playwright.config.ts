@@ -1,11 +1,7 @@
-import { defineConfig } from '@playwright/test';
-import { envConfig } from './src/config/env';
-import { executionConfig } from './src/config/execution.config';
+// playwright.config.ts
 
-const baseURL =
-  envConfig.startFrom === 'pcw'
-    ? (envConfig.pcwUrl ?? (() => { throw new Error('START_FROM=pcw but pcwUrl is null'); })())
-    : envConfig.env.customerPortalUrl;
+import { defineConfig } from '@playwright/test';
+import { executionConfig } from './src/config/execution.config';
 
 export default defineConfig({
   testDir: './src/tests',
@@ -22,7 +18,7 @@ export default defineConfig({
   ],
 
   use: {
-    baseURL,
+    // ❌ No baseURL here — routing is handled dynamically at runtime
     headless: executionConfig.browser.headless,
     screenshot: executionConfig.artifacts.screenshot as any,
     video: executionConfig.artifacts.video as any,
