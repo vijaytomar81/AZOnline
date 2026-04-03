@@ -65,6 +65,10 @@
     "repair:run:verbose": "npm run repair -- repair --verbose",
     "repair:help": "npm run repair -- help",
 
+    "generator:pageactions": "node -r ts-node/register -r tsconfig-paths/register src/pageActionTools/page-action-generator/cli/runPageActionGenerator.ts",
+    "pageactions:generate": "npm run generator:pageactions",
+    "pageactions:generate:verbose": "npm run generator:pageactions -- --verbose",
+
     "headers:check": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/file-header-checker/cli.ts --checkMode",
     "headers:fix": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/file-header-checker/cli.ts",
 

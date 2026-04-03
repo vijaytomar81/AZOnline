@@ -1,0 +1,12 @@
+{
+  "pageKey": "athena.common.manage-cookies",
+  "actionKey": "athena.common.handle-manage-cookies.action",
+  "group": "common",
+  "actionName": "handleManageCookiesAction",
+  "paths": {
+    "actionFile": "src/pageActions/actions/athena/common/handleManageCookies.action.ts",
+    "indexFile": "src/pageActions/actions/athena/index.ts",
+    "sourcePageObjectFile": "src/pageObjects/objects/athena/common/manage-cookies/ManageCookiesPage.ts"
+  },
+  "generatedAt": "2026-04-03T20:05:26.797Z"
+}

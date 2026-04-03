@@ -1,0 +1,12 @@
+{
+  "pageKey": "athena.common.login-or-registration",
+  "actionKey": "athena.common.handle-login-or-registration.action",
+  "group": "common",
+  "actionName": "handleLoginOrRegistrationAction",
+  "paths": {
+    "actionFile": "src/pageActions/actions/athena/common/handleLoginOrRegistration.action.ts",
+    "indexFile": "src/pageActions/actions/athena/index.ts",
+    "sourcePageObjectFile": "src/pageObjects/objects/athena/common/login-or-registration/LoginOrRegistrationPage.ts"
+  },
+  "generatedAt": "2026-04-03T20:05:26.797Z"
+}

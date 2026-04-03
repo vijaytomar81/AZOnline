@@ -1,7 +1,7 @@
 {
   "sheet": "FlowNB",
   "sourceExcel": "/Users/vijaytomar/AZOnline_Automation/AZOnline/sampleData/New Business.xlsx",
-  "generatedAt": "2026-03-27T14:17:57.344Z",
+  "generatedAt": "2026-04-03T18:37:37.110Z",
   "caseCount": 3,
   "cases": [
     {
@@ -373,8 +373,8 @@
             "count": 0
           },
           "convictionsControl": {
-            "enabled": "No",
-            "count": 0,
+            "enabled": "Yes",
+            "count": 1,
             "nonMotoringFlag": ""
           }
         },
@@ -421,7 +421,23 @@
           "count": 0
         },
         "policyHolderConvictions": {
-          "count": 0
+          "count": 1,
+          "conviction1": {
+            "item": {
+              "type": "Test Con 1",
+              "code": "123",
+              "codeOtherOption": "",
+              "location": "road",
+              "date": "Fri Apr 03 2026 02:00:00 GMT+0200 (Central European Summer Time)",
+              "points": "",
+              "fineAmount": "",
+              "banLengthMonths": "",
+              "accidentRelated": "",
+              "breathalysed": "",
+              "breathalyserReading": "",
+              "resultedInDisqualification": ""
+            }
+          }
         },
         "additionalDrivers": {
           "count": 0
@@ -585,8 +601,8 @@
             "count": 0
           },
           "convictionsControl": {
-            "enabled": "No",
-            "count": 0,
+            "enabled": "Yes",
+            "count": 2,
             "nonMotoringFlag": ""
           }
         },
@@ -633,7 +649,39 @@
           "count": 0
         },
         "policyHolderConvictions": {
-          "count": 0
+          "count": 2,
+          "conviction1": {
+            "item": {
+              "type": "Test Con 1",
+              "code": "123",
+              "codeOtherOption": "",
+              "location": "road",
+              "date": "Fri Apr 03 2026 02:00:00 GMT+0200 (Central European Summer Time)",
+              "points": "",
+              "fineAmount": "",
+              "banLengthMonths": "",
+              "accidentRelated": "",
+              "breathalysed": "",
+              "breathalyserReading": "",
+              "resultedInDisqualification": ""
+            }
+          },
+          "conviction2": {
+            "item": {
+              "type": "Test Con 2",
+              "code": "456",
+              "codeOtherOption": "",
+              "location": "office",
+              "date": "Fri Apr 03 2026 02:00:00 GMT+0200 (Central European Summer Time)",
+              "points": "",
+              "fineAmount": "",
+              "banLengthMonths": "",
+              "accidentRelated": "",
+              "breathalysed": "",
+              "breathalyserReading": "",
+              "resultedInDisqualification": ""
+            }
+          }
         },
         "additionalDrivers": {
           "count": 0
