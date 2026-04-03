@@ -17,6 +17,7 @@ export const repairMissingActionFiles: RepairRule = {
         Object.keys(index.actions).forEach((pageKey) => {
             const fileName = index.actions[pageKey];
             const entryPath = `${process.cwd()}/src/pageActions/.manifest/actions/${fileName}`;
+
             if (!fs.existsSync(entryPath)) {
                 delete index.actions[pageKey];
                 removed++;
@@ -31,9 +32,14 @@ export const repairMissingActionFiles: RepairRule = {
         }
 
         const summary = generatePageActionsFromManifest({ verbose: false });
+
         const appliedFixes =
             summary.generatedActions > 0
-                ? [`Generated ${summary.generatedActions} missing page action file(s)`]
+                ? [
+                    {
+                        message: `Generated ${summary.generatedActions} missing page action file(s).`,
+                    },
+                ]
                 : [];
 
         return {

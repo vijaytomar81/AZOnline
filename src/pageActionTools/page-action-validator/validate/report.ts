@@ -122,7 +122,7 @@ export function runPageActionValidation(args: {
         rules: getPageActionValidationRules(),
     });
 
-    console.log(buildValidationResultText(pipeline.results));
+    console.log(buildValidationResultText(pipeline.results, args.verbose));
 
     const summary = buildValidationSummaryRows(pipeline.results);
 

@@ -1,7 +1,10 @@
 // src/pageActionTools/page-action-repair/repair/rules/manifest/repairActionKeyConsistency.ts
 
 import path from "node:path";
-import { PAGE_ACTIONS_MANIFEST_DIR } from "@utils/paths";
+import { PAGE_ACTIONS_MANIFEST_DIR, toRepoRelative } from "@utils/paths";
+import { buildActionName } from "@pageActionTools/page-action-generator/generator/buildActionName";
+import { loadPageObjectManifestIndex } from "@pageActionTools/page-action-generator/generator/loadPageObjectManifestIndex";
+import { loadPageObjectManifestPage } from "@pageActionTools/page-action-generator/generator/loadPageObjectManifestPage";
 import { readJson, writeJson } from "../../shared/manifest";
 import type { RepairRule } from "../../types";
 
@@ -10,26 +13,51 @@ export const repairActionKeyConsistency: RepairRule = {
     name: "repairActionKeyConsistency",
     description: "Repair incorrect page action manifest actionKey values",
     run: () => {
-        const index = readJson<{ actions: Record<string, string> }>(
+        const pageObjectIndex = loadPageObjectManifestIndex();
+        const pageActionIndex = readJson<{ actions: Record<string, string> }>(
             path.join(PAGE_ACTIONS_MANIFEST_DIR, "index.json"),
             { actions: {} }
         );
 
-        const appliedFixes: string[] = [];
+        const appliedFixes = Object.entries(pageActionIndex.actions).flatMap(
+            ([pageKey, fileName]) => {
+                const pageManifestFile = pageObjectIndex.pages[pageKey];
 
-        Object.entries(index.actions).forEach(([pageKey, fileName]) => {
-            const filePath = path.join(PAGE_ACTIONS_MANIFEST_DIR, "actions", fileName);
-            const entry = readJson<any>(filePath, {});
-            const [platform, group] = pageKey.split(".");
-            const fileBase = path.basename(entry.paths.actionFile ?? "", ".ts");
-            const expected = `${platform}.${group}.${fileBase}.action`;
+                if (!pageManifestFile) {
+                    return [];
+                }
 
-            if (entry.actionKey !== expected) {
-                entry.actionKey = expected;
+                const page = loadPageObjectManifestPage(pageManifestFile);
+                const naming = buildActionName(page);
+
+                const filePath = path.join(
+                    PAGE_ACTIONS_MANIFEST_DIR,
+                    "actions",
+                    fileName
+                );
+
+                const entry = readJson<any>(filePath, {});
+                const incorrectValueFound = entry.actionKey;
+                const fixReplacedValue = naming.actionKey;
+
+                if (incorrectValueFound === fixReplacedValue) {
+                    return [];
+                }
+
+                entry.actionKey = fixReplacedValue;
                 writeJson(filePath, entry);
-                appliedFixes.push(`Fixed actionKey for ${pageKey}`);
+
+                return [{
+                    key: pageKey,
+                    message: "Fixed actionKey.",
+                    meta: {
+                        filePath: toRepoRelative(filePath),
+                        incorrectValueFound,
+                        fixReplacedValue,
+                    },
+                }];
             }
-        });
+        );
 
         return {
             category: "manifest",

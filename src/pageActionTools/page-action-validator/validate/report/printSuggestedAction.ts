@@ -13,5 +13,10 @@ export function printSuggestedAction(results: ValidationRuleResult[]): void {
     }
 
     printSection("Suggested action");
-    console.log(info("Run page action repair, then re-run validation."));
+    console.log(
+        `${info("Run page action repair:")}  ${info("npm run pageactions:repair:verbose")}`
+    );
+    console.log(
+        `${info("then re-run validation:")} ${info("npm run pageactions:validate:verbose")}`
+    );
 }

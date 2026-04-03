@@ -2,9 +2,8 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import {
-    buildActionName,
-} from "@pageActionTools/page-action-generator/generator/buildActionName";
+import { toRepoRelative } from "@utils/paths";
+import { buildActionName } from "@pageActionTools/page-action-generator/generator/buildActionName";
 import { buildActionPath } from "@pageActionTools/page-action-generator/generator/buildActionPath";
 import { buildPageActionManifestEntry } from "@pageActionTools/page-action-generator/generator/buildPageActionManifestEntry";
 import { loadPageActionManifestIndex } from "@pageActionTools/page-action-generator/generator/loadPageActionManifestIndex";
@@ -21,21 +20,44 @@ export const repairManifestEntries: RepairRule = {
     run: () => {
         const pageObjectIndex = loadPageObjectManifestIndex();
         const pageActionIndex = loadPageActionManifestIndex();
-        const appliedFixes: string[] = [];
+        const appliedFixes = Object.keys(pageObjectIndex.pages)
+            .sort()
+            .flatMap((pageKey) => {
+                if (pageActionIndex.actions[pageKey]) {
+                    return [];
+                }
 
-        Object.keys(pageObjectIndex.pages).sort().forEach((pageKey) => {
-            if (pageActionIndex.actions[pageKey]) return;
-            const page = loadPageObjectManifestPage(pageObjectIndex.pages[pageKey]);
-            const naming = buildActionName(page);
-            const paths = buildActionPath({ page, naming });
+                const page = loadPageObjectManifestPage(pageObjectIndex.pages[pageKey]);
+                const naming = buildActionName(page);
+                const paths = buildActionPath({ page, naming });
 
-            if (!fs.existsSync(paths.actionFile)) return;
+                if (!fs.existsSync(paths.actionFile)) {
+                    return [];
+                }
 
-            const entry = buildPageActionManifestEntry({ page, naming, paths });
-            writePageActionManifestEntry({ filePath: paths.manifestEntryFile, entry });
-            pageActionIndex.actions[pageKey] = path.basename(paths.manifestEntryFile);
-            appliedFixes.push(`Created manifest entry for ${pageKey}`);
-        });
+                const entry = buildPageActionManifestEntry({
+                    page,
+                    naming,
+                    paths,
+                });
+
+                writePageActionManifestEntry({
+                    filePath: paths.manifestEntryFile,
+                    entry,
+                });
+
+                pageActionIndex.actions[pageKey] = path.basename(paths.manifestEntryFile);
+
+                return [{
+                    key: pageKey,
+                    message: "Created missing manifest entry.",
+                    meta: {
+                        filePath: toRepoRelative(paths.manifestEntryFile),
+                        incorrectValueFound: "(missing manifest entry)",
+                        fixReplacedValue: path.basename(paths.manifestEntryFile),
+                    },
+                }];
+            });
 
         writePageActionManifestIndex({
             filePath: `${process.cwd()}/src/pageActions/.manifest/index.json`,

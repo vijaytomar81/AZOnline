@@ -16,6 +16,13 @@ export type PageActionManifestEntry = {
 export type ValidationIssue = {
     level: "warning" | "error";
     message: string;
+    key?: string;
+    meta?: {
+        filePath?: string;
+        expected?: string;
+        actual?: string;
+    };
+    suggestionCommand?: string;
 };
 
 export type ValidationRuleResult = {

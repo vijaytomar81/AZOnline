@@ -5,10 +5,21 @@ export type RepairIssue = {
     message: string;
 };
 
+export type RepairAppliedFix =
+    | {
+          key?: string;
+          message: string;
+          meta?: {
+              filePath?: string;
+              incorrectValueFound?: string;
+              fixReplacedValue?: string;
+          };
+      };
+
 export type RepairRuleResult = {
     category: string;
     name: string;
-    appliedFixes: string[];
+    appliedFixes: RepairAppliedFix[];
     issues: RepairIssue[];
 };
 

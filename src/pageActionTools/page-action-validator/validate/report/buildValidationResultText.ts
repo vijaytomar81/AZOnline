@@ -4,7 +4,8 @@ import type { ValidationRuleResult } from "../types";
 import { buildValidationReportTree } from "./buildValidationReportTree";
 
 export function buildValidationResultText(
-    results: ValidationRuleResult[]
+    results: ValidationRuleResult[],
+    verbose: boolean
 ): string {
-    return buildValidationReportTree(results).join("\n");
+    return buildValidationReportTree(results, verbose).join("\n");
 }
