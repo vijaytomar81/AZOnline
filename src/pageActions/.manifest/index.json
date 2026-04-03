@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-04-03T20:05:26.795Z",
+  "generatedAt": "2026-04-03T20:15:31.609Z",
   "actions": {
     "athena.common.insurance-type-selection": "athena.common.handle-insurance-type-selection.action.json",
     "athena.common.login-or-registration": "athena.common.handle-login-or-registration.action.json",
