@@ -9,15 +9,27 @@ export const checkActionFilesExist: ValidationRule = {
     name: "checkActionFilesExist",
     description: "Validate manifest-referenced action files exist",
     run: (context) => {
-        const issues = Object.values(context.pageActionEntries).flatMap((entry) => {
-            const actionExists = fs.existsSync(path.resolve(entry.paths.actionFile));
-            return actionExists
-                ? []
-                : [{
-                    level: "error" as const,
-                    message: `Missing action file: ${entry.paths.actionFile}`,
-                }];
-        });
+        const issues = Object.entries(context.pageActionEntries).flatMap(
+            ([pageKey, entry]) => {
+                if (!entry?.paths?.actionFile) {
+                    return [{
+                        level: "error" as const,
+                        key: pageKey,
+                        message: "Manifest entry is missing paths.actionFile.",
+                    }];
+                }
+
+                const actionExists = fs.existsSync(path.resolve(entry.paths.actionFile));
+
+                return actionExists
+                    ? []
+                    : [{
+                        level: "error" as const,
+                        key: pageKey,
+                        message: `Missing action file: ${entry.paths.actionFile}`,
+                    }];
+            }
+        );
 
         return {
             category: "files",

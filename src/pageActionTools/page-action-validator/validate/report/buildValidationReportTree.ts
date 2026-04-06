@@ -63,30 +63,68 @@ function buildGroupSuffix(args: {
     return info(`(${args.totalChecks} ${label}, no issues)`);
 }
 
-function buildIssueDetailLines(issue: ValidationIssue): string[] {
+function formatIssueValue(args: {
+    issue: ValidationIssue;
+    value: string;
+    kind: "actual" | "correct";
+}): string {
+    if (args.kind === "actual") {
+        return args.issue.level === "warning"
+            ? warning(args.value)
+            : failure(args.value);
+    }
+
+    return success(args.value);
+}
+
+function buildIssueDetailLines(args: {
+    issue: ValidationIssue;
+    issueIndex: number;
+    issueCount: number;
+    parentPrefix: string;
+}): string[] {
     const lines: string[] = [];
-    const key = issue.key ?? issue.message;
+    const key = args.issue.key ?? args.issue.message;
+    const issueIcon =
+        args.issue.level === "warning"
+            ? warning(ICONS.warningIcon)
+            : failure(ICONS.failIcon);
 
-    lines.push(`   ${failure(ICONS.failIcon)} ${key}`);
+    const issueBranch = args.issueIndex === args.issueCount - 1 ? "└─" : "├─";
+    const detailIndent = `${args.parentPrefix}${args.issueIndex === args.issueCount - 1 ? "   " : "│  "}`;
 
-    if (issue.meta?.filePath) {
-        lines.push(`     ${muted("file".padEnd(11))}: ${issue.meta.filePath}`);
-    }
+    lines.push(`${args.parentPrefix}${issueBranch} ${issueIcon} ${key}`);
 
-    if (issue.meta?.expected !== undefined) {
+    if (args.issue.meta?.filePath) {
         lines.push(
-            `     ${muted("expected".padEnd(11))}: ${success(issue.meta.expected)}`
+            `${detailIndent}${muted("file".padEnd(14))}: ${args.issue.meta.filePath}`
         );
     }
 
-    if (issue.meta?.actual !== undefined) {
+    if (args.issue.meta?.actual !== undefined) {
         lines.push(
-            `     ${muted("actual".padEnd(11))}: ${failure(issue.meta.actual)}`
+            `${detailIndent}${muted("actual value".padEnd(14))}: ${formatIssueValue({
+                issue: args.issue,
+                value: args.issue.meta.actual,
+                kind: "actual",
+            })}`
         );
     }
 
-    if (issue.message) {
-        lines.push(`     ${muted("message".padEnd(11))}: ${issue.message}`);
+    if (args.issue.meta?.expected !== undefined) {
+        lines.push(
+            `${detailIndent}${muted("correct value".padEnd(14))}: ${formatIssueValue({
+                issue: args.issue,
+                value: args.issue.meta.expected,
+                kind: "correct",
+            })}`
+        );
+    }
+
+    if (args.issue.message) {
+        lines.push(
+            `${detailIndent}${muted("message".padEnd(14))}: ${args.issue.message}`
+        );
     }
 
     lines.push("");
@@ -143,9 +181,18 @@ export function buildValidationReportTree(
                 `${branch} ${ruleIcon} ${result.name}  ${issuesText(result)}`
             );
 
-            if (verbose && result.issues.length > 0) {
-                result.issues.forEach((issue) => {
-                    lines.push(...buildIssueDetailLines(issue));
+            if (result.issues.length > 0) {
+                const parentPrefix = index === groupResults.length - 1 ? "   " : "│  ";
+
+                result.issues.forEach((issue, issueIndex) => {
+                    lines.push(
+                        ...buildIssueDetailLines({
+                            issue,
+                            issueIndex,
+                            issueCount: result.issues.length,
+                            parentPrefix,
+                        })
+                    );
                 });
             }
         });

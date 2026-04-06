@@ -83,8 +83,8 @@
     "tools:tsc": "tsc -p tsconfig.tools.json --noEmit",
     "check:dead": "ts-prune",
 
-    "ci:check": "npm run check:types && npm run tools:tsc && npm run headers:check && npm run validator:check:strict",
-    "ci:check:verbose": "npm run check:types && npm run tools:tsc && npm run headers:check && npm run validator:check:strict:verbose",
+    "ci:check": "npm run check:types && npm run tools:tsc && npm run headers:check && npm run pageobjects:validate",
+    "ci:check:verbose": "npm run check:types && npm run tools:tsc && npm run headers:check && npm run pageobjects:validate:verbose",
     
     "results:clean": "node scripts/clean-results.js",
     "reports:clean": "node scripts/clean-reports.js",

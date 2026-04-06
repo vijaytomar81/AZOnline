@@ -2,6 +2,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { toRepoRelative } from "@utils/paths";
 import type { ValidationRule } from "../../types";
 
 export const checkManifestEntriesExist: ValidationRule = {
@@ -16,11 +17,18 @@ export const checkManifestEntriesExist: ValidationRule = {
                     "actions",
                     fileName
                 );
+
                 return fs.existsSync(filePath)
                     ? []
                     : [{
                         level: "error" as const,
-                        message: `Missing manifest entry file for ${pageKey}: ${fileName}`,
+                        key: pageKey,
+                        message: "Manifest index points to a missing manifest entry file.",
+                        meta: {
+                            filePath: toRepoRelative(filePath),
+                            actual: fileName,
+                            expected: "existing manifest entry file",
+                        },
                     }];
             }
         );

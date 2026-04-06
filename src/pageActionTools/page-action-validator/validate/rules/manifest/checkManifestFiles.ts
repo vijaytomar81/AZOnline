@@ -11,20 +11,37 @@ export const checkManifestFiles: ValidationRule = {
     run: (context) => {
         const issues = Object.entries(context.pageActionEntries).flatMap(
             ([pageKey, entry]) => {
-                const items: Array<[string, string]> = [
+                if (!entry?.paths) {
+                    return [{
+                        level: "error" as const,
+                        key: pageKey,
+                        message: "Manifest entry is missing paths object.",
+                    }];
+                }
+
+                const items: Array<[string, string | undefined]> = [
                     ["actionFile", entry.paths.actionFile],
                     ["indexFile", entry.paths.indexFile],
                     ["sourcePageObjectFile", entry.paths.sourcePageObjectFile],
                 ];
 
-                return items.flatMap(([label, filePath]) =>
-                    fs.existsSync(path.resolve(filePath))
+                return items.flatMap(([label, filePath]) => {
+                    if (!filePath) {
+                        return [{
+                            level: "error" as const,
+                            key: pageKey,
+                            message: `Manifest path missing for ${pageKey} -> ${label}`,
+                        }];
+                    }
+
+                    return fs.existsSync(path.resolve(filePath))
                         ? []
                         : [{
                             level: "error" as const,
+                            key: pageKey,
                             message: `Manifest path missing for ${pageKey} -> ${label}: ${filePath}`,
-                        }]
-                );
+                        }];
+                });
             }
         );
 

@@ -29,11 +29,11 @@ export const checkManifestIndexConsistency: ValidationRule = {
                     : [{
                         level: "error" as const,
                         key: pageKey,
-                        message: "Manifest index points to a missing manifest entry file.",
+                        message: "Manifest index contains stale manifest entry reference.",
                         meta: {
-                            filePath: toRepoRelative(filePath),
-                            expected: fileName,
-                            actual: "(missing file)",
+                            filePath: toRepoRelative(path.join(context.pageActionManifestDir, "index.json")),
+                            actual: fileName,
+                            expected: "reference existing manifest entry file",
                         },
                     }];
             }
@@ -52,8 +52,8 @@ export const checkManifestIndexConsistency: ValidationRule = {
                 message: "Manifest entry file exists but is not referenced in manifest index.",
                 meta: {
                     filePath: toRepoRelative(filePath),
-                    expected: "(file referenced in index)",
-                    actual: "(not indexed)",
+                    actual: "existing manifest entry file is not indexed",
+                    expected: "add file to manifest index",
                 },
             }];
         });

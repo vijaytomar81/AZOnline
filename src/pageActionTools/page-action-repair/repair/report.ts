@@ -46,36 +46,51 @@ function summarize(results: ReturnType<typeof runRepairPipeline>["results"]) {
         exitCode: errors > 0 ? 1 : 0,
         resultText:
             errors > 0
-                ? failure("ISSUES FOUND")
+                ? "ISSUES FOUND"
                 : appliedFixes > 0
-                  ? success("REPAIRED")
-                  : info("NO CHANGES"),
+                  ? "REPAIRED"
+                  : "NO CHANGES",
     };
 }
 
-function buildFixDetailLines(fix: RepairAppliedFix): string[] {
+function buildFixDetailLines(args: {
+    fix: RepairAppliedFix;
+    fixIndex: number;
+    fixCount: number;
+    parentPrefix: string;
+}): string[] {
     const lines: string[] = [];
-    const key = fix.key ?? fix.message;
+    const key = args.fix.key ?? args.fix.message;
+    const fixBranch = args.fixIndex === args.fixCount - 1 ? "└─" : "├─";
+    const detailIndent = `${args.parentPrefix}${args.fixIndex === args.fixCount - 1 ? "   " : "│  "}`;
 
-    lines.push(`   ${success(ICONS.successIcon)} ${key}`);
+    lines.push(`${args.parentPrefix}${fixBranch} ${success(ICONS.successIcon)} ${key}`);
 
-    if (fix.meta?.filePath) {
-        lines.push(`     ${muted("file".padEnd(21))}: ${fix.meta.filePath}`);
-    }
-
-    if (fix.meta?.incorrectValueFound !== undefined) {
+    if (args.fix.meta?.filePath) {
         lines.push(
-            `     ${muted("incorrect value".padEnd(21))}: ${failure(fix.meta.incorrectValueFound)}`
+            `${detailIndent}${muted("file".padEnd(23))}: ${args.fix.meta.filePath}`
         );
     }
 
-    if (fix.meta?.fixReplacedValue !== undefined) {
+    if (args.fix.meta?.incorrectValueFound !== undefined) {
         lines.push(
-            `     ${muted("fixed value".padEnd(21))}: ${success(fix.meta.fixReplacedValue)}`
+            `${detailIndent}${muted("incorrect value found".padEnd(23))}: ${failure(
+                args.fix.meta.incorrectValueFound
+            )}`
         );
     }
 
-    lines.push(`     ${muted("message".padEnd(21))}: ${fix.message}`);
+    if (args.fix.meta?.fixReplacedValue !== undefined) {
+        lines.push(
+            `${detailIndent}${muted("fix replaced value".padEnd(23))}: ${success(
+                args.fix.meta.fixReplacedValue
+            )}`
+        );
+    }
+
+    lines.push(
+        `${detailIndent}${muted("message".padEnd(23))}: ${args.fix.message}`
+    );
     lines.push("");
 
     return lines;
@@ -120,14 +135,61 @@ function buildRepairExecutionLines(
             `${branch} ${icon} ${result.category}.${result.name}  ${buildRepairSuffix(result)}`
         );
 
-        if (verbose && result.appliedFixes.length > 0) {
-            result.appliedFixes.forEach((fix) => {
-                lines.push(...buildFixDetailLines(fix));
+        if (result.appliedFixes.length > 0) {
+            const parentPrefix = index === results.length - 1 ? "   " : "│  ";
+
+            result.appliedFixes.forEach((fix, fixIndex) => {
+                lines.push(
+                    ...buildFixDetailLines({
+                        fix,
+                        fixIndex,
+                        fixCount: result.appliedFixes.length,
+                        parentPrefix,
+                    })
+                );
             });
         }
     });
 
     return lines;
+}
+
+function buildColoredSummaryRows(summary: {
+    rows: Array<[string, string | number]>;
+}): Array<[string, string | number]> {
+    return summary.rows.map(([label, value]) => {
+        if (label === "Applied fixes") {
+            return [label, Number(value) > 0 ? success(String(value)) : info(String(value))];
+        }
+
+        if (label === "Warnings") {
+            return [label, Number(value) > 0 ? warning(String(value)) : info(String(value))];
+        }
+
+        if (label === "Errors") {
+            return [label, Number(value) > 0 ? failure(String(value)) : info(String(value))];
+        }
+
+        if (label === "Rules run") {
+            return [label, info(String(value))];
+        }
+
+        return [label, value];
+    });
+}
+
+function buildColoredResultText(summary: {
+    resultText: string;
+}): string {
+    if (summary.resultText === "REPAIRED") {
+        return success(summary.resultText);
+    }
+
+    if (summary.resultText === "NO CHANGES") {
+        return info(summary.resultText);
+    }
+
+    return failure(summary.resultText);
 }
 
 export function runPageActionRepair(args: { verbose: boolean }): number {
@@ -151,7 +213,11 @@ export function runPageActionRepair(args: { verbose: boolean }): number {
 
     const summary = summarize(pipeline.results);
 
-    printSummary("REPAIR SUMMARY", summary.rows, summary.resultText);
+    printSummary(
+        "REPAIR SUMMARY",
+        buildColoredSummaryRows(summary),
+        buildColoredResultText(summary)
+    );
 
     return summary.exitCode;
 }

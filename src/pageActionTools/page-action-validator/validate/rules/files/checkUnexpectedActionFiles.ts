@@ -19,7 +19,13 @@ export const checkUnexpectedActionFiles: ValidationRule = {
             .filter((filePath) => !manifestFiles.has(path.resolve(filePath)))
             .map((filePath) => ({
                 level: "warning" as const,
-                message: `Unexpected action file not registered in manifest: ${toRepoRelative(filePath)}`,
+                key: path.basename(filePath),
+                message: "Unexpected action file not registered in manifest.",
+                meta: {
+                    filePath: toRepoRelative(filePath),
+                    actual: "file exists on disk but is not registered in manifest",
+                    expected: "add matching manifest entry or remove stale file",
+                },
             }));
 
         return {

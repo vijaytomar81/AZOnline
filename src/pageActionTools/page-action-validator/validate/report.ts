@@ -4,6 +4,7 @@ import path from "node:path";
 import fs from "node:fs";
 import {
     failure,
+    info,
     printCommandTitle,
     printEnvironment,
     printSummary,
@@ -66,6 +67,10 @@ function createContext(verbose: boolean, strict: boolean): ValidationContext {
     Object.entries(pageActionIndex).forEach(([pageKey, fileName]) => {
         const filePath = path.join(PAGE_ACTIONS_MANIFEST_DIR, "actions", fileName);
 
+        if (!fs.existsSync(filePath)) {
+            return;
+        }
+
         pageActionEntries[pageKey] = readJson<PageActionManifestEntry>(
             filePath,
             {} as PageActionManifestEntry
@@ -101,6 +106,34 @@ function buildColoredResultText(summary: {
     return failure(summary.resultText);
 }
 
+function buildColoredSummaryRows(summary: {
+    rows: Array<[string, string | number]>;
+}): Array<[string, string | number]> {
+    return summary.rows.map(([label, value]) => {
+        if (label === "Passed checks") {
+            return [label, Number(value) > 0 ? success(String(value)) : info(String(value))];
+        }
+
+        if (label === "Warn checks" || label === "Total warnings") {
+            return [label, Number(value) > 0 ? warning(String(value)) : info(String(value))];
+        }
+
+        if (
+            label === "Failed checks" ||
+            label === "Total errors" ||
+            label === "Exit code"
+        ) {
+            return [label, Number(value) > 0 ? failure(String(value)) : info(String(value))];
+        }
+
+        if (label === "Checks run") {
+            return [label, info(String(value))];
+        }
+
+        return [label, value];
+    });
+}
+
 export function runPageActionValidation(args: {
     verbose: boolean;
     strict: boolean;
@@ -128,7 +161,7 @@ export function runPageActionValidation(args: {
 
     printSummary(
         "VALIDATE SUMMARY",
-        summary.rows,
+        buildColoredSummaryRows(summary),
         buildColoredResultText(summary)
     );
 
