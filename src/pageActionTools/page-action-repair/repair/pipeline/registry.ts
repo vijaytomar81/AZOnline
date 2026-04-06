@@ -2,17 +2,27 @@
 
 import type { RepairRule } from "../types";
 import { repairMissingActionFiles } from "../rules/files/repairMissingActionFiles";
+import { repairActionFilePathConsistency } from "../rules/manifest/repairActionFilePathConsistency";
+import { repairActionIndexPathConsistency } from "../rules/manifest/repairActionIndexPathConsistency";
 import { repairActionKeyConsistency } from "../rules/manifest/repairActionKeyConsistency";
 import { repairManifestEntries } from "../rules/manifest/repairManifestEntries";
-import { repairIndexExports } from "../rules/registry/repairIndexExports";
+import { repairManifestIndexConsistency } from "../rules/manifest/repairManifestIndexConsistency";
+import { repairActionsRootExports } from "../rules/registry/repairActionsRootExports";
+import { repairPlatformIndexExports } from "../rules/registry/repairPlatformIndexExports";
+import { repairRootPageActionsExports } from "../rules/registry/repairRootPageActionsExports";
 import { repairGeneratedHeaderPath } from "../rules/hygiene/repairGeneratedHeaderPath";
 
 export function getPageActionRepairRules(): RepairRule[] {
     return [
         repairMissingActionFiles,
         repairManifestEntries,
+        repairManifestIndexConsistency,
         repairActionKeyConsistency,
-        repairIndexExports,
+        repairActionFilePathConsistency,
+        repairActionIndexPathConsistency,
+        repairRootPageActionsExports,
+        repairActionsRootExports,
+        repairPlatformIndexExports,
         repairGeneratedHeaderPath,
     ];
 }

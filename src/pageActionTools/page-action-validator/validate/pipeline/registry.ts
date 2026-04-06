@@ -5,11 +5,18 @@ import { checkPageObjectToActionCoverage } from "../rules/coverage/checkPageObje
 import { checkEnvironment } from "../rules/environment/checkEnvironment";
 import { checkActionFilesExist } from "../rules/files/checkActionFilesExist";
 import { checkUnexpectedActionFiles } from "../rules/files/checkUnexpectedActionFiles";
+import { checkActionFilePathConsistency } from "../rules/manifest/checkActionFilePathConsistency";
+import { checkActionIndexPathConsistency } from "../rules/manifest/checkActionIndexPathConsistency";
 import { checkActionKeyConsistency } from "../rules/manifest/checkActionKeyConsistency";
 import { checkManifestEntriesExist } from "../rules/manifest/checkManifestEntriesExist";
 import { checkManifestFiles } from "../rules/manifest/checkManifestFiles";
-import { checkIndexExports } from "../rules/registry/checkIndexExports";
+import { checkManifestIndexConsistency } from "../rules/manifest/checkManifestIndexConsistency";
+import { checkActionsRootExports } from "../rules/registry/checkActionsRootExports";
+import { checkPlatformIndexExports } from "../rules/registry/checkPlatformIndexExports";
+import { checkRootPageActionsExports } from "../rules/registry/checkRootPageActionsExports";
 import { checkActionFunctionName } from "../rules/hygiene/checkActionFunctionName";
+import { checkDuplicateActionKeys } from "../rules/hygiene/checkDuplicateActionKeys";
+import { checkDuplicateActionNames } from "../rules/hygiene/checkDuplicateActionNames";
 import { checkGeneratedHeaderPath } from "../rules/hygiene/checkGeneratedHeaderPath";
 
 export function getPageActionValidationRules(): ValidationRule[] {
@@ -20,9 +27,16 @@ export function getPageActionValidationRules(): ValidationRule[] {
         checkUnexpectedActionFiles,
         checkManifestEntriesExist,
         checkManifestFiles,
+        checkManifestIndexConsistency,
         checkActionKeyConsistency,
-        checkIndexExports,
+        checkActionFilePathConsistency,
+        checkActionIndexPathConsistency,
+        checkRootPageActionsExports,
+        checkActionsRootExports,
+        checkPlatformIndexExports,
         checkGeneratedHeaderPath,
         checkActionFunctionName,
+        checkDuplicateActionKeys,
+        checkDuplicateActionNames,
     ];
 }
