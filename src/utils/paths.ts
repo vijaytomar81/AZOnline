@@ -148,6 +148,40 @@ export const BUSINESS_JOURNEYS_DIR = path.join(
 
 export const PAGE_ACTIONS_DIR = path.join(SRC_DIR, "pageActions");
 
+export const PAGE_ACTIONS_ACTIONS_DIR = path.join(
+    PAGE_ACTIONS_DIR,
+    "actions"
+);
+
+// Manifest
+export const PAGE_ACTIONS_MANIFEST_DIR = path.join(
+    PAGE_ACTIONS_DIR,
+    ".manifest"
+);
+
+export const PAGE_ACTIONS_MANIFEST_INDEX_FILE = path.join(
+    PAGE_ACTIONS_MANIFEST_DIR,
+    "index.json"
+);
+export const PAGE_ACTIONS_MANIFEST_ACTIONS_DIR = path.join(
+    PAGE_ACTIONS_MANIFEST_DIR,
+    "actions"
+);
+
+/* =========================================================
+ * 🛠️ PAGE ACTION TOOLS DOMAIN
+ * ======================================================= */
+
+export const PAGE_ACTION_TOOLS_DIR = path.join(
+    SRC_DIR,
+    "pageActionTools"
+);
+
+export const PAGE_ACTION_GENERATOR_DIR = path.join(
+    PAGE_ACTION_TOOLS_DIR,
+    "page-action-generator"
+);
+
 /* =========================================================
  * 🤖 AUTOMATION DOMAIN
  * ======================================================= */

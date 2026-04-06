@@ -91,10 +91,30 @@ export function printStatus(symbol: string, text: string) {
         s = warning(symbol);
     } else if (symbol === ICONS.failIcon) {
         s = failure(symbol);
+    } else if (symbol === ICONS.hintIcon) {
+        s = info(symbol);
     }
 
     const iconPad = 2;
     console.log(`${s}${" ".repeat(iconPad)}${text}`);
+}
+
+export function printEnvironment(
+    rows: Array<[string, string | number | boolean]>
+) {
+    console.log("");
+    console.log(strong("Environment"));
+    console.log(muted("-----------"));
+
+    const longestKey = Math.max(...rows.map(([k]) => stripAnsi(String(k)).length));
+    const pad = longestKey + 1;
+
+    for (const [key, value] of rows) {
+        const label = String(key).padEnd(pad, " ");
+        console.log(`${muted(label)}: ${value}`);
+    }
+
+    console.log("");
 }
 
 export function printSummary(

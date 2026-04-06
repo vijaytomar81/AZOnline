@@ -1,5 +1,10 @@
 // src/executionLayer/mode/e2e/types.ts
 
+import type {
+    Application,
+    Product,
+} from "@config/domain/routing.config";
+
 export type RunE2EModeArgs = {
     excelPath: string;
     sheetName: string;
@@ -8,4 +13,6 @@ export type RunE2EModeArgs = {
     iterations: number;
     parallel?: number;
     verbose: boolean;
+    application?: Application;
+    product?: Product;
 };

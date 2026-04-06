@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "generatedAt": "2026-04-06T17:06:03.296Z",
+  "actions": {
+    "athena.common.insurance-type-selection": "athena.common.handle-insurance-type-selection.action.json",
+    "athena.common.login-or-registration": "athena.common.handle-login-or-registration.action.json",
+    "athena.common.manage-cookies": "athena.common.handle-manage-cookies.action.json",
+    "athena.motor.ph-driving-licence-details": "athena.motor.fill-ph-driving-licence-details.action.json"
+  }
+}

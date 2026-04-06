@@ -7,5 +7,6 @@ export type {
     PageAction,
 } from "./types";
 
-export { requireStringValue, requireRecordValue } from "./guards";
 export { requirePage, createPageActionContext } from "./context";
+export { requireStringValue, requireRecordValue } from "./guards";
+export { logPageActionInfo } from "./logging";

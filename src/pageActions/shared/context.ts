@@ -1,6 +1,7 @@
 // src/pageActions/shared/context.ts
 
 import { AppError } from "@utils/errors";
+import { PageManager } from "@pageObjects/pageManager";
 import type { ExecutionContext } from "@executionLayer/contracts";
 import type { PageActionContext } from "./types";
 
@@ -20,12 +21,17 @@ export function requirePage(
     });
 }
 
-export function createPageActionContext(
-    executionContext: ExecutionContext,
-    source: string
-): PageActionContext {
+export function createPageActionContext(args: {
+    executionContext: ExecutionContext;
+    source: string;
+    logScope: string;
+}): PageActionContext {
+    const page = requirePage(args.executionContext, args.source);
+
     return {
-        executionContext,
-        page: requirePage(executionContext, source),
+        executionContext: args.executionContext,
+        page,
+        pages: new PageManager(page),
+        logScope: args.logScope,
     };
 }

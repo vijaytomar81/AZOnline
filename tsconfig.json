@@ -40,6 +40,9 @@
       "@pageActions/*": [
         "src/pageActions/*"
       ],
+      "@pageActionTools/*": [
+        "src/pageActionTools/*"
+      ],
       "@pageObjectTools/*": [
         "src/pageObjectTools/*"
       ],
