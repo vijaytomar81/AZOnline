@@ -1,8 +1,8 @@
-// src/config/types/route-target.types.ts
+// src/configLayer/types/route-target.types.ts
 
-export type RouteStartKind = "Direct" | "PCW" | "PCWTool";
+import type { Platform } from "../models/platform.config";
 
 export type RouteTarget = {
-    kind: RouteStartKind;
+    platform: Platform;
     url: string;
 };

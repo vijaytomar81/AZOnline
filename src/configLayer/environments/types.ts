@@ -1,30 +1,38 @@
-// src/config/environments/types.ts
+// src/configLayer/environments/types.ts
 
-export type PcwPartner = "CTM" | "CNF" | "MSM" | "GOCO";
-export type Product = "Motor" | "Home";
-export type Application = "AzOnline" | "Ferry" | "Britannia";
+import type {
+    AthenaApplication,
+    PartnerApplication,
+} from "../models/application.config";
+import type { Product } from "../models/product.config";
 
-export type EnvKey = "dev" | "test" | "demo" | "nft";
+export type ApplicationUrlKey =
+    | "customerPortalUrl"
+    | "supportPortalUrl"
+    | "pcwTestToolUrl"
+    | "backdatingToolUrl";
 
-export type PartnerEntryUrls = {
-    Motor: Partial<Record<PcwPartner, string>>;
-    Home: Partial<Record<PcwPartner, string>>;
-};
+export type PartnerEntryUrls = Record<
+    Product,
+    Partial<Record<PartnerApplication, string>>
+>;
 
 export type ApplicationUrls = {
     customerPortalUrl: string;
-    supportPortalUrl?: string;
+    supportPortalUrl: string;
     pcwTestToolUrl: string;
     backdatingToolUrl: string;
     partnerEntryUrls: PartnerEntryUrls;
 };
 
 export type TargetEnvUrls = {
-    applications: Record<Application, ApplicationUrls>;
+    applications: Record<AthenaApplication, ApplicationUrls>;
 };
+
+export type EnvKey = "dev" | "test" | "demo" | "nft";
 
 export type EnvironmentsConfig = {
     defaultEnv: EnvKey;
-    calculatedEmailBase: string;
     envs: Record<EnvKey, TargetEnvUrls>;
+    calculatedEmailBase: string;
 };

@@ -1,17 +1,30 @@
 // src/configLayer/resolvers/resolveStartUrl.ts
 
 import { AppError } from "@utils/errors";
-import type { Application, Product } from "@configLayer/environments";
-import type { RouteDescriptor } from "../domain/routing.config";
-import { resolveApplicationUrl } from "./resolveApplicationUrl";
-import { resolvePcwUrl } from "./resolvePcwUrl";
+import { envConfig } from "@configLayer/env";
+import {
+    APPLICATIONS,
+    isAthenaApplication,
+    isPartnerApplication,
+    type Application,
+} from "../models/application.config";
+import type { Product } from "../models/product.config";
+import { getPlatformRouteConfig } from "../models/platformRoute.config";
+import type { RouteSelection } from "../types/routeSelection.types";
 import type { RouteTarget } from "../types/route-target.types";
+import { validateRouteSelection } from "../validators/validateRouteSelection";
+
+type ApplicationUrlKey =
+    | "customerPortalUrl"
+    | "supportPortalUrl"
+    | "pcwTestToolUrl"
+    | "backdatingToolUrl";
 
 function requireApplication(
-    application: RouteDescriptor["application"]
+    application: RouteSelection["application"]
 ): Application {
     if (application) {
-        return application as Application;
+        return application;
     }
 
     throw new AppError({
@@ -22,9 +35,9 @@ function requireApplication(
     });
 }
 
-function requireProduct(product: RouteDescriptor["product"]): Product {
+function requireProduct(product: RouteSelection["product"]): Product {
     if (product) {
-        return product as Product;
+        return product;
     }
 
     throw new AppError({
@@ -35,55 +48,100 @@ function requireProduct(product: RouteDescriptor["product"]): Product {
     });
 }
 
-export function resolveStartTarget(input: RouteDescriptor): RouteTarget {
-    const application = requireApplication(input.application);
-    const entryPoint = input.entryPoint ?? "Direct";
-
-    if (entryPoint === "Direct") {
-        return {
-            kind: "Direct",
-            url: resolveApplicationUrl({
-                application,
-                key: "customerPortalUrl",
-            }),
-        };
+function resolveHostedApplicationUrl(args: {
+    application: Application;
+    key: ApplicationUrlKey;
+}): string {
+    if (!isAthenaApplication(args.application)) {
+        throw new AppError({
+            code: "ATHENA_APPLICATION_REQUIRED",
+            stage: "route-resolution",
+            source: "resolveStartUrl",
+            message: `Application "${args.application}" is not a hosted Athena application.`,
+            context: args,
+        });
     }
 
-    if (entryPoint === "PCWTool") {
-        return {
-            kind: "PCWTool",
-            url: resolveApplicationUrl({
-                application,
-                key: "pcwTestToolUrl",
-            }),
-        };
-    }
+    const appUrls = envConfig.env.applications[args.application];
+    const url = appUrls?.[args.key];
 
-    if (entryPoint === "PCW") {
-        return {
-            kind: "PCW",
-            url: resolvePcwUrl({
-                application,
-                product: requireProduct(input.product),
-                journey: input.journey,
-            }),
-        };
+    if (url) {
+        return url;
     }
 
     throw new AppError({
-        code: "ENTRY_POINT_UNSUPPORTED",
+        code: "APPLICATION_URL_MISSING",
         stage: "route-resolution",
-        source: "resolveStartTarget",
-        message: `Unsupported entry point "${String(entryPoint)}".`,
+        source: "resolveStartUrl",
+        message: `URL "${args.key}" is missing for application "${args.application}" in environment "${envConfig.name}".`,
         context: {
-            application,
-            product: input.product,
-            journey: input.journey,
-            entryPoint,
+            environment: envConfig.name,
+            application: args.application,
+            key: args.key,
         },
     });
 }
 
-export function resolveStartUrl(input: RouteDescriptor): string {
+function resolvePartnerEntryUrl(args: {
+    application: Application;
+    product: Product;
+}): string {
+    if (!isPartnerApplication(args.application)) {
+        throw new AppError({
+            code: "PARTNER_APPLICATION_REQUIRED",
+            stage: "route-resolution",
+            source: "resolveStartUrl",
+            message: `Application "${args.application}" is not a partner application.`,
+            context: args,
+        });
+    }
+
+    const hostedApplication = APPLICATIONS.AZ_ONLINE;
+    const appUrls = envConfig.env.applications[hostedApplication];
+    const url = appUrls?.partnerEntryUrls?.[args.product]?.[args.application];
+
+    if (url) {
+        return url;
+    }
+
+    throw new AppError({
+        code: "PARTNER_ENTRY_URL_MISSING",
+        stage: "route-resolution",
+        source: "resolveStartUrl",
+        message: `No partner entry URL configured for application="${args.application}", product="${args.product}" in environment "${envConfig.name}".`,
+        context: {
+            environment: envConfig.name,
+            hostedApplication,
+            application: args.application,
+            product: args.product,
+        },
+    });
+}
+
+export function resolveStartTarget(input: RouteSelection): RouteTarget {
+    const selection = validateRouteSelection(input);
+    const application = requireApplication(selection.application);
+    const config = getPlatformRouteConfig(selection.platform);
+
+    if (config.urlResolutionMode === "applicationUrl") {
+        return {
+            platform: selection.platform,
+            url: resolveHostedApplicationUrl({
+                application,
+                key: config.applicationUrlKey,
+            }),
+        };
+    }
+
+    return {
+        platform: selection.platform,
+        url: resolvePartnerEntryUrl({
+            application,
+            product: requireProduct(selection.product),
+        }),
+    };
+}
+
+export function resolveStartUrl(input: RouteSelection): string {
     return resolveStartTarget(input).url;
 }
