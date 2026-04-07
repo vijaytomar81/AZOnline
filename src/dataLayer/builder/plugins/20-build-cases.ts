@@ -7,9 +7,9 @@ import { getSchema } from "../../data-definitions";
 import { buildVerticalCases } from "../core/buildVerticalCases";
 import { buildTabularCases } from "../core/buildTabularCases";
 import { DataBuilderError } from "../errors";
-import { emitLog } from "@logging/emitLog";
-import { LOG_CATEGORIES } from "@logging/core/logCategories";
-import { LOG_LEVELS } from "@logging/core/logLevels";
+import { emitLog } from "@frameworkCore/logging/emitLog";
+import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
+import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 
 const plugin: PipelinePlugin = {
     name: "build-cases",

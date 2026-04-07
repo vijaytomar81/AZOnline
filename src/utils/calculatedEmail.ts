@@ -1,8 +1,8 @@
 // src/utils/calculatedEmail.ts
 
 import { formatTimestamp } from "@utils/time";
-import { environments } from "@config/environments";
-import { envConfig } from "@config/env";
+import { environments } from "@configLayer/environments";
+import { envConfig } from "@configLayer/env";
 
 function normalize(value: string): string {
     return String(value || "")

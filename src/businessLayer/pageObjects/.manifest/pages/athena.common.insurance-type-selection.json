@@ -1,0 +1,20 @@
+{
+  "pageKey": "athena.common.insurance-type-selection",
+  "product": "athena",
+  "group": "common",
+  "name": "insurance-type-selection",
+  "className": "InsuranceTypeSelectionPage",
+  "paths": {
+    "pageObjectImport": "@businessLayer/pageObjects/objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage",
+    "pageObjectFile": "src/pageObjects/objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage.ts",
+    "elementsFile": "src/pageObjects/objects/athena/common/insurance-type-selection/elements.ts",
+    "aliasesGeneratedFile": "src/pageObjects/objects/athena/common/insurance-type-selection/aliases.generated.ts",
+    "aliasesFile": "src/pageObjects/objects/athena/common/insurance-type-selection/aliases.ts",
+    "pageMapFile": "src/pageObjects/maps/athena.common.insurance-type-selection.json"
+  },
+  "urlPath": "/products",
+  "title": "Get a new quote or view saved quotes",
+  "elementCount": 7,
+  "scannedAt": "2026-03-13T10:57:20.737Z",
+  "mapHash": "20bc41351912ef989593ab57164dd3b12e20ea38"
+}

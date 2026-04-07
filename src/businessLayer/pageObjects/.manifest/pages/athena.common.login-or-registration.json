@@ -1,0 +1,20 @@
+{
+  "pageKey": "athena.common.login-or-registration",
+  "product": "athena",
+  "group": "common",
+  "name": "login-or-registration",
+  "className": "LoginOrRegistrationPage",
+  "paths": {
+    "pageObjectImport": "@businessLayer/pageObjects/objects/athena/common/login-or-registration/LoginOrRegistrationPage",
+    "pageObjectFile": "src/pageObjects/objects/athena/common/login-or-registration/LoginOrRegistrationPage.ts",
+    "elementsFile": "src/pageObjects/objects/athena/common/login-or-registration/elements.ts",
+    "aliasesGeneratedFile": "src/pageObjects/objects/athena/common/login-or-registration/aliases.generated.ts",
+    "aliasesFile": "src/pageObjects/objects/athena/common/login-or-registration/aliases.ts",
+    "pageMapFile": "src/pageObjects/maps/athena.common.login-or-registration.json"
+  },
+  "urlPath": "/",
+  "title": "Allianz login page",
+  "elementCount": 4,
+  "scannedAt": "2026-03-09T12:48:41.552Z",
+  "mapHash": "82def2f2ff4abd1756f19702f8903ff8c2227ab7"
+}

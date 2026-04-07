@@ -1,7 +1,7 @@
 // playwright.config.ts
 
 import { defineConfig } from '@playwright/test';
-import { executionConfig } from './src/config/execution.config';
+import { executionConfig } from './src/configLayer/execution.config';
 
 export default defineConfig({
   testDir: './src/tests',

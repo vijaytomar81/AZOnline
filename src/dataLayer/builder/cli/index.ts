@@ -1,9 +1,9 @@
 // src/dataLayer/builder/cli/index.ts
 
 import { getArg, hasFlag, normalizeArgv } from "@utils/argv";
-import { emitLog } from "@logging/emitLog";
-import { LOG_CATEGORIES } from "@logging/core/logCategories";
-import { LOG_LEVELS } from "@logging/core/logLevels";
+import { emitLog } from "@frameworkCore/logging/emitLog";
+import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
+import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import type { DataBuilderBaseArgs } from "../types";
 import { DataBuilderError } from "../errors";
 import { parseBoolean } from "./parseBoolean";

@@ -2,11 +2,11 @@
 
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
-import { executionConfig } from "../../../config/execution.config";
+import { executionConfig } from "../../../configLayer/execution.config";
 import { DATA_GENERATED_ARCHIVE_DIR } from "@utils/paths";
-import { emitLog } from "@logging/emitLog";
-import { LOG_CATEGORIES } from "@logging/core/logCategories";
-import { LOG_LEVELS } from "@logging/core/logLevels";
+import { emitLog } from "@frameworkCore/logging/emitLog";
+import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
+import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import { resolveWriteJsonInputs } from "../core/writeJson/resolveWriteJsonInputs";
 import { resolveOutputPath } from "../core/writeJson/resolveOutputPath";
 import {

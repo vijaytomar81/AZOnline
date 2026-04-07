@@ -4,11 +4,11 @@
     "noEmit": true
   },
   "include": [
-    "src/tools/pageScanner/**/*.ts",
-    "src/tools/pageObjects/**/*.ts",
-    "src/tools/pageActions/**/*.ts",
-    "src/tools/businessJourneys/**/*.ts",
-    "src/tools/quality/**/*.ts"
+    "src/toolingLayer/pageScanner/**/*.ts",
+    "src/toolingLayer/pageObjects/**/*.ts",
+    "src/toolingLayer/pageActions/**/*.ts",
+    "src/toolingLayer/businessJourneys/**/*.ts",
+    "src/toolingLayer/quality/**/*.ts"
   ],
   "exclude": [
     "node_modules",

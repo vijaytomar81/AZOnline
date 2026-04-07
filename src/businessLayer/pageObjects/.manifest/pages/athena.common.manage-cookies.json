@@ -1,0 +1,20 @@
+{
+  "pageKey": "athena.common.manage-cookies",
+  "product": "athena",
+  "group": "common",
+  "name": "manage-cookies",
+  "className": "ManageCookiesPage",
+  "paths": {
+    "pageObjectImport": "@businessLayer/pageObjects/objects/athena/common/manage-cookies/ManageCookiesPage",
+    "pageObjectFile": "src/pageObjects/objects/athena/common/manage-cookies/ManageCookiesPage.ts",
+    "elementsFile": "src/pageObjects/objects/athena/common/manage-cookies/elements.ts",
+    "aliasesGeneratedFile": "src/pageObjects/objects/athena/common/manage-cookies/aliases.generated.ts",
+    "aliasesFile": "src/pageObjects/objects/athena/common/manage-cookies/aliases.ts",
+    "pageMapFile": "src/pageObjects/maps/athena.common.manage-cookies.json"
+  },
+  "urlPath": "/",
+  "title": "Allianz login page",
+  "elementCount": 4,
+  "scannedAt": "2026-04-01T10:40:09.711Z",
+  "mapHash": "448fcfa5529a02b2626d94a338006ffb08026a13"
+}

@@ -23,88 +23,32 @@
       "@/*": [
         "src/*"
       ],
-
-      "@automation/*": [
-        "src/automation/*"
+      "@frameworkCore/*": [
+        "src/frameworkCore/*"
       ],
-
-      "@pageObjects/*": [
-        "src/pageObjects/*"
+      "@businessLayer/*": [
+        "src/businessLayer/*"
       ],
-      "@pageMaps/*": [
-        "src/pageObjects/maps/*"
-      ],
-      "@pageObjectsObjects/*": [
-        "src/pageObjects/objects/*"
-      ],
-      "@pageManifest/*": [
-        "src/pageObjects/.manifest/*"
-      ],
-
-      "@pageActions/*": [
-        "src/pageActions/*"
-      ],
-
-      "@tools/*": [
-        "src/tools/*"
-      ],
-
-      "@pageScanner/*": [
-        "src/tools/pageScanner/*"
-      ],
-
-      "@pageObjectGenerator/*": [
-        "src/tools/pageObjects/generator/*"
-      ],
-      "@pageObjectValidator/*": [
-        "src/tools/pageObjects/validator/*"
-      ],
-      "@pageObjectRepair/*": [
-        "src/tools/pageObjects/repair/*"
-      ],
-      "@pageObjectCommon/*": [
-        "src/tools/pageObjects/common/*"
-      ],
-
-      "@pageActionGenerator/*": [
-        "src/tools/pageActions/generator/*"
-      ],
-
-      "@businessJourneyGenerator/*": [
-        "src/tools/businessJourneys/generator/*"
-      ],
-
-      "@quality/*": [
-        "src/tools/quality/*"
-      ],
-      "@fileHeaderChecker/*": [
-        "src/tools/quality/fileHeaderChecker/*"
-      ],
-
-      "@sharedTools/*": [
-        "src/tools/shared/*"
-      ],
-
-      "@utils/*": [
-        "src/utils/*"
+      "@configLayer/*": [
+        "src/configLayer/*"
       ],
       "@dataLayer/*": [
         "src/dataLayer/*"
       ],
-      "@executionLayer/*": [
-        "src/executionLayer/*"
+      "@evidenceLayer": [
+        "src/evidenceLayer/index.ts"
       ],
-      "@businessJourneys/*": [
-        "src/businessJourneys/*"
+      "@evidenceLayer/*": [
+        "src/evidenceLayer/*"
       ],
-      "@config/*": [
-        "src/config/*"
+      "@integrations/*": [
+        "src/integrations/*"
       ],
-      "@logging/*": [
-        "src/logging/*"
+      "@toolingLayer/*": [
+        "src/toolingLayer/*"
       ],
-      "@evidence/*": [
-        "src/evidence/*"
+      "@utils/*": [
+        "src/utils/*"
       ]
     }
   },
