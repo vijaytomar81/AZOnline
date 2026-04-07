@@ -1,24 +1,26 @@
 // src/businessJourneyTools/business-journey-generator/generator/render/renderStepFile.ts
 
 import { toRepoRelative } from "@utils/paths";
-import { buildStepExportName } from "../naming/buildStepExportName";
+import type { StepMapping } from "../types";
 
 export function renderStepFile(args: {
     filePath: string;
-    stepName: string;
+    mapping: StepMapping;
 }): string {
-    const exportName = buildStepExportName(args.stepName);
-
     return `// ${toRepoRelative(args.filePath)}
 
 import type { JourneyStep } from "@businessJourneys/shared/types";
+import { ${args.mapping.actionImportName} } from "${args.mapping.actionImportSource}";
 
-export const ${exportName}: JourneyStep = {
-    stepKey: "${args.stepName}",
+export const ${args.mapping.stepExportName}: JourneyStep = {
+    stepKey: "${args.mapping.stepName}",
     run: async ({ context, data }) => {
-        // TODO: wire matching pageAction here
-        // TODO: refine payload source path here
-        void context;
+        await ${args.mapping.actionImportName}({
+            context: context.pageActionContext,
+            payload: ${args.mapping.payloadExpression},
+        });
+
+        // TODO: refine payload source path if needed
         void data;
     },
 };

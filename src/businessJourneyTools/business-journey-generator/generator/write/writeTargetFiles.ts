@@ -8,8 +8,8 @@ import type {
 } from "../types";
 import { buildJourneyNames } from "../naming/buildJourneyNames";
 import { buildStepExportName } from "../naming/buildStepExportName";
-import { buildStepFileName } from "../naming/buildStepFileName";
 import { selectCandidates } from "../selectCandidates";
+import { mapActionToStep } from "../mapActionToStep";
 import { renderBuildStepsFile } from "../render/renderBuildStepsFile";
 import { renderEntryPointBuilderFile } from "../render/renderEntryPointBuilderFile";
 import { renderIndexFile } from "../render/renderIndexFile";
@@ -24,6 +24,7 @@ export function writeTargetFiles(
 ): { filesCreated: number } {
     const names = buildJourneyNames(target);
     const candidates = selectCandidates(target, inputs);
+    const mappings = candidates.map(mapActionToStep);
 
     const baseDir = path.join(
         BUSINESS_JOURNEYS_DIR,
@@ -58,29 +59,11 @@ export function writeTargetFiles(
     const commonIndexFile = path.join(baseDir, "steps", "common", "index.ts");
     const stepsIndexFile = path.join(baseDir, "steps", "index.ts");
 
-    if (
-        writeFileIfMissing(
-            runFile,
-            renderRunJourneyFile({
-                filePath: runFile,
-                target,
-                names,
-            })
-        )
-    ) {
+    if (writeFileIfMissing(runFile, renderRunJourneyFile({ filePath: runFile, target, names }))) {
         filesCreated++;
     }
 
-    if (
-        writeFileIfMissing(
-            buildStepsFile,
-            renderBuildStepsFile({
-                filePath: buildStepsFile,
-                target,
-                names,
-            })
-        )
-    ) {
+    if (writeFileIfMissing(buildStepsFile, renderBuildStepsFile({ filePath: buildStepsFile, target, names }))) {
         filesCreated++;
     }
 
@@ -101,58 +84,29 @@ export function writeTargetFiles(
         filesCreated++;
     }
 
-    if (
-        writeFileIfMissing(
-            commonStepFile,
-            renderOpenStartUrlStepFile(commonStepFile)
-        )
-    ) {
+    if (writeFileIfMissing(commonStepFile, renderOpenStartUrlStepFile(commonStepFile))) {
         filesCreated++;
     }
 
-    for (const candidate of candidates) {
-        const stepName = candidate.actionKey.split(".").slice(-1)[0];
+    for (const mapping of mappings) {
         const stepFile = path.join(
             baseDir,
             "steps",
-            candidate.actionKey.startsWith("athena.") ? "athena" : "partner",
-            buildStepFileName(stepName)
+            mapping.stepFolder,
+            mapping.stepFileName
         );
 
-        if (
-            writeFileIfMissing(
-                stepFile,
-                renderStepFile({
-                    filePath: stepFile,
-                    stepName,
-                })
-            )
-        ) {
+        if (writeFileIfMissing(stepFile, renderStepFile({ filePath: stepFile, mapping }))) {
             filesCreated++;
         }
     }
 
-    const stepExports = candidates.map((candidate) => {
-        const stepName = candidate.actionKey.split(".").slice(-1)[0];
-        const fileName = buildStepFileName(stepName).replace(".ts", "");
-        const exportName = buildStepExportName(stepName);
-        const group = candidate.actionKey.startsWith("athena.") ? "athena" : "partner";
+    const stepExports = mappings.map((mapping) => ({
+        exportName: mapping.stepExportName,
+        from: `${mapping.stepFolder}/${mapping.stepFileName.replace(".ts", "")}`,
+    }));
 
-        return {
-            exportName,
-            from: `${group}/${fileName}`,
-        };
-    });
-
-    if (
-        writeFileIfMissing(
-            stepsIndexFile,
-            renderIndexFile({
-                filePath: stepsIndexFile,
-                exports: stepExports,
-            })
-        )
-    ) {
+    if (writeFileIfMissing(stepsIndexFile, renderIndexFile({ filePath: stepsIndexFile, exports: stepExports }))) {
         filesCreated++;
     }
 
@@ -161,12 +115,7 @@ export function writeTargetFiles(
             commonIndexFile,
             renderIndexFile({
                 filePath: commonIndexFile,
-                exports: [
-                    {
-                        exportName: "stepOpenStartUrl",
-                        from: "stepOpenStartUrl",
-                    },
-                ],
+                exports: [{ exportName: "stepOpenStartUrl", from: "stepOpenStartUrl" }],
             })
         )
     ) {
@@ -178,11 +127,7 @@ export function writeTargetFiles(
             entryPointIndexFile,
             renderIndexFile({
                 filePath: entryPointIndexFile,
-                exports: [
-                    {
-                        from: entryPointFileName.replace(".ts", ""),
-                    },
-                ],
+                exports: [{ from: entryPointFileName.replace(".ts", "") }],
             })
         )
     ) {
@@ -194,12 +139,7 @@ export function writeTargetFiles(
             journeyIndexFile,
             renderIndexFile({
                 filePath: journeyIndexFile,
-                exports: [
-                    {
-                        exportName: names.runExportName,
-                        from: names.runFileName.replace(".ts", ""),
-                    },
-                ],
+                exports: [{ exportName: names.runExportName, from: names.runFileName.replace(".ts", "") }],
             })
         )
     ) {
