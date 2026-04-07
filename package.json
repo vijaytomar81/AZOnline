@@ -16,10 +16,14 @@
   "data:build:noEmpty:strict": "npm run data -- --excludeEmptyFields --strictValidation",
   "data:build:noEmpty:strict:verbose": "npm run data -- --excludeEmptyFields --strictValidation --verbose",
   "data:help": "npm run data -- --help",
-  "data:direct": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"FlowNB\"",
-  "data:pcw": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"PCW-Tool\"",
-  "data:verbose:direct": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"FlowNB\" --verbose",
-  "data:verbose:pcw": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"PCW-Tool\" --verbose",
+
+  "data:nb:athena:azonline:motor": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"FlowNB\" --platform \"Athena\" --application \"AzOnline\" --product \"Motor\" --journeyContext \"NewBusiness\"",
+  "data:nb:pcw:ctm:motor": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"FlowNB\" --platform \"PCW\" --application \"CTM\" --product \"Motor\" --journeyContext \"NewBusiness\"",
+  "data:nb:pcwtool:ctm:motor": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"PCW-Tool\" --platform \"PCWTool\" --application \"CTM\" --product \"Motor\" --journeyContext \"NewBusiness\"",
+
+  "data:verbose:nb:athena:azonline:motor": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"FlowNB\" --platform \"Athena\" --application \"AzOnline\" --product \"Motor\" --journeyContext \"NewBusiness\" --verbose",
+  "data:verbose:nb:pcw:ctm:motor": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"FlowNB\" --platform \"PCW\" --application \"CTM\" --product \"Motor\" --journeyContext \"NewBusiness\" --verbose",
+  "data:verbose:nb:pcwtool:ctm:motor": "npm run data:build -- --excel \"sampleData/New Business.xlsx\" --sheet \"PCW-Tool\" --platform \"PCWTool\" --application \"CTM\" --product \"Motor\" --journeyContext \"NewBusiness\" --verbose",
 
   "execution": "node -r ts-node/register -r tsconfig-paths/register src/frameworkCore/executionLayer/cli/main.ts",
   "execution:run": "npm run execution --",

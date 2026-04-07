@@ -1,23 +1,38 @@
 // src/dataLayer/runtime/cases/buildCasesFileNotFoundError.ts
 
+import type { Application } from "@configLayer/models/application.config";
+import type { JourneyContext } from "@configLayer/models/journeyContext.config";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Product } from "@configLayer/models/product.config";
 import { DataBuilderError } from "../../builder/errors";
 import { findGeneratedManifestItem } from "@dataLayer/runtime/manifest/generatedManifest";
 
 export function buildCasesFileNotFoundError(args: {
+    platform: Platform;
+    application: Application;
+    product: Product;
+    journeyContext: JourneyContext;
     sheetName: string;
     schemaName: string;
     attemptedPath?: string;
 }): DataBuilderError {
     const manifestItem = findGeneratedManifestItem({
+        platform: args.platform,
+        application: args.application,
+        product: args.product,
+        journeyContext: args.journeyContext,
         sheetName: args.sheetName,
-        schemaName: args.schemaName,
     });
 
     const lines: string[] = [
         "No generated data JSON found via manifest.",
         "",
-        `Sheet   : ${args.sheetName}`,
-        `Schema  : ${args.schemaName}`,
+        `Platform       : ${args.platform}`,
+        `Application    : ${args.application}`,
+        `Product        : ${args.product}`,
+        `JourneyContext : ${JSON.stringify(args.journeyContext)}`,
+        `Sheet          : ${args.sheetName}`,
+        `Schema         : ${args.schemaName}`,
         "",
     ];
 
@@ -46,7 +61,7 @@ export function buildCasesFileNotFoundError(args: {
 
     lines.push("Next step:");
     lines.push(
-        `  npm run data:build -- --excel <path> --sheet "${args.sheetName}"`
+        `  npm run data:build -- --excel <path> --sheet "${args.sheetName}" --platform "${args.platform}" --application "${args.application}" --product "${args.product}" --journeyContext "${args.journeyContext.type}"`
     );
 
     return new DataBuilderError({
@@ -55,6 +70,10 @@ export function buildCasesFileNotFoundError(args: {
         source: "buildCasesFileNotFoundError",
         message: lines.join("\n"),
         context: {
+            platform: args.platform,
+            application: args.application,
+            product: args.product,
+            journeyContext: args.journeyContext,
             sheetName: args.sheetName,
             schemaName: args.schemaName,
             filePath: args.attemptedPath ?? "",

@@ -1,13 +1,21 @@
 // src/dataLayer/runtime/cases/selectCases.ts
 
+import type { Application } from "@configLayer/models/application.config";
+import type { JourneyContext } from "@configLayer/models/journeyContext.config";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Product } from "@configLayer/models/product.config";
 import { DataBuilderError } from "../../builder/errors";
 import { loadCases, CaseObject } from "./loadCases";
 
-export function selectCases(
-    sheetName: string,
-    schemaName?: string
-): Array<{ scriptName: string; payload: CaseObject }> {
-    const all = loadCases(sheetName, schemaName);
+export function selectCases(args: {
+    platform: Platform;
+    application: Application;
+    product: Product;
+    journeyContext: JourneyContext;
+    sheetName: string;
+    schemaName?: string;
+}): Array<{ scriptName: string; payload: CaseObject }> {
+    const all = loadCases(args);
     const filter = String(process.env.CASE ?? "").trim();
 
     if (!filter) {
@@ -35,8 +43,12 @@ export function selectCases(
             source: "selectCases",
             message: `CASE selection error. Missing scriptName(s): ${missing.join(", ")}`,
             context: {
-                sheetName,
-                schemaName: schemaName ?? "",
+                platform: args.platform,
+                application: args.application,
+                product: args.product,
+                journeyContext: args.journeyContext,
+                sheetName: args.sheetName,
+                schemaName: args.schemaName ?? "",
                 requestedCases: wanted.join(", "),
                 missingCases: missing.join(", "),
             },

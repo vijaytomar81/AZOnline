@@ -10,104 +10,135 @@ import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import { resolveWriteJsonInputs } from "../core/writeJson/resolveWriteJsonInputs";
 import { resolveOutputPath } from "../core/writeJson/resolveOutputPath";
 import {
-  writeCasesJson,
-  type ArtifactWriteOptions,
+    writeCasesJson,
+    type ArtifactWriteOptions,
 } from "../core/writeJson/writeCasesJson";
 import { writeValidationReport } from "../core/writeJson/writeValidationReport";
 import { updateGeneratedManifest } from "../core/writeJson/updateGeneratedManifest";
 
 const plugin: PipelinePlugin = {
-  name: "write-json",
-  order: 70,
-  requires: [
-    "casesFile",
-    "external:sheetName",
-    "external:outputPath",
-    "external:schemaName",
-  ],
-  provides: ["absOut"],
+    name: "write-json",
+    order: 70,
+    requires: [
+        "casesFile",
+        "external:sheetName",
+        "external:outputPath",
+        "external:schemaName",
+        "external:platform",
+        "external:application",
+        "external:product",
+        "external:journeyContext",
+    ],
+    provides: ["absOut"],
 
-  run: async (ctx: DataBuilderContext) => {
-    const scope = ctx.logScope;
+    run: async (ctx: DataBuilderContext) => {
+        const scope = ctx.logScope;
 
-    const { casesFile, sheetName, schemaName } = resolveWriteJsonInputs({
-      casesFile: ctx.data.casesFile,
-      sheetName: ctx.data.sheetName,
-      schemaName: ctx.data.schemaName,
-    });
+        const {
+            casesFile,
+            sheetName,
+            schemaName,
+            platform,
+            application,
+            product,
+            journeyContext,
+        } = resolveWriteJsonInputs({
+            casesFile: ctx.data.casesFile,
+            sheetName: ctx.data.sheetName,
+            schemaName: ctx.data.schemaName,
+            platform: ctx.data.platform,
+            application: ctx.data.application,
+            product: ctx.data.product,
+            journeyContext: ctx.data.journeyContext,
+        });
 
-    const { absBaseOut } = resolveOutputPath({
-      outputPath: ctx.data.outputPath,
-      schemaName,
-      sheetName,
-    });
+        const { absBaseOut } = resolveOutputPath({
+            outputPath: ctx.data.outputPath,
+            sheetName,
+            platform,
+            application,
+            product,
+            journeyContext,
+        });
 
-    const artifactOpts: ArtifactWriteOptions = {
-      withTimestamp: executionConfig.generatedDataArtifacts.withTimestamp,
-      archiveDirPath: DATA_GENERATED_ARCHIVE_DIR,
-      maxToKeep: executionConfig.generatedDataArtifacts.maxToKeep,
-      pretty: true,
-    };
+        const artifactOpts: ArtifactWriteOptions = {
+            withTimestamp: executionConfig.generatedDataArtifacts.withTimestamp,
+            archiveDirPath: DATA_GENERATED_ARCHIVE_DIR,
+            maxToKeep: executionConfig.generatedDataArtifacts.maxToKeep,
+            pretty: true,
+        };
 
-    const writtenJsonPath = writeCasesJson({
-      absBaseOut,
-      casesFile,
-      artifactOpts,
-      sheetName,
-      schemaName,
-    });
+        const writtenJsonPath = writeCasesJson({
+            absBaseOut,
+            casesFile,
+            artifactOpts,
+            sheetName,
+            schemaName,
+            platform,
+            application,
+            product,
+            journeyContext,
+        });
 
-    ctx.data.absOut = writtenJsonPath;
+        ctx.data.absOut = writtenJsonPath;
 
-    const writtenReportPath = writeValidationReport({
-      absBaseOut,
-      validationReport: ctx.data.validationReport,
-      artifactOpts,
-      sheetName,
-      schemaName,
-    });
+        const writtenReportPath = writeValidationReport({
+            absBaseOut,
+            validationReport: ctx.data.validationReport,
+            artifactOpts,
+            sheetName,
+            schemaName,
+            platform,
+            application,
+            product,
+            journeyContext,
+        });
 
-    if (writtenReportPath) {
-      emitLog({
-        scope,
-        level: LOG_LEVELS.INFO,
-        category: LOG_CATEGORIES.ARTIFACT,
-        message: `Validation report written: ${writtenReportPath}`,
-      });
-    }
+        if (writtenReportPath) {
+            emitLog({
+                scope,
+                level: LOG_LEVELS.INFO,
+                category: LOG_CATEGORIES.ARTIFACT,
+                message: `Validation report written: ${writtenReportPath}`,
+            });
+        }
 
-    updateGeneratedManifest({
-      sheetName,
-      schemaName,
-      writtenJsonPath,
-      writtenReportPath,
-      casesFile,
-    });
+        updateGeneratedManifest({
+            platform,
+            application,
+            product,
+            journeyContext,
+            sheetName,
+            schemaName,
+            writtenJsonPath,
+            writtenReportPath,
+            casesFile,
+        });
 
-    emitLog({
-      scope,
-      level: LOG_LEVELS.INFO,
-      category: LOG_CATEGORIES.ARTIFACT,
-      message: `JSON written: ${writtenJsonPath}`,
-    });
+        emitLog({
+            scope,
+            level: LOG_LEVELS.INFO,
+            category: LOG_CATEGORIES.ARTIFACT,
+            message: `JSON written: ${writtenJsonPath}`,
+        });
 
-    emitLog({
-      scope,
-      level: LOG_LEVELS.DEBUG,
-      category: LOG_CATEGORIES.ARTIFACT,
-      message: `cases=${casesFile.caseCount}`,
-    });
+        emitLog({
+            scope,
+            level: LOG_LEVELS.DEBUG,
+            category: LOG_CATEGORIES.ARTIFACT,
+            message: `cases=${casesFile.caseCount}`,
+        });
 
-    emitLog({
-      scope,
-      level: LOG_LEVELS.DEBUG,
-      category: LOG_CATEGORIES.ARTIFACT,
-      message:
-        `generatedArtifacts.withTimestamp=${executionConfig.generatedDataArtifacts.withTimestamp}, ` +
-        `archiveDir=${DATA_GENERATED_ARCHIVE_DIR}, ` +
-        `maxToKeep=${executionConfig.generatedDataArtifacts.maxToKeep}`,
-    });
-  },
+        emitLog({
+            scope,
+            level: LOG_LEVELS.DEBUG,
+            category: LOG_CATEGORIES.ARTIFACT,
+            message:
+                `generatedArtifacts.withTimestamp=${executionConfig.generatedDataArtifacts.withTimestamp}, ` +
+                `archiveDir=${DATA_GENERATED_ARCHIVE_DIR}, ` +
+                `maxToKeep=${executionConfig.generatedDataArtifacts.maxToKeep}`,
+        });
+    },
 };
 
 export default plugin;

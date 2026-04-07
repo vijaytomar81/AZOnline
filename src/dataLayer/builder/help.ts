@@ -9,31 +9,26 @@ export function usage(): string {
 Data Builder CLI
 
 Usage:
-  ts-node src/data/builder/index.ts --excel <path> --sheet <name> [options]
+  ts-node src/data/builder/index.ts --excel <path> --sheet <name> --platform <name> --application <name> --product <name> --journeyContext <name> [options]
 
 Required:
-  --excel <path>        Path to Excel file
-  --sheet <name>        Sheet name to process
+  --excel <path>              Path to Excel file
+  --sheet <name>              Sheet name to process
+  --platform <name>           Platform
+  --application <name>        Application
+  --product <name>            Product
+  --journeyContext <name>     Journey context
 
 Optional:
-  --schema <name>       Schema / journey name
-                        (default: master)
-                        Available: ${schemas}
+  --schema <name>             Schema name
+                              Available: ${schemas}
 
-  --out <path>          Output file OR folder
-                        (default: src/data/generated/<sheet>.json)
-
-  --ids <id1,id2>       Filter by script IDs
-                        Supports:
-                        1
-                        1,2,5
-                        1-10
-                        1,3-10,15
-
-  --excludeEmptyFields  Remove empty mapped fields from JSON
-  --strictValidation    Enable strict validation checks
-  --verbose             Enable debug logs
-  --help, -h            Show help
+  --out <path>                Output file OR folder
+  --ids <id1,id2>             Filter by script IDs
+  --excludeEmptyFields        Remove empty mapped fields from JSON
+  --strictValidation          Enable strict validation checks
+  --verbose                   Enable debug logs
+  --help, -h                  Show help
 
 Environment variable equivalents:
   EXCEL_PATH
@@ -44,5 +39,9 @@ Environment variable equivalents:
   EXCLUDE_EMPTY_FIELDS
   STRICT_VALIDATION
   VERBOSE
+  PLATFORM
+  APPLICATION
+  PRODUCT
+  JOURNEY_CONTEXT
 `.trim();
 }
