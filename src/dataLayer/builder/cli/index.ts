@@ -153,7 +153,8 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
 
     const schemaName = resolveSchemaArg({
         schemaArg,
-        sheetName,
+        journeyContext,
+        platform,
     });
 
     if (verbose) {

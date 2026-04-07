@@ -1,25 +1,8 @@
 // src/dataLayer/data-definitions/index.ts
 
-export { buildAvailableSheetMappingsText } from "./buildAvailableSheetMappingsText";
-export {
-    getSchema,
-    getSchemaDataDefinitionGroup,
-    getSchemaDefinition,
-} from "./getSchemaDefinition";
-export {
-    findSchemaNameBySheetAlias,
-    listSheetAliases,
-} from "./listSheetAliases";
+export { getSchema, getSchemaDataDefinitionGroup, getSchemaDefinition } from "./getSchemaDefinition";
 export { listSchemas } from "./listSchemas";
 export { dataDefinitionRegistry } from "./registry";
 export { resolveSchemaName } from "./resolveSchemaName";
-export type {
-    DataDefinitionGroup,
-    DataSchema,
-    ExcelColumnName,
-    FieldMapping,
-    RegisteredSchema,
-    RepeatedGroup,
-    RepeatedGroups,
-    SchemaGroupMap,
-} from "./types";
+export { resolveSchemaSelection, SCHEMA_SELECTION } from "./schemaSelection.config";
+export * from "./types";

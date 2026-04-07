@@ -9,6 +9,7 @@ import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import { runSchemaValidation } from "../core/validation/runSchemaValidation";
 import { logValidationSummary } from "../core/validation/logValidationSummary";
 import { logValidationDetails } from "../core/validation/logValidationDetails";
+import { detectLayout } from "../core/spreadsheet/detectLayout";
 
 const plugin: PipelinePlugin = {
     name: "validate-schema",
@@ -27,10 +28,15 @@ const plugin: PipelinePlugin = {
             });
         }
 
+        const layout = detectLayout(ws);
+
         const report = runSchemaValidation({
             ws,
             schemaName: ctx.data.schemaName,
             sheetName: ctx.data.sheetName,
+            platform: ctx.data.platform,
+            journeyContext: ctx.data.journeyContext,
+            layout,
             strict: !!ctx.data.strictValidation,
         });
 
@@ -61,6 +67,10 @@ const plugin: PipelinePlugin = {
                 context: {
                     schemaName: ctx.data.schemaName,
                     sheetName: ctx.data.sheetName,
+                    platform: ctx.data.platform,
+                    application: ctx.data.application,
+                    product: ctx.data.product,
+                    journeyContext: ctx.data.journeyContext,
                     errorCount: report.errors.length,
                 },
             });

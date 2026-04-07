@@ -37,7 +37,12 @@ const plugin: PipelinePlugin = {
             });
         }
 
-        const schema = getSchema(ctx.data.schemaName, ctx.data.sheetName);
+        const schema = getSchema({
+            schemaName: ctx.data.schemaName,
+            journeyContext: ctx.data.journeyContext,
+            platform: ctx.data.platform,
+        });
+
         const includeEmpty = !ctx.data.excludeEmptyFields;
 
         if (verbose) {

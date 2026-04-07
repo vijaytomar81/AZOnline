@@ -2,17 +2,13 @@
 
 import path from "node:path";
 import { toRepoRelative } from "@utils/paths";
-import type { Application } from "@configLayer/models/application.config";
-import type { JourneyContext } from "@configLayer/models/journeyContext.config";
 import type { Platform } from "@configLayer/models/platform.config";
+import type { Application } from "@configLayer/models/application.config";
 import type { Product } from "@configLayer/models/product.config";
+import type { JourneyContext } from "@configLayer/models/journeyContext.config";
 
-function safeName(name: string): string {
-    return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim() || "unknown";
-}
-
-function journeyContextFolderName(journeyContext: JourneyContext): string {
-    return journeyContext.type.toLowerCase();
+function safe(name: string): string {
+    return name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim();
 }
 
 export function resolveOutputPath(args: {
@@ -27,16 +23,16 @@ export function resolveOutputPath(args: {
         return args.outRaw;
     }
 
+    const journeyFolder = args.journeyContext.type.toLowerCase();
+
     return toRepoRelative(
         path.join(
-            "src",
-            "dataLayer",
-            "generated",
-            journeyContextFolderName(args.journeyContext),
-            safeName(args.platform),
-            safeName(args.application),
-            safeName(args.product),
-            `${safeName(args.sheetName)}.json`
+            "src/dataLayer/generated",
+            journeyFolder,
+            args.platform.toLowerCase(),
+            args.application.toLowerCase(),
+            args.product.toLowerCase(),
+            `${safe(args.sheetName)}.json`
         )
     );
 }
