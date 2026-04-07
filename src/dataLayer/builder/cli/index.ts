@@ -5,14 +5,17 @@ import { emitLog } from "@frameworkCore/logging/emitLog";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import { normalizeApplication } from "@configLayer/normalizers/normalizeApplication";
-import { JOURNEY_TYPES, type JourneyContext } from "@configLayer/models/journeyContext.config";
+import {
+    JOURNEY_TYPES,
+    type JourneyContext,
+} from "@configLayer/models/journeyContext.config";
 import { normalizePlatform } from "@configLayer/normalizers/normalizePlatform";
 import { normalizeProduct } from "@configLayer/normalizers/normalizeProduct";
+import { resolveSchemaName } from "../../data-definitions";
 import type { DataBuilderBaseArgs } from "../types";
 import { DataBuilderError } from "../errors";
 import { parseBoolean } from "./parseBoolean";
 import { resolveOutputPath } from "./resolveOutputPath";
-import { resolveSchemaArg } from "./resolveSchemaArg";
 import { showBuilderHelp } from "./showBuilderHelp";
 
 function resolveJourneyContext(raw?: string): JourneyContext {
@@ -67,10 +70,6 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
 
     const sheetName = String(
         getArg(argv, "--sheet") ?? process.env.SHEET ?? ""
-    ).trim();
-
-    const schemaArg = String(
-        getArg(argv, "--schema") ?? process.env.SCHEMA ?? ""
     ).trim();
 
     const scriptIdFilter = String(
@@ -151,8 +150,7 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
 
     const journeyContext = resolveJourneyContext(journeyContextRaw);
 
-    const schemaName = resolveSchemaArg({
-        schemaArg,
+    const schemaName = resolveSchemaName({
         journeyContext,
         platform,
     });
@@ -161,7 +159,7 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
         emitLog({
             scope: logScope,
             level: LOG_LEVELS.DEBUG,
-            message: `Resolved schema "${schemaName}" from sheet "${sheetName}"`,
+            message: `Resolved schema "${schemaName}" from journeyContext "${journeyContext.type}" and platform "${platform}"`,
             category: LOG_CATEGORIES.FRAMEWORK,
         });
     }
