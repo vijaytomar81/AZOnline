@@ -27,7 +27,7 @@ export function validateRouteSelection(
             platform: selection.platform,
             application: selection.application,
             product: selection.product,
-            policyContext: selection.policyContext,
+            journeyContext: selection.journeyContext,
             validApplicationsForPlatform:
                 PLATFORM_APPLICATIONS[selection.platform] ?? [],
         },

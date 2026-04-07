@@ -1,32 +1,29 @@
 // src/configLayer/environments/types.ts
 
+import type { Platform } from "../models/platform.config";
 import type {
+    Application,
     AthenaApplication,
-    PartnerApplication,
 } from "../models/application.config";
 import type { Product } from "../models/product.config";
 
-export type ApplicationUrlKey =
-    | "customerPortalUrl"
-    | "supportPortalUrl"
-    | "pcwTestToolUrl"
-    | "backdatingToolUrl";
-
-export type PartnerEntryUrls = Record<
-    Product,
-    Partial<Record<PartnerApplication, string>>
+export type StartUrls = Record<
+    Platform,
+    Partial<Record<Application, Partial<Record<Product, string>>>>
 >;
 
-export type ApplicationUrls = {
-    customerPortalUrl: string;
+export type AthenaServiceUrls = {
     supportPortalUrl: string;
-    pcwTestToolUrl: string;
     backdatingToolUrl: string;
-    partnerEntryUrls: PartnerEntryUrls;
+};
+
+export type ServiceUrls = {
+    Athena: Partial<Record<AthenaApplication, AthenaServiceUrls>>;
 };
 
 export type TargetEnvUrls = {
-    applications: Record<AthenaApplication, ApplicationUrls>;
+    startUrls: StartUrls;
+    serviceUrls: ServiceUrls;
 };
 
 export type EnvKey = "dev" | "test" | "demo" | "nft";

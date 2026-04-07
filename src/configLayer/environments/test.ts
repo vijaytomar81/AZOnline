@@ -1,73 +1,87 @@
-// src/config/environments/test.ts
+// src/configLayer/environments/test.ts
 
 import type { TargetEnvUrls } from "./types";
+import { PLATFORMS } from "../models/platform.config";
+import { APPLICATIONS } from "../models/application.config";
+import { PRODUCTS } from "../models/product.config";
 
 export const testEnv: TargetEnvUrls = {
-    applications: {
-        AzOnline: {
-            customerPortalUrl:
-                "https://customer-portal-lv-test.athenapaas.com",
-            supportPortalUrl:
-                "https://support-portal-lv-demo.athenapaas.com",
-            pcwTestToolUrl:
-                "https://aggregator-test-portal-lv-test.athenapaas.com",
-            backdatingToolUrl:
-                "https://backdating-tool-lv-test.athenapaas.com",
-            partnerEntryUrls: {
-                Motor: {
-                    CTM: "https://journey-gateway-product.uat.ctmers.io/car/5.0/start",
-                    CNF: "https://my.confusedpartnertest.co.uk",
-                    MSM: "https://pre.moneysupermarket.dev",
-                    GOCO: "https://www.partnertest-gocompare.com",
-                },
-                Home: {
-                    CTM: "https://journey-gateway-product.uat.ctmers.io/home/4.0/start",
-                    CNF: "REPLACE_ME",
-                    MSM: "REPLACE_ME",
-                    GOCO: "REPLACE_ME",
-                },
+    startUrls: {
+        [PLATFORMS.ATHENA]: {
+            [APPLICATIONS.AZ_ONLINE]: {
+                [PRODUCTS.MOTOR]:
+                    "https://customer-portal-lv-test.athenapaas.com",
+                [PRODUCTS.HOME]: "REPLACE_ME",
+            },
+            [APPLICATIONS.FERRY]: {
+                [PRODUCTS.MOTOR]: "REPLACE_ME",
+                [PRODUCTS.HOME]: "REPLACE_ME",
+            },
+            [APPLICATIONS.BRITANNIA]: {
+                [PRODUCTS.MOTOR]: "REPLACE_ME",
+                [PRODUCTS.HOME]: "REPLACE_ME",
             },
         },
 
-        Ferry: {
-            customerPortalUrl: "REPLACE_ME",
-            supportPortalUrl: "REPLACE_ME",
-            pcwTestToolUrl: "REPLACE_ME",
-            backdatingToolUrl: "REPLACE_ME",
-            partnerEntryUrls: {
-                Motor: {
-                    CTM: "REPLACE_ME",
-                    CNF: "REPLACE_ME",
-                    MSM: "REPLACE_ME",
-                    GOCO: "REPLACE_ME",
-                },
-                Home: {
-                    CTM: "REPLACE_ME",
-                    CNF: "REPLACE_ME",
-                    MSM: "REPLACE_ME",
-                    GOCO: "REPLACE_ME",
-                },
+        [PLATFORMS.PCW_TOOL]: {
+            [APPLICATIONS.CTM]: {
+                [PRODUCTS.MOTOR]: "https://aggregator-test-portal-lv-test.athenapaas.com",
+                [PRODUCTS.HOME]: "https://aggregator-test-portal-lv-test.athenapaas.com",
+            },
+            [APPLICATIONS.CNF]: {
+                [PRODUCTS.MOTOR]: "https://aggregator-test-portal-lv-test.athenapaas.com",
+                [PRODUCTS.HOME]: "https://aggregator-test-portal-lv-test.athenapaas.com",
+            },
+            [APPLICATIONS.MSM]: {
+                [PRODUCTS.MOTOR]: "https://aggregator-test-portal-lv-test.athenapaas.com",
+                [PRODUCTS.HOME]: "https://aggregator-test-portal-lv-test.athenapaas.com",
+            },
+            [APPLICATIONS.GOCO]: {
+                [PRODUCTS.MOTOR]: "https://aggregator-test-portal-lv-test.athenapaas.com",
+                [PRODUCTS.HOME]: "https://aggregator-test-portal-lv-test.athenapaas.com",
             },
         },
 
-        Britannia: {
-            customerPortalUrl: "REPLACE_ME",
-            supportPortalUrl: "REPLACE_ME",
-            pcwTestToolUrl: "REPLACE_ME",
-            backdatingToolUrl: "REPLACE_ME",
-            partnerEntryUrls: {
-                Motor: {
-                    CTM: "REPLACE_ME",
-                    CNF: "REPLACE_ME",
-                    MSM: "REPLACE_ME",
-                    GOCO: "REPLACE_ME",
-                },
-                Home: {
-                    CTM: "REPLACE_ME",
-                    CNF: "REPLACE_ME",
-                    MSM: "REPLACE_ME",
-                    GOCO: "REPLACE_ME",
-                },
+        [PLATFORMS.PCW]: {
+            [APPLICATIONS.CTM]: {
+                [PRODUCTS.MOTOR]:
+                    "https://journey-gateway-product.uat.ctmers.io/car/5.0/start",
+                [PRODUCTS.HOME]:
+                    "https://journey-gateway-product.uat.ctmers.io/home/4.0/start",
+            },
+            [APPLICATIONS.CNF]: {
+                [PRODUCTS.MOTOR]:
+                    "https://my.confusedpartnertest.co.uk",
+                [PRODUCTS.HOME]: "REPLACE_ME",
+            },
+            [APPLICATIONS.MSM]: {
+                [PRODUCTS.MOTOR]:
+                    "https://pre.moneysupermarket.dev",
+                [PRODUCTS.HOME]: "REPLACE_ME",
+            },
+            [APPLICATIONS.GOCO]: {
+                [PRODUCTS.MOTOR]:
+                    "https://www.partnertest-gocompare.com",
+                [PRODUCTS.HOME]: "REPLACE_ME",
+            },
+        },
+    },
+
+    serviceUrls: {
+        Athena: {
+            [APPLICATIONS.AZ_ONLINE]: {
+                supportPortalUrl:
+                    "https://support-portal-lv-demo.athenapaas.com",
+                backdatingToolUrl:
+                    "https://backdating-tool-lv-test.athenapaas.com",
+            },
+            [APPLICATIONS.FERRY]: {
+                supportPortalUrl: "REPLACE_ME",
+                backdatingToolUrl: "REPLACE_ME",
+            },
+            [APPLICATIONS.BRITANNIA]: {
+                supportPortalUrl: "REPLACE_ME",
+                backdatingToolUrl: "REPLACE_ME",
             },
         },
     },
