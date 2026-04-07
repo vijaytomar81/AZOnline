@@ -5,7 +5,7 @@ export function printBusinessJourneyGeneratorHelp() {
     console.log("Business Journey Generator");
     console.log("");
     console.log("Usage:");
-    console.log("  npm run businessjourneys:generate");
-    console.log("  npm run businessjourneys:generate:verbose");
+    console.log("  npm run businessjourney:generate");
+    console.log("  npm run businessjourney:generate:verbose");
     console.log("");
 }

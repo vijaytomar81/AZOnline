@@ -4,8 +4,9 @@ import { runGenerateCommand } from "./commands/generate";
 import { printBusinessJourneyGeneratorHelp } from "./generatorHelp";
 
 function main() {
-    const command = process.argv[2] ?? "generate";
-    const verbose = process.argv.includes("--verbose");
+    const args = process.argv.slice(2);
+    const verbose = args.includes("--verbose");
+    const command = args.find((arg) => !arg.startsWith("-")) ?? "generate";
 
     if (command === "generate") {
         const exitCode = runGenerateCommand({ verbose });
