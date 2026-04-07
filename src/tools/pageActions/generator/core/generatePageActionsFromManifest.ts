@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/generator/generatePageActionsFromManifest.ts
+// src/tools/pageActions/generator/core/generatePageActionsFromManifest.ts
 
 import fs from "node:fs";
 import path from "node:path";
@@ -12,19 +12,19 @@ import { ICONS } from "@utils/icons";
 import { toRepoRelative } from "@utils/paths";
 import type { PageActionManifestIndex } from "../manifest/types";
 import type { GenerateSummary } from "../shared/types";
-import { buildActionName } from "./buildActionName";
-import { buildActionPath } from "./buildActionPath";
-import { buildPageActionManifestEntry } from "./buildPageActionManifestEntry";
-import { classifyPageObjectMethods } from "./classifyPageObjectMethods";
-import { ensurePageActionIndexes } from "./ensurePageActionIndexes";
-import { extractPageObjectMethods } from "./extractPageObjectMethods";
-import { loadPageActionManifestIndex } from "./loadPageActionManifestIndex";
-import { loadPageObjectManifestIndex } from "./loadPageObjectManifestIndex";
-import { loadPageObjectManifestPage } from "./loadPageObjectManifestPage";
-import { readPageObjectFile } from "./readPageObjectFile";
-import { renderPageActionFile } from "./renderPageActionFile";
-import { writePageActionManifestEntry } from "./writePageActionManifestEntry";
-import { writePageActionManifestIndex } from "./writePageActionManifestIndex";
+import { buildActionName } from "./action/buildActionName";
+import { buildActionPath } from "./action/buildActionPath";
+import { buildPageActionManifestEntry } from "./manifestSync/buildPageActionManifestEntry";
+import { classifyPageObjectMethods } from "./action/classifyPageObjectMethods";
+import { ensurePageActionIndexes } from "./registry/ensurePageActionIndexes";
+import { extractPageObjectMethods } from "./action/extractPageObjectMethods";
+import { loadPageActionManifestIndex } from "./manifestSync/loadPageActionManifestIndex";
+import { loadPageObjectManifestIndex } from "./manifestSync/loadPageObjectManifestIndex";
+import { loadPageObjectManifestPage } from "./manifestSync/loadPageObjectManifestPage";
+import { readPageObjectFile } from "./action/readPageObjectFile";
+import { renderPageActionFile } from "./action/renderPageActionFile";
+import { writePageActionManifestEntry } from "./manifestSync/writePageActionManifestEntry";
+import { writePageActionManifestIndex } from "./manifestSync/writePageActionManifestIndex";
 
 function printArrowLine(text: string): void {
     console.log(`   → ${text}`);

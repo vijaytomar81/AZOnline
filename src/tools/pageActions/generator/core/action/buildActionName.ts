@@ -1,8 +1,8 @@
-// src/tools/pageActions/generator/generator/buildActionName.ts
+// src/tools/pageActions/generator/core/action/buildActionName.ts
 
-import type { PageObjectManifestPage } from "../manifest/types";
-import type { ActionNaming } from "../shared/types";
-import { toPascalCase } from "../shared/naming";
+import type { PageObjectManifestPage } from "../../manifest/types";
+import type { ActionNaming } from "../../shared/types";
+import { toPascalCase } from "../../shared/naming";
 
 export function buildActionName(
     page: PageObjectManifestPage

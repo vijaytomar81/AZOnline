@@ -1,8 +1,8 @@
-// src/tools/pageActions/generator/generator/loadPageActionManifestIndex.ts
+// src/tools/pageActions/generator/core/manifestSync/loadPageActionManifestIndex.ts
 
 import fs from "node:fs";
 import { PAGE_ACTIONS_MANIFEST_INDEX_FILE } from "@utils/paths";
-import type { PageActionManifestIndex } from "../manifest/types";
+import type { PageActionManifestIndex } from "../../manifest/types";
 
 export function loadPageActionManifestIndex(): PageActionManifestIndex {
     if (!fs.existsSync(PAGE_ACTIONS_MANIFEST_INDEX_FILE)) {

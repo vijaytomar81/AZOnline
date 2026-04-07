@@ -1,8 +1,8 @@
-// src/tools/pageActions/generator/generator/ensurePageActionIndexes.ts
+// src/tools/pageActions/generator/core/registry/ensurePageActionIndexes.ts
 
 import fs from "node:fs";
 import path from "node:path";
-import type { ActionNaming, ActionPathInfo } from "../shared/types";
+import type { ActionNaming, ActionPathInfo } from "../../shared/types";
 
 function upsertLine(filePath: string, line: string): void {
     fs.mkdirSync(path.dirname(filePath), { recursive: true });

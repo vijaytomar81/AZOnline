@@ -1,7 +1,7 @@
 // src/tools/pageActions/generator/cli/runPageActionGenerator.ts
 
 import path from "node:path";
-import { generatePageActionsFromManifest } from "../generator/generatePageActionsFromManifest";
+import { generatePageActionsFromManifest } from "../core/generatePageActionsFromManifest";
 import {
     printCommandTitle,
     printEnvironment,

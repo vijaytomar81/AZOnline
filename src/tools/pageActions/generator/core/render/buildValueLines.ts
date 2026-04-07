@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/generator/render/buildValueLines.ts
+// src/tools/pageActions/generator/core/render/buildValueLines.ts
 
 import type { PageObjectManifestPage } from "../../manifest/types";
 import type { ExtractedMethod } from "../../shared/types";

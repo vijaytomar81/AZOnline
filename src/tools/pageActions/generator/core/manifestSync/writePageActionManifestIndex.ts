@@ -1,8 +1,8 @@
-// src/tools/pageActions/generator/generator/writePageActionManifestIndex.ts
+// src/tools/pageActions/generator/core/manifestSync/writePageActionManifestIndex.ts
 
 import fs from "node:fs";
 import path from "node:path";
-import type { PageActionManifestIndex } from "../manifest/types";
+import type { PageActionManifestIndex } from "../../manifest/types";
 
 export function writePageActionManifestIndex(args: {
     filePath: string;

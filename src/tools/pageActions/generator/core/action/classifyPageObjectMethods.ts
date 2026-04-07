@@ -1,7 +1,7 @@
-// src/tools/pageActions/generator/generator/classifyPageObjectMethods.ts
+// src/tools/pageActions/generator/core/action/classifyPageObjectMethods.ts
 
-import type { ClassifiedMethods, ExtractedMethod } from "../shared/types";
-import { normalizeFieldNameFromMethod } from "../shared/naming";
+import type { ClassifiedMethods, ExtractedMethod } from "../../shared/types";
+import { normalizeFieldNameFromMethod } from "../../shared/naming";
 
 function isValueMethod(method: ExtractedMethod): boolean {
     return method.hasArguments && /^(input|select|search)/.test(method.name);

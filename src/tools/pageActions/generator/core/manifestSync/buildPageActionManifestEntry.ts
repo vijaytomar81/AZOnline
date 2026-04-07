@@ -1,11 +1,11 @@
-// src/tools/pageActions/generator/generator/buildPageActionManifestEntry.ts
+// src/tools/pageActions/generator/core/manifestSync/buildPageActionManifestEntry.ts
 
 import { toRepoRelative } from "@utils/paths";
 import type {
     PageActionManifestEntry,
     PageObjectManifestPage,
-} from "../manifest/types";
-import type { ActionNaming, ActionPathInfo } from "../shared/types";
+} from "../../manifest/types";
+import type { ActionNaming, ActionPathInfo } from "../../shared/types";
 
 export function buildPageActionManifestEntry(args: {
     page: PageObjectManifestPage;

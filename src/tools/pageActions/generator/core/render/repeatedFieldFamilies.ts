@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/generator/render/repeatedFieldFamilies.ts
+// src/tools/pageActions/generator/core/render/repeatedFieldFamilies.ts
 
 export function hasNumericToken(value: string): boolean {
     return /\d+/.test(value);

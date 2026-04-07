@@ -1,8 +1,8 @@
-// src/tools/pageActions/generator/generator/writePageActionManifestEntry.ts
+// src/tools/pageActions/generator/core/manifestSync/writePageActionManifestEntry.ts
 
 import fs from "node:fs";
 import path from "node:path";
-import type { PageActionManifestEntry } from "../manifest/types";
+import type { PageActionManifestEntry } from "../../manifest/types";
 
 export function writePageActionManifestEntry(args: {
     filePath: string;

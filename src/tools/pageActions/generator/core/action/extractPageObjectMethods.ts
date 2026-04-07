@@ -1,6 +1,6 @@
-// src/tools/pageActions/generator/generator/extractPageObjectMethods.ts
+// src/tools/pageActions/generator/core/action/extractPageObjectMethods.ts
 
-import type { ExtractedMethod } from "../shared/types";
+import type { ExtractedMethod } from "../../shared/types";
 
 const IGNORE_METHODS = new Set([
     "waitUntilReady",

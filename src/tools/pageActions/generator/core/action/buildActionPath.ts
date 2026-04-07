@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/generator/buildActionPath.ts
+// src/tools/pageActions/generator/core/action/buildActionPath.ts
 
 import path from "node:path";
 import {
@@ -8,8 +8,8 @@ import {
     PAGE_ACTIONS_MANIFEST_DIR,
     PAGE_ACTIONS_MANIFEST_INDEX_FILE,
 } from "@utils/paths";
-import type { PageObjectManifestPage } from "../manifest/types";
-import type { ActionNaming, ActionPathInfo } from "../shared/types";
+import type { PageObjectManifestPage } from "../../manifest/types";
+import type { ActionNaming, ActionPathInfo } from "../../shared/types";
 
 export function buildActionPath(args: {
     page: PageObjectManifestPage;

@@ -1,11 +1,11 @@
-// src/tools/pageActions/generator/generator/render/buildSuggestionBlock.ts
+// src/tools/pageActions/generator/core/render/buildTodoValueBlock.ts
 
 import type { PageObjectManifestPage } from "../../manifest/types";
 import type { ExtractedMethod } from "../../shared/types";
-import { buildSuggestionLines } from "./buildSuggestionLines";
+import { buildValueLines } from "./buildValueLines";
 import { indentLines } from "./indentLines";
 
-export function buildSuggestionBlock(args: {
+export function buildTodoValueBlock(args: {
     page: PageObjectManifestPage;
     methods: ExtractedMethod[];
 }): string[] {
@@ -13,12 +13,12 @@ export function buildSuggestionBlock(args: {
         return [];
     }
 
-    const rawLines = buildSuggestionLines(args);
+    const rawLines = buildValueLines(args);
 
     return [
         "    /*",
         "     --------------------------------------------------------------------------- ",
-        "     TODO: review and enable click / radio / link interactions if needed:",
+        "     TODO: review and enable conditional / low-confidence mappings if needed:",
         "     --------------------------------------------------------------------------- ",
         "    ",
         ...indentLines(rawLines),

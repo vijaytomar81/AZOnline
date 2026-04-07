@@ -1,12 +1,12 @@
-// src/tools/pageActions/generator/generator/renderPageActionFile.ts
+// src/tools/pageActions/generator/core/action/renderPageActionFile.ts
 
 import { toRepoRelative } from "@utils/paths";
-import type { PageObjectManifestPage } from "../manifest/types";
-import type { ActionNaming, ClassifiedMethods } from "../shared/types";
-import { buildConditionalIndexedBlocks } from "./render/buildConditionalIndexedBlocks";
-import { buildSuggestionBlock } from "./render/buildSuggestionBlock";
-import { buildTodoValueBlock } from "./render/buildTodoValueBlock";
-import { buildValueLines } from "./render/buildValueLines";
+import type { PageObjectManifestPage } from "../../manifest/types";
+import type { ActionNaming, ClassifiedMethods } from "../../shared/types";
+import { buildConditionalIndexedBlocks } from "../render/buildConditionalIndexedBlocks";
+import { buildSuggestionBlock } from "../render/buildSuggestionBlock";
+import { buildTodoValueBlock } from "../render/buildTodoValueBlock";
+import { buildValueLines } from "../render/buildValueLines";
 
 export function renderPageActionFile(args: {
     page: PageObjectManifestPage;

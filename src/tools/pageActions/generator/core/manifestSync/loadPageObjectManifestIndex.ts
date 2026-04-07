@@ -1,8 +1,8 @@
-// src/tools/pageActions/generator/generator/loadPageObjectManifestIndex.ts
+// src/tools/pageActions/generator/core/manifestSync/loadPageObjectManifestIndex.ts
 
 import fs from "node:fs";
 import { PAGE_MANIFEST_INDEX_FILE } from "@utils/paths";
-import type { PageObjectManifestIndex } from "../manifest/types";
+import type { PageObjectManifestIndex } from "../../manifest/types";
 
 export function loadPageObjectManifestIndex(): PageObjectManifestIndex {
     return JSON.parse(
