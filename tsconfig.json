@@ -23,30 +23,68 @@
       "@/*": [
         "src/*"
       ],
+
       "@automation/*": [
         "src/automation/*"
       ],
+
       "@pageObjects/*": [
         "src/pageObjects/*"
       ],
-      "@page-maps/*": [
+      "@pageMaps/*": [
         "src/pageObjects/maps/*"
       ],
-      "@page-objects/*": [
+      "@pageObjectsObjects/*": [
         "src/pageObjects/objects/*"
       ],
-      "@page-manifest/*": [
+      "@pageManifest/*": [
         "src/pageObjects/.manifest/*"
       ],
+
       "@pageActions/*": [
         "src/pageActions/*"
       ],
-      "@pageActionTools/*": [
-        "src/pageActionTools/*"
+
+      "@tools/*": [
+        "src/tools/*"
       ],
-      "@pageObjectTools/*": [
-        "src/pageObjectTools/*"
+
+      "@pageScanner/*": [
+        "src/tools/pageScanner/*"
       ],
+
+      "@pageObjectGenerator/*": [
+        "src/tools/pageObjects/generator/*"
+      ],
+      "@pageObjectValidator/*": [
+        "src/tools/pageObjects/validator/*"
+      ],
+      "@pageObjectRepair/*": [
+        "src/tools/pageObjects/repair/*"
+      ],
+      "@pageObjectCommon/*": [
+        "src/tools/pageObjects/common/*"
+      ],
+
+      "@pageActionGenerator/*": [
+        "src/tools/pageActions/generator/*"
+      ],
+
+      "@businessJourneyGenerator/*": [
+        "src/tools/businessJourneys/generator/*"
+      ],
+
+      "@quality/*": [
+        "src/tools/quality/*"
+      ],
+      "@fileHeaderChecker/*": [
+        "src/tools/quality/fileHeaderChecker/*"
+      ],
+
+      "@sharedTools/*": [
+        "src/tools/shared/*"
+      ],
+
       "@utils/*": [
         "src/utils/*"
       ],

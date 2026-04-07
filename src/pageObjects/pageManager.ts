@@ -2,10 +2,10 @@
 // AUTO-GENERATED from src/pageObjects/.manifest/
 
 import type { Page } from "@playwright/test";
-import { InsuranceTypeSelectionPage } from "@page-objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage";
-import { LoginOrRegistrationPage } from "@page-objects/athena/common/login-or-registration/LoginOrRegistrationPage";
-import { ManageCookiesPage } from "@page-objects/athena/common/manage-cookies/ManageCookiesPage";
-import { PhDrivingLicenceDetailsPage } from "@page-objects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage";
+import { InsuranceTypeSelectionPage } from "@pageObjectsObjects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage";
+import { LoginOrRegistrationPage } from "@pageObjectsObjects/athena/common/login-or-registration/LoginOrRegistrationPage";
+import { ManageCookiesPage } from "@pageObjectsObjects/athena/common/manage-cookies/ManageCookiesPage";
+import { PhDrivingLicenceDetailsPage } from "@pageObjectsObjects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage";
 
 type PageFactory<T> = () => T;
 

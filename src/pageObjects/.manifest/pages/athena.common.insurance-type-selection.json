@@ -5,7 +5,7 @@
   "name": "insurance-type-selection",
   "className": "InsuranceTypeSelectionPage",
   "paths": {
-    "pageObjectImport": "@page-objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage",
+    "pageObjectImport": "@pageObjectsObjects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage",
     "pageObjectFile": "src/pageObjects/objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage.ts",
     "elementsFile": "src/pageObjects/objects/athena/common/insurance-type-selection/elements.ts",
     "aliasesGeneratedFile": "src/pageObjects/objects/athena/common/insurance-type-selection/aliases.generated.ts",

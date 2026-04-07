@@ -8,7 +8,7 @@ import { createScopedLogger } from "@logging/adapters/createScopedLogger";
 import { emitLog } from "@logging/emitLog";
 import { LOG_CATEGORIES } from "@logging/core/logCategories";
 import { LOG_LEVELS } from "@logging/core/logLevels";
-import { scanPage } from "@pageObjectTools/page-scanner/scanner/runner";
+import { scanPage } from "@pageScanner/scanner/runner";
 import { toRepoRelative } from "@utils/paths";
 import { isLocatorFailure } from "./isLocatorFailure";
 

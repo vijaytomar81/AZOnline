@@ -5,7 +5,7 @@
   "name": "login-or-registration",
   "className": "LoginOrRegistrationPage",
   "paths": {
-    "pageObjectImport": "@page-objects/athena/common/login-or-registration/LoginOrRegistrationPage",
+    "pageObjectImport": "@pageObjectsObjects/athena/common/login-or-registration/LoginOrRegistrationPage",
     "pageObjectFile": "src/pageObjects/objects/athena/common/login-or-registration/LoginOrRegistrationPage.ts",
     "elementsFile": "src/pageObjects/objects/athena/common/login-or-registration/elements.ts",
     "aliasesGeneratedFile": "src/pageObjects/objects/athena/common/login-or-registration/aliases.generated.ts",

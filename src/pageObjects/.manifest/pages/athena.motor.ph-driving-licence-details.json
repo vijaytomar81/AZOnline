@@ -5,7 +5,7 @@
   "name": "ph-driving-licence-details",
   "className": "PhDrivingLicenceDetailsPage",
   "paths": {
-    "pageObjectImport": "@page-objects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage",
+    "pageObjectImport": "@pageObjectsObjects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage",
     "pageObjectFile": "src/pageObjects/objects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage.ts",
     "elementsFile": "src/pageObjects/objects/athena/motor/ph-driving-licence-details/elements.ts",
     "aliasesGeneratedFile": "src/pageObjects/objects/athena/motor/ph-driving-licence-details/aliases.generated.ts",

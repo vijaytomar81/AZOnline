@@ -5,7 +5,7 @@
   "scripts": {
     "test:e2e": "playwright test",
     "e2e": "npm run data:build -- && npm run test:e2e",
-    
+
     "data": "node -r ts-node/register -r tsconfig-paths/register src/dataLayer/builder/index.ts",
     "data:build": "npm run data --",
     "data:build:verbose": "npm run data -- --verbose",
@@ -37,33 +37,33 @@
     "smoke:help": "npm run execution -- --mode e2e --help",
     "smoke:data:help": "npm run execution -- --mode data --help",
 
-    "scan:cli": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/page-scanner/cli.ts",
+    "scan:cli": "node -r ts-node/register -r tsconfig-paths/register src/tools/pageScanner/cli.ts",
     "scan:page": "npm run scan:cli -- scan",
     "scan:page:verbose": "npm run scan:cli -- scan --verbose",
     "scan:page:merge": "npm run scan:cli -- scan --merge",
     "scan:page:merge:verbose": "npm run scan:cli -- scan --merge --verbose",
     "scan:help": "npm run scan:cli -- help",
 
-    "pageobjects:cli": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/page-object-generator/cli.ts",
+    "pageobjects:cli": "node -r ts-node/register -r tsconfig-paths/register src/tools/pageObjects/generator/cli.ts",
     "pageobjects:generate": "npm run pageobjects:cli -- generate --merge",
     "pageobjects:generate:verbose": "npm run pageobjects:cli -- generate --merge --verbose",
     "pageobjects:generate:changed": "npm run pageobjects:cli -- generate --changedOnly --merge",
     "pageobjects:generate:changed:verbose": "npm run pageobjects:cli -- generate --changedOnly --merge --verbose",
     "pageobjects:help": "npm run pageobjects:cli -- help",
 
-    "pageobjects:validate:cli": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/page-object-validator/cli.ts",
+    "pageobjects:validate:cli": "node -r ts-node/register -r tsconfig-paths/register src/tools/pageObjects/validator/cli.ts",
     "pageobjects:validate": "npm run pageobjects:validate:cli -- validate",
     "pageobjects:validate:verbose": "npm run pageobjects:validate:cli -- validate --verbose",
     "pageobjects:validate:strict": "npm run pageobjects:validate:cli -- validate --strict",
     "pageobjects:validate:strict:verbose": "npm run pageobjects:validate:cli -- validate --strict --verbose",
     "pageobjects:validate:help": "npm run pageobjects:validate:cli -- help",
 
-    "pageobjects:repair:cli": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/page-object-repair/cli.ts",
+    "pageobjects:repair:cli": "node -r ts-node/register -r tsconfig-paths/register src/tools/pageObjects/repair/cli.ts",
     "pageobjects:repair": "npm run pageobjects:repair:cli -- repair",
     "pageobjects:repair:verbose": "npm run pageobjects:repair:cli -- repair --verbose",
     "pageobjects:repair:help": "npm run pageobjects:repair:cli -- help",
 
-    "pageactions:generate:cli": "node -r ts-node/register -r tsconfig-paths/register src/pageActionTools/page-action-generator/cli/runPageActionGenerator.ts",
+    "pageactions:generate:cli": "node -r ts-node/register -r tsconfig-paths/register src/tools/pageActions/generator/cli/runPageActionGenerator.ts",
     "pageactions:generate": "npm run pageactions:generate:cli",
     "pageactions:generate:verbose": "npm run pageactions:generate:cli -- --verbose",
 
@@ -76,12 +76,12 @@
     "pageactions:repair": "npm run pageactions:repair:cli -- repair",
     "pageactions:repair:verbose": "npm run pageactions:repair:cli -- repair --verbose",
 
-    "businessjourney:generate:cli": "node -r ts-node/register -r tsconfig-paths/register src/businessJourneyTools/business-journey-generator/cli.ts",
+    "businessjourney:generate:cli": "node -r ts-node/register -r tsconfig-paths/register src/tools/businessJourneys/generator/cli.ts",
     "businessjourney:generate": "npm run businessjourney:generate:cli",
     "businessjourney:generate:verbose": "npm run businessjourney:generate:cli -- --verbose",
 
-    "headers:check": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/file-header-checker/cli.ts --checkMode",
-    "headers:fix": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/file-header-checker/cli.ts",
+    "headers:check": "node -r ts-node/register -r tsconfig-paths/register src/tools/quality/fileHeaderChecker/cli.ts --checkMode",
+    "headers:fix": "node -r ts-node/register -r tsconfig-paths/register src/tools/quality/fileHeaderChecker/cli.ts",
 
     "check:types": "tsc --noEmit",
     "tools:tsc": "tsc -p tsconfig.tools.json --noEmit",
@@ -89,7 +89,7 @@
 
     "ci:check": "npm run check:types && npm run tools:tsc && npm run headers:check && npm run pageobjects:validate",
     "ci:check:verbose": "npm run check:types && npm run tools:tsc && npm run headers:check && npm run pageobjects:validate:verbose",
-    
+
     "results:clean": "node scripts/clean-results.js",
     "reports:clean": "node scripts/clean-reports.js",
     "allure:generate": "allure generate results/allure-results -o reports/allure-report --clean",

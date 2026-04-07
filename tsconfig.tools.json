@@ -4,11 +4,11 @@
     "noEmit": true
   },
   "include": [
-    "src/pageObjectTools/page-scanner/**/*.ts",
-    "src/pageObjectTools/page-object-generator/**/*.ts",
-    "src/pageObjectTools/page-object-validator/**/*.ts",
-    "src/pageObjectTools/page-object-repair/**/*.ts",
-    "src/pageObjectTools/page-object-common/**/*.ts"
+    "src/tools/pageScanner/**/*.ts",
+    "src/tools/pageObjects/**/*.ts",
+    "src/tools/pageActions/**/*.ts",
+    "src/tools/businessJourneys/**/*.ts",
+    "src/tools/quality/**/*.ts"
   ],
   "exclude": [
     "node_modules",
