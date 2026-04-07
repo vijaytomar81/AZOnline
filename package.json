@@ -76,6 +76,10 @@
     "pageactions:repair": "npm run pageactions:repair:cli -- repair",
     "pageactions:repair:verbose": "npm run pageactions:repair:cli -- repair --verbose",
 
+    "businessjourney:generate:cli": "node -r ts-node/register -r tsconfig-paths/register src/businessJourneyTools/business-journey-generator/cli.ts",
+    "businessjourney:generate": "npm run businessjourney:generate:cli",
+    "businessjourney:generate:verbose": "npm run businessjourney:generate:cli -- --verbose",
+
     "headers:check": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/file-header-checker/cli.ts --checkMode",
     "headers:fix": "node -r ts-node/register -r tsconfig-paths/register src/pageObjectTools/file-header-checker/cli.ts",
 

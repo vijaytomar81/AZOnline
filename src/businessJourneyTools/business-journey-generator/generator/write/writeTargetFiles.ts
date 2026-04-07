@@ -1,0 +1,210 @@
+// src/businessJourneyTools/business-journey-generator/generator/write/writeTargetFiles.ts
+
+import path from "node:path";
+import { BUSINESS_JOURNEYS_DIR } from "@utils/paths";
+import type {
+    JourneyGenerationInputs,
+    JourneyTarget,
+} from "../types";
+import { buildJourneyNames } from "../naming/buildJourneyNames";
+import { buildStepExportName } from "../naming/buildStepExportName";
+import { buildStepFileName } from "../naming/buildStepFileName";
+import { selectCandidates } from "../selectCandidates";
+import { renderBuildStepsFile } from "../render/renderBuildStepsFile";
+import { renderEntryPointBuilderFile } from "../render/renderEntryPointBuilderFile";
+import { renderIndexFile } from "../render/renderIndexFile";
+import { renderOpenStartUrlStepFile } from "../render/renderOpenStartUrlStepFile";
+import { renderRunJourneyFile } from "../render/renderRunJourneyFile";
+import { renderStepFile } from "../render/renderStepFile";
+import { writeFileIfMissing } from "./writeFileIfMissing";
+
+export function writeTargetFiles(
+    target: JourneyTarget,
+    inputs: JourneyGenerationInputs
+): { filesCreated: number } {
+    const names = buildJourneyNames(target);
+    const candidates = selectCandidates(target, inputs);
+
+    const baseDir = path.join(
+        BUSINESS_JOURNEYS_DIR,
+        "journeys",
+        names.applicationFolderName,
+        names.productFolderName,
+        names.journeyFolderName
+    );
+
+    let filesCreated = 0;
+
+    const runFile = path.join(baseDir, names.runFileName);
+    const buildStepsFile = path.join(baseDir, names.buildStepsFileName);
+    const journeyIndexFile = path.join(baseDir, "index.ts");
+
+    const entryPointFileName =
+        target.entryPoint === "direct"
+            ? "buildDirectEntrySteps.ts"
+            : target.entryPoint === "pcwtool"
+              ? "buildPcwToolEntrySteps.ts"
+              : "buildPcwEntrySteps.ts";
+
+    const entryPointFile = path.join(baseDir, "entryPoints", entryPointFileName);
+    const entryPointIndexFile = path.join(baseDir, "entryPoints", "index.ts");
+
+    const commonStepFile = path.join(
+        baseDir,
+        "steps",
+        "common",
+        "stepOpenStartUrl.ts"
+    );
+    const commonIndexFile = path.join(baseDir, "steps", "common", "index.ts");
+    const stepsIndexFile = path.join(baseDir, "steps", "index.ts");
+
+    if (
+        writeFileIfMissing(
+            runFile,
+            renderRunJourneyFile({
+                filePath: runFile,
+                target,
+                names,
+            })
+        )
+    ) {
+        filesCreated++;
+    }
+
+    if (
+        writeFileIfMissing(
+            buildStepsFile,
+            renderBuildStepsFile({
+                filePath: buildStepsFile,
+                target,
+                names,
+            })
+        )
+    ) {
+        filesCreated++;
+    }
+
+    if (
+        writeFileIfMissing(
+            entryPointFile,
+            renderEntryPointBuilderFile({
+                filePath: entryPointFile,
+                kind:
+                    target.entryPoint === "direct"
+                        ? "direct"
+                        : target.entryPoint === "pcwtool"
+                          ? "pcwTool"
+                          : "pcw",
+            })
+        )
+    ) {
+        filesCreated++;
+    }
+
+    if (
+        writeFileIfMissing(
+            commonStepFile,
+            renderOpenStartUrlStepFile(commonStepFile)
+        )
+    ) {
+        filesCreated++;
+    }
+
+    for (const candidate of candidates) {
+        const stepName = candidate.actionKey.split(".").slice(-1)[0];
+        const stepFile = path.join(
+            baseDir,
+            "steps",
+            candidate.actionKey.startsWith("athena.") ? "athena" : "partner",
+            buildStepFileName(stepName)
+        );
+
+        if (
+            writeFileIfMissing(
+                stepFile,
+                renderStepFile({
+                    filePath: stepFile,
+                    stepName,
+                })
+            )
+        ) {
+            filesCreated++;
+        }
+    }
+
+    const stepExports = candidates.map((candidate) => {
+        const stepName = candidate.actionKey.split(".").slice(-1)[0];
+        const fileName = buildStepFileName(stepName).replace(".ts", "");
+        const exportName = buildStepExportName(stepName);
+        const group = candidate.actionKey.startsWith("athena.") ? "athena" : "partner";
+
+        return {
+            exportName,
+            from: `${group}/${fileName}`,
+        };
+    });
+
+    if (
+        writeFileIfMissing(
+            stepsIndexFile,
+            renderIndexFile({
+                filePath: stepsIndexFile,
+                exports: stepExports,
+            })
+        )
+    ) {
+        filesCreated++;
+    }
+
+    if (
+        writeFileIfMissing(
+            commonIndexFile,
+            renderIndexFile({
+                filePath: commonIndexFile,
+                exports: [
+                    {
+                        exportName: "stepOpenStartUrl",
+                        from: "stepOpenStartUrl",
+                    },
+                ],
+            })
+        )
+    ) {
+        filesCreated++;
+    }
+
+    if (
+        writeFileIfMissing(
+            entryPointIndexFile,
+            renderIndexFile({
+                filePath: entryPointIndexFile,
+                exports: [
+                    {
+                        from: entryPointFileName.replace(".ts", ""),
+                    },
+                ],
+            })
+        )
+    ) {
+        filesCreated++;
+    }
+
+    if (
+        writeFileIfMissing(
+            journeyIndexFile,
+            renderIndexFile({
+                filePath: journeyIndexFile,
+                exports: [
+                    {
+                        exportName: names.runExportName,
+                        from: names.runFileName.replace(".ts", ""),
+                    },
+                ],
+            })
+        )
+    ) {
+        filesCreated++;
+    }
+
+    return { filesCreated };
+}
