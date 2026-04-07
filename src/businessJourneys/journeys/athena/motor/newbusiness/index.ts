@@ -1,3 +1,3 @@
-// src/businessJourneys/journeys/athena/motor/newbusiness/index.ts
+// src/businessJourneys/journeys/athena/motor/newBusiness/index.ts
 
-export { runAthenaMotorNewbusinessJourney } from "./runAthenaMotorNewbusiness.journey";
+export { runAthenaMotorNewBusinessJourney } from "./runAthenaMotorNewBusiness.journey";

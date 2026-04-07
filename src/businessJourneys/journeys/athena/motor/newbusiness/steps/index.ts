@@ -1,6 +1,6 @@
-// src/businessJourneys/journeys/athena/motor/newbusiness/steps/index.ts
+// src/businessJourneys/journeys/athena/motor/newBusiness/steps/index.ts
 
-export { stepHandleinsurancetypeselection } from "./athena/stepHandleinsurancetypeselection";
-export { stepHandleloginorregistration } from "./athena/stepHandleloginorregistration";
-export { stepHandlemanagecookies } from "./athena/stepHandlemanagecookies";
-export { stepFillphdrivinglicencedetails } from "./athena/stepFillphdrivinglicencedetails";
+export { stepHandleInsuranceTypeSelection } from "./athena/stepHandleInsuranceTypeSelection";
+export { stepHandleLoginOrRegistration } from "./athena/stepHandleLoginOrRegistration";
+export { stepHandleManageCookies } from "./athena/stepHandleManageCookies";
+export { stepFillPhDrivingLicenceDetails } from "./athena/stepFillPhDrivingLicenceDetails";

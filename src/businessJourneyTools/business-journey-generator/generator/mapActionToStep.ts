@@ -1,6 +1,5 @@
 // src/businessJourneyTools/business-journey-generator/generator/mapActionToStep.ts
 
-import { toCamelFromText } from "@utils/text";
 import type { PageActionEntry, StepMapping } from "./types";
 import { buildStepExportName } from "./naming/buildStepExportName";
 import { buildStepFileName } from "./naming/buildStepFileName";
@@ -11,21 +10,16 @@ function stripActionSuffix(actionName: string): string {
         : actionName;
 }
 
+function lowerFirst(value: string): string {
+    return value ? value[0].toLowerCase() + value.slice(1) : value;
+}
+
 function buildStepName(entry: PageActionEntry): string {
-    const base = stripActionSuffix(entry.actionName);
-    return toCamelFromText(base) || base;
+    return lowerFirst(stripActionSuffix(entry.actionName));
 }
 
 function buildStepFolder(entry: PageActionEntry): "athena" | "partner" {
     return entry.pageKey.startsWith("athena.") ? "athena" : "partner";
-}
-
-function buildPayloadExpression(entry: PageActionEntry): string {
-    if (entry.group === "common") {
-        return "data";
-    }
-
-    return "data";
 }
 
 export function mapActionToStep(entry: PageActionEntry): StepMapping {
@@ -38,6 +32,6 @@ export function mapActionToStep(entry: PageActionEntry): StepMapping {
         stepFolder: buildStepFolder(entry),
         actionImportName: entry.actionName,
         actionImportSource: "@pageActions",
-        payloadExpression: buildPayloadExpression(entry),
+        payloadExpression: "data",
     };
 }

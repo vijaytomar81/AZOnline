@@ -1,10 +1,10 @@
-// src/businessJourneys/journeys/athena/motor/newbusiness/steps/athena/stepHandlemanagecookies.ts
+// src/businessJourneys/journeys/athena/motor/newBusiness/steps/athena/stepHandleManageCookies.ts
 
 import type { JourneyStep } from "@businessJourneys/shared/types";
 import { handleManageCookiesAction } from "@pageActions";
 
-export const stepHandlemanagecookies: JourneyStep = {
-    stepKey: "handlemanagecookies",
+export const stepHandleManageCookies: JourneyStep = {
+    stepKey: "handleManageCookies",
     run: async ({ context, data }) => {
         await handleManageCookiesAction({
             context: context.pageActionContext,

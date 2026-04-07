@@ -1,26 +1,55 @@
 // src/businessJourneyTools/business-journey-generator/generator/buildJourneyTargets.ts
 
-import { JourneyTarget } from "./types";
+import { uniq } from "@utils/collections";
+import type { JourneyGenerationInputs, JourneyTarget } from "./types";
 
-const PRODUCTS = ["motor", "home"];
-const JOURNEYS = ["newbusiness"];
-const ENTRY_POINTS = ["direct", "pcw", "pcwtool"];
+const PARTNER_APPLICATIONS = ["msm", "ctm", "cnf", "goco"] as const;
+type SupportedProduct = "motor" | "home";
 
-export function buildJourneyTargets(): JourneyTarget[] {
-    const targets: JourneyTarget[] = [];
+function isSupportedProduct(value: string): value is SupportedProduct {
+    return value === "motor" || value === "home";
+}
 
-    for (const product of PRODUCTS) {
-        for (const journey of JOURNEYS) {
-            for (const entryPoint of ENTRY_POINTS) {
-                targets.push({
-                    application: "athena",
-                    product,
-                    journey,
-                    entryPoint,
-                });
-            }
-        }
-    }
+function buildAthenaTargets(products: SupportedProduct[]): JourneyTarget[] {
+    return products.flatMap((product) => [
+        {
+            application: "athena",
+            product,
+            journey: "newBusiness",
+            entryPoint: "direct",
+        },
+        {
+            application: "athena",
+            product,
+            journey: "newBusiness",
+            entryPoint: "pcwTool",
+        },
+    ]);
+}
 
-    return targets;
+function buildPartnerTargets(products: SupportedProduct[]): JourneyTarget[] {
+    return products.flatMap((product) =>
+        PARTNER_APPLICATIONS.map((application) => ({
+            application,
+            product,
+            journey: "newBusiness",
+            entryPoint: "pcw",
+        }))
+    );
+}
+
+export function buildJourneyTargets(
+    inputs: JourneyGenerationInputs
+): JourneyTarget[] {
+    const products = uniq(
+        inputs.pageActions
+            .filter((entry) => entry.pageKey.startsWith("athena."))
+            .filter((entry) => entry.group !== "common")
+            .map((entry) => entry.group)
+    ).filter(isSupportedProduct);
+
+    return [
+        ...buildAthenaTargets(products),
+        ...buildPartnerTargets(products),
+    ];
 }

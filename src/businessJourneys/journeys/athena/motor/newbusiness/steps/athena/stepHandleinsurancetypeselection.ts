@@ -1,10 +1,10 @@
-// src/businessJourneys/journeys/athena/motor/newbusiness/steps/athena/stepHandleinsurancetypeselection.ts
+// src/businessJourneys/journeys/athena/motor/newBusiness/steps/athena/stepHandleInsuranceTypeSelection.ts
 
 import type { JourneyStep } from "@businessJourneys/shared/types";
 import { handleInsuranceTypeSelectionAction } from "@pageActions";
 
-export const stepHandleinsurancetypeselection: JourneyStep = {
-    stepKey: "handleinsurancetypeselection",
+export const stepHandleInsuranceTypeSelection: JourneyStep = {
+    stepKey: "handleInsuranceTypeSelection",
     run: async ({ context, data }) => {
         await handleInsuranceTypeSelectionAction({
             context: context.pageActionContext,

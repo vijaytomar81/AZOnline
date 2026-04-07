@@ -1,10 +1,10 @@
-// src/businessJourneys/journeys/athena/motor/newbusiness/steps/athena/stepFillphdrivinglicencedetails.ts
+// src/businessJourneys/journeys/athena/motor/newBusiness/steps/athena/stepFillPhDrivingLicenceDetails.ts
 
 import type { JourneyStep } from "@businessJourneys/shared/types";
 import { fillPhDrivingLicenceDetailsAction } from "@pageActions";
 
-export const stepFillphdrivinglicencedetails: JourneyStep = {
-    stepKey: "fillphdrivinglicencedetails",
+export const stepFillPhDrivingLicenceDetails: JourneyStep = {
+    stepKey: "fillPhDrivingLicenceDetails",
     run: async ({ context, data }) => {
         await fillPhDrivingLicenceDetailsAction({
             context: context.pageActionContext,

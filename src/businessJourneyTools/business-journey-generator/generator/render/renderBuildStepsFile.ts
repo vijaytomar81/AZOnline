@@ -12,14 +12,14 @@ export function renderBuildStepsFile(args: {
     const entryBuilder =
         args.target.entryPoint === "direct"
             ? "buildDirectEntrySteps"
-            : args.target.entryPoint === "pcwtool"
+            : args.target.entryPoint === "pcwTool"
               ? "buildPcwToolEntrySteps"
               : "buildPcwEntrySteps";
 
     const entryImport =
         args.target.entryPoint === "direct"
             ? "./entryPoints/buildDirectEntrySteps"
-            : args.target.entryPoint === "pcwtool"
+            : args.target.entryPoint === "pcwTool"
               ? "./entryPoints/buildPcwToolEntrySteps"
               : "./entryPoints/buildPcwEntrySteps";
 

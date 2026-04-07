@@ -43,6 +43,7 @@ function printTargetDetails(args: {
     console.log(`   → journey       : ${args.target.journey}`);
     console.log(`   → entry point   : ${args.target.entryPoint}`);
     console.log(`   → files created : ${args.createdFiles}`);
+    console.log("");
 }
 
 function buildSummary(args: {
@@ -66,7 +67,7 @@ export function generateBusinessJourneys(options: GenerateOptions) {
     ]);
 
     const inputs = loadJourneyGenerationInputs();
-    const targets = buildJourneyTargets();
+    const targets = buildJourneyTargets(inputs);
 
     printSection("Generation details");
 

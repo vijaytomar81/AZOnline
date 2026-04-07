@@ -1,9 +1,9 @@
-// src/businessJourneys/journeys/athena/motor/newbusiness/buildAthenaMotorNewbusinessSteps.ts
+// src/businessJourneys/journeys/athena/motor/newBusiness/buildAthenaMotorNewBusinessSteps.ts
 
 import type { JourneyStep } from "@businessJourneys/shared/types";
 import { buildDirectEntrySteps } from "./entryPoints/buildDirectEntrySteps";
 
-export function buildAthenaMotorNewbusinessSteps(args: {
+export function buildAthenaMotorNewBusinessSteps(args: {
     entryPoint: string;
 }): JourneyStep[] {
     const entrySteps = buildDirectEntrySteps();

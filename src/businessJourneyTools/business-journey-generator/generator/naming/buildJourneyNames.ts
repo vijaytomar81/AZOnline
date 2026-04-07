@@ -1,11 +1,20 @@
 // src/businessJourneyTools/business-journey-generator/generator/naming/buildJourneyNames.ts
 
-import { toCamelFromText } from "@utils/text";
 import type { JourneyTarget } from "../types";
 
-function toPascal(value: string): string {
-    const camel = toCamelFromText(value);
-    return camel ? camel[0].toUpperCase() + camel.slice(1) : "";
+function splitWords(value: string): string[] {
+    return value
+        .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+        .replace(/[_\-.]+/g, " ")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+}
+
+function toPascalCase(value: string): string {
+    return splitWords(value)
+        .map((word) => word[0].toUpperCase() + word.slice(1))
+        .join("");
 }
 
 export type JourneyNames = {
@@ -19,9 +28,9 @@ export type JourneyNames = {
 };
 
 export function buildJourneyNames(target: JourneyTarget): JourneyNames {
-    const app = toPascal(target.application);
-    const product = toPascal(target.product);
-    const journey = toPascal(target.journey);
+    const app = toPascalCase(target.application);
+    const product = toPascalCase(target.product);
+    const journey = toPascalCase(target.journey);
 
     return {
         journeyFolderName: target.journey,

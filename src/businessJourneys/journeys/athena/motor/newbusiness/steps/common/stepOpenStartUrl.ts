@@ -1,4 +1,4 @@
-// src/businessJourneys/journeys/athena/motor/newbusiness/steps/common/stepOpenStartUrl.ts
+// src/businessJourneys/journeys/athena/motor/newBusiness/steps/common/stepOpenStartUrl.ts
 
 import type { JourneyStep } from "@businessJourneys/shared/types";
 
