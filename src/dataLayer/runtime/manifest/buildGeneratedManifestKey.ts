@@ -10,13 +10,11 @@ export function buildGeneratedManifestKey(args: {
     application: Application;
     product: Product;
     journeyContext: JourneyContext;
-    sheetName: string;
 }): string {
     return [
         args.platform,
         args.application,
         args.product,
         args.journeyContext.type,
-        args.sheetName,
     ].join(":");
 }

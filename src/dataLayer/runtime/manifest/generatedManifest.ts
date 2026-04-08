@@ -23,7 +23,6 @@ export function findGeneratedManifestItem(args: {
         application: args.application,
         product: args.product,
         journeyContext: args.journeyContext,
-        sheetName: args.sheetName,
     });
 
     return manifest.data[key];
@@ -47,7 +46,6 @@ export function upsertGeneratedManifestItem(args: {
         application: args.application,
         product: args.product,
         journeyContext: args.journeyContext,
-        sheetName: args.sheetName,
     });
 
     upsertItem({

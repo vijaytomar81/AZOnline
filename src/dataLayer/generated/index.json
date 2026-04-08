@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-04-08T09:35:16.257Z",
+  "data": {
+    "Athena:AzOnline:Motor:NewBusiness": {
+      "key": "Athena:AzOnline:Motor:NewBusiness",
+      "platform": "Athena",
+      "application": "AzOnline",
+      "product": "Motor",
+      "journeyContext": {
+        "type": "NewBusiness"
+      },
+      "sheetName": "FlowNB",
+      "schemaName": "new_business_journey",
+      "filePath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/athena/azonline/motor/FlowNB_20260408_113516_257.json",
+      "validationReportPath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/athena/azonline/motor/FlowNB.validation_20260408_113516_257.json",
+      "caseCount": 3,
+      "generatedAt": "2026-04-08T09:35:16.257Z"
+    }
+  }
+}
