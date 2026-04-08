@@ -1,287 +1,335 @@
 # Config Layer
 
-This folder contains all configuration and route-resolution logic used by the automation framework.
+---
 
-It is responsible for three things:
+# 1. Overview
 
-1. defining runtime behavior that is global to execution
-2. defining environment-specific URLs and application mappings
-3. resolving scenario-driven routing inputs into a concrete start URL
+The **Config Layer** defines all **domain-level configuration** used across the framework.
 
-This layer must stay declarative and predictable. It should not contain page automation logic, Playwright selector logic, or business journey execution steps.
+It acts as the **single source of truth** for:
+
+- platform definitions
+- application definitions
+- product definitions
+- journey context definitions
+- schema selection rules
+
+This layer is **pure configuration + normalization**, with **no business logic or runtime execution**.
 
 ---
 
-# Design Principles
+# 2. Purpose
 
-## 1. Scenario-driven routing
-Routing is resolved at runtime using:
-- application
-- product
-- journey
-- entryPoint
+The Config Layer ensures:
 
-## 2. Environment vs Application
-Environment:
-- dev, test, demo, nft
-
-Application:
-- AzOnline, Ferry, Britannia
-
-## 3. All URLs belong to application
-All URLs are accessed via:
-env.applications[application]
-
-## 4. Strict inference
-- Application ≠ Journey
-- Product ≠ Partner
-
-No mixing.
-
-## 5. Config must stay pure
-Only:
-- constants
-- mappings
-- pure resolver functions
+- consistent domain modeling across the framework
+- centralized control of platform/application/product definitions
+- deterministic schema selection
+- decoupling between data builder and execution layer
+- strong typing and validation for inputs
 
 ---
 
-# Folder Overview
+# 3. Core Concepts
+
+## Platform
+
+Represents the entry point system.
+
+Examples:
+
+- Athena
+- PCW
+- PCWTool
+
+---
+
+## Application
+
+Represents the application or channel.
+
+Examples:
+
+- AzOnline
+- CTM
+- CNF
+
+---
+
+## Product
+
+Represents the insurance product.
+
+Examples:
+
+- Motor
+- Van
+- Home
+
+---
+
+## Journey Context
+
+Represents the journey type.
+
+Supported:
+
+- NewBusiness
+- Renewal
+- MTC
+- MTA (future extension)
+
+---
+
+# 4. Responsibilities
+
+The Config Layer is responsible for:
+
+- defining enums/constants for domain entities
+- normalizing CLI/user inputs
+- validating supported values
+- resolving schema selection inputs
+- exposing strongly typed models
+
+---
+
+# 5. Folder Structure
 
 ```
-src/config
-├── domain
-├── env.ts
-├── environments
-└── execution.config.ts
+src/configLayer
+│
+├── models
+│   ├── platform.config.ts
+│   ├── application.config.ts
+│   ├── product.config.ts
+│   └── journeyContext.config.ts
+│
+├── normalizers
+│   ├── normalizePlatform.ts
+│   ├── normalizeApplication.ts
+│   └── normalizeProduct.ts
+│
+└── domain
+    └── (future domain-specific logic)
 ```
 
 ---
 
-# execution.config.ts
+# 6. Platform Model
 
-Technical runtime config:
-- browser
-- timeouts
-- artifacts
-- diagnostics
+Defines all supported platforms.
 
----
+Example:
 
-# env.ts
+- ATHENA
+- PCW
+- PCW_TOOL
 
-Resolves current environment:
-- TARGET_ENV
-- returns envConfig
+Used for:
 
-No routing logic here.
+- schema selection
+- routing
+- execution behavior
 
 ---
 
-# environments/
+# 7. Application Model
 
-Each file = one environment:
-- dev.ts
-- test.ts
-- demo.ts
-- nft.ts
+Defines supported applications.
 
-Each contains:
+Example:
 
-applications: {
-  AzOnline: { ... },
-  Ferry: { ... },
-  Britannia: { ... }
-}
+- AZONLINE
+- CTM
+- CNF
 
-Each application contains:
-- customerPortalUrl
-- supportPortalUrl
-- pcwTestToolUrl
-- backdatingToolUrl
-- partnerEntryUrls
+Used for:
+
+- output path structure
+- execution context
 
 ---
 
-# partnerEntryUrls structure
+# 8. Product Model
 
-partnerEntryUrls: {
-  Motor: {
-    CTM,
-    CNF,
-    MSM,
-    GOCO
-  },
-  Home: {
-    CTM,
-    CNF,
-    MSM,
-    GOCO
-  }
-}
+Defines supported products.
+
+Example:
+
+- MOTOR
+- VAN
+- HOME
+
+Used for:
+
+- output organization
+- test coverage segmentation
 
 ---
 
-# domain/
+# 9. Journey Context Model
 
-Core routing logic lives here.
+Defines journey types.
 
-## routing.config.ts
-Defines:
-- Application
-- Product
-- EntryPoint
-- RouteDescriptor
+Example:
 
-## journey.config.ts
-Normalizes journeys:
-Direct, CTM, CNF, MSM, GOCO
+- NEW_BUSINESS
+- RENEWAL
+- MTC
 
-## application.inference.config.ts
-ONLY application rules.
-
-## product.inference.config.ts
-ONLY product rules.
-
-## application.resolver.ts
-Resolves application safely.
-
-## product.resolver.ts
-Resolves product safely.
-
-## resolveScenarioDefaults.ts
-Combines:
-- CLI
-- row data
-- inference
-
-## resolveApplicationUrl.ts
-Returns:
-application URLs
-
-## resolvePcwUrl.ts
-Returns:
-partner entry URL
-
-## resolveStartUrl.ts
-Main routing engine.
-
----
-
-# Routing Model
-
-EntryPoint → Behavior
-
-Direct:
-→ customerPortalUrl
-
-PCWTool:
-→ pcwTestToolUrl
-
-PCW:
-→ partnerEntryUrls[product][journey]
-
----
-
-# Example
-
-Direct:
-AzOnline → customerPortalUrl
-
-PCWTool:
-AzOnline → pcwTestToolUrl
-
-PCW:
-Britannia + Home + CTM → partnerEntryUrls.Home.CTM
-
----
-
-# Playwright Config Rule
-
-Playwright MUST NOT:
-- hardcode URLs
-- know application
-- know product
-
-Routing is runtime responsibility.
-
----
-
-# Modes
-
-Data Mode:
-- uses source + schema
-
-E2E Mode:
-- uses excel row
-
-Both resolve:
-application + product + journey + entryPoint
-
----
-
-# Anti-patterns
-
-DO NOT:
-- hardcode AzOnline
-- infer product from CTM
-- infer application from CNF
-- use START_FROM
-- duplicate routing logic
-
----
-
-# Summary
-
-This layer provides:
-- environment isolation
-- application-based URL ownership
-- strict inference
-- unified routing
-
----
-
-# Diagram
-
-```mermaid
-
-flowchart LR
-
-    A["Execution Layer<br/>(Data Mode / E2E Mode)"]
-    B["Scenario (normalized)<br/><br/>application? (optional)<br/>product? (optional)<br/>journey<br/>entryPoint"]
-    C["resolveScenarioDefaults<br/><br/>- CLI override<br/>- Row values<br/>- Inference (safe rules)"]
-    D["RouteDescriptor<br/><br/>application<br/>product<br/>journey<br/>entryPoint"]
-    E["resolveStartUrl"]
-
-    F1["Direct<br/><br/>Application URL"]
-    F2["PCWTool<br/><br/>Application Tool URL"]
-    F3["PCW<br/><br/>Application Partner Entry URL"]
-
-    G1["env.applications[app].customerPortalUrl"]
-    G2["env.applications[app].pcwTestToolUrl"]
-    G3["env.applications[app].partnerEntryUrls[product][journey]"]
-
-    H["Final Start URL"]
-    I["Playwright<br/>page.goto()"]
-
-    %% Flow
-    A --> B
-    B --> C
-    C --> D
-    D --> E
-
-    E --> F1
-    E --> F2
-    E --> F3
-
-    F1 --> G1
-    F2 --> G2
-    F3 --> G3
-
-    G1 --> H
-    G2 --> H
-    G3 --> H
-
-    H --> I
+Structure:
 
 ```
+{ type: "NewBusiness" }
+```
+
+---
+
+# 10. Normalization
+
+All CLI inputs are normalized via:
+
+- normalizePlatform
+- normalizeApplication
+- normalizeProduct
+
+Purpose:
+
+- case-insensitive handling
+- alias support
+- strict validation
+
+---
+
+# 11. Schema Selection Integration
+
+The Config Layer provides inputs for schema selection.
+
+Flow:
+
+```
+CLI → Config Layer → Data Layer → Schema Selection
+```
+
+Schema is selected using:
+
+- journeyContext
+- platform
+
+Defined in:
+
+src/dataLayer/data-definitions/schemaSelection.config.ts
+
+---
+
+# 12. Example Flow
+
+```
+Input:
+
+--platform Athena
+--application AzOnline
+--product Motor
+--journeyContext NewBusiness
+
+↓
+
+Normalized:
+
+platform = ATHENA
+application = AZONLINE
+product = MOTOR
+journeyContext = { type: NEW_BUSINESS }
+
+↓
+
+Passed to Data Layer
+
+↓
+
+Schema resolved:
+new_business_journey
+```
+
+---
+
+# 13. Design Principles
+
+The Config Layer is:
+
+- centralized
+- strongly typed
+- normalization-first
+- validation-driven
+- dependency-free (no runtime coupling)
+- reusable across layers
+
+---
+
+# 14. Extension Guide
+
+To add new platform:
+
+1. update platform.config.ts
+2. update normalizePlatform.ts
+3. update schemaSelection.config.ts (if needed)
+
+---
+
+To add new application:
+
+1. update application.config.ts
+2. update normalizeApplication.ts
+
+---
+
+To add new product:
+
+1. update product.config.ts
+2. update normalizeProduct.ts
+
+---
+
+To add new journey:
+
+1. update journeyContext.config.ts
+2. update schemaSelection.config.ts
+3. implement schema in dataLayer
+
+---
+
+# 15. Boundaries
+
+Config Layer DOES:
+
+- define domain
+- normalize inputs
+- validate values
+
+Config Layer DOES NOT:
+
+- read Excel
+- build data
+- execute tests
+- manage runtime state
+
+---
+
+# 16. Relationship with Other Layers
+
+| Layer | Responsibility |
+|------|----------------|
+| Config Layer | domain + normalization |
+| Data Layer | schema + data generation |
+| Execution Layer | runtime + test execution |
+
+---
+
+# 17. Future Enhancements
+
+- subtype support for MTA journeys
+- richer platform capability mapping
+- environment-based configuration overrides
+- feature flags for platform-specific behavior
+
+---
