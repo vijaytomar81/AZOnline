@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/aliasParser/types.ts
+// src/toolingLayer/pageObjects/generator/generator/aliasParser/types.ts
 export type AliasPair = {
     aliasKey: string;
     elementKey: string;

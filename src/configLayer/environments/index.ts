@@ -1,4 +1,4 @@
-// src/config/environments/index.ts
+// src/configLayer/environments/index.ts
 
 import type { EnvironmentsConfig } from "./types";
 import { devEnv } from "./dev";

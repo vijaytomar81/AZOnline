@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/core/registry/ensurePageActionIndexes.ts
+// src/toolingLayer/pageActions/generator/core/registry/ensurePageActionIndexes.ts
 
 import fs from "node:fs";
 import path from "node:path";

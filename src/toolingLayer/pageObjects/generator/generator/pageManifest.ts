@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/pageManifest.ts
+// src/toolingLayer/pageObjects/generator/generator/pageManifest.ts
 
 import fs from "node:fs";
 import path from "node:path";

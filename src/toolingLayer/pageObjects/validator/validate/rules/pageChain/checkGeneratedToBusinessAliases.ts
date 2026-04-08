@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/pageChain/checkGeneratedToBusinessAliases.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/pageChain/checkGeneratedToBusinessAliases.ts
 
 import fs from "node:fs";
 

@@ -1,4 +1,4 @@
-// src/executionLayer/core/context/outputs.ts
+// src/frameworkCore/executionLayer/core/context/outputs.ts
 
 import type { ExecutionContext } from "@frameworkCore/executionLayer/contracts";
 

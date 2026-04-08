@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/template/validateBaseFields.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/template/validateBaseFields.ts
 
 import type { RawExecutionScenarioRow } from "../types";
 import {

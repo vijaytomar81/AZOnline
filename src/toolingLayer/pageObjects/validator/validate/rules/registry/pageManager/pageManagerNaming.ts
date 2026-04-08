@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/registry/pageManager/pageManagerNaming.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/registry/pageManager/pageManagerNaming.ts
 
 import { toCamelFromText } from "@utils/text";
 

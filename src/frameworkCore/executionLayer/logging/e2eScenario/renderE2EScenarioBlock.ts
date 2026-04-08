@@ -1,50 +1,28 @@
-// src/executionLayer/logging/e2eScenario/renderE2EScenarioBlock.ts
+// src/frameworkCore/executionLayer/logging/e2eScenario/renderE2EScenarioBlock.ts
 
-import { success } from "@utils/cliFormat";
 import type {
     ExecutionScenario,
     ExecutionScenarioResult,
 } from "@frameworkCore/executionLayer/contracts";
-import { field, statusText } from "@frameworkCore/executionLayer/logging/shared";
-import { renderExecutionItemBlock } from "./renderExecutionItemBlock";
+import { field } from "../shared";
 
 export function renderE2EScenarioBlock(args: {
     scenario: ExecutionScenario;
     result: ExecutionScenarioResult;
-    duration: string;
-    verbose?: boolean;
 }): string {
-    const outputs = args.result.outputs ?? {};
     const lines: string[] = [];
 
-    lines.push("");
-    lines.push(
-        `====================${success("[SCENARIO]")} ${args.scenario.scenarioId} | ${args.scenario.scenarioName}====================`
-    );
-    lines.push(field("ScenarioId", args.scenario.scenarioId));
-    lines.push(field("ScenarioName", args.scenario.scenarioName));
-    lines.push(field("Journey", args.scenario.journey));
-    lines.push(field("PolicyContext", args.scenario.policyContext));
-    lines.push(field("EntryPoint", args.scenario.entryPoint ?? "Direct"));
-    lines.push(field("TotalItems", args.scenario.totalItems));
-    lines.push("");
-
-    args.result.itemResults.forEach((item, index) => {
-        lines.push(
-            ...renderExecutionItemBlock({
-                item,
-                index,
-                total: args.result.itemResults.length,
-                outputs,
-                verbose: args.verbose,
-            })
-        );
-    });
-
-    lines.push("");
-    lines.push(field("ScenarioStatus", statusText(args.result.status)));
-    lines.push(field("ScenarioTime", args.duration));
-    lines.push("============================================================");
+    lines.push(`E2E SCENARIO :: ${args.scenario.scenarioId}`);
+    lines.push(field("Scenario", args.scenario.scenarioName));
+    lines.push(field("Status", args.result.status));
+    lines.push(field("Platform", args.scenario.platform));
+    lines.push(field("Application", args.scenario.application));
+    lines.push(field("Product", args.scenario.product));
+    lines.push(field("JourneyStartWith", args.scenario.journeyStartWith));
+    lines.push(field("PolicyNumber", args.scenario.policyNumber ?? ""));
+    lines.push(field("LoginId", args.scenario.loginId ?? ""));
+    lines.push(field("Description", args.scenario.description));
+    lines.push(field("Items", String(args.scenario.totalItems)));
 
     return lines.join("\n");
 }

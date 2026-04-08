@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/registry/indexExports/indexExportNaming.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/registry/indexExports/indexExportNaming.ts
 
 export function expectedClassName(pageKey: string): string {
     const last = pageKey.split(".").slice(-1)[0] || "Page";

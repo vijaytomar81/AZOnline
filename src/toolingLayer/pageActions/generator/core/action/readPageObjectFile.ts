@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/core/action/readPageObjectFile.ts
+// src/toolingLayer/pageActions/generator/core/action/readPageObjectFile.ts
 
 import fs from "node:fs";
 

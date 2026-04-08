@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/builders/buildAliasesGeneratedTs.ts
+// src/toolingLayer/pageObjects/generator/builders/buildAliasesGeneratedTs.ts
 
 import type { PageMap } from "../generator/types";
 import { buildUrlReFromUrlPath } from "../generator/urlMeta";

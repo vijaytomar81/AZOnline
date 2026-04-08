@@ -1,4 +1,4 @@
-// src/tools/pageObjects/repair/repair/rules/manifest/repairManifest.ts
+// src/toolingLayer/pageObjects/repair/repair/rules/manifest/repairManifest.ts
 
 import type { TreeNode } from "@utils/cliTree";
 import type { RepairRule } from "../../pipeline/types";

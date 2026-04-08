@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/pageMap/mergePageMaps.ts
+// src/toolingLayer/pageScanner/scanner/pageMap/mergePageMaps.ts
 
 import type { PageMap, PageMapElementEntry, PageMapEntry, PageMapGroupEntry } from "../types";
 

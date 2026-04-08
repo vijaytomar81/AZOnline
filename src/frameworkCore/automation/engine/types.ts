@@ -1,4 +1,4 @@
-// src/automation/engine/types.ts
+// src/frameworkCore/automation/engine/types.ts
 
 import type { Page } from "@playwright/test";
 

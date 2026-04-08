@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/selectCandidates.ts
+// src/toolingLayer/businessJourneys/generator/generator/selectCandidates.ts
 
 import type {
     JourneyGenerationInputs,

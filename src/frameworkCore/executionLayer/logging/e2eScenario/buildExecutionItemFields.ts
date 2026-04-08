@@ -1,4 +1,4 @@
-// src/executionLayer/logging/e2eScenario/buildExecutionItemFields.ts
+// src/frameworkCore/executionLayer/logging/e2eScenario/buildExecutionItemFields.ts
 
 import type { ExecutionItemResult } from "@frameworkCore/executionLayer/contracts";
 import { OUTPUT_KEYS } from "@frameworkCore/executionLayer/constants/outputKeys";

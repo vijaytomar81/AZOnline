@@ -1,4 +1,4 @@
-// src/executionLayer/runtime/itemData/utils/normalizeResolverKey.ts
+// src/frameworkCore/executionLayer/runtime/itemData/utils/normalizeResolverKey.ts
 
 import { normalizeSpaces } from "@utils/text";
 

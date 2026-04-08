@@ -1,4 +1,4 @@
-// src/automation/base/AutomationPageDriver.ts
+// src/frameworkCore/automation/base/AutomationPageDriver.ts
 
 import type { Locator } from "@playwright/test";
 import type { AliasMap, ElementDef } from "@frameworkCore/automation/engine";

@@ -1,4 +1,4 @@
-// src/automation/diagnostics/runPageScanOnLocatorFailure.ts
+// src/frameworkCore/automation/diagnostics/runPageScanOnLocatorFailure.ts
 
 import fs from "node:fs/promises";
 import path from "node:path";

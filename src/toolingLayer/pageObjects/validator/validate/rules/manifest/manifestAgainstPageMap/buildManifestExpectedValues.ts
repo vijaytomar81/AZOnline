@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/buildManifestExpectedValues.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/buildManifestExpectedValues.ts
 
 import { getPageArtifactPaths } from "@toolingLayer/pageObjects/common/pagePaths";
 import type { LoadedPageMap } from "@toolingLayer/pageObjects/common/readPageMap";

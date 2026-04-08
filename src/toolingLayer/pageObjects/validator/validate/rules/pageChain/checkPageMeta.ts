@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/pageChain/checkPageMeta.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/pageChain/checkPageMeta.ts
 
 import fs from "node:fs";
 

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/repair/repair/types.ts
+// src/toolingLayer/pageObjects/repair/repair/types.ts
 
 import type { TreeNode } from "@utils/cliTree";
 

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/buildExtraManifestIssueEntries.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/buildExtraManifestIssueEntries.ts
 
 import type { TreeNode } from "@utils/cliTree";
 import {

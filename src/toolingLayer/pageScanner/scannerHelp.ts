@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scannerHelp.ts
+// src/toolingLayer/pageScanner/scannerHelp.ts
 
 export function usage(): string {
     return `

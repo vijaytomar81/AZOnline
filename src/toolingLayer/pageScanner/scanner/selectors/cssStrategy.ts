@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/selectors/cssStrategy.ts
+// src/toolingLayer/pageScanner/scanner/selectors/cssStrategy.ts
 
 import type { ScannedElement, SelectorCandidate } from "../types";
 import { getElementTag, scoreCss } from "./shared";

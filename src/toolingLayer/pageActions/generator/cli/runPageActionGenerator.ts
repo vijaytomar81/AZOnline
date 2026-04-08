@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/cli/runPageActionGenerator.ts
+// src/toolingLayer/pageActions/generator/cli/runPageActionGenerator.ts
 
 import path from "node:path";
 import { generatePageActionsFromManifest } from "../core/generatePageActionsFromManifest";

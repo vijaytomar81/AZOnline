@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/report.ts
+// src/toolingLayer/pageObjects/generator/generator/report.ts
 
 import type { SyncPageRegistryResult } from "./registry";
 

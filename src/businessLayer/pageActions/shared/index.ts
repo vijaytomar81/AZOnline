@@ -1,4 +1,4 @@
-// src/pageActions/shared/index.ts
+// src/businessLayer/pageActions/shared/index.ts
 
 export type {
     PageActionContext,

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/paths.ts
+// src/toolingLayer/pageObjects/generator/generator/paths.ts
 import { buildPageArtifact } from "./pageArtifact";
 
 export function pageKeyToFolder(pagesDir: string, pageKey: string) {

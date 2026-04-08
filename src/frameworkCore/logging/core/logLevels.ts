@@ -1,4 +1,4 @@
-// src/logging/core/logLevels.ts
+// src/frameworkCore/logging/core/logLevels.ts
 
 export const LOG_LEVELS = {
     DEBUG: "debug",

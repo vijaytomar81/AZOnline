@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/core/action/classifyPageObjectMethods.ts
+// src/toolingLayer/pageActions/generator/core/action/classifyPageObjectMethods.ts
 
 import type { ClassifiedMethods, ExtractedMethod } from "../../shared/types";
 import { normalizeFieldNameFromMethod } from "../../shared/naming";

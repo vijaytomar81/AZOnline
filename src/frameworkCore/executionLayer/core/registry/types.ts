@@ -1,4 +1,4 @@
-// src/executionLayer/core/registry/types.ts
+// src/frameworkCore/executionLayer/core/registry/types.ts
 
 import type {
     ExecutionContext,

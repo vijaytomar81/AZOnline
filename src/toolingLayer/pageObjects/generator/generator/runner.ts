@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/runner.ts
+// src/toolingLayer/pageObjects/generator/generator/runner.ts
 
 import path from "node:path";
 

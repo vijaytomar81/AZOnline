@@ -1,4 +1,4 @@
-// src/logging/core/logConfig.ts
+// src/frameworkCore/logging/core/logConfig.ts
 
 import type { LogCategory } from "./logCategories";
 import { parseEnabledLogCategories } from "@frameworkCore/logging/utils/parseEnabledLogCategories";

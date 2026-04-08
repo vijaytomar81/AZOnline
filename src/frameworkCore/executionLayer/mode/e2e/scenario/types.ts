@@ -1,10 +1,9 @@
-// src/executionLayer/mode/e2e/scenario/types.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/types.ts
 
 import type {
-    ExecutionEntryPoint,
     ExecutionItem,
-    ExecutionPolicyContext,
     ExecutionScenario,
+    ExecutionJourneyStartWith,
 } from "@frameworkCore/executionLayer/contracts";
 import type { RawExecutionScenarioRow } from "@frameworkCore/executionLayer/runtime/scenarioSheet";
 
@@ -12,8 +11,7 @@ export type {
     RawExecutionScenarioRow,
     ExecutionItem,
     ExecutionScenario,
-    ExecutionEntryPoint,
-    ExecutionPolicyContext,
+    ExecutionJourneyStartWith,
 };
 
 export type ScenarioValidationResult = {

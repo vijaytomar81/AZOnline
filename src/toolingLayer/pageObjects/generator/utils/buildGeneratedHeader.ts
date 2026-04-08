@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/utils/buildGeneratedHeader.ts
+// src/toolingLayer/pageObjects/generator/utils/buildGeneratedHeader.ts
 
 import path from "node:path";
 import {

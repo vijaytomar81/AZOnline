@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/normalize/normalizeExecute.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/normalize/normalizeExecute.ts
 
 import { normalizeKey } from "./shared";
 

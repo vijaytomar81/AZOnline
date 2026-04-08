@@ -1,4 +1,4 @@
-// src/executionLayer/contracts/ExecutionResult.ts
+// src/frameworkCore/executionLayer/contracts/ExecutionResult.ts
 
 export type ExecutionItemStatus =
     | "passed"

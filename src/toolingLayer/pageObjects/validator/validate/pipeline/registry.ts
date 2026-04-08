@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/pipeline/registry.ts
+// src/toolingLayer/pageObjects/validator/validate/pipeline/registry.ts
 
 import type { ValidationRule } from "./types";
 

@@ -1,4 +1,4 @@
-// src/executionLayer/logging/e2eScenario/index.ts
+// src/frameworkCore/executionLayer/logging/e2eScenario/index.ts
 
 export { getTreeTokens } from "./getTreeTokens";
 export { getExecutionItemDebugLines } from "./getExecutionItemDebugLines";

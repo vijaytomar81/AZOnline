@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/hygiene/moduleHygiene/collectPageManagerModuleHygieneIssues.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/hygiene/moduleHygiene/collectPageManagerModuleHygieneIssues.ts
 
 import type { ModuleHygieneRuleResult } from "./moduleHygieneTypes";
 import { formatKeyList } from "./formatKeyList";

@@ -1,4 +1,4 @@
-// src/evidence/runtime/EvidenceRunInfo.ts
+// src/evidenceLayer/runtime/EvidenceRunInfo.ts
 
 export type EvidenceRunInfo = {
     runId: string;

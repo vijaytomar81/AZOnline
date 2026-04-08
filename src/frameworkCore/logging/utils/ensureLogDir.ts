@@ -1,4 +1,4 @@
-// src/logging/utils/ensureLogDir.ts
+// src/frameworkCore/logging/utils/ensureLogDir.ts
 
 import fs from "node:fs";
 

@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/render/renderRunJourneyFile.ts
+// src/toolingLayer/businessJourneys/generator/generator/render/renderRunJourneyFile.ts
 
 import { toRepoRelative } from "@utils/paths";
 import type { JourneyTarget } from "../types";

@@ -1,10 +1,9 @@
-// src/executionLayer/mode/data/buildDataScenarios.ts
+// src/frameworkCore/executionLayer/mode/data/buildDataScenarios.ts
 
 import type { CasesFile } from "@dataLayer/builder/types";
-import type {
-    Application,
-    Product,
-} from "@configLayer/domain/routing.config";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Application } from "@configLayer/models/application.config";
+import type { Product } from "@configLayer/models/product.config";
 import { buildScenarioFromCase } from "./buildScenarioFromCase";
 import type {
     BuildDataScenariosResult,
@@ -12,19 +11,17 @@ import type {
 } from "./types";
 
 export function buildDataScenarios(args: {
-    source: string;
-    schemaName: string;
     casesFile: CasesFile;
-    application?: Application;
-    product?: Product;
+    platform: Platform;
+    application: Application;
+    product: Product;
 }): BuildDataScenariosResult {
     const overrideByScenarioId: DataScenarioOverrideMap = new Map();
 
     const scenarios = args.casesFile.cases.map((item) => {
         const scenario = buildScenarioFromCase({
-            source: args.source,
-            schemaName: args.schemaName,
             item,
+            platform: args.platform,
             application: args.application,
             product: args.product,
         });

@@ -1,4 +1,4 @@
-// src/businessJourneys/newBusiness/index.ts
+// src/businessLayer/businessJourneys/newBusiness/index.ts
 
 import type { ExecutionItemExecutorArgs } from "@frameworkCore/executionLayer/core/registry";
 

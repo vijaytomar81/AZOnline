@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generatorHelp.ts
+// src/toolingLayer/businessJourneys/generator/generatorHelp.ts
 
 export function printBusinessJourneyGeneratorHelp() {
     console.log("");

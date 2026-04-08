@@ -1,4 +1,4 @@
-// src/evidence/constants/evidenceLabels.ts
+// src/evidenceLayer/constants/evidenceLabels.ts
 
 export const EVIDENCE_LABELS = {
     TEST_CASE_ID: "test_case_id",

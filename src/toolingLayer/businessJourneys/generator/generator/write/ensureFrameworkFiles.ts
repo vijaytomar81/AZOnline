@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/write/ensureFrameworkFiles.ts
+// src/toolingLayer/businessJourneys/generator/generator/write/ensureFrameworkFiles.ts
 
 import path from "node:path";
 import { BUSINESS_JOURNEYS_DIR } from "@utils/paths";

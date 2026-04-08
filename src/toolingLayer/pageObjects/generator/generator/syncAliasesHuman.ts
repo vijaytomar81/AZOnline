@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/syncAliasesHuman.ts
+// src/toolingLayer/pageObjects/generator/generator/syncAliasesHuman.ts
 
 import fs from "node:fs";
 

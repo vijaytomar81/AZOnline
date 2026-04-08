@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/types.ts
+// src/toolingLayer/pageObjects/generator/generator/types.ts
 
 import type { Logger } from "@utils/logger";
 

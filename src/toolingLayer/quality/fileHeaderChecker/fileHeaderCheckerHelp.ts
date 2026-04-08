@@ -1,4 +1,4 @@
-// src/tools/quality/fileHeaderChecker/fileHeaderCheckerHelp.ts
+// src/toolingLayer/quality/fileHeaderChecker/fileHeaderCheckerHelp.ts
 
 export function usage(): string {
     return `

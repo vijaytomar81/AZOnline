@@ -1,4 +1,4 @@
-// src/config/env.ts
+// src/configLayer/env.ts
 
 import { environments } from "./environments";
 import type { EnvKey } from "./environments";

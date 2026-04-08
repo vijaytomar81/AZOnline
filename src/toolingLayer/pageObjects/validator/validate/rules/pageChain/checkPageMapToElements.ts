@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/pageChain/checkPageMapToElements.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/pageChain/checkPageMapToElements.ts
 
 import fs from "node:fs";
 

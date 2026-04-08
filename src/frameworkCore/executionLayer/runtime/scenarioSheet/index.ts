@@ -1,4 +1,4 @@
-// src/executionLayer/runtime/scenarioSheet/index.ts
+// src/frameworkCore/executionLayer/runtime/scenarioSheet/index.ts
 
 export type {
     RawExecutionScenarioRow,

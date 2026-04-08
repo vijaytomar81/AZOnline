@@ -1,4 +1,4 @@
-// src/automation/base/BaseWaits.ts
+// src/frameworkCore/automation/base/BaseWaits.ts
 
 import type { Page } from "@playwright/test";
 import { executionConfig } from "@configLayer/execution.config";

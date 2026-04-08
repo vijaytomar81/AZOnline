@@ -1,4 +1,4 @@
-// src/executionLayer/contracts/ExecutionContext.ts
+// src/frameworkCore/executionLayer/contracts/ExecutionContext.ts
 
 import type { Browser, BrowserContext, Page } from "@playwright/test";
 import type { ExecutionScenario } from "./ExecutionScenario";

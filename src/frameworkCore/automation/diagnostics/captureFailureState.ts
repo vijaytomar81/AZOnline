@@ -1,4 +1,4 @@
-// src/automation/diagnostics/captureFailureState.ts
+// src/frameworkCore/automation/diagnostics/captureFailureState.ts
 
 import type { Page } from "@playwright/test";
 import { executionConfig } from "@configLayer/execution.config";

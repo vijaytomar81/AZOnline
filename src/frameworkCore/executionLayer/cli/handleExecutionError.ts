@@ -1,4 +1,4 @@
-// src/executionLayer/cli/handleExecutionError.ts
+// src/frameworkCore/executionLayer/cli/handleExecutionError.ts
 
 import { AppError } from "@utils/errors";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";

@@ -1,4 +1,4 @@
-// src/executionLayer/logging/dataCase/shouldShowDataCaseDebugLines.ts
+// src/frameworkCore/executionLayer/logging/dataCase/shouldShowDataCaseDebugLines.ts
 
 import type { ExecutionScenarioResult } from "@frameworkCore/executionLayer/contracts";
 

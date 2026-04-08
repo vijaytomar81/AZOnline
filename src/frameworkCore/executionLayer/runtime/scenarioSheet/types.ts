@@ -1,17 +1,22 @@
-// src/executionLayer/runtime/scenarioSheet/types.ts
+// src/frameworkCore/executionLayer/runtime/scenarioSheet/types.ts
 
 export type RawExecutionScenarioRow = {
     ScenarioId: string;
     ScenarioName?: string;
-    Journey?: string;
-    PolicyContext?: string;
-    EntryPoint?: string;
+
+    Platform?: string;
+    Application?: string;
+    Product?: string;
+    JourneyStartWith?: string;
+
     PolicyNumber?: string;
     LoginId?: string;
     Password?: string;
+
     Description?: string;
     Execute?: string;
     TotalItems?: string | number;
+
     [key: string]: unknown;
 };
 

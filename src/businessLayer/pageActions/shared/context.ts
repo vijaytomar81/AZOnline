@@ -1,4 +1,4 @@
-// src/pageActions/shared/context.ts
+// src/businessLayer/pageActions/shared/context.ts
 
 import { AppError } from "@utils/errors";
 import { PageManager } from "@businessLayer/pageObjects/pageManager";

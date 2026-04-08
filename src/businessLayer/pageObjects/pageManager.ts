@@ -1,4 +1,4 @@
-// src/pageObjects/pageManager.ts
+// src/businessLayer/pageObjects/pageManager.ts
 // AUTO-GENERATED from src/pageObjects/.manifest/
 
 import type { Page } from "@playwright/test";

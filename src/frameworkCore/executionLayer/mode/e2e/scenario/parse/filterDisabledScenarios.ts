@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/parse/filterDisabledScenarios.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/parse/filterDisabledScenarios.ts
 
 import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
 

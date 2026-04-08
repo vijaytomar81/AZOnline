@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/keyNaming/normalize.ts
+// src/toolingLayer/pageScanner/scanner/keyNaming/normalize.ts
 
 export function clean(value?: string | null): string | undefined {
     const v = value?.replace(/\s+/g, " ").trim();

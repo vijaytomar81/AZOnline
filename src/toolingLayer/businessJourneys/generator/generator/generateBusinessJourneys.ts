@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/generateBusinessJourneys.ts
+// src/toolingLayer/businessJourneys/generator/generator/generateBusinessJourneys.ts
 
 import {
     info,

@@ -1,4 +1,4 @@
-// src/executionLayer/logging/executionLogRenderer.ts
+// src/frameworkCore/executionLayer/logging/executionLogRenderer.ts
 
 import { failure, muted, success } from "@utils/cliFormat";
 import type { ExecutionMode } from "@frameworkCore/executionLayer/contracts";

@@ -1,4 +1,4 @@
-// src/pageObjects/objects/athena/common/manage-cookies/ManageCookiesPage.ts
+// src/businessLayer/pageObjects/objects/athena/common/manage-cookies/ManageCookiesPage.ts
 // pageKey: athena.common.manage-cookies
 
 import type { Locator, Page } from "@playwright/test";

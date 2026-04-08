@@ -1,4 +1,4 @@
-// src/tools/pageObjects/repair/repair/shared/registry.ts
+// src/toolingLayer/pageObjects/repair/repair/shared/registry.ts
 
 import fs from "node:fs";
 

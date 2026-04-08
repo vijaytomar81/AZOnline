@@ -1,4 +1,4 @@
-// src/logging/core/logCategories.ts
+// src/frameworkCore/logging/core/logCategories.ts
 
 export const LOG_CATEGORIES = {
     FRAMEWORK: "framework",

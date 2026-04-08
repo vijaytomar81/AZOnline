@@ -1,4 +1,4 @@
-// src/logging/policies/shouldPublishLog.ts
+// src/frameworkCore/logging/policies/shouldPublishLog.ts
 
 import type { LogEvent } from "@frameworkCore/logging/core/logEvent";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";

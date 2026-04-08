@@ -1,4 +1,4 @@
-// src/executionLayer/core/scenario/buildScenarioExecutionResult.ts
+// src/frameworkCore/executionLayer/core/scenario/buildScenarioExecutionResult.ts
 
 import type {
     ExecutionContext,

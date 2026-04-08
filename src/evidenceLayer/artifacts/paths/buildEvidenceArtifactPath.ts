@@ -1,4 +1,4 @@
-// src/evidence/artifacts/paths/buildEvidenceArtifactPath.ts
+// src/evidenceLayer/artifacts/paths/buildEvidenceArtifactPath.ts
 
 import path from "node:path";
 import type { EvidenceArtifactPaths } from "../contracts/EvidenceArtifactPaths";

@@ -1,4 +1,4 @@
-// src/evidence/core/InMemoryEvidenceStore.ts
+// src/evidenceLayer/core/InMemoryEvidenceStore.ts
 
 import type { EvidenceEntry } from "../contracts/EvidenceEntry";
 import type { EvidenceLabel } from "../contracts/EvidenceLabel";

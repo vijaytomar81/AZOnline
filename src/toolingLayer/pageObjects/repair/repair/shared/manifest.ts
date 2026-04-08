@@ -1,4 +1,4 @@
-// src/tools/pageObjects/repair/repair/shared/manifest.ts
+// src/toolingLayer/pageObjects/repair/repair/shared/manifest.ts
 
 import crypto from "node:crypto";
 import fs from "node:fs";

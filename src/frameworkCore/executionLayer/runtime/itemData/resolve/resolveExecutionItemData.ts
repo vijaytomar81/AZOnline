@@ -1,8 +1,11 @@
-// src/executionLayer/runtime/itemData/resolve/resolveExecutionItemData.ts
+// src/frameworkCore/executionLayer/runtime/itemData/resolve/resolveExecutionItemData.ts
 
 import { AppError } from "@utils/errors";
 import { normalizeSpaces } from "@utils/text";
-import type { ExecutionItem } from "@frameworkCore/executionLayer/contracts";
+import type {
+    ExecutionItem,
+    ExecutionScenario,
+} from "@frameworkCore/executionLayer/contracts";
 import type {
     ExecutionItemDataDebugCollector,
     ExecutionItemDataRegistry,
@@ -15,24 +18,15 @@ import { getOrLoadExecutionItemCasesFile } from "../utils/getOrLoadExecutionItem
 
 export function resolveExecutionItemData(args: {
     registry: ExecutionItemDataRegistry;
-    journey: string;
+    scenario: ExecutionScenario;
     item: ExecutionItem;
     logScope: string;
     debugCollector?: ExecutionItemDataDebugCollector;
 }): ResolvedExecutionItemData {
     const testCaseRef = normalizeSpaces(args.item.testCaseRef);
 
-    emitResolverDebug({
-        message:
-            `Resolving execution item data -> action=${args.item.action}, journey=${args.journey}, ` +
-            `subType=${args.item.subType ?? ""}, testCaseRef=${testCaseRef}`,
-        logScope: args.logScope,
-        debugCollector: args.debugCollector,
-    });
-
     const source = findExecutionItemDataSource({
         registry: args.registry,
-        journey: args.journey,
         item: args.item,
     });
 
@@ -41,29 +35,18 @@ export function resolveExecutionItemData(args: {
             code: "EXECUTION_ITEM_DATA_SOURCE_NOT_FOUND",
             stage: "resolve-execution-item-data",
             source: "resolveExecutionItemData",
-            message:
-                `No execution item data source registered for action="${args.item.action}", ` +
-                `journey="${args.journey}", subType="${args.item.subType ?? ""}".`,
+            message: `No data source found for action="${args.item.action}" subType="${args.item.subType ?? ""}".`,
             context: {
                 action: args.item.action,
-                journey: args.journey,
                 subType: args.item.subType ?? "",
                 testCaseRef,
             },
         });
     }
 
-    emitResolverDebug({
-        message:
-            `Matched execution item data source -> action=${source.action}, ` +
-            `journey=${source.journey ?? ""}, subType=${source.subType ?? ""}, ` +
-            `sheet=${source.sheetName}, schema=${source.schemaName ?? ""}`,
-        logScope: args.logScope,
-        debugCollector: args.debugCollector,
-    });
-
     const casesFile = getOrLoadExecutionItemCasesFile({
         registry: args.registry,
+        scenario: args.scenario,
         source,
         logScope: args.logScope,
         debugCollector: args.debugCollector,
@@ -79,28 +62,18 @@ export function resolveExecutionItemData(args: {
             code: "EXECUTION_ITEM_TEST_CASE_NOT_FOUND",
             stage: "resolve-execution-item-data",
             source: "resolveExecutionItemData",
-            message:
-                `TestCaseRef "${testCaseRef}" not found in sheet "${source.sheetName}" ` +
-                `for action "${args.item.action}".`,
+            message: `TestCaseRef "${testCaseRef}" not found for action="${args.item.action}".`,
             context: {
                 testCaseRef,
                 action: args.item.action,
-                sheetName: source.sheetName,
-                schemaName: source.schemaName ?? "",
+                subType: args.item.subType ?? "",
             },
         });
     }
-
-    emitResolverDebug({
-        message: `Resolved test case -> scriptId=${hit.scriptId ?? ""}, scriptName=${hit.scriptName}`,
-        logScope: args.logScope,
-        debugCollector: args.debugCollector,
-    });
 
     return {
         testCaseRef,
         payload: hit.data,
         source,
-        sourceFileSheet: casesFile.sheet,
     };
 }

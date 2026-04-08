@@ -1,4 +1,4 @@
-// src/logging/core/logEvent.ts
+// src/frameworkCore/logging/core/logEvent.ts
 
 import type { LogCategory } from "./logCategories";
 import type { LogLevel } from "./logLevels";

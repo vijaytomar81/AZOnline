@@ -1,4 +1,4 @@
-// src/automation/base/index.ts
+// src/frameworkCore/automation/base/index.ts
 
 export type {
     AutomationPageDriver,

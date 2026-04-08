@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/pageMap/diffPageMaps.ts
+// src/toolingLayer/pageScanner/scanner/pageMap/diffPageMaps.ts
 
 import type { PageMap, PageMapEntry } from "../types";
 

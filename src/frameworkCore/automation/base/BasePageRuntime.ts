@@ -1,4 +1,4 @@
-// src/automation/base/BasePageRuntime.ts
+// src/frameworkCore/automation/base/BasePageRuntime.ts
 
 import type { Page } from "@playwright/test";
 import { executionConfig } from "@configLayer/execution.config";

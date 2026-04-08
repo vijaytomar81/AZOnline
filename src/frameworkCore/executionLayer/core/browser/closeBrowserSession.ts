@@ -1,4 +1,4 @@
-// src/executionLayer/core/browser/closeBrowserSession.ts
+// src/frameworkCore/executionLayer/core/browser/closeBrowserSession.ts
 
 import type { BrowserSession } from "./types";
 

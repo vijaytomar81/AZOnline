@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/report/printSuggestedAction.ts
+// src/toolingLayer/pageObjects/validator/validate/report/printSuggestedAction.ts
 
 import { ICONS } from "@utils/icons";
 import { info, printSection, strong } from "@utils/cliFormat";

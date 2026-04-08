@@ -1,4 +1,4 @@
-// src/evidence/artifacts/json/writeEvidenceJsonArtifact.ts
+// src/evidenceLayer/artifacts/json/writeEvidenceJsonArtifact.ts
 
 import fs from "node:fs/promises";
 import { buildEvidenceJson } from "./buildEvidenceJson";

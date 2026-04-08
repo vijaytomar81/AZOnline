@@ -1,25 +1,28 @@
-// src/executionLayer/contracts/ExecutionScenario.ts
+// src/frameworkCore/executionLayer/contracts/ExecutionScenario.ts
 
 import type { ExecutionItem } from "./ExecutionItem";
-import type {
-    Application,
-    Product,
-} from "@configLayer/domain/routing.config";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Application } from "@configLayer/models/application.config";
+import type { Product } from "@configLayer/models/product.config";
 
-export type ExecutionPolicyContext = "NewBusiness" | "ExistingPolicy";
-export type ExecutionEntryPoint = "Direct" | "PCW" | "PCWTool";
+export type ExecutionJourneyStartWith =
+    | "newPolicy"
+    | "existingPolicy";
 
 export type ExecutionScenario = {
     scenarioId: string;
     scenarioName: string;
-    journey: string;
-    policyContext: ExecutionPolicyContext;
-    entryPoint?: ExecutionEntryPoint;
-    application?: Application;
-    product?: Product;
+
+    platform: Platform;
+    application: Application;
+    product: Product;
+
+    journeyStartWith: ExecutionJourneyStartWith;
+
     policyNumber?: string;
     loginId?: string;
     password?: string;
+
     description: string;
     execute: boolean;
     totalItems: number;

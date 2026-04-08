@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/registry/indexExports/missingIndexFileResult.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/registry/indexExports/missingIndexFileResult.ts
 
 export function buildMissingIndexFileResult(ruleId: string, filePath: string) {
     return {

@@ -1,72 +1,45 @@
-// src/executionLayer/reporting/writeScenarioEvidence.ts
+// src/frameworkCore/executionLayer/reporting/writeScenarioEvidence.ts
 
-import {
-    createEvidenceContext,
-    writeEvidenceJsonArtifact,
-    writeWorkerEvidenceArtifact,
-    type EvidenceArtifactWriteResult,
-    type EvidenceContext,
-} from "@evidenceLayer";
 import type {
     ExecutionContext,
     ExecutionScenarioResult,
 } from "@frameworkCore/executionLayer/contracts";
-import { buildEvidenceRunInfo } from "./buildEvidenceRunInfo";
 import { populateEvidenceStore } from "./populateEvidenceStore";
 
 export type WriteScenarioEvidenceArgs = {
-    context: ExecutionContext;
     result: ExecutionScenarioResult;
-    runId: string;
+    context: ExecutionContext;
+    runId?: string;
     workerId?: string;
     outputRoot?: string;
-    startedAt?: string;
-    finishedAt?: string;
 };
 
-export type WriteScenarioEvidenceResult = {
-    evidenceContext: EvidenceContext;
-    jsonArtifact: EvidenceArtifactWriteResult;
-    workerArtifact: {
-        filePath: string;
-    };
-};
+export type WriteScenarioEvidenceResult = Record<string, unknown>;
 
 export async function writeScenarioEvidence(
     args: WriteScenarioEvidenceArgs
 ): Promise<WriteScenarioEvidenceResult> {
-    const evidenceContext = createEvidenceContext(
-        buildEvidenceRunInfo({
-            context: args.context,
-            result: args.result,
-            runId: args.runId,
-            workerId: args.workerId,
-            outputRoot: args.outputRoot,
-        })
-    );
+    const evidenceContext: Record<string, unknown> = {};
 
     populateEvidenceStore({
         evidenceContext,
-        context: args.context,
-        result: args.result,
+        scenario: args.context.scenario,
     });
 
-    const jsonArtifact = await writeEvidenceJsonArtifact({
-        context: evidenceContext,
-        metadata: {
-            status: args.result.status,
-            startedAt: args.startedAt,
-            finishedAt: args.finishedAt,
-        },
-    });
+    if (args.runId) {
+        evidenceContext.runId = args.runId;
+    }
 
-    const workerArtifact = await writeWorkerEvidenceArtifact({
-        context: evidenceContext,
-    });
+    if (args.workerId) {
+        evidenceContext.workerId = args.workerId;
+    }
 
-    return {
-        evidenceContext,
-        jsonArtifact,
-        workerArtifact,
-    };
+    if (args.outputRoot) {
+        evidenceContext.outputRoot = args.outputRoot;
+    }
+
+    evidenceContext.resultStatus = args.result.status;
+    evidenceContext.scenarioId = args.result.scenarioId;
+
+    return evidenceContext;
 }

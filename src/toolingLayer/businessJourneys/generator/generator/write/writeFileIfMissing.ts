@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/write/writeFileIfMissing.ts
+// src/toolingLayer/businessJourneys/generator/generator/write/writeFileIfMissing.ts
 
 import { fileExists, safeWriteTextIfMissing } from "@utils/fs";
 

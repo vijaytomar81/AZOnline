@@ -1,3 +1,3 @@
-// src/tools/pageActions/generator/index.ts
+// src/toolingLayer/pageActions/generator/index.ts
 
 export { generatePageActionsFromManifest } from "./core/generatePageActionsFromManifest";

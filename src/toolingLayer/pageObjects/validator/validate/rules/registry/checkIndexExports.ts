@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/registry/checkIndexExports.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/registry/checkIndexExports.ts
 
 import fs from "node:fs";
 

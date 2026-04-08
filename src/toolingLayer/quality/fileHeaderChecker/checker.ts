@@ -1,4 +1,4 @@
-// src/tools/quality/fileHeaderChecker/checker.ts
+// src/toolingLayer/quality/fileHeaderChecker/checker.ts
 
 import fs from "node:fs";
 import path from "node:path";

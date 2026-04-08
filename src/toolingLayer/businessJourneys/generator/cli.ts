@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/cli.ts
+// src/toolingLayer/businessJourneys/generator/cli.ts
 
 import { runGenerateCommand } from "./commands/generate";
 import { printBusinessJourneyGeneratorHelp } from "./generatorHelp";

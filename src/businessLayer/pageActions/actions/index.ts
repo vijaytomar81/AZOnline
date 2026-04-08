@@ -1,3 +1,3 @@
-// src/pageActions/actions/index.ts
+// src/businessLayer/pageActions/actions/index.ts
 export {};
 export * from "./athena";

@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/shared/types.ts
+// src/toolingLayer/pageActions/generator/shared/types.ts
 
 export type ExtractedMethod = {
     name: string;

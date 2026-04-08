@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/core/action/extractPageObjectMethods.ts
+// src/toolingLayer/pageActions/generator/core/action/extractPageObjectMethods.ts
 
 import type { ExtractedMethod } from "../../shared/types";
 

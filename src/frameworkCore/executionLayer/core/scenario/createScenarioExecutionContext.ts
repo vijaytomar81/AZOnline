@@ -1,4 +1,4 @@
-// src/executionLayer/core/scenario/createScenarioExecutionContext.ts
+// src/frameworkCore/executionLayer/core/scenario/createScenarioExecutionContext.ts
 
 import type { ExecutionContext, ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
 import { createExecutionContext } from "@frameworkCore/executionLayer/core/context";

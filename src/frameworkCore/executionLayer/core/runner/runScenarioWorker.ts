@@ -1,4 +1,4 @@
-// src/executionLayer/core/runner/runScenarioWorker.ts
+// src/frameworkCore/executionLayer/core/runner/runScenarioWorker.ts
 
 import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
 import { formatDuration } from "@frameworkCore/executionLayer/logging";

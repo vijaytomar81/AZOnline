@@ -1,4 +1,4 @@
-// src/executionLayer/logging/e2eScenario/shouldShowExecutionItemDebugLines.ts
+// src/frameworkCore/executionLayer/logging/e2eScenario/shouldShowExecutionItemDebugLines.ts
 
 import type { ExecutionItemResult } from "@frameworkCore/executionLayer/contracts";
 

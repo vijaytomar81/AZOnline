@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/registry/indexExports/buildIndexExportExpectedState.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/registry/indexExports/buildIndexExportExpectedState.ts
 
 import type { LoadedPageMap } from "@toolingLayer/pageObjects/common/readPageMap";
 import type { IndexExportExpectedState } from "./indexExportTypes";

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/registry/generatePagesIndex.ts
+// src/toolingLayer/pageObjects/generator/generator/registry/generatePagesIndex.ts
 
 import path from "node:path";
 

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/pageChain/pageObjectStructure/pageObjectStructureChecks.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/pageChain/pageObjectStructure/pageObjectStructureChecks.ts
 
 export function hasOpeningMarker(pageObjectTs: string): boolean {
     return pageObjectTs.includes("// <scanner:aliases>");

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/report/reportGroups.ts
+// src/toolingLayer/pageObjects/validator/validate/report/reportGroups.ts
 
 import type { ValidationRuleExecutionResult } from "../types";
 

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/scaffold.ts
+// src/toolingLayer/pageObjects/generator/generator/scaffold.ts
 
 import fs from "node:fs";
 import path from "node:path";

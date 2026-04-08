@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/core/generatePageActionsFromManifest.ts
+// src/toolingLayer/pageActions/generator/core/generatePageActionsFromManifest.ts
 
 import fs from "node:fs";
 import path from "node:path";

@@ -1,4 +1,4 @@
-// src/api/gmail/gmailParser.ts
+// src/integrations/api/gmail/gmailParser.ts
 
 function decodeBase64Url(data?: string): string {
     if (!data) return "";

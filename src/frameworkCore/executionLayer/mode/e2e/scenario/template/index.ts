@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/template/index.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/template/index.ts
 
 export {
     normalizeTemplateKey,

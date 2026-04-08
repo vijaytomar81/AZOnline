@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/report.ts
+// src/toolingLayer/pageObjects/validator/validate/report.ts
 
 import { printTree } from "@utils/cliTree";
 import { printSection, printSummary } from "@utils/cliFormat";

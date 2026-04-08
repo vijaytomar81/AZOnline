@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/core/manifestSync/loadPageObjectManifestIndex.ts
+// src/toolingLayer/pageActions/generator/core/manifestSync/loadPageObjectManifestIndex.ts
 
 import fs from "node:fs";
 import { PAGE_MANIFEST_INDEX_FILE } from "@utils/paths";

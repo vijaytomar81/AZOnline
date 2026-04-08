@@ -1,4 +1,4 @@
-// src/executionLayer/logging/e2eScenario/getExecutionItemDebugLines.ts
+// src/frameworkCore/executionLayer/logging/e2eScenario/getExecutionItemDebugLines.ts
 
 import type { ExecutionItemResult } from "@frameworkCore/executionLayer/contracts";
 import { safeText } from "@frameworkCore/executionLayer/logging/shared";

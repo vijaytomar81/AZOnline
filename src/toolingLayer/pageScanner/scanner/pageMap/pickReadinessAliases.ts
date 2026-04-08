@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/pageMap/pickReadinessAliases.ts
+// src/toolingLayer/pageScanner/scanner/pageMap/pickReadinessAliases.ts
 
 import type {
     PageMap,

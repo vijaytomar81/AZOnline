@@ -1,4 +1,4 @@
-// src/evidence/artifacts/run/promoteWorkerPageScans.ts
+// src/evidenceLayer/artifacts/run/promoteWorkerPageScans.ts
 
 import fs from "node:fs/promises";
 import path from "node:path";

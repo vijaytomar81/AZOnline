@@ -1,4 +1,4 @@
-// src/executionLayer/core/bootstrap/types.ts
+// src/frameworkCore/executionLayer/core/bootstrap/types.ts
 
 import type { ExecutorRegistry } from "@frameworkCore/executionLayer/core/registry";
 import type { ExecutionItemDataRegistry } from "@frameworkCore/executionLayer/runtime/itemData";

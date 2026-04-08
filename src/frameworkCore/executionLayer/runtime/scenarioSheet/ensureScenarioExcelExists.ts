@@ -1,4 +1,4 @@
-// src/executionLayer/runtime/scenarioSheet/ensureScenarioExcelExists.ts
+// src/frameworkCore/executionLayer/runtime/scenarioSheet/ensureScenarioExcelExists.ts
 
 import { AppError } from "@utils/errors";
 import { fileExists } from "@utils/fs";

@@ -1,4 +1,4 @@
-// src/pageObjects/objects/athena/common/manage-cookies/aliases.generated.ts
+// src/businessLayer/pageObjects/objects/athena/common/manage-cookies/aliases.generated.ts
 // pageKey: athena.common.manage-cookies
 // scannedAt: 2026-04-01T10:40:09.711Z
 

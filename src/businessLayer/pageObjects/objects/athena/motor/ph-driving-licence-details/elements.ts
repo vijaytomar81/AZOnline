@@ -1,4 +1,4 @@
-// src/pageObjects/objects/athena/motor/ph-driving-licence-details/elements.ts
+// src/businessLayer/pageObjects/objects/athena/motor/ph-driving-licence-details/elements.ts
 // pageKey: athena.motor.ph-driving-licence-details
 // scannedAt: 2026-03-13T17:03:49.922Z
 

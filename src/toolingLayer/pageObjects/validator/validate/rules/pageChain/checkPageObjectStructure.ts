@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/pageChain/checkPageObjectStructure.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/pageChain/checkPageObjectStructure.ts
 
 import fs from "node:fs";
 

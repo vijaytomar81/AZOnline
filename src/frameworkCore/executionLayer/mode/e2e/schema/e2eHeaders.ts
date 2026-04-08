@@ -1,11 +1,14 @@
-// src/executionLayer/mode/e2e/schema/e2eHeaders.ts
+// src/frameworkCore/executionLayer/mode/e2e/schema/e2eHeaders.ts
 
 export const E2E_HEADERS = {
     SCENARIO_ID: "ScenarioId",
     SCENARIO_NAME: "ScenarioName",
-    JOURNEY: "Journey",
-    POLICY_CONTEXT: "PolicyContext",
-    ENTRY_POINT: "EntryPoint",
+
+    PLATFORM: "Platform",
+    APPLICATION: "Application",
+    PRODUCT: "Product",
+    JOURNEY_START_WITH: "JourneyStartWith",
+
     POLICY_NUMBER: "PolicyNumber",
     LOGIN_ID: "LoginId",
     PASSWORD: "Password",

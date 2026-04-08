@@ -1,4 +1,4 @@
-// src/logging/core/logScopes.ts
+// src/frameworkCore/logging/core/logScopes.ts
 
 export const LOG_SCOPES = {
     APP: "app",

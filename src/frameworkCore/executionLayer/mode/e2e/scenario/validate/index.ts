@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/validate/index.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/validate/index.ts
 
 export { normalizeValidationKey } from "./shared";
 export { validateExecutionItemPortal } from "./validateExecutionItemPortal";

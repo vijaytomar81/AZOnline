@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/conventions/checkNamingConventions.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/conventions/checkNamingConventions.ts
 
 import path from "node:path";
 

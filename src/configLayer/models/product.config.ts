@@ -1,4 +1,4 @@
-// src/config/models/product.config.ts
+// src/configLayer/models/product.config.ts
 
 /**
  * =========================================================

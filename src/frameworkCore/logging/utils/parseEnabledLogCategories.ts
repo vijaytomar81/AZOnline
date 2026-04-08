@@ -1,4 +1,4 @@
-// src/logging/utils/parseEnabledLogCategories.ts
+// src/frameworkCore/logging/utils/parseEnabledLogCategories.ts
 
 import {
     getAllLogCategories,

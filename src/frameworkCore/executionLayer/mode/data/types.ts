@@ -1,20 +1,20 @@
-// src/executionLayer/mode/data/types.ts
+// src/frameworkCore/executionLayer/mode/data/types.ts
 
 import type { CasesFile } from "@dataLayer/builder/types";
 import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
-import type {
-    Application,
-    Product,
-} from "@configLayer/domain/routing.config";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Application } from "@configLayer/models/application.config";
+import type { Product } from "@configLayer/models/product.config";
+import type { JourneyContext } from "@configLayer/models/journeyContext.config";
 
 export type DataModeArgs = {
-    source: string;
-    schemaArg?: string;
     iterations?: number;
     parallel?: number;
     verbose?: boolean;
-    application?: Application;
-    product?: Product;
+    platform: Platform;
+    application: Application;
+    product: Product;
+    journeyContext: JourneyContext;
 };
 
 export type DataScenarioOverrideMap = Map<

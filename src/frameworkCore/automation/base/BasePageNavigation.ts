@@ -1,4 +1,4 @@
-// src/automation/base/BasePageNavigation.ts
+// src/frameworkCore/automation/base/BasePageNavigation.ts
 
 import type { Page } from "@playwright/test";
 import { dismissKnownOverlays } from "@frameworkCore/automation/navigation/dismissKnownOverlays";

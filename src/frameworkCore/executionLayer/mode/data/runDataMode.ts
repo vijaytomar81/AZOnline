@@ -1,6 +1,5 @@
-// src/executionLayer/mode/data/runDataMode.ts
+// src/frameworkCore/executionLayer/mode/data/runDataMode.ts
 
-import { resolveSchemaName } from "@dataLayer/data-definitions";
 import { getCasesFile } from "@dataLayer/runtime/cases/getCasesFile";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
@@ -15,24 +14,29 @@ import { environments } from "@configLayer/environments";
 export async function runDataMode(
     args: DataModeArgs
 ): Promise<void> {
-    const schemaName = resolveSchemaName(args.schemaArg, args.source);
-
     emitLog({
         scope: "run",
         level: LOG_LEVELS.INFO,
         category: LOG_CATEGORIES.FRAMEWORK,
-        message: `Mode -> data | source=${args.source} | schema=${schemaName} | iterations=${args.iterations ?? 1}`,
+        message:
+            `Mode -> data | platform=${args.platform} | application=${args.application} | ` +
+            `product=${args.product} | journey=${args.journeyContext.type}`,
     });
 
-    const casesFile = getCasesFile(args.source, schemaName);
-    const bootstrap = createExecutionBootstrap();
+    const casesFile = getCasesFile({
+        platform: args.platform,
+        application: args.application,
+        product: args.product,
+        journeyContext: args.journeyContext,
+        sheetName: "generated",
+    });
 
+    const bootstrap = createExecutionBootstrap();
     registerDefaultExecutors(bootstrap);
 
     const { scenarios, overrideByScenarioId } = buildDataScenarios({
-        source: args.source,
-        schemaName,
         casesFile,
+        platform: args.platform,
         application: args.application,
         product: args.product,
     });
@@ -51,8 +55,6 @@ export async function runDataMode(
         iterations: args.iterations ?? 1,
         parallel: args.parallel ?? 1,
         verbose: args.verbose,
-        schema: schemaName,
-        source: args.source,
         registry: bootstrap.executorRegistry,
         executionItemDataRegistry: bootstrap.executionItemDataRegistry,
         resolveOverrideItemData: (scenario) =>

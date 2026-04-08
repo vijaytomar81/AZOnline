@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/hygiene/moduleHygiene/moduleHygieneTypes.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/hygiene/moduleHygiene/moduleHygieneTypes.ts
 
 import type { TreeNode } from "@utils/cliTree";
 import type { ValidationIssue } from "../../../types";

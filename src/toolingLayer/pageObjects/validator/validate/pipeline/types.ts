@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/pipeline/types.ts
+// src/toolingLayer/pageObjects/validator/validate/pipeline/types.ts
 
 import type { Logger } from "@utils/logger";
 import type { ValidationRuleResult } from "../types";

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/repair/repair/shared/pageObjectReadiness.ts
+// src/toolingLayer/pageObjects/repair/repair/shared/pageObjectReadiness.ts
 
 const READINESS_DECLARATION = "const readinessLocators: Locator[] =";
 const WAIT_FOR_STANDARD_READY_CALL = "await this.waitForStandardReady({";

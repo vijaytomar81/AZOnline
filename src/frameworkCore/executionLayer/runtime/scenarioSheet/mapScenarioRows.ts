@@ -1,4 +1,4 @@
-// src/executionLayer/runtime/scenarioSheet/mapScenarioRows.ts
+// src/frameworkCore/executionLayer/runtime/scenarioSheet/mapScenarioRows.ts
 
 import type ExcelJS from "exceljs";
 import type { RawExecutionScenarioRow } from "./types";

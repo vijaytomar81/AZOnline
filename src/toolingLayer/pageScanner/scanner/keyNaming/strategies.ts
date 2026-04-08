@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/keyNaming/strategies.ts
+// src/toolingLayer/pageScanner/scanner/keyNaming/strategies.ts
 
 import type { ScannedElement } from "../types";
 import {

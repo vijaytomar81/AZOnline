@@ -1,4 +1,4 @@
-// src/executionLayer/index.ts
+// src/frameworkCore/executionLayer/index.ts
 
 export * from "./contracts";
 

@@ -1,4 +1,4 @@
-// src/executionLayer/core/registry/index.ts
+// src/frameworkCore/executionLayer/core/registry/index.ts
 
 export type {
     ExecutionItemExecutorArgs,

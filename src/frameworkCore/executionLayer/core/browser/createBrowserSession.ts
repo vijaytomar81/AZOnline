@@ -1,4 +1,4 @@
-// src/executionLayer/core/browser/createBrowserSession.ts
+// src/frameworkCore/executionLayer/core/browser/createBrowserSession.ts
 
 import { executionConfig } from "@configLayer/execution.config";
 import type { BrowserSession } from "./types";

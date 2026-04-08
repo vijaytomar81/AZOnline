@@ -1,4 +1,4 @@
-// src/executionLayer/logging/e2eScenario/renderExecutionItemBlock.ts
+// src/frameworkCore/executionLayer/logging/e2eScenario/renderExecutionItemBlock.ts
 
 import type { ExecutionItemResult } from "@frameworkCore/executionLayer/contracts";
 import { renderFields, safeText } from "@frameworkCore/executionLayer/logging/shared";

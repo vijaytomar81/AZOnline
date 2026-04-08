@@ -1,4 +1,4 @@
-// src/executionLayer/contracts/ExecutionPlan.ts
+// src/frameworkCore/executionLayer/contracts/ExecutionPlan.ts
 
 import type { ExecutionScenario } from "./ExecutionScenario";
 

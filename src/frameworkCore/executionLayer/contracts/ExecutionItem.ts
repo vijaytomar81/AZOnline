@@ -1,4 +1,4 @@
-// src/executionLayer/contracts/ExecutionItem.ts
+// src/frameworkCore/executionLayer/contracts/ExecutionItem.ts
 
 export type ExecutionItem = {
     itemNo: number;

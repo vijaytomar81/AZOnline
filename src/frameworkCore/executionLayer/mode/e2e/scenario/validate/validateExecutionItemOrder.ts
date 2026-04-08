@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/validate/validateExecutionItemOrder.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/validate/validateExecutionItemOrder.ts
 
 import type { ExecutionItem } from "@frameworkCore/executionLayer/contracts";
 

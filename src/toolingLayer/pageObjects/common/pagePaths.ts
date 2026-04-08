@@ -1,4 +1,4 @@
-// src/tools/pageObjects/common/pagePaths.ts
+// src/toolingLayer/pageObjects/common/pagePaths.ts
 
 import path from "node:path";
 

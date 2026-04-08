@@ -1,4 +1,4 @@
-// src/logging/utils/buildLogFilePath.ts
+// src/frameworkCore/logging/utils/buildLogFilePath.ts
 
 import path from "node:path";
 import type { LogCategory } from "@frameworkCore/logging/core/logCategories";

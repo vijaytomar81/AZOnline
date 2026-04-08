@@ -1,4 +1,4 @@
-// src/automation/diagnostics/index.ts
+// src/frameworkCore/automation/diagnostics/index.ts
 
 export { isLocatorFailure } from "./isLocatorFailure";
 

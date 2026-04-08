@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/schema/normalizeE2EHeader.ts
+// src/frameworkCore/executionLayer/mode/e2e/schema/normalizeE2EHeader.ts
 
 import { normalizeHeaderKey } from "@utils/text";
 import { E2E_HEADER_ALIASES } from "./e2eHeaderAliases";
@@ -10,9 +10,10 @@ function buildCanonicalHeaderMap(maxItems = 20): Map<string, string> {
     const baseHeaders = [
         E2E_HEADERS.SCENARIO_ID,
         E2E_HEADERS.SCENARIO_NAME,
-        E2E_HEADERS.JOURNEY,
-        E2E_HEADERS.POLICY_CONTEXT,
-        E2E_HEADERS.ENTRY_POINT,
+        E2E_HEADERS.PLATFORM,
+        E2E_HEADERS.APPLICATION,
+        E2E_HEADERS.PRODUCT,
+        E2E_HEADERS.JOURNEY_START_WITH,
         E2E_HEADERS.POLICY_NUMBER,
         E2E_HEADERS.LOGIN_ID,
         E2E_HEADERS.PASSWORD,

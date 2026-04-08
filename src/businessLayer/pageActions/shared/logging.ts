@@ -1,4 +1,4 @@
-// src/pageActions/shared/logging.ts
+// src/businessLayer/pageActions/shared/logging.ts
 
 import { emitLog } from "@frameworkCore/logging/emitLog";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";

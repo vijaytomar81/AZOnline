@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/registry/indexExports/indexExportTypes.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/registry/indexExports/indexExportTypes.ts
 
 import type { ValidationIssue } from "../../../types";
 

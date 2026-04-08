@@ -1,4 +1,4 @@
-// src/pageObjects/objects/athena/common/manage-cookies/aliases.ts
+// src/businessLayer/pageObjects/objects/athena/common/manage-cookies/aliases.ts
 // pageKey: athena.common.manage-cookies
 //
 // This file is safe to edit.

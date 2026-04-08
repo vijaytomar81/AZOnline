@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/outputs/checkGeneratedFilesExist.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/outputs/checkGeneratedFilesExist.ts
 
 import fs from "node:fs";
 

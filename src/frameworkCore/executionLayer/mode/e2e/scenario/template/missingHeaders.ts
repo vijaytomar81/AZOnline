@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/template/missingHeaders.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/template/missingHeaders.ts
 
 import { normalizeTemplateKey } from "./shared";
 

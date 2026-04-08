@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/keyNaming/heuristics.ts
+// src/toolingLayer/pageScanner/scanner/keyNaming/heuristics.ts
 
 import type { ScannedElement } from "../types";
 import {

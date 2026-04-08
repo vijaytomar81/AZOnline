@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/validate/validateExecutionItemPortal.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/validate/validateExecutionItemPortal.ts
 
 import type { ExecutionItem } from "@frameworkCore/executionLayer/contracts";
 import { normalizeValidationKey } from "./shared";

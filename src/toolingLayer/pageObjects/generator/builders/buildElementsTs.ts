@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/builders/buildElementsTs.ts
+// src/toolingLayer/pageObjects/generator/builders/buildElementsTs.ts
 
 import type { PageMap, PageMapElement } from "../generator/types";
 import { escapeTsString, isValidTsIdentifier } from "@utils/ts";

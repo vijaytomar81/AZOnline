@@ -1,4 +1,4 @@
-// src/tools/pageObjects/common/readPageMap.ts
+// src/toolingLayer/pageObjects/common/readPageMap.ts
 
 import path from "node:path";
 

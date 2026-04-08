@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/runE2EMode.ts
+// src/frameworkCore/executionLayer/mode/e2e/runE2EMode.ts
 
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
@@ -30,6 +30,7 @@ export async function runE2EMode(
         excelPath: args.excelPath,
         sheetName: args.sheetName,
         includeDisabled: args.includeDisabled,
+        platform: args.platform,
         application: args.application,
         product: args.product,
     });

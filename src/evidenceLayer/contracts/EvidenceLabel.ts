@@ -1,4 +1,4 @@
-// src/evidence/contracts/EvidenceLabel.ts
+// src/evidenceLayer/contracts/EvidenceLabel.ts
 
 import { EVIDENCE_LABELS } from "../constants/evidenceLabels";
 

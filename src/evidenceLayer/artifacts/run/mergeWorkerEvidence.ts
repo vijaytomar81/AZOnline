@@ -1,4 +1,4 @@
-// src/evidence/artifacts/run/mergeWorkerEvidence.ts
+// src/evidenceLayer/artifacts/run/mergeWorkerEvidence.ts
 
 import fs from "node:fs/promises";
 import path from "node:path";

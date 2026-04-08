@@ -1,4 +1,4 @@
-// src/executionLayer/core/result/result.ts
+// src/frameworkCore/executionLayer/core/result/result.ts
 
 export type {
     ExecutionItemStatus,

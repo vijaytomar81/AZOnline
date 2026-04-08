@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/pageMapLoader.ts
+// src/toolingLayer/pageObjects/generator/generator/pageMapLoader.ts
 
 import fs from "node:fs";
 

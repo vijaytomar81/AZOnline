@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/buildManifestComparisonInputs.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/buildManifestComparisonInputs.ts
 
 import type { ManifestComparisonInputs } from "./manifestAgainstPageMapTypes";
 

@@ -1,4 +1,4 @@
-// src/logging/adapters/createScopedLogger.ts
+// src/frameworkCore/logging/adapters/createScopedLogger.ts
 
 import { emitLog } from "@frameworkCore/logging/emitLog";
 import {

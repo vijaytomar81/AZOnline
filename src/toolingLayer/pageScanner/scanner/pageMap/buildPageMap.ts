@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/pageMap/buildPageMap.ts
+// src/toolingLayer/pageScanner/scanner/pageMap/buildPageMap.ts
 
 import { nowIso } from "@utils/time";
 import { uniq, uniqueKey } from "@utils/collections";

@@ -1,4 +1,4 @@
-// src/executionLayer/mode/data/help.ts
+// src/frameworkCore/executionLayer/mode/data/help.ts
 
 export function printDataModeHelp(): void {
     console.log(`
@@ -6,22 +6,22 @@ Data Mode Usage
 
 Required:
   --mode data
-  --source <sourceName>
+  --platform <Athena|PCW|PCWTool>
+  --application <AzOnline|Ferry|Britannia|CTM|CNF|MSM|GoCo>
+  --product <Motor|Home>
+  --journeyContext <NewBusiness|MTA|Renewal|MTC>
 
 Optional:
-  --schema <schemaName>
-  --app <AzOnline|Ferry|Britannia>
-  --product <Motor|Home>
   --iterations <number>
   --parallel <number>
   --verbose
 
 Notes:
-  - Application is resolved from --app first, otherwise inferred from source.
-  - Product is resolved from --product first, otherwise inferred from source/schema.
-  - If either cannot be resolved, execution fails.
+  - Data mode resolves generated data using:
+    platform + application + product + journeyContext
+  - No source or schema argument is required.
 
 Example:
-  npm run execution -- --mode data --source FlowNB --app AzOnline --product Motor
+  npm run execution -- --mode data --platform Athena --application AzOnline --product Motor --journeyContext NewBusiness
 `.trim());
 }

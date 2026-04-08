@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/types.ts
+// src/toolingLayer/pageScanner/scanner/types.ts
 
 import type { Logger } from "@utils/logger";
 

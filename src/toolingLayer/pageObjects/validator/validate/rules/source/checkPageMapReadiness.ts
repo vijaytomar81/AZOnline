@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/source/checkPageMapReadiness.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/source/checkPageMapReadiness.ts
 
 import path from "node:path";
 

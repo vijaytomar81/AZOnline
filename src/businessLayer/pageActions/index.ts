@@ -1,3 +1,3 @@
-// src/pageActions/index.ts
+// src/businessLayer/pageActions/index.ts
 export * from "./shared";
 export * from "./actions";

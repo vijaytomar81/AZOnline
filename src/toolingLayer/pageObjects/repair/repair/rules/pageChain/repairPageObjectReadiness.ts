@@ -1,4 +1,4 @@
-// src/tools/pageObjects/repair/repair/rules/pageChain/repairPageObjectReadiness.ts
+// src/toolingLayer/pageObjects/repair/repair/rules/pageChain/repairPageObjectReadiness.ts
 
 import fs from "node:fs";
 

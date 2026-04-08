@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/pageChain/pageObjectStructure/buildPageObjectStructureReportNode.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/pageChain/pageObjectStructure/buildPageObjectStructureReportNode.ts
 
 import type { TreeNode } from "@utils/cliTree";
 import { formatPageObjectStructureItems } from "./formatPageObjectStructureItems";

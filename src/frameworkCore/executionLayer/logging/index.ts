@@ -1,4 +1,4 @@
-// src/executionLayer/logging/index.ts
+// src/frameworkCore/executionLayer/logging/index.ts
 
 export {
     headerLine,

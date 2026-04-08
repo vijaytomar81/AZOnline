@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/getSmartElementsKey.ts
+// src/toolingLayer/pageScanner/scanner/getSmartElementsKey.ts
 
 import type { ScannedElement } from "./types";
 import {

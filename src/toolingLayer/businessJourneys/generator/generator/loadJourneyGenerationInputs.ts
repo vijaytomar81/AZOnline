@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/loadJourneyGenerationInputs.ts
+// src/toolingLayer/businessJourneys/generator/generator/loadJourneyGenerationInputs.ts
 
 import path from "node:path";
 import { safeReadJson } from "@utils/fs";

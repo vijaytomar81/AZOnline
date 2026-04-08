@@ -1,11 +1,10 @@
-// src/executionLayer/mode/e2e/scenario/parse/parseScenarios.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/parse/parseScenarios.ts
 
 import { AppError } from "@utils/errors";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Application } from "@configLayer/models/application.config";
+import type { Product } from "@configLayer/models/product.config";
 import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
-import type {
-    Application,
-    Product,
-} from "@configLayer/domain/routing.config";
 import type {
     RawExecutionScenarioRow,
     ScenarioValidationResult,
@@ -27,6 +26,7 @@ export type ParseScenariosOptions = {
     includeDisabled?: boolean;
     failOnTemplateErrors?: boolean;
     failOnValidationErrors?: boolean;
+    platform?: Platform;
     application?: Application;
     product?: Product;
 };
@@ -53,11 +53,15 @@ export function parseScenarios(
     }
 
     const normalized = normalizeScenarioList(rows, {
+        platform: opts.platform,
         application: opts.application,
         product: opts.product,
     });
 
-    const scenarios = filterDisabledScenarios(normalized, !!opts.includeDisabled);
+    const scenarios = filterDisabledScenarios(
+        normalized,
+        !!opts.includeDisabled
+    );
     const validation = validateScenarioList(scenarios);
 
     if (opts.failOnValidationErrors && hasValidationErrors(validation)) {

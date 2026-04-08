@@ -1,4 +1,4 @@
-// src/executionLayer/logging/dataCase/formatRequestPreview.ts
+// src/frameworkCore/executionLayer/logging/dataCase/formatRequestPreview.ts
 
 export function formatRequestPreview(value: unknown): string {
     const text = String(value ?? "").trim();

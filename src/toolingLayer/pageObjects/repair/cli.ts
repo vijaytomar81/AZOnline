@@ -1,4 +1,4 @@
-// src/tools/pageObjects/repair/cli.ts
+// src/toolingLayer/pageObjects/repair/cli.ts
 
 import { normalizeArgv } from "@utils/argv";
 import { printCommandTitle } from "@utils/cliFormat";

@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/core/action/renderPageActionFile.ts
+// src/toolingLayer/pageActions/generator/core/action/renderPageActionFile.ts
 
 import { toRepoRelative } from "@utils/paths";
 import type { PageObjectManifestPage } from "../../manifest/types";

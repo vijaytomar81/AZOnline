@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/render/renderEntryPointBuilderFile.ts
+// src/toolingLayer/businessJourneys/generator/generator/render/renderEntryPointBuilderFile.ts
 
 import { toRepoRelative } from "@utils/paths";
 

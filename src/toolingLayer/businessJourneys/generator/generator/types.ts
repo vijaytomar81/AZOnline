@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/types.ts
+// src/toolingLayer/businessJourneys/generator/generator/types.ts
 
 export type JourneyTarget = {
     application: string;

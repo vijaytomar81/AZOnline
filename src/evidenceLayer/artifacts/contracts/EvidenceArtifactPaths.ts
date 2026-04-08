@@ -1,4 +1,4 @@
-// src/evidence/artifacts/contracts/EvidenceArtifactPaths.ts
+// src/evidenceLayer/artifacts/contracts/EvidenceArtifactPaths.ts
 
 export type EvidenceArtifactPaths = {
     baseDir: string;

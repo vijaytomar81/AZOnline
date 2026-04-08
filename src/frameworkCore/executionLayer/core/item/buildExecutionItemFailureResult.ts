@@ -1,4 +1,4 @@
-// src/executionLayer/core/item/buildExecutionItemFailureResult.ts
+// src/frameworkCore/executionLayer/core/item/buildExecutionItemFailureResult.ts
 
 import { nowIso } from "@utils/time";
 import type {

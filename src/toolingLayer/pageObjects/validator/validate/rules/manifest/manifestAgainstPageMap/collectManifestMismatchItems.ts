@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/collectManifestMismatchItems.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/collectManifestMismatchItems.ts
 
 import { buildManifestExpectedValues } from "./buildManifestExpectedValues";
 import { mismatchText } from "./manifestAgainstPageMapFormatters";

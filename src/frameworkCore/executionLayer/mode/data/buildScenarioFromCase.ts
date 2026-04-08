@@ -1,53 +1,40 @@
-// src/executionLayer/mode/data/buildScenarioFromCase.ts
+// src/frameworkCore/executionLayer/mode/data/buildScenarioFromCase.ts
 
 import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
-import type {
-    Application,
-    Product,
-} from "@configLayer/domain/routing.config";
-import { resolveScenarioDefaultsFromData } from "@configLayer/domain/resolveScenarioDefaults";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Application } from "@configLayer/models/application.config";
+import type { Product } from "@configLayer/models/product.config";
 import type { BuiltCaseLike } from "./types";
-import { resolveDataJourney } from "./resolveDataJourney";
-import { resolveEntryPoint } from "./resolveEntryPoint";
 
 export function buildScenarioFromCase(args: {
-    source: string;
-    schemaName: string;
     item: BuiltCaseLike;
-    application?: Application;
-    product?: Product;
+    platform: Platform;
+    application: Application;
+    product: Product;
 }): ExecutionScenario {
     const scenarioId =
         args.item.scriptId ?? args.item.scriptName ?? "UNKNOWN_CASE";
+
     const scenarioName = args.item.scriptName ?? scenarioId;
-    const entryPoint = resolveEntryPoint(args.schemaName);
-    const defaults = resolveScenarioDefaultsFromData({
-        source: args.source,
-        schemaName: args.schemaName,
-        applicationOverride: args.application,
-        productOverride: args.product,
-    });
 
     return {
         scenarioId,
         scenarioName,
-        journey: resolveDataJourney({
-            schemaName: args.schemaName,
-            builtCase: args.item,
-        }),
-        policyContext: "NewBusiness",
-        entryPoint,
-        application: defaults.application,
-        product: defaults.product,
+
+        platform: args.platform,
+        application: args.application,
+        product: args.product,
+
+        journeyStartWith: "newPolicy",
+
         description: scenarioName,
         execute: true,
         totalItems: 1,
+
         items: [
             {
                 itemNo: 1,
                 action: "NewBusiness",
-                subType: undefined,
-                portal: undefined,
                 testCaseRef: scenarioId,
             },
         ],

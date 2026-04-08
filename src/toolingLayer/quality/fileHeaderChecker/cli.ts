@@ -1,4 +1,4 @@
-// src/tools/quality/fileHeaderChecker/cli.ts
+// src/toolingLayer/quality/fileHeaderChecker/cli.ts
 
 import { normalizeArgv, hasFlag } from "@utils/argv";
 import { runHeaderChecker } from "./checker";

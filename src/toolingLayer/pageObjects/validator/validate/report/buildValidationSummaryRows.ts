@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/report/buildValidationSummaryRows.ts
+// src/toolingLayer/pageObjects/validator/validate/report/buildValidationSummaryRows.ts
 
 import type { ValidationSummary } from "../types";
 

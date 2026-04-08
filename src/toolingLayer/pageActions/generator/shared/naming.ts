@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/shared/naming.ts
+// src/toolingLayer/pageActions/generator/shared/naming.ts
 
 export function toPascalCase(value: string): string {
     return value

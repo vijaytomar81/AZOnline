@@ -1,4 +1,4 @@
-// src/executionLayer/runtime/defaults/index.ts
+// src/frameworkCore/executionLayer/runtime/defaults/index.ts
 
 export type { ExecutorRegistration } from "./types";
 export { buildRegistrationRoute } from "./buildRegistrationRoute";

@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/template/validateTemplateHeaders.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/template/validateTemplateHeaders.ts
 
 import { AppError } from "@utils/errors";
 import { missingHeaders } from "./missingHeaders";
@@ -9,9 +9,10 @@ export function validateTemplateHeaders(
     const requiredBaseHeaders = [
         "ScenarioId",
         "ScenarioName",
-        "Journey",
-        "PolicyContext",
-        "EntryPoint",
+        "Platform",
+        "Application",
+        "Product",
+        "JourneyStartWith",
         "Description",
         "Execute",
         "TotalItems",

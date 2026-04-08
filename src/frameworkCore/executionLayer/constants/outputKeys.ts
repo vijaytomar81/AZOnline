@@ -1,4 +1,4 @@
-// src/executionLayer/constants/outputKeys.ts
+// src/frameworkCore/executionLayer/constants/outputKeys.ts
 
 export const OUTPUT_KEYS = {
     NEW_BUSINESS: {

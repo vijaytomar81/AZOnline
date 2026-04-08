@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/pageGenerationContext.ts
+// src/toolingLayer/pageObjects/generator/generator/pageGenerationContext.ts
 
 import { hashContent } from "@utils/hash";
 import type { PageMap } from "./types";

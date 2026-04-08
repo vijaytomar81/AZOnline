@@ -1,4 +1,4 @@
-// src/evidence/artifacts/run/writeWorkerEvidenceArtifact.ts
+// src/evidenceLayer/artifacts/run/writeWorkerEvidenceArtifact.ts
 
 import fs from "node:fs/promises";
 import path from "node:path";

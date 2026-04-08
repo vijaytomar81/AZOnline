@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/registry/indexExports/buildIndexExportReportNodes.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/registry/indexExports/buildIndexExportReportNodes.ts
 
 import type { TreeNode } from "@utils/cliTree";
 import type { GroupedIndexExportIssues } from "./indexExportTypes";

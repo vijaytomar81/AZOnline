@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/naming/buildStepExportName.ts
+// src/toolingLayer/businessJourneys/generator/generator/naming/buildStepExportName.ts
 
 function splitWords(value: string): string[] {
     return value

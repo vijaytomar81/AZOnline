@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/cli.ts
+// src/toolingLayer/pageObjects/generator/cli.ts
 import os from "node:os";
 import path from "node:path";
 

@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/parse/formatValidationErrors.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/parse/formatValidationErrors.ts
 
 import type { ScenarioValidationResult } from "../types";
 

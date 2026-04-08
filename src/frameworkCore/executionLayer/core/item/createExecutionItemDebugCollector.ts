@@ -1,4 +1,4 @@
-// src/executionLayer/core/item/createExecutionItemDebugCollector.ts
+// src/frameworkCore/executionLayer/core/item/createExecutionItemDebugCollector.ts
 
 export function createExecutionItemDebugCollector() {
     const debugLines: string[] = [];

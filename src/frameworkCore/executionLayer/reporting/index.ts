@@ -1,4 +1,4 @@
-// src/executionLayer/reporting/index.ts
+// src/frameworkCore/executionLayer/reporting/index.ts
 
 export { buildEvidenceRunInfo } from "./buildEvidenceRunInfo";
 export { populateEvidenceStore } from "./populateEvidenceStore";

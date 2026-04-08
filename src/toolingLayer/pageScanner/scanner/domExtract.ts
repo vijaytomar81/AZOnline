@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/domExtract.ts
+// src/toolingLayer/pageScanner/scanner/domExtract.ts
 
 import type { Page } from "@playwright/test";
 import type { ScannedElement } from "./types";

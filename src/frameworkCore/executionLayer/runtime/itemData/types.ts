@@ -1,10 +1,17 @@
-// src/executionLayer/runtime/itemData/types.ts
+// src/frameworkCore/executionLayer/runtime/itemData/types.ts
 
 import type { CasesFile } from "@dataLayer/builder/types";
-import type {
-    ExecutionItemDataSource,
-    ResolvedExecutionItemData,
-} from "@frameworkCore/executionLayer/contracts";
+
+export type ExecutionItemDataSource = {
+    action: string;
+    subType?: string;
+};
+
+export type ResolvedExecutionItemData = {
+    testCaseRef: string;
+    payload: Record<string, unknown>;
+    source: ExecutionItemDataSource;
+};
 
 export type ExecutionItemDataRegistry = {
     sources: ExecutionItemDataSource[];
@@ -13,9 +20,4 @@ export type ExecutionItemDataRegistry = {
 
 export type ExecutionItemDataDebugCollector = {
     push(message: string): void;
-};
-
-export type {
-    ExecutionItemDataSource,
-    ResolvedExecutionItemData,
 };

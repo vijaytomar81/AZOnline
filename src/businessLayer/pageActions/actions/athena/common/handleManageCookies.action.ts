@@ -1,4 +1,4 @@
-// src/pageActions/actions/athena/common/handleManageCookies.action.ts
+// src/businessLayer/pageActions/actions/athena/common/handleManageCookies.action.ts
 
 import type { PageAction } from "@businessLayer/pageActions/shared";
 import { logPageActionInfo } from "@businessLayer/pageActions/shared";

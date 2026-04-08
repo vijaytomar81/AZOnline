@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/elementGeneratorHelp.ts
+// src/toolingLayer/pageObjects/generator/elementGeneratorHelp.ts
 
 export function usage(): string {
   return `

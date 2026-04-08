@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/commands/validate.ts
+// src/toolingLayer/pageObjects/validator/commands/validate.ts
 
 import fs from "node:fs";
 

@@ -1,4 +1,4 @@
-// src/logging/emitLog.ts
+// src/frameworkCore/logging/emitLog.ts
 
 import { createLogEvent, logEvent } from "@frameworkCore/logging/log";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";

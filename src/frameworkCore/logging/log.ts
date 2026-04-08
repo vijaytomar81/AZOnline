@@ -1,4 +1,4 @@
-// src/logging/log.ts
+// src/frameworkCore/logging/log.ts
 
 import type { LogEvent } from "@frameworkCore/logging/core/logEvent";
 import { publishToConsole } from "@frameworkCore/logging/publishers/consolePublisher";

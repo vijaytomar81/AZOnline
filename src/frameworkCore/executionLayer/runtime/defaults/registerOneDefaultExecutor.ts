@@ -1,9 +1,12 @@
-// src/executionLayer/runtime/defaults/registerOneDefaultExecutor.ts
+// src/frameworkCore/executionLayer/runtime/defaults/registerOneDefaultExecutor.ts
 
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import { emitLog } from "@frameworkCore/logging/emitLog";
-import { addExecutor, type ExecutionBootstrap } from "@frameworkCore/executionLayer/core/bootstrap";
+import {
+    addExecutor,
+    type ExecutionBootstrap,
+} from "@frameworkCore/executionLayer/core/bootstrap";
 import { buildRegistrationRoute } from "./buildRegistrationRoute";
 import type { ExecutorRegistration } from "./types";
 
@@ -34,7 +37,6 @@ export function registerOneDefaultExecutor(
     addExecutor({
         bootstrap,
         action: registration.action,
-        journey: registration.journey,
         portal: registration.portal,
         subType: registration.subType,
         executor: registration.executor,

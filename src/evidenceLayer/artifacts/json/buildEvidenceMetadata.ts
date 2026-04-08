@@ -1,4 +1,4 @@
-// src/evidence/artifacts/json/buildEvidenceMetadata.ts
+// src/evidenceLayer/artifacts/json/buildEvidenceMetadata.ts
 
 import type { EvidenceContext } from "../../runtime/EvidenceContext";
 

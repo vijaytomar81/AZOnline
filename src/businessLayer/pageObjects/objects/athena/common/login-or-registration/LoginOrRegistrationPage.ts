@@ -1,4 +1,4 @@
-// src/pageObjects/objects/athena/common/login-or-registration/LoginOrRegistrationPage.ts
+// src/businessLayer/pageObjects/objects/athena/common/login-or-registration/LoginOrRegistrationPage.ts
 // pageKey: athena.common.login-or-registration
 
 import type { Locator, Page } from "@playwright/test";

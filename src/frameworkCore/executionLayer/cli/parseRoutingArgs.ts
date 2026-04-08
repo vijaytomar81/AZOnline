@@ -1,33 +1,43 @@
-// src/executionLayer/cli/parseRoutingArgs.ts
+// src/frameworkCore/executionLayer/cli/parseRoutingArgs.ts
 
 import { AppError } from "@utils/errors";
 import { normalizeSpaces } from "@utils/text";
-import {
-    APPLICATIONS,
-    PRODUCTS,
-    type Application,
-    type Product,
-} from "@configLayer/domain/routing.config";
+import { normalizePlatform } from "@configLayer/normalizers/normalizePlatform";
+import { normalizeApplication } from "@configLayer/normalizers/normalizeApplication";
+import { normalizeProduct } from "@configLayer/normalizers/normalizeProduct";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Application } from "@configLayer/models/application.config";
+import type { Product } from "@configLayer/models/product.config";
 
-const APPLICATION_MAP: Record<string, Application> = {
-    azonline: APPLICATIONS.AZ_ONLINE,
-    ferry: APPLICATIONS.FERRY,
-    britannia: APPLICATIONS.BRITANNIA,
-};
-
-const PRODUCT_MAP: Record<string, Product> = {
-    motor: PRODUCTS.MOTOR,
-    home: PRODUCTS.HOME,
-};
-
-export function parseApplication(raw?: string): Application | undefined {
-    const value = normalizeSpaces(String(raw ?? "")).toLowerCase();
+export function parsePlatform(raw?: string): Platform | undefined {
+    const value = normalizeSpaces(String(raw ?? ""));
 
     if (!value) {
         return undefined;
     }
 
-    const resolved = APPLICATION_MAP[value];
+    const resolved = normalizePlatform(value);
+
+    if (resolved) {
+        return resolved;
+    }
+
+    throw new AppError({
+        code: "INVALID_PLATFORM",
+        stage: "cli-parse",
+        source: "parsePlatform",
+        message: `Invalid --platform value "${raw}".`,
+    });
+}
+
+export function parseApplication(raw?: string): Application | undefined {
+    const value = normalizeSpaces(String(raw ?? ""));
+
+    if (!value) {
+        return undefined;
+    }
+
+    const resolved = normalizeApplication(value);
 
     if (resolved) {
         return resolved;
@@ -37,18 +47,18 @@ export function parseApplication(raw?: string): Application | undefined {
         code: "INVALID_APPLICATION",
         stage: "cli-parse",
         source: "parseApplication",
-        message: `Invalid --app value "${raw}". Allowed: AzOnline, Ferry, Britannia.`,
+        message: `Invalid --application value "${raw}".`,
     });
 }
 
 export function parseProduct(raw?: string): Product | undefined {
-    const value = normalizeSpaces(String(raw ?? "")).toLowerCase();
+    const value = normalizeSpaces(String(raw ?? ""));
 
     if (!value) {
         return undefined;
     }
 
-    const resolved = PRODUCT_MAP[value];
+    const resolved = normalizeProduct(value);
 
     if (resolved) {
         return resolved;
@@ -58,6 +68,6 @@ export function parseProduct(raw?: string): Product | undefined {
         code: "INVALID_PRODUCT",
         stage: "cli-parse",
         source: "parseProduct",
-        message: `Invalid --product value "${raw}". Allowed: Motor, Home.`,
+        message: `Invalid --product value "${raw}".`,
     });
 }

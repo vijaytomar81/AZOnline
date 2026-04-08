@@ -1,4 +1,4 @@
-// src/api/gmail/gmailClient.ts
+// src/integrations/api/gmail/gmailClient.ts
 
 import path from "node:path";
 import { google } from "googleapis";

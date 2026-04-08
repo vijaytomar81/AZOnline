@@ -1,4 +1,4 @@
-// src/executionLayer/core/item/runExecutionItem.ts
+// src/frameworkCore/executionLayer/core/item/runExecutionItem.ts
 
 import { nowIso } from "@utils/time";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
@@ -32,14 +32,22 @@ async function executeItem(args: {
 
     const outputsBefore = cloneExecutionOutputs(args.runArgs.context.outputs);
 
-    const executorLookup = getExecutionItemExecutor({
-        runArgs: args.runArgs,
-        startedAt: args.startedAt,
-        debugLines: debug.all(),
-    });
+    let executor;
+    try {
+        executor = getExecutionItemExecutor({
+            registry: args.runArgs.registry,
+            context: args.runArgs.context,
+            item: args.runArgs.item,
+        });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
 
-    if (!executorLookup.executorFound) {
-        return executorLookup.result;
+        return buildExecutionItemFailureResult({
+            item: args.runArgs.item,
+            startedAt: args.startedAt,
+            message,
+            outputs: {},
+        });
     }
 
     const resolved = resolveExecutionItemData({
@@ -52,7 +60,7 @@ async function executeItem(args: {
     });
 
     try {
-        await executorLookup.executor({
+        await executor({
             context: args.runArgs.context,
             item: args.runArgs.item,
             itemData: resolved.payload,

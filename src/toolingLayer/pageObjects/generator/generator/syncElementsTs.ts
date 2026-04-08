@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/syncElementsTs.ts
+// src/toolingLayer/pageObjects/generator/generator/syncElementsTs.ts
 
 import fs from "node:fs";
 

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/manifest/checkManifestAgainstPageMap.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/manifest/checkManifestAgainstPageMap.ts
 
 import { loadPageManifest } from "@toolingLayer/pageObjects/generator/generator/pageManifest";
 import type { ValidationRule } from "../../pipeline/types";

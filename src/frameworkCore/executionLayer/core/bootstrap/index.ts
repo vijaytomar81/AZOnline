@@ -1,4 +1,4 @@
-// src/executionLayer/core/bootstrap/index.ts
+// src/frameworkCore/executionLayer/core/bootstrap/index.ts
 
 export type {
     ExecutionBootstrap,

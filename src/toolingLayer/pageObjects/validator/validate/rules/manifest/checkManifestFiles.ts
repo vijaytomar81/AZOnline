@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/manifest/checkManifestFiles.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/manifest/checkManifestFiles.ts
 
 import fs from "node:fs";
 import path from "node:path";

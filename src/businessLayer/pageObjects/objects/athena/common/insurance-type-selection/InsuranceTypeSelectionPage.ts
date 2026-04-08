@@ -1,4 +1,4 @@
-// src/pageObjects/objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage.ts
+// src/businessLayer/pageObjects/objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage.ts
 // pageKey: athena.common.insurance-type-selection
 
 import type { Locator, Page } from "@playwright/test";

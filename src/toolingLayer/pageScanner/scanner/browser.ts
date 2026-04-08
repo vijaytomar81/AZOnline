@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/browser.ts
+// src/toolingLayer/pageScanner/scanner/browser.ts
 
 import { chromium } from "@playwright/test";
 import type { Page } from "@playwright/test";

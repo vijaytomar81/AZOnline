@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/registry/indexExports/extractIndexExportPaths.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/registry/indexExports/extractIndexExportPaths.ts
 
 export function extractIndexExportPaths(tsText: string): Set<string> {
     const paths = new Set<string>();

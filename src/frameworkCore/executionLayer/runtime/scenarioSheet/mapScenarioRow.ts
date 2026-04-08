@@ -1,4 +1,4 @@
-// src/executionLayer/runtime/scenarioSheet/mapScenarioRow.ts
+// src/frameworkCore/executionLayer/runtime/scenarioSheet/mapScenarioRow.ts
 
 import type ExcelJS from "exceljs";
 import { normalizeSpaces } from "@utils/text";

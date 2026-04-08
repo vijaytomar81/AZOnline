@@ -1,4 +1,4 @@
-// src/executionLayer/logging/e2eScenario/getTreeTokens.ts
+// src/frameworkCore/executionLayer/logging/e2eScenario/getTreeTokens.ts
 
 export function getTreeTokens(index: number, total: number) {
     const isLast = index === total - 1;

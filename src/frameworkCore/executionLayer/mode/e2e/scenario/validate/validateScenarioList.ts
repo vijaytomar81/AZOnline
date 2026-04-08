@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/validate/validateScenarioList.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/validate/validateScenarioList.ts
 
 import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
 import type { ScenarioValidationResult } from "../types";

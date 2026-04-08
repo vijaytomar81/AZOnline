@@ -1,4 +1,4 @@
-// src/automation/navigation/index.ts
+// src/frameworkCore/automation/navigation/index.ts
 
 export {
     waitForPageReady,

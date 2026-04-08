@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/pageMap/groupControls.ts
+// src/toolingLayer/pageScanner/scanner/pageMap/groupControls.ts
 
 import { uniq } from "@utils/collections";
 import type { PageMap, PageMapElementEntry, ScannedElement } from "../types";

@@ -1,4 +1,4 @@
-// src/executionLayer/core/item/resolveExecutionItemData.ts
+// src/frameworkCore/executionLayer/core/item/resolveExecutionItemData.ts
 
 import type {
     ExecutionContext,
@@ -22,16 +22,13 @@ export function resolveExecutionItemData(args: {
         args.debugCollector?.push(
             `Using override execution item data -> action=${args.item.action}, testCaseRef=${args.item.testCaseRef}`
         );
-        args.debugCollector?.push(
-            `Resolved source -> sheet=data-mode, action=${args.item.action}`
-        );
 
         return buildOverrideResolved(args.item, args.overrideItemData);
     }
 
     return resolveExecutionItemDataFromRegistry({
         registry: args.executionItemDataRegistry,
-        journey: args.context.scenario.journey,
+        scenario: args.context.scenario,
         item: args.item,
         logScope: args.logScope,
         debugCollector: args.debugCollector,

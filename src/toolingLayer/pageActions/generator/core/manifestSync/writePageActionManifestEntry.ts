@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/core/manifestSync/writePageActionManifestEntry.ts
+// src/toolingLayer/pageActions/generator/core/manifestSync/writePageActionManifestEntry.ts
 
 import fs from "node:fs";
 import path from "node:path";

@@ -1,4 +1,4 @@
-// src/executionLayer/runtime/scenarioSheet/resolveScenarioExcelPath.ts
+// src/frameworkCore/executionLayer/runtime/scenarioSheet/resolveScenarioExcelPath.ts
 
 import path from "node:path";
 

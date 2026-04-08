@@ -1,4 +1,4 @@
-// src/pageActions/shared/guards.ts
+// src/businessLayer/pageActions/shared/guards.ts
 
 import { AppError } from "@utils/errors";
 

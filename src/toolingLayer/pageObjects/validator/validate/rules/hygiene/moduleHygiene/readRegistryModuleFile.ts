@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/hygiene/moduleHygiene/readRegistryModuleFile.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/hygiene/moduleHygiene/readRegistryModuleFile.ts
 
 import fs from "node:fs";
 import type { RegistryModuleReadResult } from "./moduleHygieneTypes";

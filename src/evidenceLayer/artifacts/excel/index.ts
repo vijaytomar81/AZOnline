@@ -1,4 +1,4 @@
-// src/evidence/artifacts/excel/index.ts
+// src/evidenceLayer/artifacts/excel/index.ts
 
 export type { FlattenedOutputKey } from "./flattenOutputKeys";
 export { flattenOutputKeys } from "./flattenOutputKeys";

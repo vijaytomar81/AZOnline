@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/builders/buildAliasesHumanTs.ts
+// src/toolingLayer/pageObjects/generator/builders/buildAliasesHumanTs.ts
 
 import type { PageMap } from "../generator/types";
 import { isValidTsIdentifier } from "@utils/ts";

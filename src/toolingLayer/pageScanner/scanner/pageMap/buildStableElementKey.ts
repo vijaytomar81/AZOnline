@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/pageMap/buildStableElementKey.ts
+// src/toolingLayer/pageScanner/scanner/pageMap/buildStableElementKey.ts
 
 import { createHash } from "node:crypto";
 import type { PageMapElementEntry } from "../types";

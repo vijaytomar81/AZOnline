@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/core/action/buildActionName.ts
+// src/toolingLayer/pageActions/generator/core/action/buildActionName.ts
 
 import type { PageObjectManifestPage } from "../../manifest/types";
 import type { ActionNaming } from "../../shared/types";

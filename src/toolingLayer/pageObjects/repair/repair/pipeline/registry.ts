@@ -1,4 +1,4 @@
-// src/tools/pageObjects/repair/repair/pipeline/registry.ts
+// src/toolingLayer/pageObjects/repair/repair/pipeline/registry.ts
 
 import type { RepairRule } from "./types";
 import { repairManifest } from "../rules/manifest/repairManifest";

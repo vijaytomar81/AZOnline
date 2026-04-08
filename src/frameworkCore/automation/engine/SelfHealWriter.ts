@@ -1,4 +1,4 @@
-// src/automation/engine/SelfHealWriter.ts
+// src/frameworkCore/automation/engine/SelfHealWriter.ts
 
 import fs from "node:fs";
 import path from "node:path";

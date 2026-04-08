@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/registry/indexExports/collectIndexExportIssues.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/registry/indexExports/collectIndexExportIssues.ts
 
 import type {
     GroupedIndexExportIssues,

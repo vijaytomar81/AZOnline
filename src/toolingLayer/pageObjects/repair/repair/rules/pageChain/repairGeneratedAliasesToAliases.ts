@@ -1,4 +1,4 @@
-// src/tools/pageObjects/repair/repair/rules/pageChain/repairGeneratedAliasesToAliases.ts
+// src/toolingLayer/pageObjects/repair/repair/rules/pageChain/repairGeneratedAliasesToAliases.ts
 
 import type { TreeNode } from "@utils/cliTree";
 import type { RepairRule } from "../../pipeline/types";

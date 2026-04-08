@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/selectors/textStrategy.ts
+// src/toolingLayer/pageScanner/scanner/selectors/textStrategy.ts
 
 import type { ScannedElement, SelectorCandidate } from "../types";
 import { escapeForRegex } from "@utils/regex";

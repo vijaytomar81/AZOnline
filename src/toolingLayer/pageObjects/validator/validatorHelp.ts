@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validatorHelp.ts
+// src/toolingLayer/pageObjects/validator/validatorHelp.ts
 
 import { strong, info } from "@utils/cliFormat";
 import { ICONS } from "@utils/icons";

@@ -1,4 +1,4 @@
-// src/executionLayer/runtime/defaults/registerDefaultExecutors.ts
+// src/frameworkCore/executionLayer/runtime/defaults/registerDefaultExecutors.ts
 
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";

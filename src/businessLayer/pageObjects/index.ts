@@ -1,4 +1,4 @@
-// src/pageObjects/index.ts
+// src/businessLayer/pageObjects/index.ts
 // AUTO-GENERATED from src/pageObjects/.manifest/
 
 export * from "./pageManager";

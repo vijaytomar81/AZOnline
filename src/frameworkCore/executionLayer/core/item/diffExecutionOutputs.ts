@@ -1,4 +1,4 @@
-// src/executionLayer/core/item/diffExecutionOutputs.ts
+// src/frameworkCore/executionLayer/core/item/diffExecutionOutputs.ts
 
 function cloneValue<T>(value: T): T {
     return JSON.parse(JSON.stringify(value));

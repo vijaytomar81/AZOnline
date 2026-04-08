@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/normalize/index.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/normalize/index.ts
 
 export { getString, normalizeKey } from "./shared";
 export { normalizePolicyContext } from "./normalizePolicyContext";

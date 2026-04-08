@@ -1,4 +1,4 @@
-// src/api/gmail/index.ts
+// src/integrations/api/gmail/index.ts
 
 export * from "./gmailClient";
 export * from "./gmailParser";

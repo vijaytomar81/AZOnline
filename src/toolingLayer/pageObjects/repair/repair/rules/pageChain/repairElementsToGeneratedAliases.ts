@@ -1,4 +1,4 @@
-// src/tools/pageObjects/repair/repair/rules/pageChain/repairElementsToGeneratedAliases.ts
+// src/toolingLayer/pageObjects/repair/repair/rules/pageChain/repairElementsToGeneratedAliases.ts
 
 import fs from "node:fs";
 

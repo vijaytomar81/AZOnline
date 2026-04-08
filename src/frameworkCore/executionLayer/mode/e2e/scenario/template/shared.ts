@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/template/shared.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/template/shared.ts
 
 import { normalizeSpaces } from "@utils/text";
 import type { RawExecutionScenarioRow } from "../types";

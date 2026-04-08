@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/pageArtifact.ts
+// src/toolingLayer/pageObjects/generator/generator/pageArtifact.ts
 
 import path from "node:path";
 

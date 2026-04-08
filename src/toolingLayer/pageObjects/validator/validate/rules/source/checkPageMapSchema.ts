@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/source/checkPageMapSchema.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/source/checkPageMapSchema.ts
 
 import path from "node:path";
 

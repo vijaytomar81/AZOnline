@@ -1,4 +1,4 @@
-// src/executionLayer/core/browser/index.ts
+// src/frameworkCore/executionLayer/core/browser/index.ts
 
 export type { BrowserSession } from "./types";
 export { getBrowserLauncher } from "./getBrowserLauncher";

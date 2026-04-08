@@ -1,4 +1,4 @@
-// src/api/gmail/gmailPolicyService.ts
+// src/integrations/api/gmail/gmailPolicyService.ts
 
 import { createLogger, type Logger } from "@utils/logger";
 import { verifyPolicyEmailReceived } from "./gmailService";

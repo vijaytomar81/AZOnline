@@ -1,4 +1,4 @@
-// src/pageActions/shared/types.ts
+// src/businessLayer/pageActions/shared/types.ts
 
 import type { Page } from "@playwright/test";
 import type { ExecutionContext } from "@frameworkCore/executionLayer/contracts";

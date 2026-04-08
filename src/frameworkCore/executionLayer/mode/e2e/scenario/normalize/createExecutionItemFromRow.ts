@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/normalize/createExecutionItemFromRow.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/normalize/createExecutionItemFromRow.ts
 
 import type { ExecutionItem } from "@frameworkCore/executionLayer/contracts";
 import type { RawExecutionScenarioRow } from "../types";

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/report/countValidationIssues.ts
+// src/toolingLayer/pageObjects/validator/validate/report/countValidationIssues.ts
 
 import type { ValidationIssue } from "../types";
 

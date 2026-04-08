@@ -1,4 +1,4 @@
-// src/executionLayer/core/context/index.ts
+// src/frameworkCore/executionLayer/core/context/index.ts
 
 export type { ExecutionOutputMap } from "./types";
 export { createExecutionContext } from "./createExecutionContext";

@@ -1,4 +1,4 @@
-// src/executionLayer/core/browser/attachBrowserSession.ts
+// src/frameworkCore/executionLayer/core/browser/attachBrowserSession.ts
 
 import type { ExecutionContext } from "@frameworkCore/executionLayer/contracts";
 import type { BrowserSession } from "./types";

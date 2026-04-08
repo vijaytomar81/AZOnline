@@ -1,4 +1,4 @@
-// src/executionLayer/cli/parseParallel.ts
+// src/frameworkCore/executionLayer/cli/parseParallel.ts
 
 import { AppError } from "@utils/errors";
 import { normalizeSpaces } from "@utils/text";

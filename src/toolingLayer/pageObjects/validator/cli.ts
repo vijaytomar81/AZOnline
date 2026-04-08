@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/cli.ts
+// src/toolingLayer/pageObjects/validator/cli.ts
 
 import { normalizeArgv } from "@utils/argv";
 import { printCommandTitle } from "@utils/cliFormat";

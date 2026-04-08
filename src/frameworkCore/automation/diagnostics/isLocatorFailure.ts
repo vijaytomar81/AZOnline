@@ -1,4 +1,4 @@
-// src/automation/diagnostics/isLocatorFailure.ts
+// src/frameworkCore/automation/diagnostics/isLocatorFailure.ts
 
 const LOCATOR_FAILURE_PATTERNS = [
     "unable to resolve element",

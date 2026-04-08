@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/manifestAgainstPageMapTypes.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/manifestAgainstPageMapTypes.ts
 
 import type { TreeNode } from "@utils/cliTree";
 import type { ValidationIssue } from "../../../types";

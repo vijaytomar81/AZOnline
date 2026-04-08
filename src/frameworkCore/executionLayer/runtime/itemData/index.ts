@@ -1,4 +1,4 @@
-// src/executionLayer/runtime/itemData/index.ts
+// src/frameworkCore/executionLayer/runtime/itemData/index.ts
 
 export type {
     ExecutionItemDataRegistry,

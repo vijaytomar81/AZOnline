@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/hygiene/checkModuleHygiene.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/hygiene/checkModuleHygiene.ts
 
 import type { ValidationRule } from "../../pipeline/types";
 import { getIndexFile, getPageManagerFile } from "@toolingLayer/pageObjects/common/pagePaths";

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/common/extractTsObjectKeys.ts
+// src/toolingLayer/pageObjects/common/extractTsObjectKeys.ts
 
 import {
     extractExportedObjectBody,

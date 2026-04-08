@@ -1,4 +1,4 @@
-// src/tools/pageObjects/repair/repair/rules/registry/repairIndexExports.ts
+// src/toolingLayer/pageObjects/repair/repair/rules/registry/repairIndexExports.ts
 
 import fs from "node:fs";
 

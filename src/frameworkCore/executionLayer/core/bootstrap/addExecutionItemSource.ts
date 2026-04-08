@@ -1,4 +1,4 @@
-// src/executionLayer/core/bootstrap/addExecutionItemSource.ts
+// src/frameworkCore/executionLayer/core/bootstrap/addExecutionItemSource.ts
 
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
@@ -22,13 +22,6 @@ export function addExecutionItemSource(
         scope: "run",
         level: LOG_LEVELS.DEBUG,
         category: LOG_CATEGORIES.FRAMEWORK,
-        message: `Execution item source added for action=${source.action}, sheet=${source.sheetName}`,
-    });
-
-    emitLog({
-        scope: "run",
-        level: LOG_LEVELS.DEBUG,
-        category: LOG_CATEGORIES.FRAMEWORK,
-        message: `Execution item source -> action=${source.action}, journey=${source.journey ?? ""}, subType=${source.subType ?? ""}, schema=${source.schemaName ?? ""}, sheet=${source.sheetName}`,
+        message: `Execution item source added for action=${source.action}, subType=${source.subType ?? ""}`,
     });
 }

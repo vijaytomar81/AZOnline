@@ -1,4 +1,4 @@
-// src/executionLayer/core/scenario/runExecutionScenario.ts
+// src/frameworkCore/executionLayer/core/scenario/runExecutionScenario.ts
 
 import { writeScenarioEvidence } from "@frameworkCore/executionLayer/reporting";
 import type {

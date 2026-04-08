@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/hygiene/moduleHygiene/buildModuleHygieneReportNodes.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/hygiene/moduleHygiene/buildModuleHygieneReportNodes.ts
 
 import type { TreeNode } from "@utils/cliTree";
 

@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/normalize/getTotalItems.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/normalize/getTotalItems.ts
 
 import { getString } from "./shared";
 

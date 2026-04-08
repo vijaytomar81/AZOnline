@@ -1,4 +1,4 @@
-// src/tools/pageScanner/cli.ts
+// src/toolingLayer/pageScanner/cli.ts
 
 import { createLogger } from "@utils/logger";
 import { runScanCommand } from "./commands/scan";

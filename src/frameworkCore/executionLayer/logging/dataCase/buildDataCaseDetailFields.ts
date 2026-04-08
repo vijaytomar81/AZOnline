@@ -1,4 +1,4 @@
-// src/executionLayer/logging/dataCase/buildDataCaseDetailFields.ts
+// src/frameworkCore/executionLayer/logging/dataCase/buildDataCaseDetailFields.ts
 
 import type {
     ExecutionItemResult,

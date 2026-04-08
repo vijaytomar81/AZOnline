@@ -1,58 +1,26 @@
-// src/executionLayer/logging/dataCase/renderDataCaseBlock.ts
+// src/frameworkCore/executionLayer/logging/dataCase/renderDataCaseBlock.ts
 
-import { muted, success } from "@utils/cliFormat";
 import type {
     ExecutionScenario,
     ExecutionScenarioResult,
 } from "@frameworkCore/executionLayer/contracts";
-import {
-    divider,
-    field,
-    renderFields,
-    statusText,
-} from "@frameworkCore/executionLayer/logging/shared";
-import { buildDataCaseDetailFields } from "./buildDataCaseDetailFields";
+import { field } from "../shared";
 
 export function renderDataCaseBlock(args: {
     scenario: ExecutionScenario;
     result: ExecutionScenarioResult;
-    duration: string;
-    verbose?: boolean;
 }): string {
-    const outputs = args.result.outputs ?? {};
-    const item = args.result.itemResults[0];
-    const failedItem = args.result.itemResults.find(
-        (entry) => entry.status === "failed"
-    );
     const lines: string[] = [];
 
-    lines.push("");
-    lines.push(
-        `====================${muted("[DATA-CASE]")} ${success(
-            args.scenario.scenarioId
-        )}====================`
-    );
-    lines.push(field("TestCaseRef", args.scenario.scenarioId));
-    lines.push(field("Journey", args.scenario.journey));
-    lines.push(field("EntryPoint", args.scenario.entryPoint ?? "Direct"));
-    lines.push("");
-
-    lines.push(
-        ...renderFields(
-            buildDataCaseDetailFields({
-                result: args.result,
-                item,
-                failedItem,
-                outputs,
-                verbose: args.verbose,
-            }),
-            16
-        )
-    );
-    lines.push("");
-    lines.push(field("Status", statusText(args.result.status)));
-    lines.push(field("Duration", args.duration));
-    lines.push(divider());
+    lines.push(`DATA SCENARIO :: ${args.scenario.scenarioId}`);
+    lines.push(field("Scenario", args.scenario.scenarioName));
+    lines.push(field("Status", args.result.status));
+    lines.push(field("Platform", args.scenario.platform));
+    lines.push(field("Application", args.scenario.application));
+    lines.push(field("Product", args.scenario.product));
+    lines.push(field("JourneyStartWith", args.scenario.journeyStartWith));
+    lines.push(field("Description", args.scenario.description));
+    lines.push(field("Items", String(args.scenario.totalItems)));
 
     return lines.join("\n");
 }

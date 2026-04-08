@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/ensureScenariosExist.ts
+// src/frameworkCore/executionLayer/mode/e2e/ensureScenariosExist.ts
 
 import { AppError } from "@utils/errors";
 import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";

@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/validate/validateScenarioIdentity.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/validate/validateScenarioIdentity.ts
 
 import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
 
@@ -15,8 +15,20 @@ export function validateScenarioIdentity(
         errors.push("Missing ScenarioName");
     }
 
-    if (!scenario.journey) {
-        errors.push("Missing Journey");
+    if (!scenario.platform) {
+        errors.push("Missing Platform");
+    }
+
+    if (!scenario.application) {
+        errors.push("Missing Application");
+    }
+
+    if (!scenario.product) {
+        errors.push("Missing Product");
+    }
+
+    if (!scenario.journeyStartWith) {
+        errors.push("Missing JourneyStartWith");
     }
 
     if (!scenario.description) {
@@ -27,7 +39,7 @@ export function validateScenarioIdentity(
         errors.push("TotalItems must be greater than 0");
     }
 
-    if (scenario.policyContext === "ExistingPolicy") {
+    if (scenario.journeyStartWith === "existingPolicy") {
         if (!scenario.policyNumber) {
             errors.push("Missing PolicyNumber");
         }

@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/template/validateScenarioTemplate.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/template/validateScenarioTemplate.ts
 
 import type { RawExecutionScenarioRow } from "../types";
 import { getTemplateTotalItems } from "./shared";

@@ -1,4 +1,4 @@
-// src/executionLayer/core/runner/index.ts
+// src/frameworkCore/executionLayer/core/runner/index.ts
 
 export type { RunScenariosArgs, RunOutput } from "./types";
 

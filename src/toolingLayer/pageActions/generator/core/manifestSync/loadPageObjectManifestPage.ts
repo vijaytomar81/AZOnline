@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/core/manifestSync/loadPageObjectManifestPage.ts
+// src/toolingLayer/pageActions/generator/core/manifestSync/loadPageObjectManifestPage.ts
 
 import fs from "node:fs";
 import path from "node:path";

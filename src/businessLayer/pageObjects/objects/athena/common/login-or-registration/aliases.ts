@@ -1,4 +1,4 @@
-// src/pageObjects/objects/athena/common/login-or-registration/aliases.ts
+// src/businessLayer/pageObjects/objects/athena/common/login-or-registration/aliases.ts
 // pageKey: athena.common.login-or-registration
 //
 // This file is safe to edit.

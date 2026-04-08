@@ -1,4 +1,4 @@
-// src/pageObjects/objects/athena/common/insurance-type-selection/aliases.generated.ts
+// src/businessLayer/pageObjects/objects/athena/common/insurance-type-selection/aliases.generated.ts
 // pageKey: athena.common.insurance-type-selection
 // scannedAt: 2026-03-13T10:57:20.737Z
 

@@ -1,4 +1,4 @@
-// src/executionLayer/core/scenario/runScenarioItems.ts
+// src/frameworkCore/executionLayer/core/scenario/runScenarioItems.ts
 
 import { nowIso } from "@utils/time";
 import type {

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/hygiene/moduleHygiene/buildMissingRegistryFileResult.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/hygiene/moduleHygiene/buildMissingRegistryFileResult.ts
 
 import type { ModuleHygieneRuleResult } from "./moduleHygieneTypes";
 

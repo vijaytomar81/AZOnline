@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/registry/pageManager/collectPageManagerIssues.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/registry/pageManager/collectPageManagerIssues.ts
 
 import type { ValidationIssue } from "../../../types";
 import type {

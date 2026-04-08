@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/pageChain/pageObjectStructure/pageObjectStructureHelpers.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/pageChain/pageObjectStructure/pageObjectStructureHelpers.ts
 
 export function hasClickAliasKeyHelper(pageObjectTs: string): boolean {
     return pageObjectTs.includes(

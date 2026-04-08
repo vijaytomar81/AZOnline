@@ -1,4 +1,4 @@
-// src/executionLayer/logging/dataCase/getDataCaseDebugLines.ts
+// src/frameworkCore/executionLayer/logging/dataCase/getDataCaseDebugLines.ts
 
 import type { ExecutionItemResult } from "@frameworkCore/executionLayer/contracts";
 import { safeText } from "@frameworkCore/executionLayer/logging/shared";

@@ -1,4 +1,4 @@
-// src/logging/policies/shouldWriteLogToFile.ts
+// src/frameworkCore/logging/policies/shouldWriteLogToFile.ts
 
 import type { LogEvent } from "@frameworkCore/logging/core/logEvent";
 import { logFileConfig } from "@frameworkCore/logging/core/logFileConfig";

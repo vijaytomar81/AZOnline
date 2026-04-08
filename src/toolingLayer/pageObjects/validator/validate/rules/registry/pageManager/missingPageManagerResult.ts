@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/registry/pageManager/missingPageManagerResult.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/registry/pageManager/missingPageManagerResult.ts
 
 export function buildMissingPageManagerResult(
     ruleId: string,

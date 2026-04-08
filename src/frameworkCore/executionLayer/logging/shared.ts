@@ -1,4 +1,4 @@
-// src/executionLayer/logging/shared.ts
+// src/frameworkCore/executionLayer/logging/shared.ts
 
 import { failure, muted, success, warning } from "@utils/cliFormat";
 import type { ExecutionItemResult } from "@frameworkCore/executionLayer/contracts";

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/report/buildValidationResultText.ts
+// src/toolingLayer/pageObjects/validator/validate/report/buildValidationResultText.ts
 
 import { failure, success, warning } from "@utils/cliFormat";
 import type { ValidationSummary } from "../types";

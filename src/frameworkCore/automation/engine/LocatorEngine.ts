@@ -1,4 +1,4 @@
-// src/automation/engine/LocatorEngine.ts
+// src/frameworkCore/automation/engine/LocatorEngine.ts
 
 import type { Locator, Page } from "@playwright/test";
 import { createLogger } from "@utils/logger";

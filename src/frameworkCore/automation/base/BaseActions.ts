@@ -1,4 +1,4 @@
-// src/automation/base/BaseActions.ts
+// src/frameworkCore/automation/base/BaseActions.ts
 
 import { executionConfig } from "@configLayer/execution.config";
 import type { AliasMap } from "@frameworkCore/automation/engine";

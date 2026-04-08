@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/registry/pageManager/extractPageManagerState.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/registry/pageManager/extractPageManagerState.ts
 
 export function extractPageManagerImports(tsText: string): Map<string, string> {
     const imports = new Map<string, string>();

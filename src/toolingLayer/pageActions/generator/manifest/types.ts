@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/manifest/types.ts
+// src/toolingLayer/pageActions/generator/manifest/types.ts
 
 export type PageObjectManifestIndex = {
     version: number;

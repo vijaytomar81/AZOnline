@@ -1,4 +1,4 @@
-// src/automation/base/BasePageAliasResolver.ts
+// src/frameworkCore/automation/base/BasePageAliasResolver.ts
 
 import type { AliasMap, ElementDef } from "@frameworkCore/automation/engine";
 import type { ElementsMap } from "./AutomationPageDriver";

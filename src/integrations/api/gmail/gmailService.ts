@@ -1,4 +1,4 @@
-// src/api/gmail/gmailService.ts
+// src/integrations/api/gmail/gmailService.ts
 
 import { createLogger } from "@utils/logger";
 import { createGmailClient } from "./gmailClient";

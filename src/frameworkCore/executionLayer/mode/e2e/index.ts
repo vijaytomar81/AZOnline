@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/index.ts
+// src/frameworkCore/executionLayer/mode/e2e/index.ts
 
 export type { RunE2EModeArgs } from "./types";
 

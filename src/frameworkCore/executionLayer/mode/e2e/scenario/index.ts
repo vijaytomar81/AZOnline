@@ -1,15 +1,14 @@
-// src/executionLayer/mode/e2e/scenario/index.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/index.ts
+
+export { normalizeScenarioList, normalizeScenarioRow } from "./normalize";
+export { parseScenarios } from "./parse";
+export { validateScenarioList } from "./validate";
+export { validateScenarioTemplates } from "./template";
 
 export type {
     RawExecutionScenarioRow,
     ExecutionItem,
     ExecutionScenario,
-    ExecutionEntryPoint,
-    ExecutionPolicyContext,
+    ExecutionJourneyStartWith,
     ScenarioValidationResult,
 } from "./types";
-
-export * from "./parse";
-export * from "./normalize";
-export * from "./validate";
-export * from "./template";

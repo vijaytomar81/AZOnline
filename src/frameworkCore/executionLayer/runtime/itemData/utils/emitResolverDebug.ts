@@ -1,4 +1,4 @@
-// src/executionLayer/runtime/itemData/utils/emitResolverDebug.ts
+// src/frameworkCore/executionLayer/runtime/itemData/utils/emitResolverDebug.ts
 
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { emitLog } from "@frameworkCore/logging/emitLog";

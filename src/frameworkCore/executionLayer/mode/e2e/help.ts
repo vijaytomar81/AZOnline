@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/help.ts
+// src/frameworkCore/executionLayer/mode/e2e/help.ts
 
 export function printE2EModeHelp(): void {
     console.log(`
@@ -12,18 +12,20 @@ Required:
 Optional:
   --scenario <ScenarioId[,ScenarioId...]>
   --includeDisabled
-  --app <AzOnline|Ferry|Britannia>
+  --platform <Athena|PCW|PCWTool>
+  --application <AzOnline|Ferry|Britannia|CTM|CNF|MSM|GoCo>
   --product <Motor|Home>
   --iterations <number>
   --parallel <number>
   --verbose
 
 Notes:
-  - Application is resolved from "Application" column first, otherwise from --app.
-  - Product is resolved from "Product" column first, otherwise from --product.
-  - If either cannot be resolved, execution fails.
+  - Platform can be provided in the sheet or via --platform.
+  - Application can be provided in the sheet or via --application.
+  - Product can be provided in the sheet or via --product.
+  - JourneyStartWith is read from the sheet using values: newPolicy | existingPolicy.
 
 Example:
-  npm run execution -- --mode e2e --excel "sampleData/E2E Scenarios.xlsx" --sheet "Scenarios" --app AzOnline --product Motor
+  npm run execution -- --mode e2e --excel "sampleData/E2E Scenarios.xlsx" --sheet "Scenarios" --platform Athena --application AzOnline --product Motor
 `.trim());
 }

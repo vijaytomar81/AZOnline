@@ -1,4 +1,4 @@
-// src/executionLayer/core/browser/types.ts
+// src/frameworkCore/executionLayer/core/browser/types.ts
 
 import type { Browser, BrowserContext, Page } from "@playwright/test";
 

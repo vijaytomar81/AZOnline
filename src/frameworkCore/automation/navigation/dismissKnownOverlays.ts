@@ -1,4 +1,4 @@
-// src/automation/navigation/dismissKnownOverlays.ts
+// src/frameworkCore/automation/navigation/dismissKnownOverlays.ts
 
 import type { Page } from "@playwright/test";
 import { executionConfig } from "@configLayer/execution.config";

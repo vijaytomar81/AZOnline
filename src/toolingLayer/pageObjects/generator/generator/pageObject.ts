@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/pageObject.ts
+// src/toolingLayer/pageObjects/generator/generator/pageObject.ts
 
 import fs from "node:fs";
 

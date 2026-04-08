@@ -1,4 +1,4 @@
-// src/executionLayer/core/runner/runScenarioBatch.ts
+// src/frameworkCore/executionLayer/core/runner/runScenarioBatch.ts
 
 export async function runScenarioBatch<T, R>(
     items: T[],

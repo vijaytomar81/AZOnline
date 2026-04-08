@@ -1,4 +1,4 @@
-// src/evidence/artifacts/run/buildFinalEvidenceFiles.ts
+// src/evidenceLayer/artifacts/run/buildFinalEvidenceFiles.ts
 
 import type { RunEvidence } from "./buildRunEvidence";
 

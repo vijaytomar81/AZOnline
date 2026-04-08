@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/pipeline/runner.ts
+// src/toolingLayer/pageObjects/validator/validate/pipeline/runner.ts
 
 import { VALIDATION_RULES } from "./registry";
 import type { ValidationContext } from "./types";

@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/types.ts
+// src/toolingLayer/pageObjects/validator/validate/types.ts
 
 import type { TreeNode } from "@utils/cliTree";
 

@@ -1,4 +1,4 @@
-// src/automation/base/BasePage.ts
+// src/frameworkCore/automation/base/BasePage.ts
 
 import type { Locator, Page } from "@playwright/test";
 import { executionConfig } from "@configLayer/execution.config";

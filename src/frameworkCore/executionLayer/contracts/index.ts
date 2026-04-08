@@ -1,11 +1,10 @@
-// src/executionLayer/contracts/index.ts
+// src/frameworkCore/executionLayer/contracts/index.ts
 
 export type { ExecutionItem } from "./ExecutionItem";
 
 export type {
     ExecutionScenario,
-    ExecutionPolicyContext,
-    ExecutionEntryPoint,
+    ExecutionJourneyStartWith,
 } from "./ExecutionScenario";
 
 export type {

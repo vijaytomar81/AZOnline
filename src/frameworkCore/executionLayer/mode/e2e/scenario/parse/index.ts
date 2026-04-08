@@ -1,4 +1,4 @@
-// src/executionLayer/mode/e2e/scenario/parse/index.ts
+// src/frameworkCore/executionLayer/mode/e2e/scenario/parse/index.ts
 
 export type {
     ParseScenariosResult,

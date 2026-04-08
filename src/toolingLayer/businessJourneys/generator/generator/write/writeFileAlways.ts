@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/write/writeFileAlways.ts
+// src/toolingLayer/businessJourneys/generator/generator/write/writeFileAlways.ts
 
 import { safeReadText, safeWriteText } from "@utils/fs";
 

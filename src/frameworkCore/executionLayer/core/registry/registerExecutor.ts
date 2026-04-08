@@ -1,4 +1,4 @@
-// src/executionLayer/core/registry/registerExecutor.ts
+// src/frameworkCore/executionLayer/core/registry/registerExecutor.ts
 
 import { buildExecutorKey } from "./buildExecutorKey";
 import type {
@@ -10,7 +10,6 @@ export function registerExecutor(
     registry: ExecutorRegistry,
     args: {
         action: string;
-        journey?: string;
         portal?: string;
         subType?: string;
         executor: ExecutionItemExecutor;

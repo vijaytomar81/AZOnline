@@ -1,4 +1,4 @@
-// src/executionLayer/core/bootstrap/addExecutor.ts
+// src/frameworkCore/executionLayer/core/bootstrap/addExecutor.ts
 
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
@@ -12,14 +12,12 @@ import type { ExecutionBootstrap } from "./types";
 export function addExecutor(args: {
     bootstrap: ExecutionBootstrap;
     action: string;
-    journey?: string;
     portal?: string;
     subType?: string;
     executor: ExecutionItemExecutor;
 }): void {
     registerExecutor(args.bootstrap.executorRegistry, {
         action: args.action,
-        journey: args.journey,
         portal: args.portal,
         subType: args.subType,
         executor: args.executor,
@@ -27,10 +25,11 @@ export function addExecutor(args: {
 
     const route = [
         `action=${args.action}`,
-        args.journey ? `journey=${args.journey}` : "",
         args.portal ? `portal=${args.portal}` : "",
         args.subType ? `subType=${args.subType}` : "",
-    ].filter(Boolean).join(", ");
+    ]
+        .filter(Boolean)
+        .join(", ");
 
     emitLog({
         scope: "run",

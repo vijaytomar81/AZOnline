@@ -1,4 +1,4 @@
-// src/evidence/artifacts/excel/buildExecutionSummaryRows.ts
+// src/evidenceLayer/artifacts/excel/buildExecutionSummaryRows.ts
 
 export type SummaryRowKind = "title" | "section" | "data" | "spacer";
 

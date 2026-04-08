@@ -1,4 +1,4 @@
-// src/pageObjects/objects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage.ts
+// src/businessLayer/pageObjects/objects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage.ts
 // pageKey: athena.motor.ph-driving-licence-details
 
 import type { Locator, Page } from "@playwright/test";

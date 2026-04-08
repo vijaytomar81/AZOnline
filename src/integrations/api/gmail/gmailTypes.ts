@@ -1,4 +1,4 @@
-// src/api/gmail/gmailTypes.ts
+// src/integrations/api/gmail/gmailTypes.ts
 
 import type { Logger } from "@utils/logger";
 

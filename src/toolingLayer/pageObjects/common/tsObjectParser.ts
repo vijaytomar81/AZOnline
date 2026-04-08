@@ -1,4 +1,4 @@
-// src/tools/pageObjects/common/tsObjectParser.ts
+// src/toolingLayer/pageObjects/common/tsObjectParser.ts
 
 import { stripLineComments } from "@utils/text";
 

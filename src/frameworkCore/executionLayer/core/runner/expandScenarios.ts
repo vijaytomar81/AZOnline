@@ -1,4 +1,4 @@
-// src/executionLayer/core/runner/expandScenarios.ts
+// src/frameworkCore/executionLayer/core/runner/expandScenarios.ts
 
 import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
 

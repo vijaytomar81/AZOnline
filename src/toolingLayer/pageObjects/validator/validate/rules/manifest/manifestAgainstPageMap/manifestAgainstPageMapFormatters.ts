@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/manifestAgainstPageMapFormatters.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/manifestAgainstPageMapFormatters.ts
 
 import path from "node:path";
 

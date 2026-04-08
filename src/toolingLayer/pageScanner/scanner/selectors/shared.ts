@@ -1,4 +1,4 @@
-// src/tools/pageScanner/scanner/selectors/shared.ts
+// src/toolingLayer/pageScanner/scanner/selectors/shared.ts
 
 import type { ScannedElement } from "../types";
 

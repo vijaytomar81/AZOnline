@@ -1,4 +1,4 @@
-// src/executionLayer/core/item/index.ts
+// src/frameworkCore/executionLayer/core/item/index.ts
 
 export type { RunExecutionItemArgs } from "./types";
 

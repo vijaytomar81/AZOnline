@@ -1,4 +1,4 @@
-// src/evidence/artifacts/run/finalizeRunEvidence.ts
+// src/evidenceLayer/artifacts/run/finalizeRunEvidence.ts
 
 import fs from "node:fs/promises";
 import path from "node:path";

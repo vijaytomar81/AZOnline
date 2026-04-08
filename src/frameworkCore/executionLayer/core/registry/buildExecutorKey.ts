@@ -1,4 +1,4 @@
-// src/executionLayer/core/registry/buildExecutorKey.ts
+// src/frameworkCore/executionLayer/core/registry/buildExecutorKey.ts
 
 import { normalizeSpaces, toCamelFromText } from "@utils/text";
 
@@ -8,14 +8,12 @@ function normalizeKeyPart(value?: string): string {
 
 export function buildExecutorKey(args: {
     action: string;
-    journey?: string;
     portal?: string;
     subType?: string;
 }): string {
     const action = normalizeKeyPart(args.action);
-    const journey = normalizeKeyPart(args.journey);
     const portal = normalizeKeyPart(args.portal);
     const subType = normalizeKeyPart(args.subType);
 
-    return [action, journey, portal, subType].filter(Boolean).join(":");
+    return [action, portal, subType].filter(Boolean).join(":");
 }

@@ -1,4 +1,4 @@
-// src/executionLayer/core/runner/getScenarioScope.ts
+// src/frameworkCore/executionLayer/core/runner/getScenarioScope.ts
 
 import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
 

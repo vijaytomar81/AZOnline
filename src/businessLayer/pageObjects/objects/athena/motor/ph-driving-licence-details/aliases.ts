@@ -1,4 +1,4 @@
-// src/pageObjects/objects/athena/motor/ph-driving-licence-details/aliases.ts
+// src/businessLayer/pageObjects/objects/athena/motor/ph-driving-licence-details/aliases.ts
 // pageKey: athena.motor.ph-driving-licence-details
 //
 // This file is safe to edit.

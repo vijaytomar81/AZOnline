@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/render/renderOpenStartUrlStepFile.ts
+// src/toolingLayer/businessJourneys/generator/generator/render/renderOpenStartUrlStepFile.ts
 
 import { toRepoRelative } from "@utils/paths";
 

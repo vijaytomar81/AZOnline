@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/registry/checkPageManager.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/registry/checkPageManager.ts
 
 import fs from "node:fs";
 

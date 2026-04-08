@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/core/action/buildActionPath.ts
+// src/toolingLayer/pageActions/generator/core/action/buildActionPath.ts
 
 import path from "node:path";
 import {

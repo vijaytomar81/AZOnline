@@ -1,4 +1,4 @@
-// src/automation/engine/index.ts
+// src/frameworkCore/automation/engine/index.ts
 
 export type {
     AliasMap,

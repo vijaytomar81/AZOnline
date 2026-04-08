@@ -1,4 +1,4 @@
-// src/executionLayer/core/browser/getBrowserLauncher.ts
+// src/frameworkCore/executionLayer/core/browser/getBrowserLauncher.ts
 
 import { chromium, firefox, webkit } from "@playwright/test";
 import { executionConfig } from "@configLayer/execution.config";

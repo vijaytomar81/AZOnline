@@ -1,4 +1,4 @@
-// src/evidence/artifacts/excel/prettifyExcelColumn.ts
+// src/evidenceLayer/artifacts/excel/prettifyExcelColumn.ts
 
 const SPECIAL_CASES: Record<string, string> = {
     Id: "ID",

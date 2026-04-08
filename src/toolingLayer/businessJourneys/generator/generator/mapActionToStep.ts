@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/mapActionToStep.ts
+// src/toolingLayer/businessJourneys/generator/generator/mapActionToStep.ts
 
 import type { PageActionEntry, StepMapping } from "./types";
 import { buildStepExportName } from "./naming/buildStepExportName";

@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/core/render/buildSuggestionBlock.ts
+// src/toolingLayer/pageActions/generator/core/render/buildSuggestionBlock.ts
 
 import type { PageObjectManifestPage } from "../../manifest/types";
 import type { ExtractedMethod } from "../../shared/types";

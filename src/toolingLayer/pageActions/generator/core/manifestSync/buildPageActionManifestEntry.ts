@@ -1,4 +1,4 @@
-// src/tools/pageActions/generator/core/manifestSync/buildPageActionManifestEntry.ts
+// src/toolingLayer/pageActions/generator/core/manifestSync/buildPageActionManifestEntry.ts
 
 import { toRepoRelative } from "@utils/paths";
 import type {

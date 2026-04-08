@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/urlMeta.ts
+// src/toolingLayer/pageObjects/generator/generator/urlMeta.ts
 
 import { escapeForRegex } from "@utils/regex";
 

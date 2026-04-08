@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/naming/buildJourneyNames.ts
+// src/toolingLayer/businessJourneys/generator/generator/naming/buildJourneyNames.ts
 
 import type { JourneyTarget } from "../types";
 

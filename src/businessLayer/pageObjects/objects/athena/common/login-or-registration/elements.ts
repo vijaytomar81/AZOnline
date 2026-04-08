@@ -1,4 +1,4 @@
-// src/pageObjects/objects/athena/common/login-or-registration/elements.ts
+// src/businessLayer/pageObjects/objects/athena/common/login-or-registration/elements.ts
 // pageKey: athena.common.login-or-registration
 // scannedAt: 2026-03-09T12:48:41.552Z
 

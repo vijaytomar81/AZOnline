@@ -1,4 +1,4 @@
-// src/evidence/artifacts/run/buildRunEvidence.ts
+// src/evidenceLayer/artifacts/run/buildRunEvidence.ts
 
 export type RunEvidenceCaseMap = Record<string, Record<string, unknown>>;
 

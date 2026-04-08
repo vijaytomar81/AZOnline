@@ -1,4 +1,4 @@
-// src/tools/pageObjects/repair/repair/pipeline/types.ts
+// src/toolingLayer/pageObjects/repair/repair/pipeline/types.ts
 
 import type { Logger } from "@utils/logger";
 import type { RepairRuleResult } from "../types";

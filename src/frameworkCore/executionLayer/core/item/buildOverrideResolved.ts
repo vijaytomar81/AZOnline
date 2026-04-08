@@ -1,4 +1,4 @@
-// src/executionLayer/core/item/buildOverrideResolved.ts
+// src/frameworkCore/executionLayer/core/item/buildOverrideResolved.ts
 
 import type {
     ExecutionItem,
@@ -14,8 +14,7 @@ export function buildOverrideResolved(
         payload,
         source: {
             action: item.action,
-            sheetName: "data-mode",
+            subType: item.subType,
         },
-        sourceFileSheet: "data-mode",
     };
 }

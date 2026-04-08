@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/builders/buildPageTsStub.ts
+// src/toolingLayer/pageObjects/generator/builders/buildPageTsStub.ts
 
 import type { PageMap } from "../generator/types";
 import { toPascal } from "@utils/ts";

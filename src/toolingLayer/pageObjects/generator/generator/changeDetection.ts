@@ -1,4 +1,4 @@
-// src/tools/pageObjects/generator/generator/changeDetection.ts
+// src/toolingLayer/pageObjects/generator/generator/changeDetection.ts
 
 import { buildPageArtifact } from "./pageArtifact";
 import type { PageRegistryEntry } from "./registry";

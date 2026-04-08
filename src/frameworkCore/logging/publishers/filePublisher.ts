@@ -1,4 +1,4 @@
-// src/logging/publishers/filePublisher.ts
+// src/frameworkCore/logging/publishers/filePublisher.ts
 
 import fs from "node:fs";
 import path from "node:path";

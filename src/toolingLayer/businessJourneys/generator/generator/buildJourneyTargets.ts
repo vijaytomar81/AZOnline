@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/buildJourneyTargets.ts
+// src/toolingLayer/businessJourneys/generator/generator/buildJourneyTargets.ts
 
 import { uniq } from "@utils/collections";
 import type { JourneyGenerationInputs, JourneyTarget } from "./types";

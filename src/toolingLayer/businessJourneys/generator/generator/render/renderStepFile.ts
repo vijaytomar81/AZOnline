@@ -1,4 +1,4 @@
-// src/tools/businessJourneys/generator/generator/render/renderStepFile.ts
+// src/toolingLayer/businessJourneys/generator/generator/render/renderStepFile.ts
 
 import { toRepoRelative } from "@utils/paths";
 import type { StepMapping } from "../types";

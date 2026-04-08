@@ -1,4 +1,4 @@
-// src/api/gmail/gmailOtpService.ts
+// src/integrations/api/gmail/gmailOtpService.ts
 
 import { createLogger, type Logger } from "@utils/logger";
 import { getOtpFromLatestEmail } from "./gmailService";

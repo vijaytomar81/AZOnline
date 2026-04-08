@@ -1,4 +1,4 @@
-// src/pageObjects/objects/athena/common/insurance-type-selection/aliases.ts
+// src/businessLayer/pageObjects/objects/athena/common/insurance-type-selection/aliases.ts
 // pageKey: athena.common.insurance-type-selection
 //
 // This file is safe to edit.

@@ -1,4 +1,4 @@
-// src/executionLayer/core/runner/runScenarios.ts
+// src/frameworkCore/executionLayer/core/runner/runScenarios.ts
 
 import { createRuntimeInfo } from "@utils/runtimeInfo";
 import type { RuntimeBrowserInfo } from "@utils/runtimeInfo";

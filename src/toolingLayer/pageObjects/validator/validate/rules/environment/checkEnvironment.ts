@@ -1,4 +1,4 @@
-// src/tools/pageObjects/validator/validate/rules/environment/checkEnvironment.ts
+// src/toolingLayer/pageObjects/validator/validate/rules/environment/checkEnvironment.ts
 
 import fs from "node:fs";
 
