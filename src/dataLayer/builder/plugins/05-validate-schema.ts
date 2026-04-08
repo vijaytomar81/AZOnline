@@ -9,16 +9,17 @@ import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import { runSchemaValidation } from "../core/validation/runSchemaValidation";
 import { logValidationSummary } from "../core/validation/logValidationSummary";
 import { logValidationDetails } from "../core/validation/logValidationDetails";
-import { detectLayout } from "../core/spreadsheet/detectLayout";
 
 const plugin: PipelinePlugin = {
     name: "validate-schema",
     order: 5,
-    requires: ["sheet", "external:schemaName", "external:strictValidation"],
+    requires: ["sheet", "meta", "external:schemaName", "external:strictValidation"],
     provides: ["validationReport"],
 
     run: async (ctx) => {
         const ws = ctx.data.sheet as ExcelJS.Worksheet | undefined;
+        const meta = ctx.data.meta;
+
         if (!ws) {
             throw new DataBuilderError({
                 code: "SHEET_NOT_LOADED",
@@ -28,15 +29,23 @@ const plugin: PipelinePlugin = {
             });
         }
 
-        const layout = detectLayout(ws);
+        if (!meta) {
+            throw new DataBuilderError({
+                code: "META_NOT_EXTRACTED",
+                stage: "validate-schema",
+                source: "05-validate-schema",
+                message: "Sheet metadata not extracted.",
+            });
+        }
 
         const report = runSchemaValidation({
             ws,
+            meta,
             schemaName: ctx.data.schemaName,
             sheetName: ctx.data.sheetName,
             platform: ctx.data.platform,
+            product: ctx.data.product,
             journeyContext: ctx.data.journeyContext,
-            layout,
             strict: !!ctx.data.strictValidation,
         });
 

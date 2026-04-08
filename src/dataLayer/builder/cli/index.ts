@@ -153,13 +153,16 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
     const schemaName = resolveSchemaName({
         journeyContext,
         platform,
+        product,
     });
 
     if (verbose) {
         emitLog({
             scope: logScope,
             level: LOG_LEVELS.DEBUG,
-            message: `Resolved schema "${schemaName}" from journeyContext "${journeyContext.type}" and platform "${platform}"`,
+            message:
+                `Resolved schema "${schemaName}" from journeyContext "${journeyContext.type}", ` +
+                `platform "${platform}", product "${product}"`,
             category: LOG_CATEGORIES.FRAMEWORK,
         });
     }

@@ -1,0 +1,19 @@
+{
+  "schemaName": "new_business_pcw_tool_message",
+  "sheetName": "PCW-Tool",
+  "mode": "normal",
+  "generatedAt": "2026-04-08T16:12:44.133Z",
+  "errors": [],
+  "missingSchemaFieldsInExcel": {
+    "requiredFields": [],
+    "bySection": {}
+  },
+  "missingExcelFieldsInSchema": {
+    "unusedExcelFields": []
+  },
+  "summary": {
+    "errorCount": 0,
+    "missingSchemaFieldsInExcelCount": 0,
+    "missingExcelFieldsInSchemaCount": 0
+  }
+}

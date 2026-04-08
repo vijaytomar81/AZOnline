@@ -2,6 +2,7 @@
 
 import type { JourneyContext } from "@configLayer/models/journeyContext.config";
 import type { Platform } from "@configLayer/models/platform.config";
+import type { Product } from "@configLayer/models/product.config";
 import type {
     DataDefinitionGroup,
     DataSchema,
@@ -16,11 +17,13 @@ export function getSchemaDefinition(args: {
     schemaName?: string;
     journeyContext: JourneyContext;
     platform: Platform;
+    product: Product;
 }): RegisteredSchema {
     const key = resolveSchemaName({
         schemaName: args.schemaName,
         journeyContext: args.journeyContext,
         platform: args.platform,
+        product: args.product,
     });
 
     const definition = dataDefinitionRegistry[key];
@@ -35,6 +38,7 @@ export function getSchemaDefinition(args: {
                 schemaName: key,
                 journeyContext: args.journeyContext,
                 platform: args.platform,
+                product: args.product,
             },
         });
     }
@@ -46,6 +50,7 @@ export function getSchema(args: {
     schemaName?: string;
     journeyContext: JourneyContext;
     platform: Platform;
+    product: Product;
 }): DataSchema {
     return getSchemaDefinition(args).schema;
 }
@@ -54,6 +59,7 @@ export function getSchemaDataDefinitionGroup(args: {
     schemaName?: string;
     journeyContext: JourneyContext;
     platform: Platform;
+    product: Product;
 }): DataDefinitionGroup {
     return getSchemaDefinition(args).schema.dataDefinitionGroup;
 }

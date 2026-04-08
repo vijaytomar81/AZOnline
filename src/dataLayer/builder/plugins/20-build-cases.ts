@@ -41,6 +41,7 @@ const plugin: PipelinePlugin = {
             schemaName: ctx.data.schemaName,
             journeyContext: ctx.data.journeyContext,
             platform: ctx.data.platform,
+            product: ctx.data.product,
         });
 
         const includeEmpty = !ctx.data.excludeEmptyFields;
