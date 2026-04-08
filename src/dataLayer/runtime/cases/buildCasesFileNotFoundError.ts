@@ -12,7 +12,6 @@ export function buildCasesFileNotFoundError(args: {
     application: Application;
     product: Product;
     journeyContext: JourneyContext;
-    sheetName: string;
     schemaName: string;
     attemptedPath?: string;
 }): DataBuilderError {
@@ -21,7 +20,6 @@ export function buildCasesFileNotFoundError(args: {
         application: args.application,
         product: args.product,
         journeyContext: args.journeyContext,
-        sheetName: args.sheetName,
     });
 
     const lines: string[] = [
@@ -31,7 +29,6 @@ export function buildCasesFileNotFoundError(args: {
         `Application    : ${args.application}`,
         `Product        : ${args.product}`,
         `JourneyContext : ${JSON.stringify(args.journeyContext)}`,
-        `Sheet          : ${args.sheetName}`,
         `Schema         : ${args.schemaName}`,
         "",
     ];
@@ -43,6 +40,10 @@ export function buildCasesFileNotFoundError(args: {
 
         if (manifestItem.validationReportPath) {
             lines.push(`  Validation   : ${manifestItem.validationReportPath}`);
+        }
+
+        if (manifestItem.sheetName) {
+            lines.push(`  Sheet        : ${manifestItem.sheetName}`);
         }
 
         lines.push(`  Case Count   : ${manifestItem.caseCount}`);
@@ -61,7 +62,7 @@ export function buildCasesFileNotFoundError(args: {
 
     lines.push("Next step:");
     lines.push(
-        `  npm run data:build -- --excel <path> --sheet "${args.sheetName}" --platform "${args.platform}" --application "${args.application}" --product "${args.product}" --journeyContext "${args.journeyContext.type}"`
+        `  npm run data:build -- --excel <path> --sheet "<sheet>" --platform "${args.platform}" --application "${args.application}" --product "${args.product}" --journeyContext "${args.journeyContext.type}"`
     );
 
     return new DataBuilderError({
@@ -74,7 +75,6 @@ export function buildCasesFileNotFoundError(args: {
             application: args.application,
             product: args.product,
             journeyContext: args.journeyContext,
-            sheetName: args.sheetName,
             schemaName: args.schemaName,
             filePath: args.attemptedPath ?? "",
             manifestKey: manifestItem?.key ?? "",

@@ -14,7 +14,6 @@ export function findGeneratedManifestItem(args: {
     application: Application;
     product: Product;
     journeyContext: JourneyContext;
-    sheetName: string;
 }): GeneratedManifestItem | undefined {
     const manifest = readGeneratedManifest();
 

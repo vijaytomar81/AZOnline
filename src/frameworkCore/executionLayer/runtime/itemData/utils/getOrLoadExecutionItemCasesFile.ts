@@ -74,7 +74,6 @@ export function getOrLoadExecutionItemCasesFile(args: {
         application: args.scenario.application,
         product: args.scenario.product,
         journeyContext,
-        sheetName: "generated",
     });
 
     args.registry.cache.set(key, loaded);

@@ -17,7 +17,6 @@ export function resolveCasesFilePath(args: {
     application: Application;
     product: Product;
     journeyContext: JourneyContext;
-    sheetName: string;
     schemaName?: string;
 }): string {
     const explicit = resolveExplicitCasesFile();
@@ -30,7 +29,6 @@ export function resolveCasesFilePath(args: {
         application: args.application,
         product: args.product,
         journeyContext: args.journeyContext,
-        sheetName: args.sheetName,
     });
 
     const manifestPath = resolveManifestFilePath(manifestItem);
@@ -41,7 +39,6 @@ export function resolveCasesFilePath(args: {
             application: args.application,
             product: args.product,
             journeyContext: args.journeyContext,
-            sheetName: args.sheetName,
             schemaName: args.schemaName ?? "",
         });
     }
@@ -52,7 +49,6 @@ export function resolveCasesFilePath(args: {
             application: args.application,
             product: args.product,
             journeyContext: args.journeyContext,
-            sheetName: args.sheetName,
             schemaName: args.schemaName ?? "",
             attemptedPath: manifestPath,
         });

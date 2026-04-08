@@ -28,7 +28,6 @@ export async function runDataMode(
         application: args.application,
         product: args.product,
         journeyContext: args.journeyContext,
-        sheetName: "generated",
     });
 
     const bootstrap = createExecutionBootstrap();

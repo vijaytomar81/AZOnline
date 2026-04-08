@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-08T09:35:16.257Z",
+  "generatedAt": "2026-04-08T12:53:27.774Z",
   "data": {
     "Athena:AzOnline:Motor:NewBusiness": {
       "key": "Athena:AzOnline:Motor:NewBusiness",
@@ -11,10 +11,25 @@
       },
       "sheetName": "FlowNB",
       "schemaName": "new_business_journey",
-      "filePath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/athena/azonline/motor/FlowNB_20260408_113516_257.json",
-      "validationReportPath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/athena/azonline/motor/FlowNB.validation_20260408_113516_257.json",
+      "filePath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/athena/azonline/motor/FlowNB_20260408_145259_901.json",
+      "validationReportPath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/athena/azonline/motor/FlowNB.validation_20260408_145259_901.json",
       "caseCount": 3,
-      "generatedAt": "2026-04-08T09:35:16.257Z"
+      "generatedAt": "2026-04-08T12:52:59.902Z"
+    },
+    "PCW:CTM:Motor:NewBusiness": {
+      "key": "PCW:CTM:Motor:NewBusiness",
+      "platform": "PCW",
+      "application": "CTM",
+      "product": "Motor",
+      "journeyContext": {
+        "type": "NewBusiness"
+      },
+      "sheetName": "FlowNB",
+      "schemaName": "new_business_journey",
+      "filePath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/pcw/ctm/motor/FlowNB_20260408_145327_774.json",
+      "validationReportPath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/pcw/ctm/motor/FlowNB.validation_20260408_145327_774.json",
+      "caseCount": 3,
+      "generatedAt": "2026-04-08T12:53:27.774Z"
     }
   }
 }

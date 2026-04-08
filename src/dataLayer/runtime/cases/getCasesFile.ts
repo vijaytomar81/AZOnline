@@ -13,7 +13,6 @@ export function getCasesFile(args: {
     application: Application;
     product: Product;
     journeyContext: JourneyContext;
-    sheetName: string;
     schemaName?: string;
 }): CasesFile {
     const filePath = resolveCasesFilePath(args);
