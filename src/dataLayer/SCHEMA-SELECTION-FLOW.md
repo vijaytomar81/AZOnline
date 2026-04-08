@@ -2,85 +2,85 @@
 # Schema Selection Workflow
 
 ```mermaid
-
 flowchart TD
 
-A["main()
-[index.ts](src/dataLayer/builder/index.ts)"] --> B["parseBuildArgs()
-[index.ts](src/dataLayer/builder/cli/index.ts)"]
+A["main()"] --> B["parseBuildArgs()"]
 
-B --> C["resolveSchemaName()
-[resolveSchemaName.ts](src/dataLayer/data-definitions/resolveSchemaName.ts)"]
+B --> C["resolveSchemaName()"]
 
 C --> D{"--schema provided?"}
 
 D -->|Yes| E["Use explicit schemaName"]
 
-D -->|No| F["resolveSchemaSelection()
-[schemaSelection.config.ts](src/dataLayer/data-definitions/schemaSelection.config.ts)"]
+D -->|No| F["resolveSchemaSelection()"]
 
 F --> G["Select schemaName from:
 journeyContext + platform + product"]
 
 G --> H["schemaName resolved"]
 
-E --> I["runDataBuilder()
-[runDataBuilder.ts](src/dataLayer/builder/app/runDataBuilder.ts)"]
-
+E --> I["runDataBuilder()"]
 H --> I
 
-I --> J["load-excel plugin
-[00-load-excel.ts](src/dataLayer/builder/plugins/00-load-excel.ts)"]
+I --> J["load-excel plugin"]
 
-J --> K["extract-meta plugin
-[10-extract-meta.ts](src/dataLayer/builder/plugins/10-extract-meta.ts)
-extractTabularMeta() / extractVerticalMeta()"]
+J --> K["extract-meta plugin"]
 
 K --> L["meta.layout
 tabular | vertical"]
 
-L --> M["validate-schema plugin
-[05-validate-schema.ts](src/dataLayer/builder/plugins/05-validate-schema.ts)"]
+L --> M["validate-schema plugin"]
 
-M --> N["runSchemaValidation()
-[runSchemaValidation.ts](src/dataLayer/builder/core/validation/runSchemaValidation.ts)"]
+M --> N["runSchemaValidation()"]
 
-N --> O["getSchema()
-[getSchemaDefinition.ts](src/dataLayer/data-definitions/getSchemaDefinition.ts)"]
+N --> O["getSchema()"]
 
-O --> P["registry lookup
-[registry.ts](src/dataLayer/data-definitions/registry.ts)"]
+O --> P["registry lookup"]
 
-P --> Q["schema object returned
-[index.ts](src/dataLayer/data-definitions/newBusiness/index.ts)"]
+P --> Q["schema object returned"]
 
 Q --> R{"meta.layout"}
 
-R -->|tabular| S["validateTabularSchema()
-[validateTabularSchema.ts](src/dataLayer/builder/core/validateTabularSchema.ts)"]
+R -->|tabular| S["validateTabularSchema()"]
+R -->|vertical| T["validateVerticalSchema()"]
 
-R -->|vertical| T["validateVerticalSchema()
-[validateVerticalSchema.ts](src/dataLayer/builder/core/validateVerticalSchema.ts)"]
-
-S --> U["build-cases plugin
-[20-build-cases.ts](src/dataLayer/builder/plugins/20-build-cases.ts)"]
+S --> U["build-cases plugin"]
 T --> U
 
-U --> V["getSchema() reuse
-[getSchemaDefinition.ts](src/dataLayer/data-definitions/getSchemaDefinition.ts)"]
+U --> V["getSchema() reuse"]
 
-V --> W["registry lookup
-[registry.ts](src/dataLayer/data-definitions/registry.ts)"]
+V --> W["registry lookup"]
 
-W --> X["buildTabularCases() / buildVerticalCases()
-[buildTabularCases.ts](src/dataLayer/builder/core/buildTabularCases.ts)
-[buildVerticalCases.ts](src/dataLayer/builder/core/buildVerticalCases.ts)"]
+W --> X["buildTabularCases() / buildVerticalCases()"]
 
-X --> Y["write-json plugin
-[70-write-json.ts](src/dataLayer/builder/plugins/70-write-json.ts)"]
+X --> Y["write-json plugin"]
 
-Y --> Z["Generated JSON + manifest
-[src/dataLayer/runtime/manifest](src/dataLayer/runtime/manifest)"]
+Y --> Z["Generated JSON + manifest"]
 
 ```
+---
+
+### 🔗 File References
+
+| Step | File |
+|------|------|
+| main | [index.ts](builder/index.ts) |
+| parseBuildArgs | [index.ts](builder/cli/index.ts) |
+| resolveSchemaName | [resolveSchemaName.ts](data-definitions/resolveSchemaName.ts) |
+| schemaSelection | [schemaSelection.config.ts](data-definitions/schemaSelection.config.ts) |
+| runDataBuilder | [runDataBuilder.ts](builder/app/runDataBuilder.ts) |
+| load-excel | [00-load-excel.ts](builder/plugins/00-load-excel.ts) |
+| extract-meta | [10-extract-meta.ts](builder/plugins/10-extract-meta.ts) |
+| validate-schema | [05-validate-schema.ts](builder/plugins/05-validate-schema.ts) |
+| runSchemaValidation | [runSchemaValidation.ts](builder/core/validation/runSchemaValidation.ts) |
+| getSchema | [getSchemaDefinition.ts](data-definitions/getSchemaDefinition.ts) |
+| registry | [registry.ts](data-definitions/registry.ts) |
+| validateTabular | [validateTabularSchema.ts](builder/core/validateTabularSchema.ts) |
+| validateVertical | [validateVerticalSchema.ts](builder/core/validateVerticalSchema.ts) |
+| build-cases | [20-build-cases.ts](builder/plugins/20-build-cases.ts) |
+| buildTabularCases | [buildTabularCases.ts](builder/core/buildTabularCases.ts) |
+| buildVerticalCases | [buildVerticalCases.ts](builder/core/buildVerticalCases.ts) |
+| write-json | [70-write-json.ts](builder/plugins/70-write-json.ts) |
+| manifest | [manifest](runtime/manifest) |
+
 ---
