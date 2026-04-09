@@ -10,6 +10,13 @@ import { formatRequestPreview } from "./formatRequestPreview";
 import { getDataCaseDebugLines } from "./getDataCaseDebugLines";
 import { shouldShowDataCaseDebugLines } from "./shouldShowDataCaseDebugLines";
 
+function firstMeaningfulLine(value: unknown): string {
+    return String(value ?? "")
+        .split("\n")
+        .map((line) => line.trim())
+        .find(Boolean) ?? "";
+}
+
 export function buildDataCaseDetailFields(args: {
     result: ExecutionScenarioResult;
     item?: ExecutionItemResult;
@@ -74,7 +81,11 @@ export function buildDataCaseDetailFields(args: {
     );
 
     if (args.failedItem?.message) {
-        collectFieldIfPresent(detailFields, "Error", args.failedItem.message);
+        collectFieldIfPresent(
+            detailFields,
+            "Error",
+            firstMeaningfulLine(args.failedItem.message)
+        );
     }
 
     return detailFields;

@@ -28,6 +28,30 @@ export type WriteExecutionEvidenceExcelResult = {
     filePath: string;
 };
 
+function hasVisibleValue(value: unknown): boolean {
+    return String(value ?? "").trim() !== "";
+}
+
+function pruneEmptyColumns(rows: ExecutionCaseRow[]): ExecutionCaseRow[] {
+    if (!rows.length) {
+        return rows;
+    }
+
+    const keys = Object.keys(rows[0]).filter((key) =>
+        rows.some((row) => hasVisibleValue(row[key]))
+    );
+
+    return rows.map((row) => {
+        const next: ExecutionCaseRow = {};
+
+        keys.forEach((key) => {
+            next[key] = row[key];
+        });
+
+        return next;
+    });
+}
+
 function addExecutionDataSheet(
     workbook: ExcelJS.Workbook,
     sheetName: string,
@@ -47,13 +71,15 @@ function addExecutionDataSheet(
         return;
     }
 
-    worksheet.columns = Object.keys(rows[0]).map((key) => ({
+    const cleanedRows = pruneEmptyColumns(rows);
+
+    worksheet.columns = Object.keys(cleanedRows[0]).map((key) => ({
         header: key,
         key,
         width: 18,
     }));
 
-    rows.forEach((row) => worksheet.addRow(row));
+    cleanedRows.forEach((row) => worksheet.addRow(row));
 
     styleExecutionSheet(worksheet, sheetName);
     autoFitExecutionSheetColumns(worksheet, {
@@ -80,8 +106,8 @@ export async function writeExecutionEvidenceExcel(
     const workbook = new ExcelJS.Workbook();
     const timestamp = buildSafeTimestamp(
         input.metadata.artifactTimestamp ??
-            input.metadata.finishedAt ??
-            input.metadata.finalizedAt
+        input.metadata.finishedAt ??
+        input.metadata.finalizedAt
     );
     const filePath = path.join(
         input.baseDir,

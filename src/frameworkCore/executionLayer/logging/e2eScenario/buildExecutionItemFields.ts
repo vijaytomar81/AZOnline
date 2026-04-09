@@ -10,6 +10,13 @@ import {
 import { getExecutionItemDebugLines } from "./getExecutionItemDebugLines";
 import { shouldShowExecutionItemDebugLines } from "./shouldShowExecutionItemDebugLines";
 
+function firstMeaningfulLine(value: unknown): string {
+    return String(value ?? "")
+        .split("\n")
+        .map((line) => line.trim())
+        .find(Boolean) ?? "";
+}
+
 export function buildExecutionItemFields(args: {
     item: ExecutionItemResult;
     outputs: Record<string, unknown>;
@@ -48,7 +55,11 @@ export function buildExecutionItemFields(args: {
     }
 
     if (args.item.message) {
-        collectFieldIfPresent(itemFields, "Error", args.item.message);
+        collectFieldIfPresent(
+            itemFields,
+            "Error",
+            firstMeaningfulLine(args.item.message)
+        );
     }
 
     return itemFields;

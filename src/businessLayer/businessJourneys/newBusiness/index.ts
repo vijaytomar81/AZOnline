@@ -1,5 +1,3 @@
-// src/businessLayer/businessJourneys/newBusiness/index.ts
-
 import { buildCalculatedEmail } from "@utils/calculatedEmail";
 import { nowIso } from "@utils/time";
 import { AppError } from "@utils/errors";
@@ -49,7 +47,6 @@ export async function runNewBusiness(
         });
     }
 
-    const payload = (args.itemData ?? {}) as Record<string, unknown>;
     const startFrom = resolveStartFrom({
         platform: args.context.scenario.platform,
     });
@@ -72,7 +69,6 @@ export async function runNewBusiness(
     );
     setOutput(args, OUTPUT_KEYS.NEW_BUSINESS.QUOTE, quoteNumber);
     setOutput(args, OUTPUT_KEYS.NEW_BUSINESS.POLICY, policyNumber);
-    setOutput(args, "newBusiness.payload", payload);
 
     args.context.currentQuoteNumber = quoteNumber;
     args.context.currentPolicyNumber = policyNumber;
