@@ -48,6 +48,7 @@ export function resolveExecutionItemData(args: {
         registry: args.registry,
         scenario: args.scenario,
         source,
+        item: args.item,
         logScope: args.logScope,
         debugCollector: args.debugCollector,
     });

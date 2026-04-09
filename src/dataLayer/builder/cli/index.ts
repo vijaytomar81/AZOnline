@@ -7,7 +7,9 @@ import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import { normalizeApplication } from "@configLayer/normalizers/normalizeApplication";
 import {
     JOURNEY_TYPES,
+    MTA_TYPES,
     type JourneyContext,
+    type MtaType,
 } from "@configLayer/models/journeyContext.config";
 import { normalizePlatform } from "@configLayer/normalizers/normalizePlatform";
 import { normalizeProduct } from "@configLayer/normalizers/normalizeProduct";
@@ -18,8 +20,38 @@ import { parseBoolean } from "./parseBoolean";
 import { resolveOutputPath } from "./resolveOutputPath";
 import { showBuilderHelp } from "./showBuilderHelp";
 
-function resolveJourneyContext(raw?: string): JourneyContext {
+function resolveJourneySubType(raw?: string): MtaType | undefined {
     const value = String(raw ?? "").trim();
+
+    if (!value) {
+        return undefined;
+    }
+
+    const allowed = Object.values(MTA_TYPES);
+    const resolved = allowed.find(
+        (item) => item.toLowerCase() === value.toLowerCase()
+    );
+
+    if (resolved) {
+        return resolved;
+    }
+
+    throw new DataBuilderError({
+        code: "JOURNEY_CONTEXT_SUBTYPE_INVALID",
+        stage: "cli-args",
+        source: "cli/index.ts",
+        message:
+            `Invalid journeySubType "${raw}". ` +
+            `Allowed values: ${allowed.join(", ")}.`,
+    });
+}
+
+function resolveJourneyContext(args: {
+    raw?: string;
+    subTypeRaw?: string;
+}): JourneyContext {
+    const value = String(args.raw ?? "").trim();
+    const subType = resolveJourneySubType(args.subTypeRaw);
 
     if (!value) {
         return { type: JOURNEY_TYPES.NEW_BUSINESS };
@@ -38,12 +70,21 @@ function resolveJourneyContext(raw?: string): JourneyContext {
     }
 
     if (value === JOURNEY_TYPES.MTA) {
-        throw new DataBuilderError({
-            code: "JOURNEY_CONTEXT_SUBTYPE_MISSING",
-            stage: "cli-args",
-            source: "cli/index.ts",
-            message: 'For journeyContext "MTA", also provide a supported subtype in a future enhancement.',
-        });
+        if (!subType) {
+            throw new DataBuilderError({
+                code: "JOURNEY_CONTEXT_SUBTYPE_MISSING",
+                stage: "cli-args",
+                source: "cli/index.ts",
+                message:
+                    `For journeyContext "${JOURNEY_TYPES.MTA}", ` +
+                    `also provide --journeySubType. Allowed: ${Object.values(MTA_TYPES).join(", ")}.`,
+            });
+        }
+
+        return {
+            type: JOURNEY_TYPES.MTA,
+            subType,
+        };
     }
 
     throw new DataBuilderError({
@@ -100,6 +141,10 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
         getArg(argv, "--journeyContext") ?? process.env.JOURNEY_CONTEXT ?? ""
     ).trim();
 
+    const journeySubTypeRaw = String(
+        getArg(argv, "--journeySubType") ?? process.env.JOURNEY_SUB_TYPE ?? ""
+    ).trim();
+
     if (!excelPath) {
         throw new DataBuilderError({
             code: "EXCEL_PATH_MISSING",
@@ -148,7 +193,10 @@ export function parseBuildArgs(): DataBuilderBaseArgs & { verbose: boolean } {
         });
     }
 
-    const journeyContext = resolveJourneyContext(journeyContextRaw);
+    const journeyContext = resolveJourneyContext({
+        raw: journeyContextRaw,
+        subTypeRaw: journeySubTypeRaw,
+    });
 
     const schemaName = resolveSchemaName({
         journeyContext,

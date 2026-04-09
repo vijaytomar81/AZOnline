@@ -12,6 +12,7 @@ Required:
   --journeyContext <NewBusiness|MTA|Renewal|MTC>
 
 Optional:
+  --journeySubType <ChangeAddress|ChangeVehicle|AddDriver|RemoveDriver>
   --iterations <number>
   --parallel <number>
   --verbose
@@ -19,6 +20,7 @@ Optional:
 Notes:
   - Data mode resolves generated data using:
     platform + application + product + journeyContext
+  - When journeyContext is MTA, journeySubType is required.
   - No source or schema argument is required.
 
 Example:

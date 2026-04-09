@@ -2,6 +2,7 @@
 
 import { getArg, hasFlag, normalizeArgv } from "@utils/argv";
 import { normalizeSpaces } from "@utils/text";
+import { AppError } from "@utils/errors";
 import { setLogVerbose } from "@frameworkCore/logging/core/logConfig";
 import {
     printDataModeHelp,
@@ -11,8 +12,12 @@ import {
     printE2EModeHelp,
     runE2EMode,
 } from "@frameworkCore/executionLayer/mode/e2e";
-import { JOURNEY_TYPES } from "@configLayer/models/journeyContext.config";
-import type { JourneyContext } from "@configLayer/models/journeyContext.config";
+import {
+    JOURNEY_TYPES,
+    MTA_TYPES,
+    type JourneyContext,
+    type MtaType,
+} from "@configLayer/models/journeyContext.config";
 import { parseParallel } from "./parseParallel";
 import {
     parsePlatform,
@@ -50,8 +55,36 @@ function parseScenarioFilter(raw?: string): string[] {
         .filter(Boolean);
 }
 
-function parseJourneyContext(raw?: string): JourneyContext | undefined {
+function parseJourneySubType(raw?: string): MtaType | undefined {
     const value = normalizeSpaces(String(raw ?? ""));
+
+    if (!value) {
+        return undefined;
+    }
+
+    const allowed = Object.values(MTA_TYPES);
+    const resolved = allowed.find(
+        (item) => item.toLowerCase() === value.toLowerCase()
+    );
+
+    if (resolved) {
+        return resolved;
+    }
+
+    throw new AppError({
+        code: "INVALID_JOURNEY_SUBTYPE",
+        stage: "cli-parse",
+        source: "main.ts",
+        message: `Invalid --journeySubType value "${raw}". Allowed: ${allowed.join(", ")}.`,
+    });
+}
+
+function parseJourneyContext(args: {
+    journeyContextRaw?: string;
+    journeySubTypeRaw?: string;
+}): JourneyContext | undefined {
+    const value = normalizeSpaces(String(args.journeyContextRaw ?? ""));
+    const subType = parseJourneySubType(args.journeySubTypeRaw);
 
     if (!value) {
         return undefined;
@@ -70,10 +103,29 @@ function parseJourneyContext(raw?: string): JourneyContext | undefined {
     }
 
     if (value === JOURNEY_TYPES.MTA) {
-        return { type: JOURNEY_TYPES.MTA, subType: "ChangeAddress" };
+        if (!subType) {
+            throw new AppError({
+                code: "JOURNEY_SUBTYPE_MISSING",
+                stage: "cli-parse",
+                source: "main.ts",
+                message:
+                    `When --journeyContext is "${JOURNEY_TYPES.MTA}", ` +
+                    `--journeySubType is required. Allowed: ${Object.values(MTA_TYPES).join(", ")}.`,
+            });
+        }
+
+        return {
+            type: JOURNEY_TYPES.MTA,
+            subType,
+        };
     }
 
-    return undefined;
+    throw new AppError({
+        code: "INVALID_JOURNEY_CONTEXT",
+        stage: "cli-parse",
+        source: "main.ts",
+        message: `Invalid --journeyContext value "${args.journeyContextRaw}".`,
+    });
 }
 
 async function main(): Promise<void> {
@@ -111,9 +163,10 @@ async function main(): Promise<void> {
     );
 
     if (mode === "data") {
-        const journeyContext = parseJourneyContext(
-            String(getArg(argv, "--journeyContext") ?? "")
-        );
+        const journeyContext = parseJourneyContext({
+            journeyContextRaw: String(getArg(argv, "--journeyContext") ?? ""),
+            journeySubTypeRaw: String(getArg(argv, "--journeySubType") ?? ""),
+        });
 
         if (!platform || !application || !product || !journeyContext) {
             throw new Error(

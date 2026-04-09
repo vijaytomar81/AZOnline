@@ -20,6 +20,9 @@ Required:
   --journeyContext <name>     Journey context
 
 Optional:
+  --journeySubType <name>     Required when journeyContext=MTA
+                              Allowed: ChangeAddress, ChangeVehicle, AddDriver, RemoveDriver
+
   --schema <name>             Schema name
                               Available: ${schemas}
 
@@ -43,5 +46,6 @@ Environment variable equivalents:
   APPLICATION
   PRODUCT
   JOURNEY_CONTEXT
+  JOURNEY_SUB_TYPE
 `.trim();
 }
