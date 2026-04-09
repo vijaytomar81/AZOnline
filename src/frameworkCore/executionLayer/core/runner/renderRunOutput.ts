@@ -18,11 +18,13 @@ export function renderRunOutput(args: {
         return renderDataCaseBlock({
             scenario: args.scenario,
             result: args.result,
+            verbose: args.verbose,
         });
     }
 
     return renderE2EScenarioBlock({
         scenario: args.scenario,
         result: args.result,
+        verbose: args.verbose,
     });
 }

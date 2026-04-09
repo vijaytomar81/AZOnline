@@ -29,17 +29,6 @@ function resolveStartFrom(args: {
     }
 }
 
-function resolveJourneyLabel(args: {
-    platform: string;
-    application: string;
-}): string {
-    if (args.platform === "Athena" && args.application === "AzOnline") {
-        return "Direct";
-    }
-
-    return args.application || "Direct";
-}
-
 function setOutput(
     args: ExecutionItemExecutorArgs,
     key: string,
@@ -64,10 +53,6 @@ export async function runNewBusiness(
     const startFrom = resolveStartFrom({
         platform: args.context.scenario.platform,
     });
-    const journeyLabel = resolveJourneyLabel({
-        platform: args.context.scenario.platform,
-        application: args.context.scenario.application,
-    });
 
     const quoteNumber = buildQuoteNumber();
     const policyNumber = buildPolicyNumber();
@@ -79,13 +64,14 @@ export async function runNewBusiness(
     const openedUrl = args.context.page.url();
 
     setOutput(args, OUTPUT_KEYS.NEW_BUSINESS.LAST_ACTION, args.item.action);
-    setOutput(args, OUTPUT_KEYS.NEW_BUSINESS.START_FROM, startFrom);
-    setOutput(args, OUTPUT_KEYS.NEW_BUSINESS.JOURNEY, journeyLabel);
     setOutput(args, OUTPUT_KEYS.NEW_BUSINESS.OPENED_URL, openedUrl);
-    setOutput(args, OUTPUT_KEYS.NEW_BUSINESS.CALCULATED_EMAIL, calculatedEmail);
+    setOutput(
+        args,
+        OUTPUT_KEYS.NEW_BUSINESS.CALCULATED_EMAIL,
+        calculatedEmail
+    );
     setOutput(args, OUTPUT_KEYS.NEW_BUSINESS.QUOTE, quoteNumber);
     setOutput(args, OUTPUT_KEYS.NEW_BUSINESS.POLICY, policyNumber);
-
     setOutput(args, "newBusiness.payload", payload);
 
     args.context.currentQuoteNumber = quoteNumber;

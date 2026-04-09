@@ -42,6 +42,10 @@ export async function runScenarios(
             sheet: args.sheet,
             totalCases: args.mode === "data" ? runs.length : undefined,
             totalScenarios: args.mode === "e2e" ? runs.length : undefined,
+            platform: args.platform,
+            application: args.application,
+            product: args.product,
+            journeyContext: args.journeyContext,
         })
     );
 
@@ -71,10 +75,10 @@ export async function runScenarios(
 
     let finalEvidence:
         | {
-            baseDir: string;
-            passedEvidencePath: string;
-            failedEvidencePath?: string;
-        }
+              baseDir: string;
+              passedEvidencePath: string;
+              failedEvidencePath?: string;
+          }
         | undefined;
 
     if (executionConfig.generatedEvidenceArtifacts.enabled) {
@@ -122,6 +126,8 @@ export async function runScenarios(
             totalTime,
             runId,
             evidenceDir: finalEvidence?.baseDir,
+            passedEvidencePath: finalEvidence?.passedEvidencePath,
+            failedEvidencePath: finalEvidence?.failedEvidencePath,
         })
     );
 }

@@ -18,6 +18,10 @@ export function renderExecutionHeader(args: {
     sheet?: string;
     totalCases?: number;
     totalScenarios?: number;
+    platform?: string;
+    application?: string;
+    product?: string;
+    journeyContext?: { type: string };
 }): string {
     const lines: string[] = [];
     const title =
@@ -30,8 +34,22 @@ export function renderExecutionHeader(args: {
     lines.push(field("Environment", args.environment));
 
     if (args.mode === "data") {
-        lines.push(field("Schema", args.schema ?? ""));
-        lines.push(field("Source", args.source ?? ""));
+        if (args.platform) {
+            lines.push(field("Platform", args.platform));
+        }
+
+        if (args.application) {
+            lines.push(field("Application", args.application));
+        }
+
+        if (args.product) {
+            lines.push(field("Product", args.product));
+        }
+
+        if (args.journeyContext?.type) {
+            lines.push(field("JourneyContext", args.journeyContext.type));
+        }
+
         lines.push(field("Total Cases", args.totalCases ?? 0));
     } else {
         lines.push(field("Sheet", args.sheet ?? ""));
@@ -67,7 +85,10 @@ export function renderExecutionSummary(args: {
     lines.push(field("Total", muted(String(args.total))));
     lines.push(field("Passed", success(String(args.passed))));
     lines.push(
-        field("Failed", args.failed > 0 ? failure(String(args.failed)) : success("0"))
+        field(
+            "Failed",
+            args.failed > 0 ? failure(String(args.failed)) : success("0")
+        )
     );
     lines.push(field("Total Time", muted(args.totalTime)));
 

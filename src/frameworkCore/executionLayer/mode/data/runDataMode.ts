@@ -58,5 +58,9 @@ export async function runDataMode(
         executionItemDataRegistry: bootstrap.executionItemDataRegistry,
         resolveOverrideItemData: (scenario) =>
             overrideByScenarioId.get(scenario.scenarioId),
+        platform: args.platform,
+        application: args.application,
+        product: args.product,
+        journeyContext: args.journeyContext,
     });
 }
