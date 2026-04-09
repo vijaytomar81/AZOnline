@@ -13,10 +13,14 @@ function getString(value: unknown): string {
 }
 
 function getNumberOrBlank(value: unknown): number | string {
-    if (typeof value === "number") return value;
+    if (typeof value === "number") {
+        return value;
+    }
 
     const text = String(value ?? "").trim();
-    if (!text) return "";
+    if (!text) {
+        return "";
+    }
 
     const parsed = Number(text);
     return Number.isFinite(parsed) ? parsed : text;
@@ -34,31 +38,78 @@ function asItemResults(value: unknown): EvidenceItemResult[] {
         : [];
 }
 
+function getScenarioValue(args: {
+    scenarioId: string;
+    scenario: EvidenceCase;
+    sourceKey: string;
+}): unknown {
+    if (args.sourceKey === "scenarioId") {
+        return args.scenario.scenarioId ?? args.scenarioId;
+    }
+
+    if (args.sourceKey === "scenarioStatus") {
+        return args.scenario.status;
+    }
+
+    return args.scenario[args.sourceKey];
+}
+
+function getItemValue(args: {
+    item: EvidenceItemResult;
+    sourceKey: string;
+}): unknown {
+    const details = asRecord(args.item.details);
+
+    switch (args.sourceKey) {
+        case "testCaseRef":
+            return details.testCaseRef;
+        case "errorDetails":
+            return details.errorDetails ?? args.item.message;
+        case "subType":
+            return details.subType;
+        case "portal":
+            return details.portal;
+        default:
+            return args.item[args.sourceKey];
+    }
+}
+
+function getItemOutputs(item: EvidenceItemResult): Record<string, unknown> {
+    const details = asRecord(item.details);
+    return asRecord(details.outputs);
+}
+
 function buildItemRow(
     scenarioId: string,
     scenario: EvidenceCase,
     item: EvidenceItemResult
 ): ExecutionCaseRow {
     const row: ExecutionCaseRow = {};
-    const outputs = asRecord(item.outputs);
+    const outputs = getItemOutputs(item);
 
     EXECUTION_EXCEL_COLUMNS.forEach((column) => {
         if (column.kind === "scenario") {
-            const value =
-                column.sourceKey === "scenarioId"
-                    ? scenario.scenarioId ?? scenarioId
-                    : scenario[column.sourceKey];
-
-            row[column.header] = getString(value);
+            row[column.header] = getString(
+                getScenarioValue({
+                    scenarioId,
+                    scenario,
+                    sourceKey: column.sourceKey,
+                })
+            );
             return;
         }
 
         if (column.kind === "item") {
-            const value = item[column.sourceKey];
+            const value = getItemValue({
+                item,
+                sourceKey: column.sourceKey,
+            });
+
             row[column.header] =
                 column.sourceKey === "itemNo"
                     ? getNumberOrBlank(value)
                     : getString(value);
+
             return;
         }
 
