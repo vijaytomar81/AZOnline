@@ -6,11 +6,11 @@
   "className": "InsuranceTypeSelectionPage",
   "paths": {
     "pageObjectImport": "@businessLayer/pageObjects/objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage",
-    "pageObjectFile": "src/pageObjects/objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage.ts",
-    "elementsFile": "src/pageObjects/objects/athena/common/insurance-type-selection/elements.ts",
-    "aliasesGeneratedFile": "src/pageObjects/objects/athena/common/insurance-type-selection/aliases.generated.ts",
-    "aliasesFile": "src/pageObjects/objects/athena/common/insurance-type-selection/aliases.ts",
-    "pageMapFile": "src/pageObjects/maps/athena.common.insurance-type-selection.json"
+    "pageObjectFile": "src/businessLayer/pageObjects/objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage.ts",
+    "elementsFile": "src/businessLayer/pageObjects/objects/athena/common/insurance-type-selection/elements.ts",
+    "aliasesGeneratedFile": "src/businessLayer/pageObjects/objects/athena/common/insurance-type-selection/aliases.generated.ts",
+    "aliasesFile": "src/businessLayer/pageObjects/objects/athena/common/insurance-type-selection/aliases.ts",
+    "pageMapFile": "src/businessLayer/pageObjects/maps/athena.common.insurance-type-selection.json"
   },
   "urlPath": "/products",
   "title": "Get a new quote or view saved quotes",

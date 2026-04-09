@@ -6,11 +6,11 @@
   "className": "ManageCookiesPage",
   "paths": {
     "pageObjectImport": "@businessLayer/pageObjects/objects/athena/common/manage-cookies/ManageCookiesPage",
-    "pageObjectFile": "src/pageObjects/objects/athena/common/manage-cookies/ManageCookiesPage.ts",
-    "elementsFile": "src/pageObjects/objects/athena/common/manage-cookies/elements.ts",
-    "aliasesGeneratedFile": "src/pageObjects/objects/athena/common/manage-cookies/aliases.generated.ts",
-    "aliasesFile": "src/pageObjects/objects/athena/common/manage-cookies/aliases.ts",
-    "pageMapFile": "src/pageObjects/maps/athena.common.manage-cookies.json"
+    "pageObjectFile": "src/businessLayer/pageObjects/objects/athena/common/manage-cookies/ManageCookiesPage.ts",
+    "elementsFile": "src/businessLayer/pageObjects/objects/athena/common/manage-cookies/elements.ts",
+    "aliasesGeneratedFile": "src/businessLayer/pageObjects/objects/athena/common/manage-cookies/aliases.generated.ts",
+    "aliasesFile": "src/businessLayer/pageObjects/objects/athena/common/manage-cookies/aliases.ts",
+    "pageMapFile": "src/businessLayer/pageObjects/maps/athena.common.manage-cookies.json"
   },
   "urlPath": "/",
   "title": "Allianz login page",

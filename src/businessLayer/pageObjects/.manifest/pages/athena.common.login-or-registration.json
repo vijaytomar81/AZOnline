@@ -6,11 +6,11 @@
   "className": "LoginOrRegistrationPage",
   "paths": {
     "pageObjectImport": "@businessLayer/pageObjects/objects/athena/common/login-or-registration/LoginOrRegistrationPage",
-    "pageObjectFile": "src/pageObjects/objects/athena/common/login-or-registration/LoginOrRegistrationPage.ts",
-    "elementsFile": "src/pageObjects/objects/athena/common/login-or-registration/elements.ts",
-    "aliasesGeneratedFile": "src/pageObjects/objects/athena/common/login-or-registration/aliases.generated.ts",
-    "aliasesFile": "src/pageObjects/objects/athena/common/login-or-registration/aliases.ts",
-    "pageMapFile": "src/pageObjects/maps/athena.common.login-or-registration.json"
+    "pageObjectFile": "src/businessLayer/pageObjects/objects/athena/common/login-or-registration/LoginOrRegistrationPage.ts",
+    "elementsFile": "src/businessLayer/pageObjects/objects/athena/common/login-or-registration/elements.ts",
+    "aliasesGeneratedFile": "src/businessLayer/pageObjects/objects/athena/common/login-or-registration/aliases.generated.ts",
+    "aliasesFile": "src/businessLayer/pageObjects/objects/athena/common/login-or-registration/aliases.ts",
+    "pageMapFile": "src/businessLayer/pageObjects/maps/athena.common.login-or-registration.json"
   },
   "urlPath": "/",
   "title": "Allianz login page",
