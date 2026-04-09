@@ -23,6 +23,8 @@ export function buildExecutionItemFailureResult(args: {
         message: args.message,
         details: {
             testCaseRef: args.item.testCaseRef,
+            subType: args.item.subType ?? "",
+            portal: args.item.portal ?? "",
             outputs: args.outputs ?? {},
             errorDetails: args.message,
             pageScans: args.pageScans ?? [],

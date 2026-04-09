@@ -22,6 +22,8 @@ export function createExecutionItemSuccessResult(args: {
         finishedAt: nowIso(),
         details: {
             testCaseRef: args.resolved.testCaseRef,
+            subType: args.item.subType ?? "",
+            portal: args.item.portal ?? "",
             outputs: args.outputs,
             errorDetails: "",
             pageScans: [],

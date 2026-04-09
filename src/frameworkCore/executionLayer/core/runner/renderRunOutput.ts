@@ -18,6 +18,7 @@ export function renderRunOutput(args: {
         return renderDataCaseBlock({
             scenario: args.scenario,
             result: args.result,
+            duration: args.duration,
             verbose: args.verbose,
         });
     }
@@ -25,6 +26,7 @@ export function renderRunOutput(args: {
     return renderE2EScenarioBlock({
         scenario: args.scenario,
         result: args.result,
+        duration: args.duration,
         verbose: args.verbose,
     });
 }

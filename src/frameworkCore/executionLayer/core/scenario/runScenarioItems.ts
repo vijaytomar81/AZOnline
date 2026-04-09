@@ -18,9 +18,6 @@ function buildNotExecutedReason(args: {
     failedResult: ExecutionItemResult;
 }): string {
     const scenarioId = args.context.scenario.scenarioId;
-    const failedMessage =
-        args.failedResult.message?.trim() ||
-        "Previous item failed.";
 
     return [
         `Not executed because one of the previous item failed.`,
@@ -53,6 +50,8 @@ function createNotExecutedItemResult(args: {
         message: errorDetails,
         details: {
             testCaseRef: args.item.testCaseRef,
+            subType: args.item.subType ?? "",
+            portal: args.item.portal ?? "",
             outputs: {},
             errorDetails,
             pageScans: [],
