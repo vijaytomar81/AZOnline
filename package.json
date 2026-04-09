@@ -30,14 +30,23 @@
   "execution:verbose": "npm run execution -- --verbose",
   "execution:help": "npm run execution -- --help",
 
-  "smoke:direct": "npm run execution -- --mode data --source \"FlowNB\" --application AzOnline --product Motor",
-  "smoke:pcw": "npm run execution -- --mode data --source \"PCW-Tool\" --application AzOnline --product Motor",
-  "smoke:e2e": "npm run execution -- --mode e2e --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\" --application AzOnline --product Motor",
-  "smoke:verbose:direct": "npm run execution -- --mode data --source \"FlowNB\" --verbose",
-  "smoke:verbose:pcw": "npm run execution -- --mode data --source \"PCW-Tool\" --verbose",
-  "smoke:verbose:e2e": "npm run execution -- --mode e2e --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\" --verbose",
-  "smoke:direct:loop": "npm run execution -- --mode data --source \"FlowNB\" --iterations 2 --verbose",
-  "smoke:pcw:loop": "npm run execution -- --mode data --source \"PCW-Tool\" --iterations 2 --verbose",
+  "smoke:direct": "npm run execution -- --mode data --platform Athena --application AzOnline --product Motor --journeyContext NewBusiness",
+  "smoke:pcw": "npm run execution -- --mode data --platform PCW --application CTM --product Motor --journeyContext NewBusiness",
+  "smoke:pcwtool": "npm run execution -- --mode data --platform PCWTool --application CTM --product Motor --journeyContext NewBusiness",
+
+  "smoke:e2e": "npm run execution -- --mode e2e --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\" --platform Athena --application AzOnline --product Motor",
+
+  "smoke:verbose:direct": "npm run execution -- --mode data --platform Athena --application AzOnline --product Motor --journeyContext NewBusiness --verbose",
+  "smoke:verbose:pcw": "npm run execution -- --mode data --platform PCW --application CTM --product Motor --journeyContext NewBusiness --verbose",
+  "smoke:verbose:pcwtool": "npm run execution -- --mode data --platform PCWTool --application CTM --product Motor --journeyContext NewBusiness --verbose",
+  "smoke:verbose:e2e": "npm run execution -- --mode e2e --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\" --platform Athena --application AzOnline --product Motor --verbose",
+
+  "smoke:direct:loop": "npm run execution -- --mode data --platform Athena --application AzOnline --product Motor --journeyContext NewBusiness --iterations 2 --verbose",
+  "smoke:pcw:loop": "npm run execution -- --mode data --platform PCW --application CTM --product Motor --journeyContext NewBusiness --iterations 2 --verbose",
+  "smoke:pcwtool:loop": "npm run execution -- --mode data --platform PCWTool --application CTM --product Motor --journeyContext NewBusiness --iterations 2 --verbose",
+
+  "smoke:mta:add-driver": "npm run execution -- --mode data --platform Athena --application AzOnline --product Motor --journeyContext MTA --journeySubType AddDriver",
+
   "smoke:help": "npm run execution -- --mode e2e --help",
   "smoke:data:help": "npm run execution -- --mode data --help",
 
