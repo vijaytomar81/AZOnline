@@ -41,6 +41,12 @@
       "@evidenceLayer/*": [
         "src/evidenceLayer/*"
       ],
+      "@evidenceFactory": [
+        "src/evidenceFactory/index.ts"
+      ],
+      "@evidenceFactory/*": [
+        "src/evidenceFactory/*"
+      ],
       "@integrations/*": [
         "src/integrations/*"
       ],
