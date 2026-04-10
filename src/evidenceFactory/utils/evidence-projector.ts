@@ -11,8 +11,8 @@ import type { EvidenceFieldDefinition } from '@configLayer/models/evidence/types
 import { normalizeStatus } from './status-utils';
 
 type EvidenceViewField = EvidenceFieldDefinition & {
-  toJSON?: boolean;
-  toExcel?: boolean;
+  toTechnicalOutput?: boolean;
+  toBusinessOutput?: boolean;
 };
 
 export function resolveFields(status: string): readonly EvidenceViewField[] {
@@ -38,18 +38,21 @@ export function resolveConsoleFields(mode?: string): {
 } {
   return String(mode ?? '').toLowerCase() === 'e2e'
     ? {
-        header: CONSOLE_EVIDENCE_FIELDS.E2E_HEADER,
-        detail: CONSOLE_EVIDENCE_FIELDS.E2E_ITEM,
-      }
+      header: CONSOLE_EVIDENCE_FIELDS.E2E_HEADER,
+      detail: CONSOLE_EVIDENCE_FIELDS.E2E_ITEM,
+    }
     : {
-        header: CONSOLE_EVIDENCE_FIELDS.DATA_HEADER,
-        detail: CONSOLE_EVIDENCE_FIELDS.DATA_DETAIL,
-      };
+      header: CONSOLE_EVIDENCE_FIELDS.DATA_HEADER,
+      detail: CONSOLE_EVIDENCE_FIELDS.DATA_DETAIL,
+    };
 }
 
 export function mapFields(
   source: Record<string, unknown>,
-  fields: readonly (EvidenceFieldDefinition & { toJSON?: boolean; toExcel?: boolean })[],
+  fields: readonly (EvidenceFieldDefinition & {
+    toTechnicalOutput?: boolean;
+    toBusinessOutput?: boolean;
+  })[],
   target: 'json' | 'xml' | 'csv' | 'excel' | 'console',
 ): Record<string, string | number | boolean> {
   const result: Record<string, string | number | boolean> = {};
@@ -57,8 +60,8 @@ export function mapFields(
   for (const field of fields) {
     const include =
       target === 'excel' || target === 'console'
-        ? field.toExcel !== false
-        : field.toJSON !== false;
+        ? field.toBusinessOutput !== false
+        : field.toTechnicalOutput !== false;
 
     if (!include) {
       continue;
@@ -73,12 +76,15 @@ export function mapFields(
 
 export function mapXmlFields(
   source: Record<string, unknown>,
-  fields: readonly (EvidenceFieldDefinition & { toJSON?: boolean; toExcel?: boolean })[],
+  fields: readonly (EvidenceFieldDefinition & {
+    toTechnicalOutput?: boolean;
+    toBusinessOutput?: boolean;
+  })[],
 ): Record<string, string | number | boolean> {
   const result: Record<string, string | number | boolean> = {};
 
   for (const field of fields) {
-    if (field.toJSON === false) {
+    if (field.toTechnicalOutput === false) {
       continue;
     }
 

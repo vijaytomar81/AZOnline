@@ -60,7 +60,7 @@ export class ExcelWriter {
     events: ManifestEvent[],
   ): void {
     const sheet = workbook.addWorksheet(title);
-    const fields = resolveFields(status).filter((field) => field.toExcel !== false);
+    const fields = resolveFields(status).filter((field) => field.toBusinessOutput !== false);
     const headers = fields.map((field) => field.label);
 
     sheet.addRow(headers);
