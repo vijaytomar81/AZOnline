@@ -1,20 +1,36 @@
 // src/frameworkCore/executionLayer/logging/e2eScenario/buildExecutionItemFields.ts
 
+import { CONSOLE_EVIDENCE_FIELDS } from "@configLayer/models/evidence";
 import type { ExecutionItemResult } from "@frameworkCore/executionLayer/contracts";
-import { OUTPUT_KEYS } from "@frameworkCore/executionLayer/constants/outputKeys";
 import {
-    collectFieldIfPresent,
+    getFirstLine,
     itemDuration,
     statusText,
 } from "@frameworkCore/executionLayer/logging/shared";
 import { getExecutionItemDebugLines } from "./getExecutionItemDebugLines";
 import { shouldShowExecutionItemDebugLines } from "./shouldShowExecutionItemDebugLines";
 
-function firstMeaningfulLine(value: unknown): string {
-    return String(value ?? "")
-        .split("\n")
-        .map((line) => line.trim())
-        .find(Boolean) ?? "";
+function asRecord(value: unknown): Record<string, unknown> {
+    return value && typeof value === "object" && !Array.isArray(value)
+        ? (value as Record<string, unknown>)
+        : {};
+}
+
+function getValue(
+    item: ExecutionItemResult,
+    outputs: Record<string, unknown>,
+    key: string
+): unknown {
+    const itemRecord = asRecord(item);
+    const details = asRecord(itemRecord.details);
+    const detailOutputs = asRecord(details.outputs);
+
+    return (
+        itemRecord[key] ??
+        details[key] ??
+        detailOutputs[key] ??
+        outputs[key]
+    );
 }
 
 export function buildExecutionItemFields(args: {
@@ -22,45 +38,41 @@ export function buildExecutionItemFields(args: {
     outputs: Record<string, unknown>;
     verbose?: boolean;
 }): Array<[string, unknown]> {
-    const itemFields: Array<[string, unknown]> = [];
 
-    if (shouldShowExecutionItemDebugLines({
-        verbose: args.verbose,
-        item: args.item,
-    })) {
-        getExecutionItemDebugLines(args.item).forEach((debugLine) => {
-            itemFields.push(["DEBUG", debugLine]);
+    const fields: Array<[string, unknown]> = [];
+
+    if (
+        shouldShowExecutionItemDebugLines({
+            verbose: args.verbose,
+            item: args.item,
+        })
+    ) {
+        getExecutionItemDebugLines(args.item).forEach((d) => {
+            fields.push(["DEBUG", d]);
         });
     }
 
-    itemFields.push(["Status", statusText(args.item.status)]);
-    itemFields.push(["Duration", itemDuration(args.item)]);
+    fields.push(["Status", statusText(args.item.status)]);
+    fields.push(["Duration", itemDuration(args.item)]);
 
-    if (args.item.action === "NewBusiness") {
-        collectFieldIfPresent(
-            itemFields,
-            "CalculatedEmail",
-            args.outputs[OUTPUT_KEYS.NEW_BUSINESS.CALCULATED_EMAIL]
-        );
-        collectFieldIfPresent(
-            itemFields,
-            "QuoteNumber",
-            args.outputs[OUTPUT_KEYS.NEW_BUSINESS.QUOTE]
-        );
-        collectFieldIfPresent(
-            itemFields,
-            "PolicyNumber",
-            args.outputs[OUTPUT_KEYS.NEW_BUSINESS.POLICY]
-        );
-    }
+    const configFields = CONSOLE_EVIDENCE_FIELDS.E2E_ITEM;
 
-    if (args.item.message) {
-        collectFieldIfPresent(
-            itemFields,
-            "Error",
-            firstMeaningfulLine(args.item.message)
-        );
-    }
+    configFields.forEach((f) => {
+        if (f.key === "status" || f.key === "itemNo" || f.key === "action") {
+            return;
+        }
 
-    return itemFields;
+        const value = getValue(args.item, args.outputs, f.key);
+
+        if (value !== undefined && value !== "") {
+            const finalValue =
+                f.key === "errorDetails"
+                    ? getFirstLine(value)
+                    : value;
+
+            fields.push([f.label, finalValue]);
+        }
+    });
+
+    return fields;
 }

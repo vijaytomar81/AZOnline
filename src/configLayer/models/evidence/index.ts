@@ -1,6 +1,6 @@
 // src/configLayer/models/evidence/index.ts
 
-import {
+export {
     CONSOLE_EVIDENCE_FIELDS,
     META_EVIDENCE_FIELDS,
     PASSED_EVIDENCE_FIELDS,

@@ -1,5 +1,10 @@
 // src/evidenceLayer/artifacts/excel/buildExecutionExcelRows.ts
 
+import {
+    FAILED_EVIDENCE_FIELDS,
+    NOT_EXECUTED_EVIDENCE_FIELDS,
+    PASSED_EVIDENCE_FIELDS,
+} from "@configLayer/models/evidence/views";
 import type { ExecutionCaseRow } from "./buildExecutionItemRows";
 import { buildExecutionItemRows } from "./buildExecutionItemRows";
 import {
@@ -30,11 +35,20 @@ export function buildExecutionExcelRows(
     failedRows: ExecutionCaseRow[];
     notExecutedRows: ExecutionCaseRow[];
 } {
-    const passedRows = buildExecutionItemRows(input.passedEvidence?.cases ?? {});
-    const failedRows = buildExecutionItemRows(input.failedEvidence?.cases ?? {});
-    const notExecutedRows = buildExecutionItemRows(
-        input.notExecutedEvidence?.cases ?? {}
-    );
+    const passedRows = buildExecutionItemRows({
+        cases: input.passedEvidence?.cases ?? {},
+        fields: PASSED_EVIDENCE_FIELDS,
+    });
+
+    const failedRows = buildExecutionItemRows({
+        cases: input.failedEvidence?.cases ?? {},
+        fields: FAILED_EVIDENCE_FIELDS,
+    });
+
+    const notExecutedRows = buildExecutionItemRows({
+        cases: input.notExecutedEvidence?.cases ?? {},
+        fields: NOT_EXECUTED_EVIDENCE_FIELDS,
+    });
 
     const totalItems =
         passedRows.length + failedRows.length + notExecutedRows.length;

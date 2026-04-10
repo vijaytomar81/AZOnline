@@ -1,3 +1,4 @@
+// src/businessLayer/businessJourneys/newBusiness/index.ts
 import { buildCalculatedEmail } from "@utils/calculatedEmail";
 import { nowIso } from "@utils/time";
 import { AppError } from "@utils/errors";

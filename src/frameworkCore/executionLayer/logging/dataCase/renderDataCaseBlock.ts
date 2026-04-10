@@ -44,7 +44,7 @@ export function renderDataCaseBlock(args: {
     lines.push(field("Application", args.scenario.application));
     lines.push(field("Product", args.scenario.product));
     lines.push(field("JourneyStartWith", args.scenario.journeyStartWith));
-    lines.push(field("TotalItems", String(args.scenario.totalItems)));
+    // lines.push(field("TotalItems", String(args.scenario.totalItems)));
     lines.push("");
 
     const detailFields = buildDataCaseDetailFields({

@@ -37,14 +37,14 @@ function pruneEmptyColumns(rows: ExecutionCaseRow[]): ExecutionCaseRow[] {
         return rows;
     }
 
-    const keys = Object.keys(rows[0]).filter((key) =>
+    const orderedKeys = Object.keys(rows[0]).filter((key) =>
         rows.some((row) => hasVisibleValue(row[key]))
     );
 
     return rows.map((row) => {
         const next: ExecutionCaseRow = {};
 
-        keys.forEach((key) => {
+        orderedKeys.forEach((key) => {
             next[key] = row[key];
         });
 
@@ -106,8 +106,8 @@ export async function writeExecutionEvidenceExcel(
     const workbook = new ExcelJS.Workbook();
     const timestamp = buildSafeTimestamp(
         input.metadata.artifactTimestamp ??
-        input.metadata.finishedAt ??
-        input.metadata.finalizedAt
+            input.metadata.finishedAt ??
+            input.metadata.finalizedAt
     );
     const filePath = path.join(
         input.baseDir,

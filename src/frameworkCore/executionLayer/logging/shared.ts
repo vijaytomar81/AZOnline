@@ -14,7 +14,7 @@ export function divider(): string {
 }
 
 export function safeText(value: unknown): string {
-    return String(value ?? "");
+    return getFirstLine(value);
 }
 
 export function field(
@@ -78,4 +78,11 @@ export function collectFieldIfPresent(
     if (value !== undefined && value !== null && String(value) !== "") {
         entries.push([label, value]);
     }
+}
+
+export function getFirstLine(value: unknown): string {
+    return String(value ?? "")
+        .split("\n")
+        .map((line) => line.trim())
+        .find(Boolean) ?? "";
 }
