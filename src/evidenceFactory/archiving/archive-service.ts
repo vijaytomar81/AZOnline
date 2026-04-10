@@ -11,12 +11,18 @@ export class ArchiveService {
     const currentRoot = path.join(this.artifactsRoot, 'current');
     const archiveRoot = path.join(this.artifactsRoot, 'archive');
     let archivedCount = 0;
+
     for (const suite of await safeReadDir(currentRoot)) {
       const suitePath = path.join(currentRoot, suite);
+
       for (const executionId of await safeReadDir(suitePath)) {
         const executionPath = path.join(suitePath, executionId);
         const info = await stat(executionPath);
-        if (!info.isDirectory() || daysOld(info.mtime) < args.olderThanDays) continue;
+
+        if (!info.isDirectory() || daysOld(info.mtime) < args.olderThanDays) {
+          continue;
+        }
+
         const bucket = monthBucket(info.mtime);
         const targetDir = path.join(archiveRoot, bucket, suite);
         await ensureDir(targetDir);
@@ -24,6 +30,7 @@ export class ArchiveService {
         archivedCount += 1;
       }
     }
+
     return { archivedCount };
   }
 }

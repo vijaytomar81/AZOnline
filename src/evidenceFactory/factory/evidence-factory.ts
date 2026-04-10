@@ -7,9 +7,15 @@ import { ExcelWriter } from '../writers/excel/excel-writer';
 import { NdjsonStore } from '../manifest/ndjson-store';
 import { OutputRouter } from '../routing/output-router';
 import { ArchiveService } from '../archiving/archive-service';
-import { validateAgainstSchema } from './validator';
 import { nowIso } from '../utils/time-utils';
-import { EvidenceSchema, EvidenceWriteRequest, EvidenceWriteResponse, FinalizeExecutionRequest, FinalizeExecutionResponse, ManifestEvent } from '../contracts/types';
+import { normalizeStatus } from '../utils/status-utils';
+import type {
+  EvidenceWriteRequest,
+  EvidenceWriteResponse,
+  FinalizeExecutionRequest,
+  FinalizeExecutionResponse,
+  ManifestEvent,
+} from '../contracts/types';
 
 export class EvidenceFactory {
   private readonly jsonWriter = new JsonWriter();
@@ -21,43 +27,80 @@ export class EvidenceFactory {
   private readonly router = new OutputRouter();
   private readonly archiveService = new ArchiveService();
 
-  async writeEvidence<T extends Record<string, unknown>>(
-    schema: EvidenceSchema<T>,
-    request: EvidenceWriteRequest<T>,
-  ): Promise<EvidenceWriteResponse> {
-    validateAgainstSchema(schema, request.data);
-    const artifacts = await Promise.all(request.outputFormats.map(async (format) => {
-      if (format === 'console') {
-        return this.consoleWriter.write({ testCaseId: request.testCaseId, status: request.status, data: request.data });
-      }
-      const filePath = this.router.evidenceFilePath({ ...request, format });
-      if (format === 'json') return this.jsonWriter.write(filePath, schema, request.data);
-      if (format === 'xml') return this.xmlWriter.write(filePath, schema, request.data);
-      return this.csvWriter.write(filePath, schema, request.data);
-    }));
+  async writeEvidence(request: EvidenceWriteRequest): Promise<EvidenceWriteResponse> {
+    const normalizedStatus = normalizeStatus(request.status);
 
-    const event: ManifestEvent<T> = {
-      ...request,
-      jsonPath: artifacts.find((a) => a.format === 'json')?.relativePath,
-      xmlPath: artifacts.find((a) => a.format === 'xml')?.relativePath,
-      csvPath: artifacts.find((a) => a.format === 'csv')?.relativePath,
+    const artifacts = await Promise.all(
+      request.outputFormats.map(async (format) => {
+        if (format === 'console') {
+          return this.consoleWriter.write(request.payload, request.consoleMode);
+        }
+
+        const filePath = this.router.evidenceFilePath({
+          suiteName: request.suiteName,
+          executionId: request.executionId,
+          artifactId: request.artifactId,
+          artifactName: request.artifactName,
+          status: normalizedStatus,
+          format,
+        });
+
+        if (format === 'json') {
+          return this.jsonWriter.write(filePath, normalizedStatus, request.payload);
+        }
+
+        if (format === 'xml') {
+          return this.xmlWriter.write(filePath, normalizedStatus, request.payload);
+        }
+
+        return this.csvWriter.write(filePath, normalizedStatus, request.payload);
+      }),
+    );
+
+    const event: ManifestEvent = {
+      executionId: request.executionId,
+      suiteName: request.suiteName,
+      artifactId: request.artifactId,
+      artifactName: request.artifactName,
+      status: normalizedStatus,
+      consoleMode: request.consoleMode,
+      payload: request.payload,
+      artifacts: {
+        jsonPath: artifacts.find((artifact) => artifact.format === 'json')?.relativePath,
+        xmlPath: artifacts.find((artifact) => artifact.format === 'xml')?.relativePath,
+        csvPath: artifacts.find((artifact) => artifact.format === 'csv')?.relativePath,
+      },
+      createdAt: nowIso(),
     };
+
     await this.store.append(this.router.eventFilePath(request.suiteName, request.executionId), event);
-    return { executionId: request.executionId, testCaseId: request.testCaseId, status: request.status, generatedAt: nowIso(), artifacts };
+
+    return {
+      executionId: request.executionId,
+      artifactId: request.artifactId,
+      status: normalizedStatus,
+      generatedAt: nowIso(),
+      artifacts,
+    };
   }
 
   async finalizeExecution(request: FinalizeExecutionRequest): Promise<FinalizeExecutionResponse> {
     const eventPath = this.router.eventFilePath(request.suiteName, request.executionId);
     const events = await this.store.readAll(eventPath);
-    const excel = await this.excelWriter.write(this.router.excelPath(request.suiteName, request.executionId), request, events);
-    const summary = {
-      total: events.length,
-      passed: events.filter((e) => e.status === 'PASSED').length,
-      failed: events.filter((e) => e.status === 'FAILED').length,
-      error: events.filter((e) => e.status === 'ERROR').length,
-      notExecuted: events.filter((e) => e.status === 'NOT_EXECUTED').length,
+
+    const excel = await this.excelWriter.write(
+      this.router.excelPath(request.suiteName, request.executionId),
+      request,
+      events,
+    );
+
+    return {
+      executionId: request.executionId,
+      suiteName: request.suiteName,
+      generatedAt: nowIso(),
+      excel,
+      eventCount: events.length,
     };
-    return { executionId: request.executionId, suiteName: request.suiteName, generatedAt: nowIso(), summary, excel };
   }
 
   async archiveOldExecutions(args: { olderThanDays: number }): Promise<{ archivedCount: number }> {

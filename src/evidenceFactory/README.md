@@ -1,95 +1,160 @@
-# README.md
-# Evidence Factory
+# Evidence Factory (consumer-only)
 
-A reusable Node.js + TypeScript evidence layer for car and home insurance test execution.
+A config-driven evidence writer for AZOnline.
 
-## What it does
-- Writes JSON, XML, CSV, and console evidence per test case during execution
-- Supports parallel test execution in the same run by writing one file set per test case
-- Tracks execution events in an append-only NDJSON manifest
-- Builds one final Excel report at the end with these tabs:
-  - Summary
-  - Passed
-  - Failed
-  - Error
-  - Not Executed
-- Archives old execution folders
-- Returns metadata to the calling layer or app
-- Works well with Playwright, Jenkins, and Docker
+This package is intentionally a **consumer only**. It does **not** define evidence fields.
+It consumes the evidence configuration already defined in:
 
-## Install
-```bash
-npm install
-```
+- `src/configLayer/models/evidence/types.ts`
+- `src/configLayer/models/evidence/views/*`
+- `src/configLayer/models/evidence/fields/*`
 
-## Libraries used
-These are already in `package.json`.
-```bash
-npm install typescript ts-node @types/node exceljs fast-xml-parser csv-stringify
-```
+## Design
 
-## Build
-```bash
-npm run build
-```
+- **executionLayer** builds payload objects that already match your evidence config keys
+- **evidenceFactory** only:
+  - projects configured fields
+  - writes JSON / XML / CSV
+  - logs console evidence
+  - appends NDJSON manifest events
+  - generates final Excel workbook
+  - archives old execution folders
 
-## Run examples
-```bash
-npm run example:car
-npm run example:home
-```
+## Important rule
 
-## Public API
+Do **not** add fields inside `src/evidenceFactory`.
+
+Add or change fields only in:
+
+- `src/configLayer/models/evidence`
+
+## Expected payload shape
+
+Your execution layer should send payload keys that match config keys directly.
+
+Example payload:
+
 ```ts
+const payload = {
+  scenarioId: "SCN-001",
+  scenarioName: "Create Quote",
+  platform: "Athena",
+  application: "AzOnline",
+  product: "Motor",
+  journeyStartWith: "NewBusiness",
+  description: "Create quote and verify premium",
+  status: "passed",
+  itemNo: 1,
+  action: "Create Quote",
+  subType: "HappyPath",
+  portal: "AzOnline",
+  testCaseRef: "TC001",
+  startedAt: new Date().toISOString(),
+  finishedAt: new Date().toISOString(),
+  message: "",
+  errorDetails: "",
+  calculatedEmail: "test@example.com",
+  calculatedEmailId: "test",
+  quoteNumber: "Q-10001",
+  policyNumber: "P-10001",
+  runtimeInfo: {
+    system: { platform: process.platform, node: process.version },
+    browser: { name: "chromium", headless: true }
+  }
+};
+```
+
+Because your config also supports nested keys like `runtimeInfo.browser`, nested objects are fine.
+
+## Write evidence during execution
+
+```ts
+import { EvidenceFactory } from "@evidenceFactory";
+
 const factory = new EvidenceFactory();
-await factory.writeEvidence(schema, request);
-await factory.finalizeExecution(finalizeRequest);
-await factory.archiveOldExecutions({ olderThanDays: 14 });
+
+await factory.writeEvidence({
+  executionId: "RUN-001",
+  suiteName: "motor-regression",
+  artifactId: "TC001",
+  artifactName: "create-quote",
+  status: "passed",
+  outputFormats: ["json", "xml", "csv", "console"],
+  consoleMode: "e2e",
+  payload
+});
 ```
 
-## Where to add new fields
-Add or change fields in:
-- `src/examples/schemas.ts`
+## Finalize execution after the run
 
-Example:
+`metaPayload` should also follow your configured meta keys.
+
 ```ts
-export const carInsuranceSchema = defineSchema<CarInsurancePayload>({
-  name: 'car-insurance',
-  fields: {
-    policyId: { type: 'string', required: true },
-    premium: { type: 'number', required: true },
-    approved: { type: 'boolean', required: true },
-    quoteDate: { type: 'date', required: true }
+await factory.finalizeExecution({
+  executionId: "RUN-001",
+  suiteName: "motor-regression",
+  metaPayload: {
+    runId: "RUN-001",
+    mode: "e2e",
+    environment: "qa",
+    startedAt: "2026-04-10T08:00:00.000Z",
+    finishedAt: "2026-04-10T08:10:00.000Z",
+    totalTime: "600000",
+    totalItems: 10,
+    passedItems: 8,
+    failedItems: 1,
+    errorItems: 1,
+    notExecutedItems: 0,
+    totalCount: 10,
+    passedCount: 8,
+    failedCount: 1,
+    errorCount: 1,
+    notExecutedCount: 0,
+    finalizedAt: new Date().toISOString(),
+    artifactTimestamp: new Date().toISOString()
   }
 });
 ```
 
-## How it writes files
-For a single run:
+## Output structure
+
 ```text
 artifacts/
   current/
-    car-regression/
-      EXEC-001/
-        json/passed/TC001_create-policy.json
-        xml/passed/TC001_create-policy.xml
-        csv/passed/TC001_create-policy.csv
+    motor-regression/
+      RUN-001/
+        json/passed/TC001_create-quote.json
+        xml/passed/TC001_create-quote.xml
+        csv/passed/TC001_create-quote.csv
         manifests/events.ndjson
-        excel/car-regression_EXEC-001.xlsx
+        excel/motor-regression_RUN-001.xlsx
 ```
 
-## Parallel execution model
-- Each test case writes its own files
-- Shared run state is stored as one NDJSON line per event
-- Excel is generated only once at the end
+## Parallel execution
 
-## Playwright example
-```ts
-const response = await factory.writeEvidence(carInsuranceSchema, request);
-await attachArtifacts(testInfo, response.artifacts);
+This supports same-run parallel execution because:
+
+- each test case writes separate JSON/XML/CSV files
+- the manifest is append-only NDJSON
+- Excel is generated once at the end
+
+## Integrating in executionLayer
+
+Recommended flow:
+
+1. executionLayer builds payload from evidence config fields
+2. call `writeEvidence(...)` per item/scenario/test case
+3. call `finalizeExecution(...)` once after the run
+4. optionally call `archiveOldExecutions(...)`
+
+## Example commands
+
+```bash
+npm run check:types
 ```
 
-## Notes
-- This project is designed for local filesystem artifact storage
-- Old run folders can be moved to `artifacts/archive`
-- The Excel formatter is in `src/writers/excel/excel-formatter.ts`
+If you want a quick smoke test after wiring:
+
+```bash
+node -r ts-node/register -r tsconfig-paths/register src/evidenceFactory/examples/example-usage.ts
+```

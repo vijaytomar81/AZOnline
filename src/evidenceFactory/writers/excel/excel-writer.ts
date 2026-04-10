@@ -1,31 +1,36 @@
 // src/evidenceFactory/writers/excel/excel-writer.ts
-import ExcelJS from 'exceljs';
+import path from 'path';
 import { writeFile } from 'fs/promises';
-import { ArtifactMetadata, ManifestEvent } from '../../contracts/types';
+import ExcelJS from 'exceljs';
 import { ensureDir, getFileSize, relativeFromProject } from '../../utils/path-utils';
 import { nowIso } from '../../utils/time-utils';
+import { mapFields, resolveFields, resolveMetaFields } from '../../utils/evidence-projector';
 import { ExcelFormatter } from './excel-formatter';
+import type { ArtifactMetadata, FinalizeExecutionRequest, ManifestEvent } from '../../contracts/types';
 
 export class ExcelWriter {
   private readonly formatter = new ExcelFormatter();
 
-  async write<T extends Record<string, unknown>>(
+  async write(
     filePath: string,
-    request: { executionId: string; suiteName: string; appName: string; environment: string },
-    events: Array<ManifestEvent<T>>,
+    request: FinalizeExecutionRequest,
+    events: ManifestEvent[],
   ): Promise<ArtifactMetadata> {
     const workbook = new ExcelJS.Workbook();
-    this.addSummary(workbook, request, events);
-    this.addStatusSheet(workbook, 'Passed', events.filter((e) => e.status === 'PASSED'));
-    this.addStatusSheet(workbook, 'Failed', events.filter((e) => e.status === 'FAILED'));
-    this.addStatusSheet(workbook, 'Error', events.filter((e) => e.status === 'ERROR'));
-    this.addStatusSheet(workbook, 'Not Executed', events.filter((e) => e.status === 'NOT_EXECUTED'));
-    await ensureDir(filePath.substring(0, filePath.lastIndexOf('/')));
+
+    this.addSummary(workbook, request.metaPayload);
+    this.addStatusSheet(workbook, 'Passed', 'passed', events.filter((event) => String(event.status).toLowerCase() === 'passed'));
+    this.addStatusSheet(workbook, 'Failed', 'failed', events.filter((event) => String(event.status).toLowerCase() === 'failed'));
+    this.addStatusSheet(workbook, 'Error', 'error', events.filter((event) => String(event.status).toLowerCase() === 'error'));
+    this.addStatusSheet(workbook, 'Not Executed', 'not_executed', events.filter((event) => String(event.status).toLowerCase() === 'not_executed'));
+
+    await ensureDir(path.dirname(filePath));
     const buffer = await workbook.xlsx.writeBuffer();
     await writeFile(filePath, Buffer.from(buffer));
+
     return {
       format: 'excel',
-      fileName: filePath.split('/').pop(),
+      fileName: path.basename(filePath),
       filePath,
       relativePath: relativeFromProject(filePath),
       sizeBytes: await getFileSize(filePath),
@@ -33,55 +38,38 @@ export class ExcelWriter {
     };
   }
 
-  private addSummary<T extends Record<string, unknown>>(
+  private addSummary(
     workbook: ExcelJS.Workbook,
-    request: { executionId: string; suiteName: string; appName: string; environment: string },
-    events: Array<ManifestEvent<T>>,
+    metaPayload: Record<string, unknown>,
   ): void {
-    const summary = workbook.addWorksheet('Summary');
-    const counts = {
-      total: events.length,
-      passed: events.filter((e) => e.status === 'PASSED').length,
-      failed: events.filter((e) => e.status === 'FAILED').length,
-      error: events.filter((e) => e.status === 'ERROR').length,
-      notExecuted: events.filter((e) => e.status === 'NOT_EXECUTED').length,
-    };
-    summary.addRows([
-      ['Execution Id', request.executionId],
-      ['Suite Name', request.suiteName],
-      ['App Name', request.appName],
-      ['Environment', request.environment],
-      ['Generated At', nowIso()],
-      [],
-      ['Metric', 'Count'],
-      ['Total', counts.total],
-      ['Passed', counts.passed],
-      ['Failed', counts.failed],
-      ['Error', counts.error],
-      ['Not Executed', counts.notExecuted],
-    ]);
-    this.formatter.styleHeader(summary.getRow(7));
-    summary.columns.forEach((column) => (column.width = 22));
+    const sheet = workbook.addWorksheet('Summary');
+    sheet.addRow(['Field', 'Value']);
+
+    const mapped = mapFields(metaPayload, resolveMetaFields(), 'excel');
+    for (const [field, value] of Object.entries(mapped)) {
+      sheet.addRow([field, value]);
+    }
+
+    this.formatter.styleTable(sheet);
   }
 
-  private addStatusSheet<T extends Record<string, unknown>>(
+  private addStatusSheet(
     workbook: ExcelJS.Workbook,
-    name: string,
-    events: Array<ManifestEvent<T>>,
+    title: string,
+    status: string,
+    events: ManifestEvent[],
   ): void {
-    const sheet = workbook.addWorksheet(name);
-    sheet.addRow([
-      'testCaseId', 'testName', 'status', 'insuranceType', 'startedAt', 'endedAt', 'durationMs',
-      'correlationId', 'traceId', 'failureReason', 'errorMessage', 'jsonPath', 'xmlPath', 'csvPath',
-    ]);
+    const sheet = workbook.addWorksheet(title);
+    const fields = resolveFields(status).filter((field) => field.toExcel !== false);
+    const headers = fields.map((field) => field.label);
+
+    sheet.addRow(headers);
+
     for (const event of events) {
-      sheet.addRow([
-        event.testCaseId, event.testName, event.status, event.insuranceType, event.startedAt,
-        event.endedAt, event.durationMs, event.correlationId ?? '', event.traceId ?? '',
-        event.failureReason ?? '', event.errorMessage ?? '', event.jsonPath ?? '',
-        event.xmlPath ?? '', event.csvPath ?? '',
-      ]);
+      const mapped = mapFields(event.payload, fields, 'excel');
+      sheet.addRow(headers.map((header) => mapped[header] ?? ''));
     }
+
     this.formatter.styleTable(sheet);
   }
 }

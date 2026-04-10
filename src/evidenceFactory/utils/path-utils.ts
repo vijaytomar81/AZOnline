@@ -11,12 +11,15 @@ export async function getFileSize(filePath: string): Promise<number> {
   return fileStat.size;
 }
 
-export function statusFolder(status: string): string {
-  return status.toLowerCase().replace(/_/g, '-');
+export function safeFileName(value: string): string {
+  return String(value)
+    .replace(/[^a-zA-Z0-9-_]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
-export function safeFileName(value: string): string {
-  return value.replace(/[^a-zA-Z0-9-_]+/g, '-').replace(/-+/g, '-');
+export function statusFolder(status: string): string {
+  return String(status).toLowerCase().replace(/_/g, '-');
 }
 
 export function relativeFromProject(filePath: string): string {
