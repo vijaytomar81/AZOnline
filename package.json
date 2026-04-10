@@ -88,8 +88,8 @@
     "allure:serve": "allure serve results/allure-results",
     "e2e:report": "npm run allure:generate",
     "evidence:check": "tsc --noEmit",
-    "evidence:car": "node -r ts-node/register -r tsconfig-paths/register src/evidenceFactory/examples/car-run-example.ts",
-    "evidence:home": "node -r ts-node/register -r tsconfig-paths/register src/evidenceFactory/examples/home-run-example.ts"
+    "factory:check": "node -r ts-node/register -r tsconfig-paths/register src/evidenceFactory/examples/example-usage.ts"
+
   },
   "repository": {
     "type": "git",
