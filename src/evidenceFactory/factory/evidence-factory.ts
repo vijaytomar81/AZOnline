@@ -1,4 +1,5 @@
 // src/evidenceFactory/factory/evidence-factory.ts
+import path from 'path';
 import { JsonWriter } from '../writers/json/json-writer';
 import { XmlWriter } from '../writers/xml/xml-writer';
 import { CsvWriter } from '../writers/csv/csv-writer';
@@ -10,6 +11,8 @@ import { ArchiveService } from '../archiving/archive-service';
 import { nowIso } from '../utils/time-utils';
 import { normalizeStatus } from '../utils/status-utils';
 import type {
+  ArchiveExecutionsRequest,
+  EvidenceFactoryOptions,
   EvidenceWriteRequest,
   EvidenceWriteResponse,
   FinalizeExecutionRequest,
@@ -24,8 +27,20 @@ export class EvidenceFactory {
   private readonly consoleWriter = new ConsoleWriter();
   private readonly excelWriter = new ExcelWriter();
   private readonly store = new NdjsonStore();
-  private readonly router = new OutputRouter();
-  private readonly archiveService = new ArchiveService();
+  private readonly router: OutputRouter;
+  private readonly archiveService: ArchiveService;
+  private readonly options: EvidenceFactoryOptions;
+
+  constructor(options: EvidenceFactoryOptions = {}) {
+    this.options = options;
+
+    const rootDir = options.rootDir
+      ? path.resolve(options.rootDir)
+      : path.join(process.cwd(), process.env.EVIDENCE_ROOT_DIR ?? 'artifacts');
+
+    this.router = new OutputRouter(rootDir, options.fileNaming);
+    this.archiveService = new ArchiveService(rootDir);
+  }
 
   async writeEvidence(request: EvidenceWriteRequest): Promise<EvidenceWriteResponse> {
     const normalizedStatus = normalizeStatus(request.status);
@@ -43,6 +58,7 @@ export class EvidenceFactory {
           artifactName: request.artifactName,
           status: normalizedStatus,
           format,
+          payload: request.payload,
         });
 
         if (format === 'json') {
@@ -89,7 +105,7 @@ export class EvidenceFactory {
     const events = await this.store.readAll(eventPath);
 
     const excel = await this.excelWriter.write(
-      this.router.excelPath(request.suiteName, request.executionId),
+      this.router.excelPath(request.suiteName, request.executionId, request.metaPayload),
       request,
       events,
     );
@@ -103,7 +119,12 @@ export class EvidenceFactory {
     };
   }
 
-  async archiveOldExecutions(args: { olderThanDays: number }): Promise<{ archivedCount: number }> {
-    return this.archiveService.archiveOldExecutions(args);
+  async archiveOldExecutions(args: ArchiveExecutionsRequest = {}): Promise<{ archivedCount: number }> {
+    return this.archiveService.archiveOldExecutions({
+      olderThanDays: args.olderThanDays ?? this.options.archive?.olderThanDays,
+      zip: args.zip ?? this.options.archive?.zip ?? false,
+      maxCurrentExecutionsPerSuite:
+        args.maxCurrentExecutionsPerSuite ?? this.options.archive?.maxCurrentExecutionsPerSuite,
+    });
   }
 }

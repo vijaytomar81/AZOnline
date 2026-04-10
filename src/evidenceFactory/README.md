@@ -2,17 +2,19 @@
 
 A config-driven evidence writer for AZOnline.
 
-This package is intentionally a **consumer only**. It does **not** define evidence fields.
+This package is intentionally a **consumer only**. It does **not** define evidence fields.  
 It consumes the evidence configuration already defined in:
 
-- `src/configLayer/models/evidence/types.ts`
-- `src/configLayer/models/evidence/views/*`
-- `src/configLayer/models/evidence/fields/*`
+- src/configLayer/models/evidence/types.ts
+- src/configLayer/models/evidence/views/*
+- src/configLayer/models/evidence/fields/*
+
+---
 
 ## Design
 
-- **executionLayer** builds payload objects that already match your evidence config keys
-- **evidenceFactory** only:
+- executionLayer builds payload objects that already match your evidence config keys  
+- evidenceFactory only:
   - projects configured fields
   - writes JSON / XML / CSV
   - logs console evidence
@@ -20,22 +22,25 @@ It consumes the evidence configuration already defined in:
   - generates final Excel workbook
   - archives old execution folders
 
+---
+
 ## Important rule
 
-Do **not** add fields inside `src/evidenceFactory`.
+Do NOT add fields inside src/evidenceFactory.
 
 Add or change fields only in:
 
-- `src/configLayer/models/evidence`
+src/configLayer/models/evidence
+
+---
 
 ## Expected payload shape
 
 Your execution layer should send payload keys that match config keys directly.
 
-Example payload:
-
-```ts
-const payload = {
+Example:
+```
+{
   scenarioId: "SCN-001",
   scenarioName: "Create Quote",
   platform: "Athena",
@@ -46,33 +51,37 @@ const payload = {
   status: "passed",
   itemNo: 1,
   action: "Create Quote",
-  subType: "HappyPath",
-  portal: "AzOnline",
   testCaseRef: "TC001",
   startedAt: new Date().toISOString(),
   finishedAt: new Date().toISOString(),
-  message: "",
-  errorDetails: "",
   calculatedEmail: "test@example.com",
-  calculatedEmailId: "test",
   quoteNumber: "Q-10001",
-  policyNumber: "P-10001",
-  runtimeInfo: {
-    system: { platform: process.platform, node: process.version },
-    browser: { name: "chromium", headless: true }
-  }
-};
+  policyNumber: "P-10001"
+}
 ```
+---
 
-Because your config also supports nested keys like `runtimeInfo.browser`, nested objects are fine.
+## Factory setup (executionLayer)
+
+Example:
+```
+const factory = new EvidenceFactory({
+  rootDir: process.env.EVIDENCE_ROOT_DIR ?? "artifacts",
+  fileNaming: {
+    includeTimestamp: true,
+    timestampSource: "payload"
+  },
+  archive: {
+    olderThanDays: 14,
+    zip: true,
+    maxCurrentExecutionsPerSuite: 30
+  }
+});
+```
+---
 
 ## Write evidence during execution
-
-```ts
-import { EvidenceFactory } from "@evidenceFactory";
-
-const factory = new EvidenceFactory();
-
+```
 await factory.writeEvidence({
   executionId: "RUN-001",
   suiteName: "motor-regression",
@@ -80,81 +89,124 @@ await factory.writeEvidence({
   artifactName: "create-quote",
   status: "passed",
   outputFormats: ["json", "xml", "csv", "console"],
-  consoleMode: "e2e",
   payload
 });
 ```
+---
 
-## Finalize execution after the run
-
-`metaPayload` should also follow your configured meta keys.
-
-```ts
+## Finalize execution
+```
 await factory.finalizeExecution({
   executionId: "RUN-001",
   suiteName: "motor-regression",
   metaPayload: {
     runId: "RUN-001",
-    mode: "e2e",
     environment: "qa",
-    startedAt: "2026-04-10T08:00:00.000Z",
-    finishedAt: "2026-04-10T08:10:00.000Z",
-    totalTime: "600000",
-    totalItems: 10,
-    passedItems: 8,
-    failedItems: 1,
-    errorItems: 1,
-    notExecutedItems: 0,
-    totalCount: 10,
-    passedCount: 8,
-    failedCount: 1,
-    errorCount: 1,
-    notExecutedCount: 0,
-    finalizedAt: new Date().toISOString(),
-    artifactTimestamp: new Date().toISOString()
+    totalItems: 10
   }
 });
 ```
+---
 
 ## Output structure
-
-```text
+```
 artifacts/
   current/
     motor-regression/
       RUN-001/
-        json/passed/TC001_create-quote.json
-        xml/passed/TC001_create-quote.xml
-        csv/passed/TC001_create-quote.csv
+        json/passed/TC001_create-quote_2026-04-10T09-15-00-000Z.json
+        xml/passed/TC001_create-quote_2026-04-10T09-15-00-000Z.xml
+        csv/passed/TC001_create-quote_2026-04-10T09-15-00-000Z.csv
         manifests/events.ndjson
-        excel/motor-regression_RUN-001.xlsx
+        excel/motor-regression_RUN-001_2026-04-10T09-20-00-000Z.xlsx
 ```
+---
+
+## File naming strategy
+
+Without timestamp:
+TC001_create-quote.json
+
+With timestamp:
+TC001_create-quote_2026-04-10T09-15-00-000Z.json
+
+---
+
+## Output formats
+
+Controlled via:
+
+outputFormats: ["json", "xml", "csv", "console"]
+
+Excel is generated only during finalizeExecution.
+
+---
 
 ## Parallel execution
 
-This supports same-run parallel execution because:
+- Each test writes separate files
+- NDJSON is append-only
+- Excel generated once at end
 
-- each test case writes separate JSON/XML/CSV files
-- the manifest is append-only NDJSON
-- Excel is generated once at the end
+---
 
-## Integrating in executionLayer
+## Archiving strategy
 
-Recommended flow:
+Configurable:
 
-1. executionLayer builds payload from evidence config fields
-2. call `writeEvidence(...)` per item/scenario/test case
-3. call `finalizeExecution(...)` once after the run
-4. optionally call `archiveOldExecutions(...)`
+- olderThanDays → move old runs
+- zip → compress archived runs
+- maxCurrentExecutionsPerSuite → keep limited runs
 
-## Example commands
+Archive structure:
+```
+artifacts/archive/YYYY-MM/<suite>/<executionId>.zip
+```
+---
 
-```bash
+## Useful commands
+```
 npm run check:types
 ```
+---
 
-If you want a quick smoke test after wiring:
+# Flow
 
-```bash
-node -r ts-node/register -r tsconfig-paths/register src/evidenceFactory/examples/example-usage.ts
+That is a **plain code block**, not a Mermaid block.
+
+## Correct syntax
+
+The opening fence must be on **one line**:
+
+````md
+```mermaid
+flowchart TD
+
+A[Execution Layer] --> B[Build Payload based on Evidence Config]
+B --> C[writeEvidence()]
+C --> D{outputFormats}
+
+D -->|json| E1[Write JSON File]
+D -->|xml| E2[Write XML File]
+D -->|csv| E3[Write CSV File]
+D -->|console| E4[Console Log]
+
+C --> F[Append NDJSON Manifest]
+
+subgraph Parallel Execution
+  E1
+  E2
+  E3
+  F
+end
+
+F --> G[All Test Cases Completed]
+G --> H[finalizeExecution()]
+H --> I[Read All Manifest Events]
+I --> J[Generate Excel Report]
+J --> K[Save Excel File]
+K --> L[Return Metadata Response]
+L --> M[Archive Old Executions]
 ```
+
+---

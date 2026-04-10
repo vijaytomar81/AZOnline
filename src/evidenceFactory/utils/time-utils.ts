@@ -11,3 +11,7 @@ export function daysOld(target: Date): number {
   const diffMs = Date.now() - target.getTime();
   return Math.floor(diffMs / (1000 * 60 * 60 * 24));
 }
+
+export function fileSafeTimestamp(date = new Date()): string {
+  return date.toISOString().replace(/[:.]/g, '-');
+}

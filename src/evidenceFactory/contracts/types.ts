@@ -58,3 +58,22 @@ export type ManifestEvent = {
   };
   createdAt: string;
 };
+
+export type EvidenceFactoryOptions = {
+  rootDir?: string;
+  archive?: {
+    olderThanDays?: number;
+    zip?: boolean;
+    maxCurrentExecutionsPerSuite?: number;
+  };
+  fileNaming?: {
+    includeTimestamp?: boolean;
+    timestampSource?: 'now' | 'payload';
+  };
+};
+
+export type ArchiveExecutionsRequest = {
+  olderThanDays?: number;
+  zip?: boolean;
+  maxCurrentExecutionsPerSuite?: number;
+};
