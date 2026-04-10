@@ -3,7 +3,6 @@
 import type { EvidenceFieldDefinition } from "../types";
 
 export const EVIDENCE_RUNTIME_FIELDS = {
-
     LAST_ACTION: { field: "LAST_ACTION", key: "lastAction", label: "Last Action", valueType: "string" },
 
     CALCULATED_EMAIL_ID: { field: "CALCULATED_EMAIL_ID", key: "calculatedEmailId", label: "Calculated Email ID", valueType: "string" },
@@ -26,9 +25,29 @@ export const EVIDENCE_RUNTIME_FIELDS = {
     PAGE_SCANS: { field: "PAGE_SCANS", key: "pageScans", label: "Page Scans", valueType: "json" },
 
     // =========================
-    // Runtime Info
+    // Runtime / System fields
     // =========================
-    RUNTIME_SYSTEM: { field: "RUNTIME_SYSTEM", key: "runtimeInfo.system", label: "Runtime System", valueType: "json" },
-    RUNTIME_BROWSER: { field: "RUNTIME_BROWSER", key: "runtimeInfo.browser", label: "Runtime Browser", valueType: "json" },
+    MACHINE_NAME: { field: "MACHINE_NAME", key: "machineName", label: "Machine Name", valueType: "string" },
+    USER: { field: "USER", key: "user", label: "User", valueType: "string" },
+    OS_VERSION: { field: "OS_VERSION", key: "osVersion", label: "OS Version", valueType: "string" },
+
+    // =========================
+    // Browser fields
+    // =========================
+    BROWSER: { field: "BROWSER", key: "browser", label: "Browser", valueType: "string" },
+    BROWSER_CHANNEL: { field: "BROWSER_CHANNEL", key: "browserChannel", label: "Browser Channel", valueType: "string" },
+    BROWSER_VERSION: { field: "BROWSER_VERSION", key: "browserVersion", label: "Browser Version", valueType: "string" },
+    HEADLESS: { field: "HEADLESS", key: "headless", label: "Headless", valueType: "boolean" },
+
+    // =========================
+    // Results / timing fields
+    // =========================
+    PASS_RATE: { field: "PASS_RATE", key: "passRate", label: "Pass Rate (%)", valueType: "string" },
+    EXECUTION_TIME: { field: "EXECUTION_TIME", key: "executionTime", label: "Execution Time", valueType: "string" },
+
+    // =========================
+    // Evidence pathing
+    // =========================
+    EVIDENCE_DIRECTORY: { field: "EVIDENCE_DIRECTORY", key: "evidenceDirectory", label: "Evidence Directory", valueType: "string" },
 
 } as const satisfies Record<string, EvidenceFieldDefinition>;
