@@ -85,11 +85,49 @@ const factory = new EvidenceFactory({
 await factory.writeEvidence({
   executionId: "RUN-001",
   suiteName: "motor-regression",
+
   artifactId: "TC001",
   artifactName: "create-quote",
+
   status: "passed",
-  outputFormats: ["json", "xml", "csv", "console"],
-  payload
+
+  // ✅ Only include what you actually want to generate
+  // (Excel will ALWAYS be generated in finalize step)
+  outputFormats: ["json", "console"],
+
+  // ✅ Optional but recommended
+  consoleMode: "e2e",
+
+  payload: {
+    scenarioId: "SCN-001",
+    scenarioName: "Create Quote",
+    platform: "Athena",
+    application: "AzOnline",
+    product: "Motor",
+    journeyStartWith: "NewBusiness",
+
+    itemNo: 1,
+    action: "Create Quote",
+    testCaseRef: "TC001",
+
+    startedAt: new Date().toISOString(),
+    finishedAt: new Date().toISOString(),
+
+    calculatedEmail: "test@example.com",
+    quoteNumber: "Q-10001",
+    policyNumber: "P-10001",
+
+    // ✅ Nested example (important for your config)
+    runtimeInfo: {
+      system: {
+        platform: process.platform,
+      },
+      browser: {
+        name: "chromium",
+        headless: true,
+      },
+    },
+  },
 });
 ```
 ---
