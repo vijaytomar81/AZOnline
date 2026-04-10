@@ -174,17 +174,19 @@ npm run check:types
 
 That is a **plain code block**, not a Mermaid block.
 
+---
+
 ## Correct syntax
+
 
 The opening fence must be on **one line**:
 
-````md
-```mermaid
+````mermaid
 flowchart TD
 
 A[Execution Layer] --> B[Build Payload based on Evidence Config]
-B --> C[writeEvidence()]
-C --> D{outputFormats}
+B --> C[writeEvidence]
+C --> D[outputFormats]
 
 D -->|json| E1[Write JSON File]
 D -->|xml| E2[Write XML File]
@@ -201,12 +203,12 @@ subgraph Parallel Execution
 end
 
 F --> G[All Test Cases Completed]
-G --> H[finalizeExecution()]
+G --> H[finalizeExecution]
 H --> I[Read All Manifest Events]
 I --> J[Generate Excel Report]
 J --> K[Save Excel File]
 K --> L[Return Metadata Response]
 L --> M[Archive Old Executions]
-```
-
+````
 ---
+
