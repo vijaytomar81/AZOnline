@@ -11,8 +11,8 @@ import type { EvidenceFieldDefinition } from '@configLayer/models/evidence/types
 import { normalizeStatus } from './status-utils';
 
 type EvidenceViewField = EvidenceFieldDefinition & {
-  toTechnicalOutput?: boolean;
-  toBusinessOutput?: boolean;
+  toStructuredOutput?: boolean;
+  toReportOutput?: boolean;
 };
 
 export function resolveFields(status: string): readonly EvidenceViewField[] {
@@ -50,8 +50,8 @@ export function resolveConsoleFields(mode?: string): {
 export function mapFields(
   source: Record<string, unknown>,
   fields: readonly (EvidenceFieldDefinition & {
-    toTechnicalOutput?: boolean;
-    toBusinessOutput?: boolean;
+    toStructuredOutput?: boolean;
+    toReportOutput?: boolean;
   })[],
   target: 'json' | 'xml' | 'csv' | 'excel' | 'console',
 ): Record<string, string | number | boolean> {
@@ -60,8 +60,8 @@ export function mapFields(
   for (const field of fields) {
     const include =
       target === 'excel' || target === 'console'
-        ? field.toBusinessOutput !== false
-        : field.toTechnicalOutput !== false;
+        ? field.toReportOutput !== false
+        : field.toStructuredOutput !== false;
 
     if (!include) {
       continue;
@@ -77,14 +77,14 @@ export function mapFields(
 export function mapXmlFields(
   source: Record<string, unknown>,
   fields: readonly (EvidenceFieldDefinition & {
-    toTechnicalOutput?: boolean;
-    toBusinessOutput?: boolean;
+    toStructuredOutput?: boolean;
+    toReportOutput?: boolean;
   })[],
 ): Record<string, string | number | boolean> {
   const result: Record<string, string | number | boolean> = {};
 
   for (const field of fields) {
-    if (field.toTechnicalOutput === false) {
+    if (field.toStructuredOutput === false) {
       continue;
     }
 
@@ -93,6 +93,52 @@ export function mapXmlFields(
   }
 
   return result;
+}
+
+export function buildMetaSections(
+  metaPayload: Record<string, unknown>,
+): Array<{
+  sectionTitle: string;
+  rows: Array<{ label: string; value: string | number | boolean }>;
+}> {
+  const metaFields = resolveMetaFields();
+  const sections: Array<{
+    sectionTitle: string;
+    rows: Array<{ label: string; value: string | number | boolean }>;
+  }> = [];
+
+  for (const [sectionKey, sectionValue] of Object.entries(metaPayload)) {
+    if (!sectionValue || typeof sectionValue !== 'object' || Array.isArray(sectionValue)) {
+      continue;
+    }
+
+    const sectionObject = sectionValue as Record<string, unknown>;
+    const rows: Array<{ label: string; value: string | number | boolean }> = [];
+
+    for (const [childKey, childValue] of Object.entries(sectionObject)) {
+      const field = metaFields.find(
+        (item) => item.key === childKey && item.toReportOutput !== false,
+      );
+
+      if (!field) {
+        continue;
+      }
+
+      rows.push({
+        label: field.label,
+        value: toOutputValue(childValue),
+      });
+    }
+
+    if (rows.length > 0) {
+      sections.push({
+        sectionTitle: toSectionTitle(sectionKey),
+        rows,
+      });
+    }
+  }
+
+  return sections;
 }
 
 function extractValue(source: Record<string, unknown>, keyPath: string): unknown {
@@ -126,4 +172,8 @@ function toOutputValue(value: unknown): string | number | boolean {
 
 function toSafeXmlKey(value: string): string {
   return value.replace(/[^a-zA-Z0-9_-]/g, '_');
+}
+
+function toSectionTitle(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
