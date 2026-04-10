@@ -25,6 +25,7 @@ export const EXCEL_COLORS = {
     results: {
         passed: '2E7D32',
         failed: 'C62828',
+        error: '8E2430',
         notExecuted: 'EF6C00',
     },
 } as const;
@@ -59,14 +60,24 @@ export function getExecutionRowFillColor(sheetName: string): string | undefined 
     }
 }
 
-export function getResultValueColor(label: string): string | undefined {
-    switch (label) {
-        case 'Passed':
+export function getResultValueColor(key: string): string | undefined {
+    switch (key) {
+        case 'passedCount':
+        case 'passedItems':
             return EXCEL_COLORS.results.passed;
-        case 'Failed':
+
+        case 'failedCount':
+        case 'failedItems':
             return EXCEL_COLORS.results.failed;
-        case 'Not Executed':
+
+        case 'errorCount':
+        case 'errorItems':
+            return EXCEL_COLORS.results.error;
+
+        case 'notExecutedCount':
+        case 'notExecutedItems':
             return EXCEL_COLORS.results.notExecuted;
+
         default:
             return undefined;
     }

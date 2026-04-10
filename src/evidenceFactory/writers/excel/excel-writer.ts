@@ -108,6 +108,7 @@ export class ExcelWriter {
         rows.push({
           label: field.label,
           value: this.toCellValue(childValue),
+          key: field.key,
         });
       }
 

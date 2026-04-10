@@ -128,11 +128,11 @@ async function main(): Promise<void> {
         headless: true,
       },
       results: {
-        totalItems: 18,
-        passed: 3,
-        failed: 9,
-        notExecuted: 6,
-        passRate: '16.67%',
+        totalItems: 2,
+        passedCount: 1,
+        failedCount: 1,
+        notExecutedCount: 0,
+        passRate: '50.00%',
       },
       timing: {
         executionTime: '7.74s',

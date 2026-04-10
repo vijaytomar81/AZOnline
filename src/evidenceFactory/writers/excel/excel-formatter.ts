@@ -7,9 +7,15 @@ import {
   getResultValueColor,
 } from './excel-colors';
 
+type SummaryRow = {
+  label: string;
+  value: string | number | boolean;
+  key: string;
+};
+
 export type SummarySection = {
   title: string;
-  rows: Array<{ label: string; value: string | number | boolean }>;
+  rows: SummaryRow[];
 };
 
 function measureCell(value: unknown): number {
@@ -134,7 +140,7 @@ export function styleSummarySheet(
       valueCell.value = row.value;
       valueCell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
 
-      const resultColor = section.title === 'Results' ? getResultValueColor(row.label) : undefined;
+      const resultColor = section.title === 'Results' ? getResultValueColor(row.key) : undefined;
       if (resultColor) {
         valueCell.font = { bold: true, color: { argb: resultColor } };
       }
