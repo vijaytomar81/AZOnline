@@ -101,6 +101,10 @@ export class ExcelWriter {
           continue;
         }
 
+        if (!this.hasDisplayableSummaryValue(childValue)) {
+          continue;
+        }
+
         rows.push({
           label: field.label,
           value: this.toCellValue(childValue),
@@ -116,6 +120,26 @@ export class ExcelWriter {
     }
 
     return sections;
+  }
+
+  private hasDisplayableSummaryValue(value: unknown): boolean {
+    if (value === null || value === undefined) {
+      return false;
+    }
+
+    if (typeof value === 'string') {
+      return value.trim().length > 0;
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return true;
+    }
+
+    if (value instanceof Date) {
+      return true;
+    }
+
+    return false;
   }
 
   private filterByStatus(events: ManifestEvent[], status: string): ManifestEvent[] {
