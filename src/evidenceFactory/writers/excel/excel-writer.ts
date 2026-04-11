@@ -2,17 +2,23 @@
 import path from 'path';
 import { writeFile } from 'fs/promises';
 import ExcelJS from 'exceljs';
+import {
+  type MetaEvidenceViewField,
+  type EvidenceReportSection,
+} from '@configLayer/models/evidence';
 import { ensureDir, getFileSize, relativeFromProject } from '../../utils/path-utils';
 import { nowIso } from '../../utils/time-utils';
-import { mapFields, resolveFields, resolveMetaFields } from '../../utils/evidence-projector';
+import {
+  extractValue,
+  mapFields,
+  resolveFields,
+  resolveMetaFields,
+  toOutputValue,
+} from '../../utils/evidence-projector';
 import { styleExecutionSheet, styleSummarySheet, type SummarySection } from './excel-formatter';
 import type { ArtifactMetadata, FinalizeExecutionRequest, ManifestEvent } from '../../contracts/types';
 
-type MetaField = {
-  key: string;
-  label: string;
-  toReportOutput?: boolean;
-};
+type SummaryRow = SummarySection['rows'][number];
 
 export class ExcelWriter {
   async write(
@@ -52,7 +58,7 @@ export class ExcelWriter {
     metaPayload: Record<string, unknown>,
   ): void {
     const sheet = workbook.addWorksheet('Summary');
-    const metaFields = resolveMetaFields() as readonly MetaField[];
+    const metaFields = resolveMetaFields();
     const sections = this.buildSummarySections(metaPayload, metaFields);
 
     styleSummarySheet(sheet, sections);
@@ -80,47 +86,50 @@ export class ExcelWriter {
 
   private buildSummarySections(
     metaPayload: Record<string, unknown>,
-    metaFields: readonly MetaField[],
+    metaFields: readonly MetaEvidenceViewField[],
   ): SummarySection[] {
-    const sections: SummarySection[] = [];
+    const sectionMap = new Map<EvidenceReportSection, SummaryRow[]>();
 
-    for (const [sectionKey, sectionValue] of Object.entries(metaPayload)) {
-      if (!sectionValue || typeof sectionValue !== 'object' || Array.isArray(sectionValue)) {
+    for (const field of metaFields) {
+      if (field.toReportOutput === false) {
         continue;
       }
 
-      const sectionObject = sectionValue as Record<string, unknown>;
-      const rows: SummarySection['rows'] = [];
+      const value = extractValue(metaPayload, field.key);
 
-      for (const [childKey, childValue] of Object.entries(sectionObject)) {
-        const field = metaFields.find(
-          (item) => item.key === childKey && item.toReportOutput !== false,
-        );
-
-        if (!field) {
-          continue;
-        }
-
-        if (!this.hasDisplayableSummaryValue(childValue)) {
-          continue;
-        }
-
-        rows.push({
-          label: field.label,
-          value: this.toCellValue(childValue),
-          key: field.key,
-        });
+      if (!this.hasDisplayableSummaryValue(value)) {
+        continue;
       }
 
-      if (rows.length > 0) {
-        sections.push({
-          title: this.toSectionTitle(sectionKey),
-          rows,
-        });
+      const section = field.section ?? 'Other Info';
+
+      if (!sectionMap.has(section)) {
+        sectionMap.set(section, []);
       }
+
+      sectionMap.get(section)!.push({
+        key: field.key,
+        label: field.label,
+        value: toOutputValue(value),
+      });
     }
 
-    return sections;
+    const orderedSections: EvidenceReportSection[] = [
+      'Run',
+      'Runtime',
+      'Browser',
+      'Results',
+      'Timing',
+      'System Metadata',
+      'Other Info',
+    ];
+
+    return orderedSections
+      .filter((section) => (sectionMap.get(section)?.length ?? 0) > 0)
+      .map((section) => ({
+        title: section,
+        rows: sectionMap.get(section)!,
+      }));
   }
 
   private hasDisplayableSummaryValue(value: unknown): boolean {
@@ -145,22 +154,5 @@ export class ExcelWriter {
 
   private filterByStatus(events: ManifestEvent[], status: string): ManifestEvent[] {
     return events.filter((event) => String(event.status).toLowerCase() === status);
-  }
-
-  private toSectionTitle(value: string): string {
-    return value.charAt(0).toUpperCase() + value.slice(1);
-  }
-
-  private toCellValue(value: unknown): string | number | boolean {
-    if (value === null || value === undefined) {
-      return '';
-    }
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      return value;
-    }
-    if (value instanceof Date) {
-      return value.toISOString();
-    }
-    return JSON.stringify(value);
   }
 }

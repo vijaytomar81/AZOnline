@@ -6,6 +6,7 @@ import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import { emitLog } from "@frameworkCore/logging/emitLog";
 import { addExecutionItemResult } from "@frameworkCore/executionLayer/core/context";
 import type { ExecutionItemResult } from "@frameworkCore/executionLayer/contracts";
+import { buildEvidencePayload } from "@frameworkCore/executionLayer/reporting/buildEvidencePayload";
 import { buildExecutionItemFailureResult } from "./buildExecutionItemFailureResult";
 import { createExecutionItemDebugCollector } from "./createExecutionItemDebugCollector";
 import { createExecutionItemSuccessResult } from "./createExecutionItemSuccessResult";
@@ -94,6 +95,41 @@ async function executeItem(args: {
     }
 }
 
+async function writeItemEvidence(args: {
+    runArgs: RunExecutionItemArgs;
+    result: ExecutionItemResult;
+}): Promise<void> {
+    if (!args.runArgs.evidenceFactory) {
+        return;
+    }
+
+    const artifactId = String(
+        args.result.details?.testCaseRef ?? args.result.itemNo
+    );
+
+    const artifactName = [
+        args.result.action,
+        args.result.details?.subType,
+        args.result.details?.portal,
+    ]
+        .filter(Boolean)
+        .join("-");
+
+    await args.runArgs.evidenceFactory.writeEvidence({
+        executionId: args.runArgs.runId ?? "local-run",
+        suiteName: args.runArgs.suiteName ?? "default-suite",
+        artifactId,
+        artifactName: artifactName || args.result.action,
+        status: args.result.status,
+        consoleMode: args.runArgs.mode,
+        outputFormats: ["json", "console"],
+        payload: buildEvidencePayload({
+            context: args.runArgs.context,
+            result: args.result,
+        }),
+    });
+}
+
 export async function runExecutionItem(
     args: RunExecutionItemArgs
 ): Promise<ExecutionItemResult> {
@@ -107,55 +143,17 @@ export async function runExecutionItem(
 
         addExecutionItemResult(args.context, result);
 
-        // ✅ NEW: EvidenceFactory integration (non-blocking)
         try {
-            if (args.evidenceFactory) {
-                await args.evidenceFactory.writeEvidence({
-                    executionId: args.runId ?? "local-run",
-                    suiteName: args.suiteName ?? "default-suite",
-                    artifactId:
-                        String(result.details?.testCaseRef ?? result.itemNo),
-                    artifactName: result.action,
-                    status: result.status,
-                    consoleMode: args.mode,
-                    outputFormats: ["json", "console"],
-                    payload: {
-                        // Scenario
-                        scenarioId: args.context.scenario.scenarioId,
-                        scenarioName: args.context.scenario.scenarioName,
-                        platform: args.context.scenario.platform,
-                        application: args.context.scenario.application,
-                        product: args.context.scenario.product,
-                        journeyStartWith:
-                            args.context.scenario.journeyStartWith,
-                        description: args.context.scenario.description,
-
-                        // Item
-                        itemNo: result.itemNo,
-                        action: result.action,
-                        subType: result.details?.subType,
-                        portal: result.details?.portal,
-                        testCaseRef: result.details?.testCaseRef,
-
-                        status: result.status,
-                        startedAt: result.startedAt,
-                        finishedAt: result.finishedAt,
-
-                        message: result.message ?? "",
-                        errorDetails: result.details?.errorDetails ?? "",
-                        blockedBy: result.details?.blockedBy ?? "",
-
-                        // Outputs (flattened)
-                        ...args.context.outputs,
-                    },
-                });
-            }
-        } catch (err) {
+            await writeItemEvidence({
+                runArgs: args,
+                result,
+            });
+        } catch (error) {
             emitLog({
                 scope: args.logScope,
                 level: LOG_LEVELS.WARN,
                 category: LOG_CATEGORIES.FRAMEWORK,
-                message: `EvidenceFactory write failed: ${err instanceof Error ? err.message : String(err)
+                message: `EvidenceFactory write failed: ${error instanceof Error ? error.message : String(error)
                     }`,
             });
         }
@@ -173,35 +171,13 @@ export async function runExecutionItem(
 
         addExecutionItemResult(args.context, result);
 
-        // Optional: also log failure to evidence
         try {
-            if (args.evidenceFactory) {
-                await args.evidenceFactory.writeEvidence({
-                    executionId: args.runId ?? "local-run",
-                    suiteName: args.suiteName ?? "default-suite",
-                    artifactId:
-                        String(result.details?.testCaseRef ?? result.itemNo),
-                    artifactName: result.action,
-                    status: result.status,
-                    consoleMode: args.mode,
-                    outputFormats: ["json", "console"],
-                    payload: {
-                        scenarioId: args.context.scenario.scenarioId,
-                        scenarioName: args.context.scenario.scenarioName,
-
-                        itemNo: result.itemNo,
-                        action: result.action,
-                        status: result.status,
-                        startedAt: result.startedAt,
-                        finishedAt: result.finishedAt,
-
-                        message: result.message ?? "",
-                        errorDetails: result.details?.errorDetails ?? "",
-                    },
-                });
-            }
+            await writeItemEvidence({
+                runArgs: args,
+                result,
+            });
         } catch {
-            // ignore
+            // ignore evidence write failure
         }
 
         return result;

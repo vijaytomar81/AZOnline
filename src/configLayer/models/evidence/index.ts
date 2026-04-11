@@ -1,5 +1,8 @@
 // src/configLayer/models/evidence/index.ts
 
+// =========================
+// Views (configs)
+// =========================
 export {
     CONSOLE_EVIDENCE_FIELDS,
     META_EVIDENCE_FIELDS,
@@ -8,3 +11,14 @@ export {
     ERROR_EVIDENCE_FIELDS,
     NOT_EXECUTED_EVIDENCE_FIELDS,
 } from "@configLayer/models/evidence/views";
+
+// =========================
+// Types
+// =========================
+export type {
+    EvidenceValueType,
+    EvidenceFieldDefinition,
+    EvidenceViewFieldDefinition,
+    MetaEvidenceViewField,
+    EvidenceReportSection,
+} from "@configLayer/models/evidence/types";
