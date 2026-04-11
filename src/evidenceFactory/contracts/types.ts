@@ -64,11 +64,6 @@ export type ManifestItemEvent = {
   status: string;
   consoleMode?: string;
   payload: Record<string, unknown>;
-  artifacts: {
-    jsonPath?: string;
-    xmlPath?: string;
-    csvPath?: string;
-  };
   createdAt: string;
 };
 

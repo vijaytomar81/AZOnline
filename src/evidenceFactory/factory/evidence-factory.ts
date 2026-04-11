@@ -1,40 +1,40 @@
 // src/evidenceFactory/factory/evidence-factory.ts
 
 import path from 'path';
-import { JsonWriter } from '../writers/json/json-writer';
-import { XmlWriter } from '../writers/xml/xml-writer';
-import { CsvWriter } from '../writers/csv/csv-writer';
-import { ConsoleWriter } from '../writers/console/console-writer';
 import { ExcelWriter } from '../writers/excel/excel-writer';
 import { NdjsonStore } from '../manifest/ndjson-store';
 import { OutputRouter } from '../routing/output-router';
+import { ArchiveService } from '../archiving/archive-service';
 import { nowIso } from '../utils/time-utils';
 import { normalizeStatus } from '../utils/status-utils';
 import type {
+  ArchiveExecutionsRequest,
   EvidenceFactoryOptions,
   EvidenceWriteRequest,
   EvidenceWriteResponse,
   FinalizeExecutionRequest,
   FinalizeExecutionResponse,
   ManifestEvent,
+  ManifestItemEvent,
   ManifestSummaryEvent,
 } from '../contracts/types';
 
 export class EvidenceFactory {
-  private readonly jsonWriter = new JsonWriter();
-  private readonly xmlWriter = new XmlWriter();
-  private readonly csvWriter = new CsvWriter();
-  private readonly consoleWriter = new ConsoleWriter();
   private readonly excelWriter = new ExcelWriter();
   private readonly store = new NdjsonStore();
   private readonly router: OutputRouter;
+  private readonly archiveService: ArchiveService;
+  private readonly options: EvidenceFactoryOptions;
 
   constructor(options: EvidenceFactoryOptions = {}) {
+    this.options = options;
+
     const rootDir = options.rootDir
       ? path.resolve(options.rootDir)
-      : path.join(process.cwd(), 'artifacts');
+      : path.join(process.cwd(), process.env.EVIDENCE_ROOT_DIR ?? 'artifacts');
 
-    this.router = new OutputRouter(rootDir);
+    this.router = new OutputRouter(rootDir, options.fileNaming);
+    this.archiveService = new ArchiveService(rootDir);
   }
 
   async writeEvidence(request: EvidenceWriteRequest): Promise<EvidenceWriteResponse> {
@@ -63,41 +63,7 @@ export class EvidenceFactory {
 
     const normalizedStatus = normalizeStatus(request.status);
 
-    const artifacts = await Promise.all(
-      request.outputFormats
-        .filter((f) => f !== 'excel')
-        .map(async (format) => {
-          if (format === 'console') {
-            return this.consoleWriter.write(request.payload, request.consoleMode);
-          }
-
-          const filePath = this.router.evidenceFilePath({
-            suiteName: request.suiteName,
-            executionId: request.executionId,
-            artifactId: request.artifactId,
-            artifactName: request.artifactName,
-            status: normalizedStatus,
-            format,
-            payload: request.payload,
-          });
-
-          if (format === 'json') {
-            return this.jsonWriter.write(filePath, normalizedStatus, request.payload);
-          }
-
-          if (format === 'xml') {
-            return this.xmlWriter.write(filePath, normalizedStatus, request.payload);
-          }
-
-          if (format === 'csv') {
-            return this.csvWriter.write(filePath, normalizedStatus, request.payload);
-          }
-
-          throw new Error(`Unsupported format: ${format}`);
-        }),
-    );
-
-    const event: ManifestEvent = {
+    const event: ManifestItemEvent = {
       eventType: 'item',
       executionId: request.executionId,
       suiteName: request.suiteName,
@@ -106,11 +72,6 @@ export class EvidenceFactory {
       status: normalizedStatus,
       consoleMode: request.consoleMode,
       payload: request.payload,
-      artifacts: {
-        jsonPath: artifacts.find((a) => a.format === 'json')?.relativePath,
-        xmlPath: artifacts.find((a) => a.format === 'xml')?.relativePath,
-        csvPath: artifacts.find((a) => a.format === 'csv')?.relativePath,
-      },
       createdAt: nowIso(),
     };
 
@@ -125,7 +86,7 @@ export class EvidenceFactory {
       artifactId: request.artifactId,
       status: normalizedStatus,
       generatedAt: nowIso(),
-      artifacts,
+      artifacts: [],
     };
   }
 
@@ -136,14 +97,18 @@ export class EvidenceFactory {
     const events = (await this.store.readAll(eventPath)) as ManifestEvent[];
 
     const summary = events
-      .filter((e): e is ManifestSummaryEvent => e.eventType === 'summary')
+      .filter((event): event is ManifestSummaryEvent => event.eventType === 'summary')
       .pop();
 
-    let excel;
+    if (!summary) {
+      throw new Error('No summary event found. Cannot finalize execution.');
+    }
 
-    if (summary?.outputFormats.includes('excel')) {
+    let excel: FinalizeExecutionResponse['excel'];
+
+    if (summary.outputFormats.includes('excel')) {
       excel = await this.excelWriter.write(
-        this.router.excelPath(request.suiteName, request.executionId, {}),
+        this.router.excelPath(request.suiteName, request.executionId, summary.metaPayload),
         request,
         events,
       );
@@ -156,5 +121,16 @@ export class EvidenceFactory {
       excel,
       eventCount: events.length,
     };
+  }
+
+  async archiveOldExecutions(
+    args: ArchiveExecutionsRequest = {},
+  ): Promise<{ archivedCount: number }> {
+    return this.archiveService.archiveOldExecutions({
+      olderThanDays: args.olderThanDays ?? this.options.archive?.olderThanDays,
+      zip: args.zip ?? this.options.archive?.zip ?? false,
+      maxCurrentExecutionsPerSuite:
+        args.maxCurrentExecutionsPerSuite ?? this.options.archive?.maxCurrentExecutionsPerSuite,
+    });
   }
 }
