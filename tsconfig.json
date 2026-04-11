@@ -35,12 +35,6 @@
       "@dataLayer/*": [
         "src/dataLayer/*"
       ],
-      "@evidenceLayer": [
-        "src/evidenceLayer/index.ts"
-      ],
-      "@evidenceLayer/*": [
-        "src/evidenceLayer/*"
-      ],
       "@evidenceFactory": [
         "src/evidenceFactory/index.ts"
       ],
