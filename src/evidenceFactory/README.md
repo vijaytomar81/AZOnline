@@ -80,7 +80,7 @@ const factory = new EvidenceFactory({
 ```
 ---
 
-## Write evidence during execution
+## Write evidence during execution using "payload" or "metaPayload"
 ```
 await factory.writeEvidence({
       executionId: 'RUN-001',
@@ -118,66 +118,6 @@ await factory.writeEvidence({
 ```
 ---
 
-## Finalize execution / Execution Summary
-```
-await factory.finalizeExecution({
-  executionId: "RUN-001",
-  suiteName: "motor-regression",
-  metaPayload: {
-      run: {
-        runId: 'test-run-20260410_114949',
-        mode: 'e2e',
-        environment: 'test',
-        evidenceDirectory: 'results/evidence/test-run-20260410_114949',
-      },
-      runtime: {
-        machineName: 'Vijays-MacBook-Air.local',
-        user: 'vijaytomar',
-        platform: 'darwin',
-        osVersion: '25.3.0',
-      },
-      browser: {
-        browser: 'chromium',
-        browserChannel: 'msedge',
-        browserVersion: '146.0.3856.97',
-        headless: true,
-      },
-      results: {
-        totalItems: 2,
-        passedCount: 1,
-        failedCount: 1,
-        errorCount: 0,
-        notExecutedCount: 0,
-        passRate: '50.00%',
-      },
-      timing: {
-        executionTime: '7.74s',
-        startedAt: '2026-04-10T09:49:49.351Z',
-        finishedAt: '2026-04-10T09:49:57.086Z',
-      },
-
-      // Optional flat keys too, if your current META_EVIDENCE_FIELDS still use them
-      runId: 'RUN-001',
-      mode: 'e2e',
-      environment: 'qa',
-      startedAt: startedAt.toISOString(),
-      finishedAt: finishedAt.toISOString(),
-      totalCount: 2,
-      passedCount: 1,
-      failedCount: 1,
-      errorCount: 0,
-      notExecutedCount: 0,
-      cleanupWorkerArtifacts: false,
-      finalizedAt: finishedAt.toISOString(),
-      artifactTimestamp: finishedAt.toISOString(),
-      outputRoot: 'artifacts',
-      evidenceDir: 'artifacts/current/motor-regression/RUN-001',
-      promotedPageScanCount: 0,
-    },
-});
-```
----
-
 ## Output structure
 ```
 artifacts/
@@ -204,11 +144,25 @@ TC001_create-quote_2026-04-10T09-15-00-000Z.json
 
 ## Output formats
 
+### writeEvidence
+
 Controlled via:
 
 outputFormats: ["json", "xml", "csv", "console"]
 
-Excel is generated only during finalizeExecution.
+### finalizeExecution
+
+Controlled via:
+
+outputFormats: ["excel"]
+
+---
+
+### Important
+
+- Only explicitly requested formats are generated
+- Excel is generated only during finalizeExecution
+- Console logs are generated only if "console" is included
 
 ---
 
