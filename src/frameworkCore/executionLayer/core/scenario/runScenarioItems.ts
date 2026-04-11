@@ -133,7 +133,7 @@ export async function runScenarioItems(args: {
                             artifactName: notExecutedResult.action,
                             status: notExecutedResult.status,
                             consoleMode: args.mode,
-                            outputFormats: ["json", "console"],
+                            outputFormats: ["json", "excel"],
                             payload: {
                                 scenarioId:
                                     args.context.scenario.scenarioId,

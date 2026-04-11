@@ -80,56 +80,41 @@ async function main(): Promise<void> {
   const result = await factory.finalizeExecution({
     executionId: 'RUN-001',
     suiteName: 'motor-regression',
+    outputFormats: ['excel'],
     metaPayload: {
-      run: {
-        runId: 'test-run-20260410_114949',
-        mode: 'e2e',
-        environment: 'test',
-        evidenceDirectory: 'results/evidence/test-run-20260410_114949',
-      },
-      runtime: {
-        machineName: 'Vijays-MacBook-Air.local',
-        user: 'vijaytomar',
-        platform: 'darwin',
-        osVersion: '25.3.0',
-      },
-      browser: {
-        browser: 'chromium',
-        browserChannel: 'msedge',
-        browserVersion: '146.0.3856.97',
-        headless: true,
-      },
-      results: {
-        totalItems: 2,
-        passedCount: 1,
-        failedCount: 1,
-        errorCount: 0,
-        notExecutedCount: 0,
-        passRate: '50.00%',
-      },
-      timing: {
-        executionTime: '7.74s',
-        startedAt: '2026-04-10T09:49:49.351Z',
-        finishedAt: '2026-04-10T09:49:57.086Z',
-      },
-
-      // Optional flat keys too, if your current META_EVIDENCE_FIELDS still use them
       runId: 'RUN-001',
       mode: 'e2e',
       environment: 'qa',
-      startedAt: startedAt.toISOString(),
-      finishedAt: finishedAt.toISOString(),
-      totalTime: '7740',
+      evidenceDirectory: 'artifacts/current/motor-regression/RUN-001',
+
+      machineName: 'Vijays-MacBook-Air.local',
+      user: 'vijaytomar',
+      platform: 'darwin',
+      osVersion: '25.3.0',
+
+      browser: 'chromium',
+      browserChannel: 'msedge',
+      browserVersion: '146.0.3856.97',
+      headless: true,
+
       totalItems: 2,
       passedItems: 1,
       failedItems: 1,
       errorItems: 0,
       notExecutedItems: 0,
+
       totalCount: 2,
       passedCount: 1,
       failedCount: 1,
       errorCount: 0,
       notExecutedCount: 0,
+      passRate: '50.00%',
+
+      executionTime: '7.74s',
+      startedAt: startedAt.toISOString(),
+      finishedAt: finishedAt.toISOString(),
+      totalTime: '7740',
+
       workerArtifactCount: 2,
       mergedCaseCount: 0,
       corruptedArtifactCount: 0,
@@ -137,13 +122,14 @@ async function main(): Promise<void> {
       cleanupWorkerArtifacts: false,
       finalizedAt: finishedAt.toISOString(),
       artifactTimestamp: finishedAt.toISOString(),
+      promotedPageScanCount: 0,
+
       outputRoot: 'artifacts',
       evidenceDir: 'artifacts/current/motor-regression/RUN-001',
       passedEvidencePath: 'artifacts/current/motor-regression/RUN-001/json/passed',
       failedEvidencePath: 'artifacts/current/motor-regression/RUN-001/json/failed',
       notExecutedEvidencePath: 'artifacts/current/motor-regression/RUN-001/json/not-executed',
       pageScansDir: '',
-      promotedPageScanCount: 0,
     },
   });
 

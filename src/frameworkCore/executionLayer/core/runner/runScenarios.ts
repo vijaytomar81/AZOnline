@@ -179,6 +179,7 @@ export async function runScenarios(
         await evidenceFactory.finalizeExecution({
             executionId: runId,
             suiteName,
+            outputFormats: ["excel"],
             metaPayload: buildEvidenceMetaPayload({
                 source: metaSource,
             }),

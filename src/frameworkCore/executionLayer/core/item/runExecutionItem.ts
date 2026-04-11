@@ -122,7 +122,7 @@ async function writeItemEvidence(args: {
         artifactName: artifactName || args.result.action,
         status: args.result.status,
         consoleMode: args.runArgs.mode,
-        outputFormats: ["json", "console"],
+        outputFormats: ["json", "excel"],
         payload: buildEvidencePayload({
             context: args.runArgs.context,
             result: args.result,
