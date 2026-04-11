@@ -131,6 +131,7 @@ async function main(): Promise<void> {
         totalItems: 2,
         passedCount: 1,
         failedCount: 1,
+        errorCount: 0,
         notExecutedCount: 0,
         passRate: '50.00%',
       },
