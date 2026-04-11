@@ -83,68 +83,97 @@ const factory = new EvidenceFactory({
 ## Write evidence during execution
 ```
 await factory.writeEvidence({
-  executionId: "RUN-001",
-  suiteName: "motor-regression",
-
-  artifactId: "TC001",
-  artifactName: "create-quote",
-
-  status: "passed",
-
-  // ✅ Only include what you actually want to generate
-  // (Excel will ALWAYS be generated in finalize step)
-  outputFormats: ["json", "console"],
-
-  // ✅ Optional but recommended
-  consoleMode: "e2e",
-
-  payload: {
-    scenarioId: "SCN-001",
-    scenarioName: "Create Quote",
-    platform: "Athena",
-    application: "AzOnline",
-    product: "Motor",
-    journeyStartWith: "NewBusiness",
-
-    itemNo: 1,
-    action: "Create Quote",
-    testCaseRef: "TC001",
-
-    startedAt: new Date().toISOString(),
-    finishedAt: new Date().toISOString(),
-
-    calculatedEmail: "test@example.com",
-    quoteNumber: "Q-10001",
-    policyNumber: "P-10001",
-
-    // ✅ Nested example (important for your config)
-    runtime: {
-        machineName: 'Vijays-MacBook-Air.local',
-        user: 'vijaytomar',
-        platform: 'darwin',
-        osVersion: '25.3.0',
+      executionId: 'RUN-001',
+      suiteName: 'motor-regression',
+      artifactId: 'TC001',
+      artifactName: 'create-quote',
+      status: 'passed',
+      consoleMode: 'e2e',
+      outputFormats: ['json', 'console'],
+      payload: {
+        scenarioId: 'SCN-001',
+        scenarioName: 'Create Quote',
+        platform: 'Athena',
+        application: 'AzOnline',
+        product: 'Motor',
+        journeyStartWith: 'NewBusiness',
+        description: 'Create quote and verify premium',
+        status: 'passed',
+        itemNo: 1,
+        action: 'Create Quote',
+        subType: 'HappyPath',
+        portal: 'AzOnline',
+        testCaseRef: 'TC001',
+        startedAt: startedAt.toISOString(),
+        finishedAt: new Date(startedAt.getTime() + 2_500).toISOString(),
+        message: '',
+        errorDetails: '',
+        blockedBy: '',
+        calculatedEmail: 'test@example.com',
+        calculatedEmailId: 'test',
+        quoteNumber: 'Q-10001',
+        policyNumber: 'P-10001',
       },
-    browser: {
-        browser: 'chromium',
-        browserChannel: 'msedge',
-        browserVersion: '146.0.3856.97',
-        headless: true,
-      },
-  },
-});
+    });
 ```
 ---
 
-## Finalize execution
+## Finalize execution / Execution Summary
 ```
 await factory.finalizeExecution({
   executionId: "RUN-001",
   suiteName: "motor-regression",
   metaPayload: {
-    runId: "RUN-001",
-    environment: "qa",
-    totalItems: 10
-  }
+      run: {
+        runId: 'test-run-20260410_114949',
+        mode: 'e2e',
+        environment: 'test',
+        evidenceDirectory: 'results/evidence/test-run-20260410_114949',
+      },
+      runtime: {
+        machineName: 'Vijays-MacBook-Air.local',
+        user: 'vijaytomar',
+        platform: 'darwin',
+        osVersion: '25.3.0',
+      },
+      browser: {
+        browser: 'chromium',
+        browserChannel: 'msedge',
+        browserVersion: '146.0.3856.97',
+        headless: true,
+      },
+      results: {
+        totalItems: 2,
+        passedCount: 1,
+        failedCount: 1,
+        errorCount: 0,
+        notExecutedCount: 0,
+        passRate: '50.00%',
+      },
+      timing: {
+        executionTime: '7.74s',
+        startedAt: '2026-04-10T09:49:49.351Z',
+        finishedAt: '2026-04-10T09:49:57.086Z',
+      },
+
+      // Optional flat keys too, if your current META_EVIDENCE_FIELDS still use them
+      runId: 'RUN-001',
+      mode: 'e2e',
+      environment: 'qa',
+      startedAt: startedAt.toISOString(),
+      finishedAt: finishedAt.toISOString(),
+      totalCount: 2,
+      passedCount: 1,
+      failedCount: 1,
+      errorCount: 0,
+      notExecutedCount: 0,
+      cleanupWorkerArtifacts: false,
+      finalizedAt: finishedAt.toISOString(),
+      artifactTimestamp: finishedAt.toISOString(),
+      outputRoot: 'artifacts',
+      evidenceDir: 'artifacts/current/motor-regression/RUN-001',
+      promotedPageScanCount: 0,
+    },
 });
 ```
 ---

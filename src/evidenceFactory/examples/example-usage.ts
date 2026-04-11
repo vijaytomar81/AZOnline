@@ -40,20 +40,6 @@ async function main(): Promise<void> {
         calculatedEmailId: 'test',
         quoteNumber: 'Q-10001',
         policyNumber: 'P-10001',
-        runtimeInfo: {
-          system: {
-            machineName: 'Vijays-MacBook-Air.local',
-            user: 'vijaytomar',
-            platform: process.platform,
-            osVersion: process.version,
-          },
-          browser: {
-            browser: 'chromium',
-            browserChannel: 'msedge',
-            browserVersion: '146.0.3856.97',
-            headless: true,
-          },
-        },
       },
     }),
     factory.writeEvidence({
@@ -87,20 +73,6 @@ async function main(): Promise<void> {
         calculatedEmailId: 'test2',
         quoteNumber: 'Q-10002',
         policyNumber: '',
-        runtimeInfo: {
-          system: {
-            machineName: 'Vijays-MacBook-Air.local',
-            user: 'vijaytomar',
-            platform: process.platform,
-            osVersion: process.version,
-          },
-          browser: {
-            browser: 'chromium',
-            browserChannel: 'msedge',
-            browserVersion: '146.0.3856.97',
-            headless: true,
-          },
-        },
       },
     }),
   ]);
@@ -172,20 +144,6 @@ async function main(): Promise<void> {
       notExecutedEvidencePath: 'artifacts/current/motor-regression/RUN-001/json/not-executed',
       pageScansDir: '',
       promotedPageScanCount: 0,
-      runtimeInfo: {
-        system: {
-          machineName: 'Vijays-MacBook-Air.local',
-          user: 'vijaytomar',
-          platform: process.platform,
-          osVersion: process.version,
-        },
-        browser: {
-          browser: 'chromium',
-          browserChannel: 'msedge',
-          browserVersion: '146.0.3856.97',
-          headless: true,
-        },
-      },
     },
   });
 
