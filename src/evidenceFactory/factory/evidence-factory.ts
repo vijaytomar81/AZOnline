@@ -1,4 +1,5 @@
 // src/evidenceFactory/factory/evidence-factory.ts
+
 import path from 'path';
 import { JsonWriter } from '../writers/json/json-writer';
 import { XmlWriter } from '../writers/xml/xml-writer';
@@ -89,7 +90,10 @@ export class EvidenceFactory {
       createdAt: nowIso(),
     };
 
-    await this.store.append(this.router.eventFilePath(request.suiteName, request.executionId), event);
+    await this.store.append(
+      this.router.eventFilePath(request.suiteName, request.executionId),
+      event,
+    );
 
     return {
       executionId: request.executionId,
@@ -104,11 +108,15 @@ export class EvidenceFactory {
     const eventPath = this.router.eventFilePath(request.suiteName, request.executionId);
     const events = await this.store.readAll(eventPath);
 
-    const excel = await this.excelWriter.write(
-      this.router.excelPath(request.suiteName, request.executionId, request.metaPayload),
-      request,
-      events,
-    );
+    let excel: FinalizeExecutionResponse['excel'];
+
+    if (request.outputFormats.includes('excel')) {
+      excel = await this.excelWriter.write(
+        this.router.excelPath(request.suiteName, request.executionId, request.metaPayload),
+        request,
+        events,
+      );
+    }
 
     return {
       executionId: request.executionId,
@@ -119,7 +127,9 @@ export class EvidenceFactory {
     };
   }
 
-  async archiveOldExecutions(args: ArchiveExecutionsRequest = {}): Promise<{ archivedCount: number }> {
+  async archiveOldExecutions(
+    args: ArchiveExecutionsRequest = {},
+  ): Promise<{ archivedCount: number }> {
     return this.archiveService.archiveOldExecutions({
       olderThanDays: args.olderThanDays ?? this.options.archive?.olderThanDays,
       zip: args.zip ?? this.options.archive?.zip ?? false,

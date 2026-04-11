@@ -1,5 +1,9 @@
 // src/evidenceFactory/contracts/types.ts
-export type EvidenceOutputFormat = 'json' | 'xml' | 'csv' | 'console';
+
+export type EvidenceOutputFormat = 'json' | 'xml' | 'csv' | 'console' | 'excel';
+
+export type EvidenceWriteOutputFormat = Exclude<EvidenceOutputFormat, 'excel'>;
+export type FinalizeExecutionOutputFormat = Extract<EvidenceOutputFormat, 'excel'>;
 
 export type EvidenceWriteRequest = {
   executionId: string;
@@ -7,7 +11,7 @@ export type EvidenceWriteRequest = {
   artifactId: string;
   artifactName?: string;
   status: string;
-  outputFormats: EvidenceOutputFormat[];
+  outputFormats: EvidenceWriteOutputFormat[];
   payload: Record<string, unknown>;
   consoleMode?: 'data' | 'e2e' | string;
 };
@@ -16,6 +20,7 @@ export type FinalizeExecutionRequest = {
   executionId: string;
   suiteName: string;
   metaPayload: Record<string, unknown>;
+  outputFormats: FinalizeExecutionOutputFormat[];
 };
 
 export type ArtifactMetadata = {
@@ -39,7 +44,7 @@ export type FinalizeExecutionResponse = {
   executionId: string;
   suiteName: string;
   generatedAt: string;
-  excel: ArtifactMetadata;
+  excel?: ArtifactMetadata;
   eventCount: number;
 };
 
