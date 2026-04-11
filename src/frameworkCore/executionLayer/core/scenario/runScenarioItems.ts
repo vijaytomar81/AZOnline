@@ -74,6 +74,12 @@ export async function runScenarioItems(args: {
     logScope: string;
     overrideItemData?: Record<string, unknown>;
     stopOnFailure?: boolean;
+
+    // ✅ NEW: EvidenceFactory integration
+    evidenceFactory?: any;
+    runId?: string;
+    suiteName?: string;
+    mode?: "e2e" | "data";
 }): Promise<void> {
     const stopOnFailure = args.stopOnFailure !== false;
     const items = args.context.scenario.items;
@@ -88,6 +94,12 @@ export async function runScenarioItems(args: {
             executionItemDataRegistry: args.executionItemDataRegistry,
             logScope: `${args.logScope}:Item${item.itemNo}`,
             overrideItemData: args.overrideItemData,
+
+            // ✅ pass through to item layer
+            evidenceFactory: args.evidenceFactory,
+            runId: args.runId,
+            suiteName: args.suiteName,
+            mode: args.mode,
         });
 
         if (stopOnFailure && result.status === "failed") {
@@ -96,15 +108,58 @@ export async function runScenarioItems(args: {
                 skippedIndex < items.length;
                 skippedIndex++
             ) {
-                addExecutionItemResult(
-                    args.context,
-                    createNotExecutedItemResult({
-                        context: args.context,
-                        item: items[skippedIndex],
-                        failedItem: item,
-                        failedResult: result,
-                    })
-                );
+                const skippedItem = items[skippedIndex];
+
+                const notExecutedResult = createNotExecutedItemResult({
+                    context: args.context,
+                    item: skippedItem,
+                    failedItem: item,
+                    failedResult: result,
+                });
+
+                addExecutionItemResult(args.context, notExecutedResult);
+
+                // ✅ ALSO send to EvidenceFactory
+                try {
+                    if (args.evidenceFactory) {
+                        await args.evidenceFactory.writeEvidence({
+                            executionId: args.runId ?? "local-run",
+                            suiteName: args.suiteName ?? "default-suite",
+                            artifactId:
+                                String(
+                                    notExecutedResult.details?.testCaseRef ??
+                                    notExecutedResult.itemNo
+                                ),
+                            artifactName: notExecutedResult.action,
+                            status: notExecutedResult.status,
+                            consoleMode: args.mode,
+                            outputFormats: ["json", "console"],
+                            payload: {
+                                scenarioId:
+                                    args.context.scenario.scenarioId,
+                                scenarioName:
+                                    args.context.scenario.scenarioName,
+
+                                itemNo: notExecutedResult.itemNo,
+                                action: notExecutedResult.action,
+                                status: notExecutedResult.status,
+                                startedAt: notExecutedResult.startedAt,
+                                finishedAt: notExecutedResult.finishedAt,
+
+                                message:
+                                    notExecutedResult.message ?? "",
+                                errorDetails:
+                                    notExecutedResult.details
+                                        ?.errorDetails ?? "",
+                                blockedBy:
+                                    notExecutedResult.details
+                                        ?.blockedBy ?? "",
+                            },
+                        });
+                    }
+                } catch {
+                    // ignore evidence failures
+                }
             }
 
             break;

@@ -106,6 +106,60 @@ export async function runExecutionItem(
         });
 
         addExecutionItemResult(args.context, result);
+
+        // ✅ NEW: EvidenceFactory integration (non-blocking)
+        try {
+            if (args.evidenceFactory) {
+                await args.evidenceFactory.writeEvidence({
+                    executionId: args.runId ?? "local-run",
+                    suiteName: args.suiteName ?? "default-suite",
+                    artifactId:
+                        String(result.details?.testCaseRef ?? result.itemNo),
+                    artifactName: result.action,
+                    status: result.status,
+                    consoleMode: args.mode,
+                    outputFormats: ["json", "console"],
+                    payload: {
+                        // Scenario
+                        scenarioId: args.context.scenario.scenarioId,
+                        scenarioName: args.context.scenario.scenarioName,
+                        platform: args.context.scenario.platform,
+                        application: args.context.scenario.application,
+                        product: args.context.scenario.product,
+                        journeyStartWith:
+                            args.context.scenario.journeyStartWith,
+                        description: args.context.scenario.description,
+
+                        // Item
+                        itemNo: result.itemNo,
+                        action: result.action,
+                        subType: result.details?.subType,
+                        portal: result.details?.portal,
+                        testCaseRef: result.details?.testCaseRef,
+
+                        status: result.status,
+                        startedAt: result.startedAt,
+                        finishedAt: result.finishedAt,
+
+                        message: result.message ?? "",
+                        errorDetails: result.details?.errorDetails ?? "",
+                        blockedBy: result.details?.blockedBy ?? "",
+
+                        // Outputs (flattened)
+                        ...args.context.outputs,
+                    },
+                });
+            }
+        } catch (err) {
+            emitLog({
+                scope: args.logScope,
+                level: LOG_LEVELS.WARN,
+                category: LOG_CATEGORIES.FRAMEWORK,
+                message: `EvidenceFactory write failed: ${err instanceof Error ? err.message : String(err)
+                    }`,
+            });
+        }
+
         return result;
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
@@ -118,6 +172,38 @@ export async function runExecutionItem(
         });
 
         addExecutionItemResult(args.context, result);
+
+        // Optional: also log failure to evidence
+        try {
+            if (args.evidenceFactory) {
+                await args.evidenceFactory.writeEvidence({
+                    executionId: args.runId ?? "local-run",
+                    suiteName: args.suiteName ?? "default-suite",
+                    artifactId:
+                        String(result.details?.testCaseRef ?? result.itemNo),
+                    artifactName: result.action,
+                    status: result.status,
+                    consoleMode: args.mode,
+                    outputFormats: ["json", "console"],
+                    payload: {
+                        scenarioId: args.context.scenario.scenarioId,
+                        scenarioName: args.context.scenario.scenarioName,
+
+                        itemNo: result.itemNo,
+                        action: result.action,
+                        status: result.status,
+                        startedAt: result.startedAt,
+                        finishedAt: result.finishedAt,
+
+                        message: result.message ?? "",
+                        errorDetails: result.details?.errorDetails ?? "",
+                    },
+                });
+            }
+        } catch {
+            // ignore
+        }
+
         return result;
     }
 }

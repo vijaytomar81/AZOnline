@@ -1,6 +1,5 @@
 // src/frameworkCore/executionLayer/core/scenario/runExecutionScenario.ts
 
-import { writeScenarioEvidence } from "@frameworkCore/executionLayer/reporting";
 import type {
     ExecutionScenario,
     ExecutionScenarioResult,
@@ -24,9 +23,12 @@ export async function runExecutionScenario(args: {
     logScope: string;
     overrideItemData?: Record<string, unknown>;
     stopOnFailure?: boolean;
+
+    // ✅ NEW: EvidenceFactory integration
+    evidenceFactory?: any;
     runId?: string;
-    workerId?: string;
-    evidenceOutputRoot?: string;
+    suiteName?: string;
+    mode?: "e2e" | "data";
 }): Promise<ExecutionScenarioResult> {
     const context = createScenarioExecutionContext(args.scenario);
     let session: BrowserSession | undefined;
@@ -42,20 +44,18 @@ export async function runExecutionScenario(args: {
             logScope: args.logScope,
             overrideItemData: args.overrideItemData,
             stopOnFailure: args.stopOnFailure,
+
+            // ✅ pass EvidenceFactory downstream
+            evidenceFactory: args.evidenceFactory,
+            runId: args.runId,
+            suiteName: args.suiteName,
+            mode: args.mode,
         });
     } finally {
         await closeBrowserSession(session);
     }
 
     const result = buildScenarioExecutionResult(context);
-
-    await writeScenarioEvidence({
-        context,
-        result,
-        runId: args.runId ?? "local-run",
-        workerId: args.workerId ?? "worker-0",
-        outputRoot: args.evidenceOutputRoot,
-    });
 
     return result;
 }

@@ -1,34 +1,47 @@
 // src/frameworkCore/executionLayer/core/runner/types.ts
 
-import type {
-    ExecutionPlan,
-    ExecutionScenario,
-} from "@frameworkCore/executionLayer/contracts";
+import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
 import type { ExecutorRegistry } from "@frameworkCore/executionLayer/core/registry";
 import type { ExecutionItemDataRegistry } from "@frameworkCore/executionLayer/runtime/itemData";
-import type { Platform } from "@configLayer/models/platform.config";
-import type { Application } from "@configLayer/models/application.config";
-import type { Product } from "@configLayer/models/product.config";
-import type { JourneyContext } from "@configLayer/models/journeyContext.config";
+import type { EvidenceFactory } from "@evidenceFactory";
 
-export type RunScenariosArgs = ExecutionPlan & {
+export type RunOutput = {
+    status: "passed" | "failed" | "not_executed";
+    block: string;
+    browser?: unknown;
+};
+
+export type RunScenariosArgs = {
+    // Core execution
+    mode: "data" | "e2e";
+    environment: string;
+    scenarios: ExecutionScenario[];
+    iterations?: number;
+    parallel?: number;
+    verbose?: boolean;
+
+    // Execution infrastructure
     registry: ExecutorRegistry;
     executionItemDataRegistry: ExecutionItemDataRegistry;
-    resolveOverrideItemData?: (
-        scenario: ExecutionScenario
-    ) => Record<string, unknown> | undefined;
+    resolveOverrideItemData?: (scenario: ExecutionScenario) => Record<string, unknown> | undefined;
+
+    // Optional metadata (used in logs / headers)
+    platform?: string;
+    application?: string;
+    product?: string;
+    journeyContext?: unknown;
+
+    // CLI / source context
+    schema?: string;
+    source?: string;
+    sheet?: string;
+
+    // Evidence / reporting
     runId?: string;
     workerId?: string;
     evidenceOutputRoot?: string;
 
-    platform?: Platform;
-    application?: Application;
-    product?: Product;
-    journeyContext?: JourneyContext;
-};
-
-export type RunOutput = {
-    status: "passed" | "failed";
-    block: string;
-    browser?: unknown;
+    // ✅ NEW — EvidenceFactory integration
+    evidenceFactory?: EvidenceFactory;
+    suiteName?: string;
 };

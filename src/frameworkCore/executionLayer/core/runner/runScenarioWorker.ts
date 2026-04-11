@@ -19,9 +19,12 @@ export async function runScenarioWorker(args: {
         executionItemDataRegistry: args.runArgs.executionItemDataRegistry,
         logScope: getScenarioScope(args.scenario),
         overrideItemData: args.runArgs.resolveOverrideItemData?.(args.scenario),
+
+        // ✅ pass EvidenceFactory context
+        evidenceFactory: args.runArgs.evidenceFactory,
         runId: args.runArgs.runId,
-        workerId: args.runArgs.workerId,
-        evidenceOutputRoot: args.runArgs.evidenceOutputRoot,
+        suiteName: args.runArgs.suiteName,
+        mode: args.runArgs.mode,
     });
 
     return {

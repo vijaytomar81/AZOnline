@@ -2,10 +2,6 @@
 
 import { createRuntimeInfo } from "@utils/runtimeInfo";
 import type { RuntimeBrowserInfo } from "@utils/runtimeInfo";
-import {
-    cleanupOldEvidenceRuns,
-    finalizeRunEvidence,
-} from "@evidenceLayer";
 import { executionConfig } from "@configLayer/execution.config";
 import { resolveRunId } from "@frameworkCore/executionLayer/runtime/resolveRunId";
 import {
@@ -18,6 +14,7 @@ import { expandScenarios } from "./expandScenarios";
 import { runScenarioBatch } from "./runScenarioBatch";
 import { runScenarioWorker } from "./runScenarioWorker";
 import type { RunScenariosArgs } from "./types";
+import { EvidenceFactory } from "@evidenceFactory";
 
 export async function runScenarios(
     args: RunScenariosArgs
@@ -26,16 +23,35 @@ export async function runScenarios(
     const startedAt = new Date().toISOString();
 
     const parallel = Math.max(1, args.parallel ?? 1);
-    const runs = expandScenarios(args.scenarios, args.iterations);
+
+    // ✅ FIX 1: ensure iterations is always number
+    const iterations = args.iterations ?? 1;
+
+    const runs = expandScenarios(args.scenarios, iterations);
     const runId = args.runId ?? resolveRunId();
 
-    const evidenceOutputRoot = args.evidenceOutputRoot;
+    const suiteName =
+        args.suiteName ??
+        `${args.platform ?? "default"}-${args.application ?? "app"}`;
+
+    const evidenceFactory = new EvidenceFactory({
+        rootDir: process.env.EVIDENCE_ROOT_DIR ?? "artifacts",
+        fileNaming: {
+            includeTimestamp: true,
+            timestampSource: "payload",
+        },
+        archive: {
+            olderThanDays: 14,
+            zip: true,
+            maxCurrentExecutionsPerSuite: 30,
+        },
+    });
 
     console.log(
         renderExecutionHeader({
             mode: args.mode,
             environment: args.environment,
-            iterations: args.iterations,
+            iterations, // ✅ FIX 2
             parallel,
             schema: args.schema,
             source: args.source,
@@ -45,7 +61,10 @@ export async function runScenarios(
             platform: args.platform,
             application: args.application,
             product: args.product,
-            journeyContext: args.journeyContext,
+
+            // ✅ FIX 3: cast journeyContext
+            journeyContext:
+                args.journeyContext as { type: string } | undefined,
         })
     );
 
@@ -58,8 +77,8 @@ export async function runScenarios(
                 runArgs: {
                     ...args,
                     runId,
-                    workerId: args.workerId ?? "worker-0",
-                    evidenceOutputRoot,
+                    suiteName,
+                    evidenceFactory,
                 },
             })
     );
@@ -73,14 +92,6 @@ export async function runScenarios(
     const totalTime = formatDuration(startedAtMs);
     const finishedAt = new Date().toISOString();
 
-    let finalEvidence:
-        | {
-              baseDir: string;
-              passedEvidencePath: string;
-              failedEvidencePath?: string;
-          }
-        | undefined;
-
     if (executionConfig.generatedEvidenceArtifacts.enabled) {
         const browserInfo = outputs.find((o) => o.browser)?.browser as
             | RuntimeBrowserInfo
@@ -90,31 +101,21 @@ export async function runScenarios(
             browser: browserInfo,
         });
 
-        finalEvidence = await finalizeRunEvidence({
-            runId,
-            outputRoot: evidenceOutputRoot,
-            cleanupTemporaryArtifacts:
-                executionConfig.generatedEvidenceArtifacts.cleanupTemporaryFilesAfterMerge,
-            keepFailedEvidenceFileOnlyWhenNeeded:
-                executionConfig.generatedEvidenceArtifacts.keepFailedEvidenceFileOnlyWhenNeeded,
-            metadata: {
+        await evidenceFactory.finalizeExecution({
+            executionId: runId,
+            suiteName,
+            metaPayload: {
                 mode: args.mode,
                 environment: args.environment,
                 totalTime,
                 startedAt,
                 finishedAt,
                 totalItems: runs.length,
-                passedItems: passed,
-                failedItems: failed,
-                notExecutedItems: runs.length - (passed + failed),
+                passedCount: passed,
+                failedCount: failed,
+                notExecutedCount: runs.length - (passed + failed),
                 runtimeInfo,
             },
-        });
-
-        await cleanupOldEvidenceRuns({
-            outputRoot: args.evidenceOutputRoot,
-            maxToKeep: executionConfig.generatedEvidenceArtifacts.maxToKeep,
-            excludeRunIds: [runId],
         });
     }
 
@@ -125,9 +126,7 @@ export async function runScenarios(
             failed,
             totalTime,
             runId,
-            evidenceDir: finalEvidence?.baseDir,
-            passedEvidencePath: finalEvidence?.passedEvidencePath,
-            failedEvidencePath: finalEvidence?.failedEvidencePath,
+            evidenceDir: `artifacts/current/${suiteName}/${runId}`,
         })
     );
 }

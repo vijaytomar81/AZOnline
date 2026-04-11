@@ -14,4 +14,10 @@ export type RunExecutionItemArgs = {
     executionItemDataRegistry: ExecutionItemDataRegistry;
     logScope: string;
     overrideItemData?: Record<string, unknown>;
+
+    // ✅ ADD THESE
+    evidenceFactory?: any;
+    runId?: string;
+    suiteName?: string;
+    mode?: "e2e" | "data";
 };
