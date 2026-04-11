@@ -118,15 +118,18 @@ await factory.writeEvidence({
     policyNumber: "P-10001",
 
     // ✅ Nested example (important for your config)
-    runtimeInfo: {
-      system: {
-        platform: process.platform,
+    runtime: {
+        machineName: 'Vijays-MacBook-Air.local',
+        user: 'vijaytomar',
+        platform: 'darwin',
+        osVersion: '25.3.0',
       },
-      browser: {
-        name: "chromium",
+    browser: {
+        browser: 'chromium',
+        browserChannel: 'msedge',
+        browserVersion: '146.0.3856.97',
         headless: true,
       },
-    },
   },
 });
 ```
