@@ -176,13 +176,19 @@ export async function runScenarios(
             promotedPageScanCount: 0,
         };
 
-        await evidenceFactory.finalizeExecution({
+        await evidenceFactory.writeEvidence({
+            entryType: 'summary',
             executionId: runId,
             suiteName,
-            outputFormats: ["excel"],
+            outputFormats: ['excel'],
             metaPayload: buildEvidenceMetaPayload({
                 source: metaSource,
             }),
+        });
+
+        await evidenceFactory.finalizeExecution({
+            executionId: runId,
+            suiteName,
         });
     }
 

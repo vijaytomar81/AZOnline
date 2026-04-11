@@ -2,25 +2,31 @@
 
 export type EvidenceOutputFormat = 'json' | 'xml' | 'csv' | 'console' | 'excel';
 
-export type EvidenceWriteOutputFormat = Exclude<EvidenceOutputFormat, 'excel'>;
-export type FinalizeExecutionOutputFormat = Extract<EvidenceOutputFormat, 'excel'>;
-
-export type EvidenceWriteRequest = {
+export type EvidenceWriteBaseRequest = {
   executionId: string;
   suiteName: string;
+  outputFormats: [EvidenceOutputFormat, ...EvidenceOutputFormat[]];
+};
+
+export type EvidenceWriteItemRequest = EvidenceWriteBaseRequest & {
+  entryType: 'item';
   artifactId: string;
   artifactName?: string;
   status: string;
-  outputFormats: EvidenceWriteOutputFormat[];
   payload: Record<string, unknown>;
   consoleMode?: 'data' | 'e2e' | string;
 };
 
+export type EvidenceWriteSummaryRequest = EvidenceWriteBaseRequest & {
+  entryType: 'summary';
+  metaPayload: Record<string, unknown>;
+};
+
+export type EvidenceWriteRequest = EvidenceWriteItemRequest | EvidenceWriteSummaryRequest;
+
 export type FinalizeExecutionRequest = {
   executionId: string;
   suiteName: string;
-  metaPayload: Record<string, unknown>;
-  outputFormats: FinalizeExecutionOutputFormat[];
 };
 
 export type ArtifactMetadata = {
@@ -34,8 +40,9 @@ export type ArtifactMetadata = {
 
 export type EvidenceWriteResponse = {
   executionId: string;
-  artifactId: string;
-  status: string;
+  entryType: 'item' | 'summary';
+  artifactId?: string;
+  status?: string;
   generatedAt: string;
   artifacts: ArtifactMetadata[];
 };
@@ -48,7 +55,8 @@ export type FinalizeExecutionResponse = {
   eventCount: number;
 };
 
-export type ManifestEvent = {
+export type ManifestItemEvent = {
+  eventType: 'item';
   executionId: string;
   suiteName: string;
   artifactId: string;
@@ -63,6 +71,17 @@ export type ManifestEvent = {
   };
   createdAt: string;
 };
+
+export type ManifestSummaryEvent = {
+  eventType: 'summary';
+  executionId: string;
+  suiteName: string;
+  metaPayload: Record<string, unknown>;
+  outputFormats: [EvidenceOutputFormat, ...EvidenceOutputFormat[]];
+  createdAt: string;
+};
+
+export type ManifestEvent = ManifestItemEvent | ManifestSummaryEvent;
 
 export type EvidenceFactoryOptions = {
   rootDir?: string;

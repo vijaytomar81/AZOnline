@@ -10,6 +10,7 @@ async function main(): Promise<void> {
 
   await Promise.all([
     factory.writeEvidence({
+      entryType: 'item',
       executionId: 'RUN-001',
       suiteName: 'motor-regression',
       artifactId: 'TC001',
@@ -43,6 +44,7 @@ async function main(): Promise<void> {
       },
     }),
     factory.writeEvidence({
+      entryType: 'item',
       executionId: 'RUN-001',
       suiteName: 'motor-regression',
       artifactId: 'TC002',
@@ -77,7 +79,8 @@ async function main(): Promise<void> {
     }),
   ]);
 
-  const result = await factory.finalizeExecution({
+  await factory.writeEvidence({
+    entryType: 'summary',
     executionId: 'RUN-001',
     suiteName: 'motor-regression',
     outputFormats: ['excel'],
@@ -131,6 +134,11 @@ async function main(): Promise<void> {
       notExecutedEvidencePath: 'artifacts/current/motor-regression/RUN-001/json/not-executed',
       pageScansDir: '',
     },
+  });
+
+  const result = await factory.finalizeExecution({
+    executionId: 'RUN-001',
+    suiteName: 'motor-regression',
   });
 
   console.log('Finalized execution:', result);

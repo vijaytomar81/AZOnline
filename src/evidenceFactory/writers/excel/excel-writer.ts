@@ -16,7 +16,13 @@ import {
   toOutputValue,
 } from '../../utils/evidence-projector';
 import { styleExecutionSheet, styleSummarySheet, type SummarySection } from './excel-formatter';
-import type { ArtifactMetadata, FinalizeExecutionRequest, ManifestEvent } from '../../contracts/types';
+import type {
+  ArtifactMetadata,
+  FinalizeExecutionRequest,
+  ManifestEvent,
+  ManifestItemEvent,
+  ManifestSummaryEvent,
+} from '../../contracts/types';
 
 type SummaryRow = SummarySection['rows'][number];
 
@@ -28,16 +34,39 @@ export class ExcelWriter {
   ): Promise<ArtifactMetadata> {
     const workbook = new ExcelJS.Workbook();
 
-    this.addSummary(workbook, request.metaPayload);
-    this.addStatusSheet(workbook, 'Passed', 'passed', this.filterByStatus(events, 'passed'));
-    this.addStatusSheet(workbook, 'Failed', 'failed', this.filterByStatus(events, 'failed'));
-    this.addStatusSheet(workbook, 'Error', 'error', this.filterByStatus(events, 'error'));
-    this.addStatusSheet(
-      workbook,
-      'Not Executed',
-      'not_executed',
-      this.filterByStatus(events, 'not_executed'),
-    );
+    const itemEvents = this.getItemEvents(events);
+    const summaryEvent = this.getLatestSummaryEvent(events);
+
+    if (summaryEvent) {
+      const summarySections = this.buildSummarySections(
+        summaryEvent.metaPayload,
+        resolveMetaFields(),
+      );
+
+      if (summarySections.length > 0) {
+        this.addSummary(workbook, summarySections);
+      }
+    }
+
+    const passedEvents = this.filterByStatus(itemEvents, 'passed');
+    if (passedEvents.length > 0) {
+      this.addStatusSheet(workbook, 'Passed', 'passed', passedEvents);
+    }
+
+    const failedEvents = this.filterByStatus(itemEvents, 'failed');
+    if (failedEvents.length > 0) {
+      this.addStatusSheet(workbook, 'Failed', 'failed', failedEvents);
+    }
+
+    const errorEvents = this.filterByStatus(itemEvents, 'error');
+    if (errorEvents.length > 0) {
+      this.addStatusSheet(workbook, 'Error', 'error', errorEvents);
+    }
+
+    const notExecutedEvents = this.filterByStatus(itemEvents, 'not_executed');
+    if (notExecutedEvents.length > 0) {
+      this.addStatusSheet(workbook, 'Not Executed', 'not_executed', notExecutedEvents);
+    }
 
     await ensureDir(path.dirname(filePath));
     const buffer = await workbook.xlsx.writeBuffer();
@@ -55,12 +84,9 @@ export class ExcelWriter {
 
   private addSummary(
     workbook: ExcelJS.Workbook,
-    metaPayload: Record<string, unknown>,
+    sections: SummarySection[],
   ): void {
     const sheet = workbook.addWorksheet('Summary');
-    const metaFields = resolveMetaFields();
-    const sections = this.buildSummarySections(metaPayload, metaFields);
-
     styleSummarySheet(sheet, sections);
   }
 
@@ -68,7 +94,7 @@ export class ExcelWriter {
     workbook: ExcelJS.Workbook,
     title: string,
     status: string,
-    events: ManifestEvent[],
+    events: ManifestItemEvent[],
   ): void {
     const sheet = workbook.addWorksheet(title);
     const fields = resolveFields(status).filter((field) => field.toReportOutput !== false);
@@ -152,7 +178,23 @@ export class ExcelWriter {
     return false;
   }
 
-  private filterByStatus(events: ManifestEvent[], status: string): ManifestEvent[] {
+  private getItemEvents(events: ManifestEvent[]): ManifestItemEvent[] {
+    return events.filter((event): event is ManifestItemEvent => event.eventType === 'item');
+  }
+
+  private getLatestSummaryEvent(events: ManifestEvent[]): ManifestSummaryEvent | undefined {
+    const summaryEvents = events.filter(
+      (event): event is ManifestSummaryEvent => event.eventType === 'summary',
+    );
+
+    if (summaryEvents.length === 0) {
+      return undefined;
+    }
+
+    return summaryEvents[summaryEvents.length - 1];
+  }
+
+  private filterByStatus(events: ManifestItemEvent[], status: string): ManifestItemEvent[] {
     return events.filter((event) => String(event.status).toLowerCase() === status);
   }
 }

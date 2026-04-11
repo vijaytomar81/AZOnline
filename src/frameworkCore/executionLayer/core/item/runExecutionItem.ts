@@ -116,6 +116,7 @@ async function writeItemEvidence(args: {
         .join("-");
 
     await args.runArgs.evidenceFactory.writeEvidence({
+        entryType: "item",
         executionId: args.runArgs.runId ?? "local-run",
         suiteName: args.runArgs.suiteName ?? "default-suite",
         artifactId,

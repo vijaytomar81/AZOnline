@@ -6,6 +6,7 @@ import type {
 } from "@frameworkCore/executionLayer/contracts";
 import type { ExecutorRegistry } from "@frameworkCore/executionLayer/core/registry";
 import type { ExecutionItemDataRegistry } from "@frameworkCore/executionLayer/runtime/itemData";
+import type { EvidenceFactory } from "@evidenceFactory/factory/evidence-factory";
 
 export type RunExecutionItemArgs = {
     context: ExecutionContext;
@@ -16,7 +17,7 @@ export type RunExecutionItemArgs = {
     overrideItemData?: Record<string, unknown>;
 
     // ✅ ADD THESE
-    evidenceFactory?: any;
+    evidenceFactory?: EvidenceFactory;
     runId?: string;
     suiteName?: string;
     mode?: "e2e" | "data";
