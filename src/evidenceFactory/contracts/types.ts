@@ -1,5 +1,10 @@
 // src/evidenceFactory/contracts/types.ts
 
+import {
+  EXECUTION_MODES,
+  type ExecutionMode,
+} from '@configLayer/executionModes';
+
 // =========================
 // Output formats
 // =========================
@@ -37,12 +42,11 @@ export type EvidenceEventType =
 // Console modes
 // =========================
 export const EVIDENCE_CONSOLE_MODE = {
-  DATA: 'data',
-  E2E: 'e2e',
+  DATA: EXECUTION_MODES.DATA,
+  E2E: EXECUTION_MODES.E2E,
 } as const;
 
-export type EvidenceConsoleMode =
-  (typeof EVIDENCE_CONSOLE_MODE)[keyof typeof EVIDENCE_CONSOLE_MODE];
+export type EvidenceConsoleMode = ExecutionMode;
 
 // =========================
 // File naming timestamp source

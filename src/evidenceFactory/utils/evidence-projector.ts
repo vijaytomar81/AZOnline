@@ -1,4 +1,5 @@
 // src/evidenceFactory/utils/evidence-projector.ts
+import { EXECUTION_MODES } from '@configLayer/executionModes';
 import {
   CONSOLE_EVIDENCE_FIELDS,
   ERROR_EVIDENCE_FIELDS,
@@ -33,7 +34,7 @@ export function resolveConsoleFields(mode?: string): {
   header: readonly EvidenceFieldDefinition[];
   detail: readonly EvidenceFieldDefinition[];
 } {
-  return String(mode ?? '').toLowerCase() === 'e2e'
+  return String(mode ?? '').toLowerCase() === EXECUTION_MODES.E2E
     ? {
       header: CONSOLE_EVIDENCE_FIELDS.E2E_HEADER,
       detail: CONSOLE_EVIDENCE_FIELDS.E2E_ITEM,

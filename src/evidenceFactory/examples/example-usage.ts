@@ -17,7 +17,7 @@ async function main(): Promise<void> {
       artifactId: 'TC001',
       artifactName: 'create-quote',
       status: 'passed',
-      consoleMode: 'e2e',
+      consoleMode: EXECUTION_MODES.E2E,
       outputFormats: ['json', 'excel'],
       payload: {
         scenarioId: 'SCN-001',
@@ -52,7 +52,7 @@ async function main(): Promise<void> {
       artifactId: 'TC002',
       artifactName: 'payment-failure',
       status: 'failed',
-      consoleMode: 'e2e',
+      consoleMode: EXECUTION_MODES.E2E,
       outputFormats: ['xml', 'csv', 'excel'],
       payload: {
         scenarioId: 'SCN-002',
@@ -88,7 +88,7 @@ async function main(): Promise<void> {
     outputFormats: ['excel', 'console'],
     metaPayload: {
       runId: 'RUN-001',
-      mode: 'e2e',
+      mode: EXECUTION_MODES.E2E,
       environment: 'qa',
       evidenceDirectory: 'artifacts/motor-regression/RUN-001',
       machineName: 'Vijays-MacBook-Air.local',
