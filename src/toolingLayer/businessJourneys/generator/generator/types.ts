@@ -1,10 +1,13 @@
 // src/toolingLayer/businessJourneys/generator/generator/types.ts
 
+import type { JourneyEntryPoint } from "@configLayer/domain/journeyEntryPoints";
+import type { JourneyStepFolder } from "@configLayer/domain/journeyStepFolders";
+
 export type JourneyTarget = {
     application: string;
     product: string;
     journey: string;
-    entryPoint: string;
+    entryPoint: JourneyEntryPoint;
 };
 
 export type PageActionEntry = {
@@ -32,7 +35,7 @@ export type StepMapping = {
     stepName: string;
     stepFileName: string;
     stepExportName: string;
-    stepFolder: "athena" | "partner";
+    stepFolder: JourneyStepFolder;
     actionImportName: string;
     actionImportSource: string;
     payloadExpression: string;

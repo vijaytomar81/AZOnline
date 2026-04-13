@@ -1,5 +1,6 @@
 // src/toolingLayer/businessJourneys/generator/generator/mapActionToStep.ts
 
+import { JOURNEY_STEP_FOLDERS, type JourneyStepFolder } from "@configLayer/domain/journeyStepFolders";
 import type { PageActionEntry, StepMapping } from "./types";
 import { buildStepExportName } from "./naming/buildStepExportName";
 import { buildStepFileName } from "./naming/buildStepFileName";
@@ -18,8 +19,10 @@ function buildStepName(entry: PageActionEntry): string {
     return lowerFirst(stripActionSuffix(entry.actionName));
 }
 
-function buildStepFolder(entry: PageActionEntry): "athena" | "partner" {
-    return entry.pageKey.startsWith("athena.") ? "athena" : "partner";
+function buildStepFolder(entry: PageActionEntry): JourneyStepFolder {
+    return entry.pageKey.startsWith("athena.")
+        ? JOURNEY_STEP_FOLDERS.ATHENA
+        : JOURNEY_STEP_FOLDERS.PARTNER;
 }
 
 export function mapActionToStep(entry: PageActionEntry): StepMapping {

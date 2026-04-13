@@ -1,13 +1,13 @@
 // src/toolingLayer/businessJourneys/generator/generator/buildJourneyTargets.ts
 
+import { JOURNEY_ENTRY_POINTS } from "@configLayer/domain/journeyEntryPoints";
+import { SUPPORTED_PRODUCTS, type SupportedProduct } from "@configLayer/domain/supportedProducts";
+import { PARTNER_APPLICATIONS } from "@configLayer/domain/partnerApplications";
 import { uniq } from "@utils/collections";
 import type { JourneyGenerationInputs, JourneyTarget } from "./types";
 
-const PARTNER_APPLICATIONS = ["msm", "ctm", "cnf", "goco"] as const;
-type SupportedProduct = "motor" | "home";
-
 function isSupportedProduct(value: string): value is SupportedProduct {
-    return value === "motor" || value === "home";
+    return value === SUPPORTED_PRODUCTS.MOTOR || value === SUPPORTED_PRODUCTS.HOME;
 }
 
 function buildAthenaTargets(products: SupportedProduct[]): JourneyTarget[] {
@@ -16,13 +16,13 @@ function buildAthenaTargets(products: SupportedProduct[]): JourneyTarget[] {
             application: "athena",
             product,
             journey: "newBusiness",
-            entryPoint: "direct",
+            entryPoint: JOURNEY_ENTRY_POINTS.DIRECT,
         },
         {
             application: "athena",
             product,
             journey: "newBusiness",
-            entryPoint: "pcwTool",
+            entryPoint: JOURNEY_ENTRY_POINTS.PCW_TOOL,
         },
     ]);
 }
@@ -33,7 +33,7 @@ function buildPartnerTargets(products: SupportedProduct[]): JourneyTarget[] {
             application,
             product,
             journey: "newBusiness",
-            entryPoint: "pcw",
+            entryPoint: JOURNEY_ENTRY_POINTS.PCW,
         }))
     );
 }

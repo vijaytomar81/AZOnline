@@ -1,6 +1,7 @@
 // src/toolingLayer/businessJourneys/generator/generator/write/writeTargetFiles.ts
 
 import path from "node:path";
+import { JOURNEY_ENTRY_POINTS, type JourneyEntryPoint } from "@configLayer/domain/journeyEntryPoints";
 import { BUSINESS_JOURNEYS_DIR } from "@utils/paths";
 import type {
     JourneyGenerationInputs,
@@ -17,12 +18,12 @@ import { renderRunJourneyFile } from "../render/renderRunJourneyFile";
 import { renderStepFile } from "../render/renderStepFile";
 import { writeFileIfMissing } from "./writeFileIfMissing";
 
-function resolveEntryPointFileName(entryPoint: string): string {
-    if (entryPoint === "direct") {
+function resolveEntryPointFileName(entryPoint: JourneyEntryPoint): string {
+    if (entryPoint === JOURNEY_ENTRY_POINTS.DIRECT) {
         return "buildDirectEntrySteps.ts";
     }
 
-    if (entryPoint === "pcwTool") {
+    if (entryPoint === JOURNEY_ENTRY_POINTS.PCW_TOOL) {
         return "buildPcwToolEntrySteps.ts";
     }
 
@@ -30,17 +31,17 @@ function resolveEntryPointFileName(entryPoint: string): string {
 }
 
 function resolveEntryPointKind(
-    entryPoint: string
-): "direct" | "pcw" | "pcwTool" {
-    if (entryPoint === "direct") {
-        return "direct";
+    entryPoint: JourneyEntryPoint
+): JourneyEntryPoint {
+    if (entryPoint === JOURNEY_ENTRY_POINTS.DIRECT) {
+        return JOURNEY_ENTRY_POINTS.DIRECT;
     }
 
-    if (entryPoint === "pcwTool") {
-        return "pcwTool";
+    if (entryPoint === JOURNEY_ENTRY_POINTS.PCW_TOOL) {
+        return JOURNEY_ENTRY_POINTS.PCW_TOOL;
     }
 
-    return "pcw";
+    return JOURNEY_ENTRY_POINTS.PCW;
 }
 
 export function writeTargetFiles(

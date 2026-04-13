@@ -1,24 +1,25 @@
 // src/toolingLayer/businessJourneys/generator/generator/render/renderEntryPointBuilderFile.ts
 
+import { JOURNEY_ENTRY_POINTS, type JourneyEntryPoint } from "@configLayer/domain/journeyEntryPoints";
 import { toRepoRelative } from "@utils/paths";
 
 export function renderEntryPointBuilderFile(args: {
     filePath: string;
-    kind: "direct" | "pcw" | "pcwTool";
+    kind: JourneyEntryPoint;
 }): string {
     const exportName =
-        args.kind === "direct"
+        args.kind === JOURNEY_ENTRY_POINTS.DIRECT
             ? "buildDirectEntrySteps"
-            : args.kind === "pcwTool"
-              ? "buildPcwToolEntrySteps"
-              : "buildPcwEntrySteps";
+            : args.kind === JOURNEY_ENTRY_POINTS.PCW_TOOL
+                ? "buildPcwToolEntrySteps"
+                : "buildPcwEntrySteps";
 
     const todoLine =
-        args.kind === "direct"
+        args.kind === JOURNEY_ENTRY_POINTS.DIRECT
             ? "// TODO: review direct-entry pre-navigation steps"
-            : args.kind === "pcwTool"
-              ? "// TODO: review pcw-tool entry preparation steps"
-              : "// TODO: review partner-entry steps before Athena handoff";
+            : args.kind === JOURNEY_ENTRY_POINTS.PCW_TOOL
+                ? "// TODO: review pcw-tool entry preparation steps"
+                : "// TODO: review partner-entry steps before Athena handoff";
 
     return `// ${toRepoRelative(args.filePath)}
 

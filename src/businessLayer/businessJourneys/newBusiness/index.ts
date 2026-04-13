@@ -2,6 +2,7 @@
 import { buildCalculatedEmail } from "@utils/calculatedEmail";
 import { nowIso } from "@utils/time";
 import { AppError } from "@utils/errors";
+import { JOURNEY_START_SOURCES, type JourneyStartSource } from "@configLayer/domain/journeyEntryPoints";
 import { OUTPUT_KEYS } from "@frameworkCore/executionLayer/constants/outputKeys";
 import type { ExecutionItemExecutorArgs } from "@frameworkCore/executionLayer/core/registry";
 
@@ -17,14 +18,14 @@ function buildQuoteNumber(): string {
 
 function resolveStartFrom(args: {
     platform: string;
-}): "Direct" | "PCW" | "PCWTool" {
+}): JourneyStartSource {
     switch (args.platform) {
-        case "PCW":
-            return "PCW";
-        case "PCWTool":
-            return "PCWTool";
+        case JOURNEY_START_SOURCES.PCW:
+            return JOURNEY_START_SOURCES.PCW;
+        case JOURNEY_START_SOURCES.PCW_TOOL:
+            return JOURNEY_START_SOURCES.PCW_TOOL;
         default:
-            return "Direct";
+            return JOURNEY_START_SOURCES.DIRECT;
     }
 }
 
