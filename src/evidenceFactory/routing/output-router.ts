@@ -16,7 +16,6 @@ export class OutputRouter {
   executionRoot(suiteName: string, executionId: string): string {
     return path.join(
       this.rootDir,
-      'current',
       safeFileName(suiteName),
       safeFileName(executionId),
     );
@@ -59,7 +58,7 @@ export class OutputRouter {
   }
 
   currentSuiteRoot(suiteName: string): string {
-    return path.join(this.rootDir, 'current', safeFileName(suiteName));
+    return path.join(this.rootDir, safeFileName(suiteName));
   }
 
   archiveSuiteRoot(bucket: string, suiteName: string): string {

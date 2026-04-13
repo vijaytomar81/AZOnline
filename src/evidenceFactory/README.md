@@ -150,7 +150,7 @@ await factory.writeEvidence({
     runId: "RUN-001",
     mode: "e2e",
     environment: "qa",
-    evidenceDirectory: "artifacts/current/motor-regression/RUN-001",
+    evidenceDirectory: "artifacts/motor-regression/RUN-001",
     totalItems: 2,
     passedCount: 1,
     failedCount: 1,
@@ -193,37 +193,35 @@ await factory.finalizeExecution({
 ### Single worker / default worker `0`
 ```text
 artifacts/
-  current/
-    motor-regression/
-      RUN-001/
-        manifests/
-          0.ndjson
-        json/
-          motor-regression_RUN-001.json
-        excel/
-          motor-regression_RUN-001.xlsx
+  motor-regression/
+    RUN-001/
+      manifests/
+        0.ndjson
+      json/
+        motor-regression_RUN-001.json
+      excel/
+        motor-regression_RUN-001.xlsx
 ```
 
 ### Multi-worker / parallel execution
 ```text
 artifacts/
-  current/
-    motor-regression/
-      RUN-001/
-        manifests/
-          0.ndjson
-          1.ndjson
-          2.ndjson
-        json/
-          motor-regression_RUN-001.json
-        xml/
-          motor-regression_RUN-001.xml
-        csv/
-          motor-regression_RUN-001.csv
-        console/
-          motor-regression_RUN-001.log
-        excel/
-          motor-regression_RUN-001.xlsx
+  motor-regression/
+    RUN-001/
+      manifests/
+        0.ndjson
+        1.ndjson
+        2.ndjson
+      json/
+        motor-regression_RUN-001.json
+      xml/
+        motor-regression_RUN-001.xml
+      csv/
+        motor-regression_RUN-001.csv
+      console/
+        motor-regression_RUN-001.log
+      excel/
+        motor-regression_RUN-001.xlsx
 ```
 
 ---

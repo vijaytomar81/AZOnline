@@ -14,7 +14,7 @@ export class ArchiveService {
     zip?: boolean;
     maxCurrentExecutionsPerSuite?: number;
   }): Promise<{ archivedCount: number }> {
-    const currentRoot = path.join(this.artifactsRoot, 'current');
+    const currentRoot = path.join(this.artifactsRoot);
     let archivedCount = 0;
 
     for (const suite of await safeReadDir(currentRoot)) {
