@@ -1,17 +1,25 @@
 // src/evidenceFactory/routing/output-router.ts
 import path from 'path';
+import {
+  EVIDENCE_OUTPUT_FORMAT,
+  EVIDENCE_TIMESTAMP_SOURCE,
+  type EvidenceOutputFormat,
+  type EvidenceTimestampSource,
+} from '../contracts/types';
 import { safeFileName } from '../utils/path-utils';
 import { fileSafeTimestamp } from '../utils/time-utils';
-import type { EvidenceOutputFormat } from '../contracts/types';
 
 export class OutputRouter {
   constructor(
-    private readonly rootDir = path.join(process.cwd(), process.env.EVIDENCE_ROOT_DIR ?? 'artifacts'),
+    private readonly rootDir = path.join(
+      process.cwd(),
+      process.env.EVIDENCE_ROOT_DIR ?? 'artifacts',
+    ),
     private readonly fileNaming?: {
       includeTimestamp?: boolean;
-      timestampSource?: 'now' | 'payload';
+      timestampSource?: EvidenceTimestampSource;
     },
-  ) { }
+  ) {}
 
   executionRoot(suiteName: string, executionId: string): string {
     return path.join(
@@ -26,7 +34,10 @@ export class OutputRouter {
   }
 
   eventFilePath(suiteName: string, executionId: string, workerId: string): string {
-    return path.join(this.manifestDirPath(suiteName, executionId), `${safeFileName(workerId)}.ndjson`);
+    return path.join(
+      this.manifestDirPath(suiteName, executionId),
+      `${safeFileName(workerId)}.ndjson`,
+    );
   }
 
   finalOutputPath(args: {
@@ -42,9 +53,9 @@ export class OutputRouter {
     }
 
     const extension =
-      args.format === 'excel'
+      args.format === EVIDENCE_OUTPUT_FORMAT.EXCEL
         ? 'xlsx'
-        : args.format === 'console'
+        : args.format === EVIDENCE_OUTPUT_FORMAT.CONSOLE
           ? 'log'
           : args.format;
 
@@ -66,7 +77,7 @@ export class OutputRouter {
   }
 
   private resolveTimestamp(payload?: Record<string, unknown>): string {
-    if (this.fileNaming?.timestampSource === 'payload') {
+    if (this.fileNaming?.timestampSource === EVIDENCE_TIMESTAMP_SOURCE.PAYLOAD) {
       const candidate = payload?.artifactTimestamp;
 
       if (candidate) {

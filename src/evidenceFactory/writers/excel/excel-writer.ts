@@ -3,9 +3,15 @@ import path from 'path';
 import { writeFile } from 'fs/promises';
 import ExcelJS from 'exceljs';
 import {
-  type MetaEvidenceViewField,
   type EvidenceReportSection,
+  type MetaEvidenceViewField,
 } from '@configLayer/models/evidence';
+import {
+  EVIDENCE_OUTPUT_FORMAT,
+  type ArtifactMetadata,
+  type ManifestItemEvent,
+  type ManifestSummaryEvent,
+} from '../../contracts/types';
 import { ensureDir, getFileSize, relativeFromProject } from '../../utils/path-utils';
 import { nowIso } from '../../utils/time-utils';
 import {
@@ -15,12 +21,11 @@ import {
   resolveMetaFields,
   toOutputValue,
 } from '../../utils/evidence-projector';
-import { styleExecutionSheet, styleSummarySheet, type SummarySection } from './excel-formatter';
-import type {
-  ArtifactMetadata,
-  ManifestItemEvent,
-  ManifestSummaryEvent,
-} from '../../contracts/types';
+import {
+  styleExecutionSheet,
+  styleSummarySheet,
+  type SummarySection,
+} from './excel-formatter';
 
 type SummaryRow = SummarySection['rows'][number];
 
@@ -49,7 +54,9 @@ export class ExcelWriter {
       ['Error', 'error'],
       ['Not Executed', 'not_executed'],
     ] as const) {
-      const statusItems = items.filter((item) => String(item.status).toLowerCase() === status);
+      const statusItems = items.filter(
+        (item) => String(item.status).toLowerCase() === status,
+      );
       if (statusItems.length > 0) {
         this.addStatusSheet(workbook, title, status, statusItems);
       }
@@ -60,7 +67,7 @@ export class ExcelWriter {
     await writeFile(filePath, Buffer.from(buffer));
 
     return {
-      format: 'excel',
+      format: EVIDENCE_OUTPUT_FORMAT.EXCEL,
       fileName: path.basename(filePath),
       filePath,
       relativePath: relativeFromProject(filePath),
@@ -81,13 +88,19 @@ export class ExcelWriter {
     items: ManifestItemEvent[],
   ): void {
     const sheet = workbook.addWorksheet(title);
-    const fields = resolveFields(status).filter((field) => field.toReportOutput !== false);
+    const fields = resolveFields(status).filter(
+      (field) => field.toReportOutput !== false,
+    );
     const headers = fields.map((field) => field.label);
 
     sheet.addRow(headers);
 
     for (const item of items) {
-      const mapped = mapFields(item.payload, fields, 'excel');
+      const mapped = mapFields(
+        item.payload,
+        fields,
+        EVIDENCE_OUTPUT_FORMAT.EXCEL,
+      );
       sheet.addRow(headers.map((header) => mapped[header] ?? ''));
     }
 

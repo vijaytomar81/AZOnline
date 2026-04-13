@@ -1,14 +1,15 @@
 // src/evidenceFactory/writers/console/console-writer.ts
 import path from 'path';
 import { writeFile } from 'fs/promises';
+import {
+  EVIDENCE_OUTPUT_FORMAT,
+  type ArtifactMetadata,
+  type ManifestItemEvent,
+  type ManifestSummaryEvent,
+} from '../../contracts/types';
 import { ensureDir, getFileSize, relativeFromProject } from '../../utils/path-utils';
 import { nowIso } from '../../utils/time-utils';
 import { mapFields, resolveFields, resolveMetaFields } from '../../utils/evidence-projector';
-import type {
-  ArtifactMetadata,
-  ManifestItemEvent,
-  ManifestSummaryEvent,
-} from '../../contracts/types';
 
 export class ConsoleWriter {
   async writeConsolidated(
@@ -20,7 +21,17 @@ export class ConsoleWriter {
 
     if (summary) {
       lines.push('[evidence][summary]');
-      lines.push(JSON.stringify(mapFields(summary.metaPayload, resolveMetaFields(), 'console'), null, 2));
+      lines.push(
+        JSON.stringify(
+          mapFields(
+            summary.metaPayload,
+            resolveMetaFields(),
+            EVIDENCE_OUTPUT_FORMAT.CONSOLE,
+          ),
+          null,
+          2,
+        ),
+      );
       lines.push('');
     }
 
@@ -40,7 +51,7 @@ export class ConsoleWriter {
     await writeFile(filePath, content, 'utf8');
 
     return {
-      format: 'console',
+      format: EVIDENCE_OUTPUT_FORMAT.CONSOLE,
       fileName: path.basename(filePath),
       filePath,
       relativePath: relativeFromProject(filePath),
@@ -56,6 +67,8 @@ export class ConsoleWriter {
     const fields = resolveFields(status);
     return items
       .filter((item) => String(item.status).toLowerCase() === status)
-      .map((item) => mapFields(item.payload, fields, 'console'));
+      .map((item) =>
+        mapFields(item.payload, fields, EVIDENCE_OUTPUT_FORMAT.CONSOLE),
+      );
   }
 }

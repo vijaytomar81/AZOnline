@@ -11,6 +11,10 @@ import {
   type EvidenceViewFieldDefinition,
   type MetaEvidenceViewField,
 } from '@configLayer/models/evidence';
+import {
+  EVIDENCE_OUTPUT_FORMAT,
+  type EvidenceOutputFormat,
+} from '../contracts/types';
 import { normalizeStatus } from './status-utils';
 
 export function resolveFields(status: string): readonly EvidenceViewFieldDefinition[] {
@@ -36,25 +40,26 @@ export function resolveConsoleFields(mode?: string): {
 } {
   return String(mode ?? '').toLowerCase() === EXECUTION_MODES.E2E
     ? {
-      header: CONSOLE_EVIDENCE_FIELDS.E2E_HEADER,
-      detail: CONSOLE_EVIDENCE_FIELDS.E2E_ITEM,
-    }
+        header: CONSOLE_EVIDENCE_FIELDS.E2E_HEADER,
+        detail: CONSOLE_EVIDENCE_FIELDS.E2E_ITEM,
+      }
     : {
-      header: CONSOLE_EVIDENCE_FIELDS.DATA_HEADER,
-      detail: CONSOLE_EVIDENCE_FIELDS.DATA_DETAIL,
-    };
+        header: CONSOLE_EVIDENCE_FIELDS.DATA_HEADER,
+        detail: CONSOLE_EVIDENCE_FIELDS.DATA_DETAIL,
+      };
 }
 
 export function mapFields(
   source: Record<string, unknown>,
   fields: readonly EvidenceViewFieldDefinition[],
-  target: 'json' | 'xml' | 'csv' | 'excel' | 'console',
+  target: EvidenceOutputFormat,
 ): Record<string, string | number | boolean> {
   const result: Record<string, string | number | boolean> = {};
 
   for (const field of fields) {
     const include =
-      target === 'excel' || target === 'console'
+      target === EVIDENCE_OUTPUT_FORMAT.EXCEL ||
+      target === EVIDENCE_OUTPUT_FORMAT.CONSOLE
         ? field.toReportOutput !== false
         : field.toStructuredOutput !== false;
 

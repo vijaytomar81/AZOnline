@@ -1,14 +1,15 @@
 // src/evidenceFactory/writers/json/json-writer.ts
 import path from 'path';
 import { writeFile } from 'fs/promises';
+import {
+  EVIDENCE_OUTPUT_FORMAT,
+  type ArtifactMetadata,
+  type ManifestItemEvent,
+  type ManifestSummaryEvent,
+} from '../../contracts/types';
 import { ensureDir, getFileSize, relativeFromProject } from '../../utils/path-utils';
 import { nowIso } from '../../utils/time-utils';
 import { mapFields, resolveFields, resolveMetaFields } from '../../utils/evidence-projector';
-import type {
-  ArtifactMetadata,
-  ManifestItemEvent,
-  ManifestSummaryEvent,
-} from '../../contracts/types';
 
 export class JsonWriter {
   async writeConsolidated(
@@ -18,7 +19,11 @@ export class JsonWriter {
   ): Promise<ArtifactMetadata> {
     const grouped = {
       summary: summary
-        ? mapFields(summary.metaPayload, resolveMetaFields(), 'json')
+        ? mapFields(
+            summary.metaPayload,
+            resolveMetaFields(),
+            EVIDENCE_OUTPUT_FORMAT.JSON,
+          )
         : undefined,
       passed: this.mapByStatus(items, 'passed'),
       failed: this.mapByStatus(items, 'failed'),
@@ -31,7 +36,7 @@ export class JsonWriter {
     await writeFile(filePath, `${JSON.stringify(grouped, null, 2)}\n`, 'utf8');
 
     return {
-      format: 'json',
+      format: EVIDENCE_OUTPUT_FORMAT.JSON,
       fileName: path.basename(filePath),
       filePath,
       relativePath: relativeFromProject(filePath),
@@ -47,6 +52,8 @@ export class JsonWriter {
     const fields = resolveFields(status);
     return items
       .filter((item) => String(item.status).toLowerCase() === status)
-      .map((item) => mapFields(item.payload, fields, 'json'));
+      .map((item) =>
+        mapFields(item.payload, fields, EVIDENCE_OUTPUT_FORMAT.JSON),
+      );
   }
 }

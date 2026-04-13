@@ -2,14 +2,20 @@
 import path from 'path';
 import { writeFile } from 'fs/promises';
 import { XMLBuilder } from 'fast-xml-parser';
+import {
+  EVIDENCE_OUTPUT_FORMAT,
+  type ArtifactMetadata,
+  type ManifestItemEvent,
+  type ManifestSummaryEvent,
+} from '../../contracts/types';
 import { ensureDir, getFileSize, relativeFromProject } from '../../utils/path-utils';
 import { nowIso } from '../../utils/time-utils';
-import { mapXmlFields, resolveFields, resolveMetaFields, mapFields } from '../../utils/evidence-projector';
-import type {
-  ArtifactMetadata,
-  ManifestItemEvent,
-  ManifestSummaryEvent,
-} from '../../contracts/types';
+import {
+  mapFields,
+  mapXmlFields,
+  resolveFields,
+  resolveMetaFields,
+} from '../../utils/evidence-projector';
 
 export class XmlWriter {
   private readonly builder = new XMLBuilder({ format: true, ignoreAttributes: false });
@@ -23,7 +29,11 @@ export class XmlWriter {
       execution: {
         generatedAt: nowIso(),
         summary: summary
-          ? mapFields(summary.metaPayload, resolveMetaFields(), 'xml')
+          ? mapFields(
+              summary.metaPayload,
+              resolveMetaFields(),
+              EVIDENCE_OUTPUT_FORMAT.XML,
+            )
           : undefined,
         passed: { item: this.mapByStatus(items, 'passed') },
         failed: { item: this.mapByStatus(items, 'failed') },
@@ -37,7 +47,7 @@ export class XmlWriter {
     await writeFile(filePath, `${xml}\n`, 'utf8');
 
     return {
-      format: 'xml',
+      format: EVIDENCE_OUTPUT_FORMAT.XML,
       fileName: path.basename(filePath),
       filePath,
       relativePath: relativeFromProject(filePath),

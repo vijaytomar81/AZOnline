@@ -2,14 +2,15 @@
 import path from 'path';
 import { writeFile } from 'fs/promises';
 import { stringify } from 'csv-stringify/sync';
+import {
+  EVIDENCE_OUTPUT_FORMAT,
+  type ArtifactMetadata,
+  type ManifestItemEvent,
+  type ManifestSummaryEvent,
+} from '../../contracts/types';
 import { ensureDir, getFileSize, relativeFromProject } from '../../utils/path-utils';
 import { nowIso } from '../../utils/time-utils';
 import { mapFields, resolveFields, resolveMetaFields } from '../../utils/evidence-projector';
-import type {
-  ArtifactMetadata,
-  ManifestItemEvent,
-  ManifestSummaryEvent,
-} from '../../contracts/types';
 
 export class CsvWriter {
   async writeConsolidated(
@@ -23,9 +24,13 @@ export class CsvWriter {
       lines.push('Summary');
       lines.push(
         stringify(
-          Object.entries(mapFields(summary.metaPayload, resolveMetaFields(), 'csv')).map(
-            ([field, value]) => ({ Field: field, Value: value }),
-          ),
+          Object.entries(
+            mapFields(
+              summary.metaPayload,
+              resolveMetaFields(),
+              EVIDENCE_OUTPUT_FORMAT.CSV,
+            ),
+          ).map(([field, value]) => ({ Field: field, Value: value })),
           { header: true },
         ).trimEnd(),
       );
@@ -45,7 +50,7 @@ export class CsvWriter {
     await writeFile(filePath, `${lines.join('\n')}\n`, 'utf8');
 
     return {
-      format: 'csv',
+      format: EVIDENCE_OUTPUT_FORMAT.CSV,
       fileName: path.basename(filePath),
       filePath,
       relativePath: relativeFromProject(filePath),
@@ -61,6 +66,8 @@ export class CsvWriter {
     const fields = resolveFields(status);
     return items
       .filter((item) => String(item.status).toLowerCase() === status)
-      .map((item) => mapFields(item.payload, fields, 'csv'));
+      .map((item) =>
+        mapFields(item.payload, fields, EVIDENCE_OUTPUT_FORMAT.CSV),
+      );
   }
 }
