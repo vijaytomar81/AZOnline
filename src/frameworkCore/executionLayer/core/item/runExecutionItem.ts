@@ -7,6 +7,10 @@ import { emitLog } from "@frameworkCore/logging/emitLog";
 import { addExecutionItemResult } from "@frameworkCore/executionLayer/core/context";
 import type { ExecutionItemResult } from "@frameworkCore/executionLayer/contracts";
 import { buildEvidencePayload } from "@frameworkCore/executionLayer/reporting/buildEvidencePayload";
+import {
+    EVIDENCE_ENTRY_TYPE,
+    EVIDENCE_OUTPUT_FORMAT,
+} from "@evidenceFactory/contracts/types";
 import { buildExecutionItemFailureResult } from "./buildExecutionItemFailureResult";
 import { createExecutionItemDebugCollector } from "./createExecutionItemDebugCollector";
 import { createExecutionItemSuccessResult } from "./createExecutionItemSuccessResult";
@@ -99,7 +103,16 @@ async function writeItemEvidence(args: {
     runArgs: RunExecutionItemArgs;
     result: ExecutionItemResult;
 }): Promise<void> {
-    if (!args.runArgs.evidenceFactory) {
+    const {
+        evidenceFactory,
+        runId,
+        suiteName,
+        mode,
+        workerId,
+        context,
+    } = args.runArgs;
+
+    if (!evidenceFactory || !runId || !suiteName || !mode) {
         return;
     }
 
@@ -115,17 +128,21 @@ async function writeItemEvidence(args: {
         .filter(Boolean)
         .join("-");
 
-    await args.runArgs.evidenceFactory.writeEvidence({
-        entryType: "item",
-        executionId: args.runArgs.runId ?? "local-run",
-        suiteName: args.runArgs.suiteName ?? "default-suite",
+    await evidenceFactory.writeEvidence({
+        entryType: EVIDENCE_ENTRY_TYPE.ITEM,
+        executionId: runId,
+        suiteName,
+        workerId,
         artifactId,
         artifactName: artifactName || args.result.action,
         status: args.result.status,
-        consoleMode: args.runArgs.mode,
-        outputFormats: ["json", "excel"],
+        consoleMode: mode,
+        outputFormats: [
+            EVIDENCE_OUTPUT_FORMAT.JSON,
+            EVIDENCE_OUTPUT_FORMAT.EXCEL,
+        ],
         payload: buildEvidencePayload({
-            context: args.runArgs.context,
+            context,
             result: args.result,
         }),
     });

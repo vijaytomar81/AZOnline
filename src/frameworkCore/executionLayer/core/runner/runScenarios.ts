@@ -10,12 +10,27 @@ import {
     renderExecutionSummary,
 } from "@frameworkCore/executionLayer/logging";
 import { buildEvidenceMetaPayload } from "@frameworkCore/executionLayer/reporting/buildEvidenceMetaPayload";
+import {
+    EVIDENCE_ENTRY_TYPE,
+    EVIDENCE_OUTPUT_FORMAT,
+    EVIDENCE_TIMESTAMP_SOURCE,
+} from "@evidenceFactory/contracts/types";
 import { countExecutionStatuses } from "./countExecutionStatuses";
 import { expandScenarios } from "./expandScenarios";
 import { runScenarioBatch } from "./runScenarioBatch";
 import { runScenarioWorker } from "./runScenarioWorker";
 import type { RunScenariosArgs } from "./types";
 import { EvidenceFactory } from "@evidenceFactory";
+
+function buildSuiteName(args: RunScenariosArgs): string {
+    if (args.suiteName) {
+        return args.suiteName;
+    }
+
+    return [args.platform, args.application, args.product]
+        .filter(Boolean)
+        .join("-");
+}
 
 export async function runScenarios(
     args: RunScenariosArgs
@@ -27,26 +42,20 @@ export async function runScenarios(
     const iterations = args.iterations ?? 1;
     const runs = expandScenarios(args.scenarios, iterations);
     const runId = args.runId ?? resolveRunId();
+    const suiteName = buildSuiteName(args);
 
-    const suiteName =
-        args.suiteName ??
-        `${args.platform ?? "default"}-${args.application ?? "app"}`;
-
-    const rootDir = process.env.EVIDENCE_CREATION_ROOT_DIR ?? "artifacts";
-    const evidenceDir = `${rootDir}/current/${suiteName}/${runId}`;
+    const rootDir = process.env.EVIDENCE_CREATION_ROOT_DIR;
+    const evidenceDir = rootDir
+        ? `${rootDir}/current/${suiteName}/${runId}`
+        : undefined;
 
     const evidenceFactory =
         args.evidenceFactory ??
         new EvidenceFactory({
-            rootDir,
+            ...(rootDir ? { rootDir } : {}),
             fileNaming: {
                 includeTimestamp: true,
-                timestampSource: "payload",
-            },
-            archive: {
-                olderThanDays: 14,
-                zip: true,
-                maxCurrentExecutionsPerSuite: 30,
+                timestampSource: EVIDENCE_TIMESTAMP_SOURCE.PAYLOAD,
             },
         });
 
@@ -111,16 +120,18 @@ export async function runScenarios(
         });
 
         const runtimeSystem =
-            runtimeInfo && typeof runtimeInfo === "object" && "system" in runtimeInfo
+            runtimeInfo &&
+                typeof runtimeInfo === "object" &&
+                "system" in runtimeInfo
                 ? (runtimeInfo.system as Record<string, unknown>)
                 : {};
+
         const runtimeBrowser =
-            runtimeInfo && typeof runtimeInfo === "object" && "browser" in runtimeInfo
+            runtimeInfo &&
+                typeof runtimeInfo === "object" &&
+                "browser" in runtimeInfo
                 ? (runtimeInfo.browser as Record<string, unknown>)
                 : {};
-
-        const finalizedAt = finishedAt;
-        const artifactTimestamp = finishedAt;
 
         const metaSource: Record<string, unknown> = {
             runId,
@@ -155,32 +166,25 @@ export async function runScenarios(
             browserVersion: runtimeBrowser.version,
             headless: runtimeBrowser.headless,
 
-            cleanupWorkerArtifacts: false,
-            finalizedAt,
-            artifactTimestamp,
+            finalizedAt: finishedAt,
+            artifactTimestamp: finishedAt,
 
-            outputRoot: rootDir,
-            evidenceDir,
-            evidenceDirectory: evidenceDir,
-
-            workerArtifactCount: 0,
+            ...(rootDir ? { outputRoot: rootDir } : {}),
+            ...(evidenceDir
+                ? {
+                    evidenceDir,
+                    evidenceDirectory: evidenceDir,
+                }
+                : {}),
             mergedCaseCount: runs.length,
-            corruptedArtifactCount: 0,
-            duplicateCaseCount: 0,
-
-            passedEvidencePath: "",
-            failedEvidencePath: "",
-            notExecutedEvidencePath: "",
-
-            pageScansDir: "",
-            promotedPageScanCount: 0,
         };
 
         await evidenceFactory.writeEvidence({
-            entryType: 'summary',
+            entryType: EVIDENCE_ENTRY_TYPE.SUMMARY,
             executionId: runId,
             suiteName,
-            outputFormats: ['excel'],
+            workerId: args.workerId,
+            outputFormats: [EVIDENCE_OUTPUT_FORMAT.EXCEL],
             metaPayload: buildEvidenceMetaPayload({
                 source: metaSource,
             }),
