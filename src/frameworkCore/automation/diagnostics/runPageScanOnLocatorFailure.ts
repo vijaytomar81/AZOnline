@@ -3,7 +3,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { Page } from "@playwright/test";
-import { executionConfig } from "@configLayer/execution.config";
+import { executionConfig } from "@configLayer/execution/execution.config";
 import { createScopedLogger } from "@frameworkCore/logging/adapters/createScopedLogger";
 import { emitLog } from "@frameworkCore/logging/emitLog";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";

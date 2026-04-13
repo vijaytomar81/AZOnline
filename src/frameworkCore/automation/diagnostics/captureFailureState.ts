@@ -1,7 +1,7 @@
 // src/frameworkCore/automation/diagnostics/captureFailureState.ts
 
 import type { Page } from "@playwright/test";
-import { executionConfig } from "@configLayer/execution.config";
+import { executionConfig } from "@configLayer/execution/execution.config";
 import { emitLog } from "@frameworkCore/logging/emitLog";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";

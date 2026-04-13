@@ -1,7 +1,7 @@
 // src/frameworkCore/automation/navigation/waitForPageReady.ts
 
 import type { Page, Locator } from "@playwright/test";
-import { executionConfig } from "@configLayer/execution.config";
+import { executionConfig } from "@configLayer/execution/execution.config";
 
 export type WaitForPageReadyInput = {
     page: Page;

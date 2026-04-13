@@ -1,4 +1,4 @@
-// src/configLayer/playwrightArtifacts.ts
+// src/configLayer/execution/playwrightArtifacts.ts
 
 export const SCREENSHOT_MODES = {
     ON: "on",

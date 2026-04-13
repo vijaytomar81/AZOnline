@@ -5,8 +5,8 @@ import type { ExecutorRegistry } from "@frameworkCore/executionLayer/core/regist
 import type { ExecutionItemDataRegistry } from "@frameworkCore/executionLayer/runtime/itemData";
 import type { EvidenceFactory } from "@evidenceFactory";
 import type { EnvKey } from "@configLayer/environments";
-import type { ExecutionMode } from "@configLayer/executionModes";
-import type { ExecutionItemStatus } from "@configLayer/executionStatuses";
+import type { ExecutionMode } from "@configLayer/core/executionModes";
+import type { ExecutionItemStatus } from "@configLayer/core/executionStatuses";
 
 export type RunOutput = {
     status: ExecutionItemStatus;

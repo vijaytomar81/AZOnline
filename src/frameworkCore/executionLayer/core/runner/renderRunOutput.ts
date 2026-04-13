@@ -4,8 +4,8 @@ import type {
     ExecutionScenario,
     ExecutionScenarioResult,
 } from "@frameworkCore/executionLayer/contracts";
-import type { ExecutionMode } from "@configLayer/executionModes";
-import { EXECUTION_MODES } from "@configLayer/executionModes";
+import type { ExecutionMode } from "@configLayer/core/executionModes";
+import { EXECUTION_MODES } from "@configLayer/core/executionModes";
 import { renderDataCaseBlock } from "@frameworkCore/executionLayer/logging/dataCase";
 import { renderE2EScenarioBlock } from "@frameworkCore/executionLayer/logging/e2eScenario";
 

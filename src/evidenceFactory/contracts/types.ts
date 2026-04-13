@@ -3,7 +3,7 @@
 import {
   EXECUTION_MODES,
   type ExecutionMode,
-} from '@configLayer/executionModes';
+} from '@configLayer/core/executionModes';
 
 // =========================
 // Output formats

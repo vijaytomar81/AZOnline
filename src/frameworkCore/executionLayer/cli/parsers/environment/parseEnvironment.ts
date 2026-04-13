@@ -4,7 +4,7 @@ import { AppError } from "@utils/errors";
 import { normalizeSpaces } from "@utils/text";
 import {
     asEnvKey,
-} from "@configLayer/env";
+} from "@configLayer/environments/env";
 import {
     environments,
     type EnvKey,

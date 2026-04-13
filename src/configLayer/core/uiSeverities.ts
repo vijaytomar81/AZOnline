@@ -1,4 +1,4 @@
-// src/configLayer/uiSeverities.ts
+// src/configLayer/core/uiSeverities.ts
 
 export const UI_SEVERITIES = {
     SUCCESS: "success",

@@ -1,6 +1,6 @@
 // src/frameworkCore/executionLayer/runtime/resolveRunId.ts
 
-import { executionConfig } from "@configLayer/execution.config";
+import { executionConfig } from "@configLayer/execution/execution.config";
 import type { EnvKey } from "@configLayer/environments";
 
 function resolveMode(): string {

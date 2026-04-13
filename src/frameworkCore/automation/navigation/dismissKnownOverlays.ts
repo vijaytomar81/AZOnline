@@ -1,7 +1,7 @@
 // src/frameworkCore/automation/navigation/dismissKnownOverlays.ts
 
 import type { Page } from "@playwright/test";
-import { executionConfig } from "@configLayer/execution.config";
+import { executionConfig } from "@configLayer/execution/execution.config";
 
 export async function dismissKnownOverlays(page: Page): Promise<void> {
     const selectors = [

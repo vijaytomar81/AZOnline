@@ -1,7 +1,7 @@
-// src/configLayer/env.ts
+// src/configLayer/environments/env.ts
 
-import { environments, ENV_NAMES } from "./environments";
-import type { EnvKey, TargetEnvUrls } from "./environments";
+import { environments, ENV_NAMES } from "./index";
+import type { EnvKey, TargetEnvUrls } from "./index";
 
 const LEGACY_ENV_KEY_MAP: Record<string, EnvKey> = {
   azonlinedev: ENV_NAMES.DEV,

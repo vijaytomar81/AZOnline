@@ -1,6 +1,6 @@
 // src/frameworkCore/executionLayer/core/item/types.ts
 
-import type { ExecutionMode } from "@configLayer/executionModes";
+import type { ExecutionMode } from "@configLayer/core/executionModes";
 import type {
     ExecutionContext,
     ExecutionItem,

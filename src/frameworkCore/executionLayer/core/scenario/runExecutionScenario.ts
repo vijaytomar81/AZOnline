@@ -5,7 +5,7 @@ import type {
     ExecutionScenarioResult,
 } from "@frameworkCore/executionLayer/contracts";
 import type { EnvKey } from "@configLayer/environments";
-import type { ExecutionMode } from "@configLayer/executionModes";
+import type { ExecutionMode } from "@configLayer/core/executionModes";
 import type { ExecutorRegistry } from "@frameworkCore/executionLayer/core/registry";
 import type { ExecutionItemDataRegistry } from "@frameworkCore/executionLayer/runtime/itemData";
 import {

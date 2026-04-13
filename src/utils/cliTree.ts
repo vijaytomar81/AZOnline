@@ -5,7 +5,7 @@ import { ICONS } from "./icons";
 import {
     UI_SEVERITIES,
     type UISeverity,
-} from "@configLayer/uiSeverities";
+} from "@configLayer/core/uiSeverities";
 
 export type TreeSeverity = UISeverity;
 

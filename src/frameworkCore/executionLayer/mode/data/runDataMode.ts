@@ -1,6 +1,6 @@
 // src/frameworkCore/executionLayer/mode/data/runDataMode.ts
 
-import { EXECUTION_MODES } from "@configLayer/executionModes";
+import { EXECUTION_MODES } from "@configLayer/core/executionModes";
 import { getCasesFile } from "@dataLayer/runtime/cases/getCasesFile";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";

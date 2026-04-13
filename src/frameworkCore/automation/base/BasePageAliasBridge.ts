@@ -1,6 +1,6 @@
 // src/frameworkCore/automation/base/BasePageAliasBridge.ts
 
-import { executionConfig } from "@configLayer/execution.config";
+import { executionConfig } from "@configLayer/execution/execution.config";
 import type { AliasMap, ElementDef } from "@frameworkCore/automation/engine";
 import type {
     AutomationPageDriver,

@@ -1,6 +1,6 @@
 // src/frameworkCore/executionLayer/core/context/createExecutionContext.ts
 
-import { resolveEnvConfig } from "@configLayer/env";
+import { resolveEnvConfig } from "@configLayer/environments/env";
 import type { EnvKey } from "@configLayer/environments";
 import type {
     ExecutionContext,

@@ -1,5 +1,5 @@
 // src/evidenceFactory/utils/evidence-projector.ts
-import { EXECUTION_MODES } from '@configLayer/executionModes';
+import { EXECUTION_MODES } from '@configLayer/core/executionModes';
 import {
   CONSOLE_EVIDENCE_FIELDS,
   ERROR_EVIDENCE_FIELDS,

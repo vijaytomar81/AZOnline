@@ -1,6 +1,6 @@
 // src/frameworkCore/executionLayer/core/browser/createBrowserSession.ts
 
-import { executionConfig } from "@configLayer/execution.config";
+import { executionConfig } from "@configLayer/execution/execution.config";
 import type { BrowserSession } from "./types";
 import { getBrowserLauncher } from "./getBrowserLauncher";
 

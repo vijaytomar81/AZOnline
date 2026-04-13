@@ -1,6 +1,6 @@
 // src/frameworkCore/executionLayer/mode/e2e/runE2EMode.ts
 
-import { EXECUTION_MODES } from "@configLayer/executionModes";
+import { EXECUTION_MODES } from "@configLayer/core/executionModes";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import { emitLog } from "@frameworkCore/logging/emitLog";

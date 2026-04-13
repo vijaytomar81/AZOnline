@@ -2,7 +2,7 @@
 
 import { getArg, hasFlag, normalizeArgv } from "@utils/argv";
 import { normalizeSpaces } from "@utils/text";
-import { EXECUTION_MODES } from "@configLayer/executionModes";
+import { EXECUTION_MODES } from "@configLayer/core/executionModes";
 import { setLogVerbose } from "@frameworkCore/logging/core/logConfig";
 import {
     printDataModeHelp,

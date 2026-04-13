@@ -7,7 +7,7 @@ import {
     LOG_LEVELS,
     LOG_LEVEL_LABELS,
     type LogLevel,
-} from "@configLayer/logLevels";
+} from "@configLayer/core/logLevels";
 
 export type { LogLevel };
 

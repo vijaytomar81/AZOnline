@@ -1,7 +1,7 @@
 // src/evidenceFactory/examples/example-usage.ts
 
 import { EvidenceFactory } from '../factory/evidence-factory';
-import { EXECUTION_MODES } from '@configLayer/executionModes';
+import { EXECUTION_MODES } from '@configLayer/core/executionModes';
 
 async function main(): Promise<void> {
   const factory = new EvidenceFactory();

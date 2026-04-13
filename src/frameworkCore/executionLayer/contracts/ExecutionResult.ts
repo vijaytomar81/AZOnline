@@ -5,7 +5,7 @@ import {
     EXECUTION_SCENARIO_STATUSES,
     type ExecutionItemStatus,
     type ExecutionScenarioStatus,
-} from "@configLayer/executionStatuses";
+} from "@configLayer/core/executionStatuses";
 
 export type { ExecutionItemStatus, ExecutionScenarioStatus };
 

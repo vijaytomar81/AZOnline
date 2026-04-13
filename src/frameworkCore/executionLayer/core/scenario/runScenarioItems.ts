@@ -1,7 +1,7 @@
 // src/frameworkCore/executionLayer/core/scenario/runScenarioItems.ts
 
 import { nowIso } from "@utils/time";
-import type { ExecutionMode } from "@configLayer/executionModes";
+import type { ExecutionMode } from "@configLayer/core/executionModes";
 import type {
     ExecutionContext,
     ExecutionItem,

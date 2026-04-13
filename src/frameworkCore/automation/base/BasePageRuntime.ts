@@ -1,7 +1,7 @@
 // src/frameworkCore/automation/base/BasePageRuntime.ts
 
 import type { Page } from "@playwright/test";
-import { executionConfig } from "@configLayer/execution.config";
+import { executionConfig } from "@configLayer/execution/execution.config";
 import {
     PageFx,
     SelfHealWriter,

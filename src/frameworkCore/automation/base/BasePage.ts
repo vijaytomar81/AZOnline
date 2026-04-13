@@ -1,7 +1,7 @@
 // src/frameworkCore/automation/base/BasePage.ts
 
 import type { Locator, Page } from "@playwright/test";
-import { executionConfig } from "@configLayer/execution.config";
+import { executionConfig } from "@configLayer/execution/execution.config";
 import type { BasePageOptions } from "@frameworkCore/automation/engine";
 import { BaseActions } from "./BaseActions";
 import { BaseReads } from "./BaseReads";

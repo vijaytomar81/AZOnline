@@ -1,4 +1,4 @@
-// src/configLayer/executionModes.ts
+// src/configLayer/core/executionModes.ts
 
 export const EXECUTION_MODES = {
     E2E: "e2e",

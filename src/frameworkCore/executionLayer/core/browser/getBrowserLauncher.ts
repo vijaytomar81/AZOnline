@@ -1,7 +1,7 @@
 // src/frameworkCore/executionLayer/core/browser/getBrowserLauncher.ts
 
 import { chromium, firefox, webkit } from "@playwright/test";
-import { executionConfig } from "@configLayer/execution.config";
+import { executionConfig } from "@configLayer/execution/execution.config";
 
 export function getBrowserLauncher() {
     const name = executionConfig.browser.name;

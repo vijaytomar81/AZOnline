@@ -1,4 +1,4 @@
-// src/configLayer/executionStatuses.ts
+// src/configLayer/core/executionStatuses.ts
 
 export const EXECUTION_ITEM_STATUSES = {
     PASSED: "passed",

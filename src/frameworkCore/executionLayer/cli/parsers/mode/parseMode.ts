@@ -3,7 +3,7 @@
 import {
     EXECUTION_MODES,
     type ExecutionMode,
-} from "@configLayer/executionModes";
+} from "@configLayer/core/executionModes";
 
 export function parseMode(raw?: string): ExecutionMode {
     return String(raw ?? EXECUTION_MODES.E2E).trim().toLowerCase() === EXECUTION_MODES.DATA

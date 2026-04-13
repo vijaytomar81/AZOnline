@@ -29,17 +29,8 @@
       "@businessLayer/*": [
         "src/businessLayer/*"
       ],
-      "@configLayer/*": [
-        "src/configLayer/*"
-      ],
       "@dataLayer/*": [
         "src/dataLayer/*"
-      ],
-      "@evidenceFactory": [
-        "src/evidenceFactory/index.ts"
-      ],
-      "@evidenceFactory/*": [
-        "src/evidenceFactory/*"
       ],
       "@integrations/*": [
         "src/integrations/*"
@@ -49,6 +40,27 @@
       ],
       "@utils/*": [
         "src/utils/*"
+      ],
+      "@configLayer/*": [
+        "src/configLayer/*"
+      ],
+      "@configLayer/core/*": [
+        "src/configLayer/core/*"
+      ],
+      "@configLayer/execution/*": [
+        "src/configLayer/execution/*"
+      ],
+      "@configLayer/environments/*": [
+        "src/configLayer/environments/*"
+      ],
+      "@configLayer/routing/*": [
+        "src/configLayer/routing/*"
+      ],
+      "@evidenceFactory": [
+        "src/evidenceFactory/index.ts"
+      ],
+      "@evidenceFactory/*": [
+        "src/evidenceFactory/*"
       ]
     }
   },

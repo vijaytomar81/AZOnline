@@ -2,8 +2,8 @@
 
 import { createRuntimeInfo } from "@utils/runtimeInfo";
 import type { RuntimeBrowserInfo } from "@utils/runtimeInfo";
-import { executionConfig } from "@configLayer/execution.config";
-import { EXECUTION_MODES } from "@configLayer/executionModes";
+import { executionConfig } from "@configLayer/execution/execution.config";
+import { EXECUTION_MODES } from "@configLayer/core/executionModes";
 import { resolveRunId } from "@frameworkCore/executionLayer/runtime/resolveRunId";
 import {
     formatDuration,

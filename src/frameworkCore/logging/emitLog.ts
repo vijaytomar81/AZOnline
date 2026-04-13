@@ -2,7 +2,7 @@
 
 import { createLogEvent, logEvent } from "@frameworkCore/logging/log";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
-import type { LogLevel } from "@configLayer/logLevels";
+import type { LogLevel } from "@configLayer/core/logLevels";
 
 export type LogCategory =
     typeof LOG_CATEGORIES[keyof typeof LOG_CATEGORIES];

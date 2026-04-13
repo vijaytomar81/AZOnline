@@ -1,4 +1,4 @@
-// src/configLayer/browserConfig.ts
+// src/configLayer/execution/browserConfig.ts
 
 export const BROWSER_NAMES = {
     CHROMIUM: "chromium",

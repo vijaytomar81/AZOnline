@@ -1,4 +1,4 @@
-// src/configLayer/resolvers/resolveStartUrl.ts
+// src/configLayer/routing/resolvers/resolveStartUrl.ts
 
 import { AppError } from "@utils/errors";
 import type { TargetEnvUrls } from "@configLayer/environments";

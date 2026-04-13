@@ -2,7 +2,7 @@
 
 import type { PipelinePlugin } from "../core/pipeline";
 import type { DataBuilderContext } from "../types";
-import { executionConfig } from "../../../configLayer/execution.config";
+import { executionConfig } from "@configLayer/execution/execution.config";
 import { DATA_GENERATED_ARCHIVE_DIR } from "@utils/paths";
 import { emitLog } from "@frameworkCore/logging/emitLog";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";

@@ -1,8 +1,8 @@
-// src/configLayer/validators/validateRouteSelection.ts
+// src/configLayer/routing/validators/validateRouteSelection.ts
 
 import { AppError } from "@utils/errors";
 import type { RouteSelection } from "../types/routeSelection.types";
-import { PLATFORM_APPLICATIONS } from "../models/platformApplication.config";
+import { PLATFORM_APPLICATIONS } from "../../models/platformApplication.config";
 
 export function isValidRouteSelection(
     selection: RouteSelection

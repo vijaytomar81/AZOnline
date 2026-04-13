@@ -1,6 +1,6 @@
 // src/frameworkCore/automation/base/BaseActions.ts
 
-import { executionConfig } from "@configLayer/execution.config";
+import { executionConfig } from "@configLayer/execution/execution.config";
 import type { AliasMap } from "@frameworkCore/automation/engine";
 import type {
     AutomationPageDriver,

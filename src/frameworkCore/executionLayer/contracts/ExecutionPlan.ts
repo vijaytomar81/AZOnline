@@ -1,7 +1,7 @@
 // src/frameworkCore/executionLayer/contracts/ExecutionPlan.ts
 
 import type { EnvKey } from "@configLayer/environments";
-import type { ExecutionMode } from "@configLayer/executionModes";
+import type { ExecutionMode } from "@configLayer/core/executionModes";
 import type { ExecutionScenario } from "./ExecutionScenario";
 
 export type ExecutionPlan = {

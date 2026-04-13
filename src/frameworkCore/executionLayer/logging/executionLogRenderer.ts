@@ -1,8 +1,8 @@
 // src/frameworkCore/executionLayer/logging/executionLogRenderer.ts
 
 import { failure, muted, success } from "@utils/cliFormat";
-import { EXECUTION_MODES } from "@configLayer/executionModes";
-import type { ExecutionMode } from "@configLayer/executionModes";
+import { EXECUTION_MODES } from "@configLayer/core/executionModes";
+import type { ExecutionMode } from "@configLayer/core/executionModes";
 import { field, headerLine } from "./shared";
 
 export function formatDuration(startMs: number): string {
