@@ -1,8 +1,13 @@
 // src/utils/cliTree.ts
+
 import { success, warning, failure } from "./cliFormat";
 import { ICONS } from "./icons";
+import {
+    UI_SEVERITIES,
+    type UISeverity,
+} from "@configLayer/uiSeverities";
 
-export type TreeSeverity = "success" | "warning" | "error" | "info";
+export type TreeSeverity = UISeverity;
 
 export type TreeNode = {
     severity?: TreeSeverity;
@@ -14,15 +19,15 @@ export type TreeNode = {
 function formatIcon(severity?: TreeSeverity): string {
     if (!severity) return "";
 
-    if (severity === "success") {
+    if (severity === UI_SEVERITIES.SUCCESS) {
         return `${success(ICONS.successIcon)} `;
     }
 
-    if (severity === "warning") {
+    if (severity === UI_SEVERITIES.WARNING) {
         return `${warning(ICONS.warningIcon)} `;
     }
 
-    if (severity === "error") {
+    if (severity === UI_SEVERITIES.ERROR) {
         return `${failure(ICONS.failIcon)} `;
     }
 

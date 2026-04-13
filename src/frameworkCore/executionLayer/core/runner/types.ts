@@ -6,9 +6,10 @@ import type { ExecutionItemDataRegistry } from "@frameworkCore/executionLayer/ru
 import type { EvidenceFactory } from "@evidenceFactory";
 import type { EnvKey } from "@configLayer/environments";
 import type { ExecutionMode } from "@configLayer/executionModes";
+import type { ExecutionItemStatus } from "@configLayer/executionStatuses";
 
 export type RunOutput = {
-    status: "passed" | "failed" | "not_executed";
+    status: ExecutionItemStatus;
     block: string;
     browser?: unknown;
 };

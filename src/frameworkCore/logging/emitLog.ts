@@ -2,8 +2,8 @@
 
 import { createLogEvent, logEvent } from "@frameworkCore/logging/log";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
+import type { LogLevel } from "@configLayer/logLevels";
 
-export type LogLevel = "debug" | "info" | "warn" | "error";
 export type LogCategory =
     typeof LOG_CATEGORIES[keyof typeof LOG_CATEGORIES];
 

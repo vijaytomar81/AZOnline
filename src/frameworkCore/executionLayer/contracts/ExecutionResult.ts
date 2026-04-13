@@ -1,12 +1,13 @@
 // src/frameworkCore/executionLayer/contracts/ExecutionResult.ts
 
-export type ExecutionItemStatus =
-    | "passed"
-    | "failed"
-    | "skipped"
-    | "not_executed";
+import {
+    EXECUTION_ITEM_STATUSES,
+    EXECUTION_SCENARIO_STATUSES,
+    type ExecutionItemStatus,
+    type ExecutionScenarioStatus,
+} from "@configLayer/executionStatuses";
 
-export type ExecutionScenarioStatus = "passed" | "failed";
+export type { ExecutionItemStatus, ExecutionScenarioStatus };
 
 export type ExecutionItemDetails = {
     testCaseRef?: string;
@@ -45,11 +46,15 @@ export function buildExecutionScenarioResult(input: {
     itemResults: ExecutionItemResult[];
     outputs?: Record<string, unknown>;
 }): ExecutionScenarioResult {
-    const hasFailure = input.itemResults.some((item) => item.status === "failed");
+    const hasFailure = input.itemResults.some(
+        (item) => item.status === EXECUTION_ITEM_STATUSES.FAILED
+    );
 
     return {
         scenarioId: input.scenarioId,
-        status: hasFailure ? "failed" : "passed",
+        status: hasFailure
+            ? EXECUTION_SCENARIO_STATUSES.FAILED
+            : EXECUTION_SCENARIO_STATUSES.PASSED,
         itemResults: input.itemResults,
         outputs: input.outputs ?? {},
     };

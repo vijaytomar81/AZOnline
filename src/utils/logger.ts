@@ -1,9 +1,15 @@
 // src/utils/logger.ts
+
 import fs from "node:fs";
 import path from "node:path";
 import { nowIso, startTimer } from "./time";
+import {
+    LOG_LEVELS,
+    LOG_LEVEL_LABELS,
+    type LogLevel,
+} from "@configLayer/logLevels";
 
-export type LogLevel = "error" | "warn" | "info" | "debug";
+export type { LogLevel };
 
 export type Logger = {
     info: (msg: string) => void;
@@ -49,10 +55,10 @@ function buildChildPrefix(parentPrefix: string, childName: string): string {
 
 function shouldLog(currentLevel: LogLevel, incomingLevel: LogLevel): boolean {
     const rank: Record<LogLevel, number> = {
-        error: 0,
-        warn: 1,
-        info: 2,
-        debug: 3,
+        [LOG_LEVELS.ERROR]: 0,
+        [LOG_LEVELS.WARN]: 1,
+        [LOG_LEVELS.INFO]: 2,
+        [LOG_LEVELS.DEBUG]: 3,
     };
 
     return rank[incomingLevel] <= rank[currentLevel];
@@ -80,9 +86,9 @@ export function createLogger(opts: CreateLoggerOptions = {}): Logger {
     const logToFile = !!opts.logToFile;
     const logFilePath = opts.logFilePath;
 
-    const fmt = (level: "INFO" | "WARN" | "ERROR" | "DEBUG", msg: string) => {
+    const fmt = (level: keyof typeof LOG_LEVEL_LABELS, msg: string) => {
         const ts = withTimestamp ? `${nowIso()} ` : "";
-        return `${ts}${prefix} ${level}: ${msg}`;
+        return `${ts}${prefix} ${LOG_LEVEL_LABELS[level]}: ${msg}`;
     };
 
     const write = (line: string, level: LogLevel) => {
@@ -95,10 +101,10 @@ export function createLogger(opts: CreateLoggerOptions = {}): Logger {
     };
 
     return {
-        info: (msg) => write(fmt("INFO", msg), "info"),
-        warn: (msg) => write(fmt("WARN", msg), "warn"),
-        error: (msg) => write(fmt("ERROR", msg), "error"),
-        debug: (msg) => write(fmt("DEBUG", msg), "debug"),
+        info: (msg) => write(fmt("INFO", msg), LOG_LEVELS.INFO),
+        warn: (msg) => write(fmt("WARN", msg), LOG_LEVELS.WARN),
+        error: (msg) => write(fmt("ERROR", msg), LOG_LEVELS.ERROR),
+        debug: (msg) => write(fmt("DEBUG", msg), LOG_LEVELS.DEBUG),
 
         child: (name: string) =>
             createLogger({
