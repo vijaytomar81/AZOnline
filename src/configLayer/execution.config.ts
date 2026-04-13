@@ -1,11 +1,25 @@
 // src/configLayer/execution.config.ts
 
 import { envBool, envNumber, envString } from "@utils/env";
+import {
+  BROWSER_NAMES,
+  BROWSER_CHANNELS,
+  type BrowserName,
+  type BrowserChannel,
+} from "./browserConfig";
+import {
+  SCREENSHOT_MODES,
+  VIDEO_MODES,
+  TRACE_MODES,
+  type ScreenshotMode,
+  type VideoMode,
+  type TraceMode,
+} from "./playwrightArtifacts";
 
 export type ExecutionConfig = {
   browser: {
-    name: "chromium" | "firefox" | "webkit";
-    channel?: "msedge" | "chrome";
+    name: BrowserName;
+    channel?: BrowserChannel;
     headless: boolean;
   };
   timeouts: {
@@ -13,9 +27,9 @@ export type ExecutionConfig = {
     expect: number;
   };
   artifacts: {
-    screenshot: "on" | "off" | "only-on-failure";
-    video: "on" | "off" | "retain-on-failure";
-    trace: "on" | "off" | "retain-on-failure";
+    screenshot: ScreenshotMode;
+    video: VideoMode;
+    trace: TraceMode;
   };
   automation: {
     selfHeal: {
@@ -51,8 +65,8 @@ export type ExecutionConfig = {
 
 export const executionConfig: ExecutionConfig = {
   browser: {
-    name: envString("BROWSER_NAME", "chromium") as any,
-    channel: envString("BROWSER", "msedge") as any,
+    name: envString("BROWSER_NAME", BROWSER_NAMES.CHROMIUM) as BrowserName,
+    channel: envString("BROWSER", BROWSER_CHANNELS.MSEDGE) as BrowserChannel,
     headless: envBool("HEADLESS", true),
   },
 
@@ -62,9 +76,9 @@ export const executionConfig: ExecutionConfig = {
   },
 
   artifacts: {
-    screenshot: envString("SCREENSHOT", "only-on-failure") as any,
-    video: envString("VIDEO", "retain-on-failure") as any,
-    trace: envString("TRACE", "retain-on-failure") as any,
+    screenshot: envString("SCREENSHOT", SCREENSHOT_MODES.ONLY_ON_FAILURE) as ScreenshotMode,
+    video: envString("VIDEO", VIDEO_MODES.RETAIN_ON_FAILURE) as VideoMode,
+    trace: envString("TRACE", TRACE_MODES.RETAIN_ON_FAILURE) as TraceMode,
   },
 
   automation: {
