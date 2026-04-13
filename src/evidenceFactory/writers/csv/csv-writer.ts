@@ -4,20 +4,45 @@ import { writeFile } from 'fs/promises';
 import { stringify } from 'csv-stringify/sync';
 import { ensureDir, getFileSize, relativeFromProject } from '../../utils/path-utils';
 import { nowIso } from '../../utils/time-utils';
-import { mapFields, resolveFields } from '../../utils/evidence-projector';
-import type { ArtifactMetadata } from '../../contracts/types';
+import { mapFields, resolveFields, resolveMetaFields } from '../../utils/evidence-projector';
+import type {
+  ArtifactMetadata,
+  ManifestItemEvent,
+  ManifestSummaryEvent,
+} from '../../contracts/types';
 
 export class CsvWriter {
-  async write(
+  async writeConsolidated(
     filePath: string,
-    status: string,
-    payload: Record<string, unknown>,
+    items: ManifestItemEvent[],
+    summary?: ManifestSummaryEvent,
   ): Promise<ArtifactMetadata> {
-    const row = mapFields(payload, resolveFields(status), 'csv');
-    const csv = stringify([row], { header: true });
+    const lines: string[] = [];
+
+    if (summary) {
+      lines.push('Summary');
+      lines.push(
+        stringify(
+          Object.entries(mapFields(summary.metaPayload, resolveMetaFields(), 'csv')).map(
+            ([field, value]) => ({ Field: field, Value: value }),
+          ),
+          { header: true },
+        ).trimEnd(),
+      );
+      lines.push('');
+    }
+
+    for (const status of ['passed', 'failed', 'error', 'not_executed'] as const) {
+      const rows = this.mapByStatus(items, status);
+      if (rows.length === 0) continue;
+
+      lines.push(status);
+      lines.push(stringify(rows, { header: true }).trimEnd());
+      lines.push('');
+    }
 
     await ensureDir(path.dirname(filePath));
-    await writeFile(filePath, csv, 'utf8');
+    await writeFile(filePath, `${lines.join('\n')}\n`, 'utf8');
 
     return {
       format: 'csv',
@@ -27,5 +52,15 @@ export class CsvWriter {
       sizeBytes: await getFileSize(filePath),
       createdAt: nowIso(),
     };
+  }
+
+  private mapByStatus(
+    items: ManifestItemEvent[],
+    status: string,
+  ): Array<Record<string, string | number | boolean>> {
+    const fields = resolveFields(status);
+    return items
+      .filter((item) => String(item.status).toLowerCase() === status)
+      .map((item) => mapFields(item.payload, fields, 'csv'));
   }
 }

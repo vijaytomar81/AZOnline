@@ -1,6 +1,6 @@
 // src/evidenceFactory/manifest/ndjson-store.ts
 import path from 'path';
-import { appendFile, readFile } from 'fs/promises';
+import { appendFile, readdir, readFile } from 'fs/promises';
 import { ensureDir } from '../utils/path-utils';
 import type { ManifestEvent } from '../contracts/types';
 
@@ -18,6 +18,22 @@ export class NdjsonStore {
         .map((line) => line.trim())
         .filter(Boolean)
         .map((line) => JSON.parse(line) as ManifestEvent);
+    } catch {
+      return [];
+    }
+  }
+
+  async readAllFromDirectory(dirPath: string): Promise<ManifestEvent[]> {
+    try {
+      const files = (await readdir(dirPath))
+        .filter((file) => file.endsWith('.ndjson'))
+        .sort();
+
+      const allEvents = await Promise.all(
+        files.map((file) => this.readAll(path.join(dirPath, file))),
+      );
+
+      return allEvents.flat();
     } catch {
       return [];
     }

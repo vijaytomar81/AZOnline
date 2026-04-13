@@ -1,6 +1,6 @@
 // src/evidenceFactory/routing/output-router.ts
 import path from 'path';
-import { safeFileName, statusFolder } from '../utils/path-utils';
+import { safeFileName } from '../utils/path-utils';
 import { fileSafeTimestamp } from '../utils/time-utils';
 import type { EvidenceOutputFormat } from '../contracts/types';
 
@@ -22,52 +22,34 @@ export class OutputRouter {
     );
   }
 
-  eventFilePath(suiteName: string, executionId: string): string {
-    return path.join(this.executionRoot(suiteName, executionId), 'manifests', 'events.ndjson');
+  manifestDirPath(suiteName: string, executionId: string): string {
+    return path.join(this.executionRoot(suiteName, executionId), 'manifests');
   }
 
-  evidenceFilePath(args: {
+  eventFilePath(suiteName: string, executionId: string, workerId: string): string {
+    return path.join(this.manifestDirPath(suiteName, executionId), `${safeFileName(workerId)}.ndjson`);
+  }
+
+  finalOutputPath(args: {
     suiteName: string;
     executionId: string;
-    artifactId: string;
-    artifactName?: string;
-    status: string;
-    format: Exclude<EvidenceOutputFormat, 'console'>;
+    format: EvidenceOutputFormat;
     payload?: Record<string, unknown>;
   }): string {
-    const parts = [safeFileName(args.artifactId)];
-
-    if (args.artifactName) {
-      parts.push(safeFileName(args.artifactName));
-    }
+    const parts = [safeFileName(args.suiteName), safeFileName(args.executionId)];
 
     if (this.fileNaming?.includeTimestamp) {
       parts.push(this.resolveTimestamp(args.payload));
     }
 
-    const file = `${parts.join('_')}.${args.format}`;
+    const extension = args.format === 'excel'
+      ? 'xlsx'
+      : args.format === 'console'
+        ? 'log'
+        : args.format;
 
-    return path.join(
-      this.executionRoot(args.suiteName, args.executionId),
-      args.format,
-      statusFolder(args.status),
-      file,
-    );
-  }
-
-  excelPath(
-    suiteName: string,
-    executionId: string,
-    payload?: Record<string, unknown>,
-  ): string {
-    const parts = [safeFileName(suiteName), safeFileName(executionId)];
-
-    if (this.fileNaming?.includeTimestamp) {
-      parts.push(this.resolveTimestamp(payload));
-    }
-
-    const file = `${parts.join('_')}.xlsx`;
-    return path.join(this.executionRoot(suiteName, executionId), 'excel', file);
+    const file = `${parts.join('_')}.${extension}`;
+    return path.join(this.executionRoot(args.suiteName, args.executionId), args.format, file);
   }
 
   currentSuiteRoot(suiteName: string): string {

@@ -5,6 +5,7 @@ export type EvidenceOutputFormat = 'json' | 'xml' | 'csv' | 'console' | 'excel';
 export type EvidenceWriteBaseRequest = {
   executionId: string;
   suiteName: string;
+  workerId?: string;
   outputFormats: [EvidenceOutputFormat, ...EvidenceOutputFormat[]];
 };
 
@@ -30,7 +31,7 @@ export type FinalizeExecutionRequest = {
 };
 
 export type ArtifactMetadata = {
-  format: string;
+  format: EvidenceOutputFormat;
   fileName?: string;
   filePath?: string;
   relativePath?: string;
@@ -51,7 +52,7 @@ export type FinalizeExecutionResponse = {
   executionId: string;
   suiteName: string;
   generatedAt: string;
-  excel?: ArtifactMetadata;
+  artifacts: ArtifactMetadata[];
   eventCount: number;
 };
 
@@ -59,10 +60,12 @@ export type ManifestItemEvent = {
   eventType: 'item';
   executionId: string;
   suiteName: string;
+  workerId: string;
   artifactId: string;
   artifactName?: string;
   status: string;
   consoleMode?: string;
+  outputFormats: [EvidenceOutputFormat, ...EvidenceOutputFormat[]];
   payload: Record<string, unknown>;
   createdAt: string;
 };
@@ -71,6 +74,7 @@ export type ManifestSummaryEvent = {
   eventType: 'summary';
   executionId: string;
   suiteName: string;
+  workerId: string;
   metaPayload: Record<string, unknown>;
   outputFormats: [EvidenceOutputFormat, ...EvidenceOutputFormat[]];
   createdAt: string;
