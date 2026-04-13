@@ -6,6 +6,5 @@ export * from "./toolingLayer";
 export * from "./dataLayer";
 export * from "./frameworkCore";
 export * from "./configLayer";
-export * from "./evidenceLayer";
 export * from "./logs";
 export * from "./helpers";

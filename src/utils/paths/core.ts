@@ -9,6 +9,5 @@ export const FRAMEWORK_CORE_DIR = path.join(SRC_DIR, "frameworkCore");
 export const BUSINESS_LAYER_DIR = path.join(SRC_DIR, "businessLayer");
 export const CONFIG_LAYER_DIR = path.join(SRC_DIR, "configLayer");
 export const DATA_LAYER_DIR = path.join(SRC_DIR, "dataLayer");
-export const EVIDENCE_LAYER_DIR = path.join(SRC_DIR, "evidenceLayer");
 export const INTEGRATIONS_DIR = path.join(SRC_DIR, "integrations");
 export const TOOLING_LAYER_DIR = path.join(SRC_DIR, "toolingLayer");
