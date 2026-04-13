@@ -4,6 +4,7 @@ import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts"
 import type { ExecutorRegistry } from "@frameworkCore/executionLayer/core/registry";
 import type { ExecutionItemDataRegistry } from "@frameworkCore/executionLayer/runtime/itemData";
 import type { EvidenceFactory } from "@evidenceFactory";
+import type { EnvKey } from "@configLayer/environments";
 
 export type RunOutput = {
     status: "passed" | "failed" | "not_executed";
@@ -12,36 +13,30 @@ export type RunOutput = {
 };
 
 export type RunScenariosArgs = {
-    // Core execution
     mode: "data" | "e2e";
-    environment: string;
+    environment: EnvKey;
     scenarios: ExecutionScenario[];
     iterations?: number;
     parallel?: number;
     verbose?: boolean;
 
-    // Execution infrastructure
     registry: ExecutorRegistry;
     executionItemDataRegistry: ExecutionItemDataRegistry;
     resolveOverrideItemData?: (scenario: ExecutionScenario) => Record<string, unknown> | undefined;
 
-    // Optional metadata (used in logs / headers)
     platform?: string;
     application?: string;
     product?: string;
     journeyContext?: unknown;
 
-    // CLI / source context
     schema?: string;
     source?: string;
     sheet?: string;
 
-    // Evidence / reporting
     runId?: string;
     workerId?: string;
     evidenceOutputRoot?: string;
 
-    // ✅ NEW — EvidenceFactory integration
     evidenceFactory?: EvidenceFactory;
     suiteName?: string;
 };

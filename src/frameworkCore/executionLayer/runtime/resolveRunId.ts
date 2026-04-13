@@ -1,16 +1,7 @@
 // src/frameworkCore/executionLayer/runtime/resolveRunId.ts
 
 import { executionConfig } from "@configLayer/execution.config";
-
-function resolveEnv(): string {
-    const value = process.env.TARGET_ENV?.trim();
-
-    if (!value) {
-        throw new Error("TARGET_ENV is required to resolve run id.");
-    }
-
-    return value;
-}
+import type { EnvKey } from "@configLayer/environments";
 
 function resolveMode(): string {
     return process.env.RUN_MODE?.trim() || "run";
@@ -29,21 +20,20 @@ function buildTimestamp(): string {
     return `${yyyy}${mm}${dd}_${hh}${min}${ss}`;
 }
 
-export function resolveRunId(): string {
-    const env = resolveEnv();
+export function resolveRunId(environment: EnvKey): string {
     const mode = resolveMode();
 
     if (process.env.RUN_ID?.trim()) {
-        return `${env}-${mode}-${process.env.RUN_ID.trim()}`;
+        return `${environment}-${mode}-${process.env.RUN_ID.trim()}`;
     }
 
     if (process.env.BUILD_NUMBER) {
-        return `${env}-${mode}-build-${process.env.BUILD_NUMBER}`;
+        return `${environment}-${mode}-build-${process.env.BUILD_NUMBER}`;
     }
 
     if (!executionConfig.generatedEvidenceArtifacts.withTimestamp) {
-        return `${env}-${mode}`;
+        return `${environment}-${mode}`;
     }
 
-    return `${env}-${mode}-${buildTimestamp()}`;
+    return `${environment}-${mode}-${buildTimestamp()}`;
 }

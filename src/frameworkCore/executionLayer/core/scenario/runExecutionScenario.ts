@@ -4,6 +4,7 @@ import type {
     ExecutionScenario,
     ExecutionScenarioResult,
 } from "@frameworkCore/executionLayer/contracts";
+import type { EnvKey } from "@configLayer/environments";
 import type { ExecutorRegistry } from "@frameworkCore/executionLayer/core/registry";
 import type { ExecutionItemDataRegistry } from "@frameworkCore/executionLayer/runtime/itemData";
 import {
@@ -18,6 +19,7 @@ import { runScenarioItems } from "./runScenarioItems";
 
 export async function runExecutionScenario(args: {
     scenario: ExecutionScenario;
+    environment: EnvKey;
     registry: ExecutorRegistry;
     executionItemDataRegistry: ExecutionItemDataRegistry;
     logScope: string;
@@ -30,7 +32,10 @@ export async function runExecutionScenario(args: {
     suiteName?: string;
     mode?: "e2e" | "data";
 }): Promise<ExecutionScenarioResult> {
-    const context = createScenarioExecutionContext(args.scenario);
+    const context = createScenarioExecutionContext(
+        args.scenario,
+        args.environment
+    );
     let session: BrowserSession | undefined;
 
     try {

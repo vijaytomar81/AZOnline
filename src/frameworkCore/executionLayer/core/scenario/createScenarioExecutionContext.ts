@@ -1,10 +1,12 @@
 // src/frameworkCore/executionLayer/core/scenario/createScenarioExecutionContext.ts
 
-import type { ExecutionContext, ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
 import { createExecutionContext } from "@frameworkCore/executionLayer/core/context";
+import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
+import type { EnvKey } from "@configLayer/environments";
 
 export function createScenarioExecutionContext(
-    scenario: ExecutionScenario
-): ExecutionContext {
-    return createExecutionContext(scenario);
+    scenario: ExecutionScenario,
+    environment: EnvKey
+) {
+    return createExecutionContext(scenario, environment);
 }

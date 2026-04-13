@@ -3,13 +3,15 @@
 import { AppError } from "@utils/errors";
 import { normalizeSpaces } from "@utils/text";
 import {
+    asEnvKey,
+} from "@configLayer/env";
+import {
     environments,
     type EnvKey,
 } from "@configLayer/environments";
 
 export function parseEnvironment(raw?: string): EnvKey {
     const value = normalizeSpaces(String(raw ?? ""));
-
     const allowed = Object.keys(environments.envs) as EnvKey[];
 
     if (!value) {
@@ -21,18 +23,14 @@ export function parseEnvironment(raw?: string): EnvKey {
         });
     }
 
-    const resolved = allowed.find(
-        (item) => item.toLowerCase() === value.toLowerCase()
-    );
-
-    if (resolved) {
-        return resolved;
+    try {
+        return asEnvKey(value);
+    } catch {
+        throw new AppError({
+            code: "INVALID_ENVIRONMENT",
+            stage: "cli-parse",
+            source: "parseEnvironment",
+            message: `Invalid --environment value "${raw}". Allowed: ${allowed.join(", ")}.`,
+        });
     }
-
-    throw new AppError({
-        code: "INVALID_ENVIRONMENT",
-        stage: "cli-parse",
-        source: "parseEnvironment",
-        message: `Invalid --environment value "${raw}". Allowed: ${allowed.join(", ")}.`,
-    });
 }

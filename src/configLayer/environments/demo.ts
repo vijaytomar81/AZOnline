@@ -1,11 +1,13 @@
 // src/configLayer/environments/demo.ts
 
 import type { TargetEnvUrls } from "./types";
+import { ENV_NAMES } from "./envNames";
 import { PLATFORMS } from "../models/platform.config";
 import { APPLICATIONS } from "../models/application.config";
 import { PRODUCTS } from "../models/product.config";
 
 export const demoEnv: TargetEnvUrls = {
+    envName: ENV_NAMES.DEMO,
     startUrls: {
         [PLATFORMS.ATHENA]: {
             [APPLICATIONS.AZ_ONLINE]: {

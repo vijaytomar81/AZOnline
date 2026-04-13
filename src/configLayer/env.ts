@@ -1,35 +1,32 @@
 // src/configLayer/env.ts
 
-import { environments } from "./environments";
-import type { EnvKey } from "./environments";
+import { environments, ENV_NAMES } from "./environments";
+import type { EnvKey, TargetEnvUrls } from "./environments";
 
 const LEGACY_ENV_KEY_MAP: Record<string, EnvKey> = {
-  azonlinedev: "dev",
-  azonlinetest: "test",
-  azonlinedemo: "demo",
-  azonlinenft: "nft",
-  dev: "dev",
-  test: "test",
-  demo: "demo",
-  nft: "nft",
+  azonlinedev: ENV_NAMES.DEV,
+  azonlinetest: ENV_NAMES.TEST,
+  azonlinedemo: ENV_NAMES.DEMO,
+  azonlinenft: ENV_NAMES.NFT,
+  [ENV_NAMES.DEV]: ENV_NAMES.DEV,
+  [ENV_NAMES.TEST]: ENV_NAMES.TEST,
+  [ENV_NAMES.DEMO]: ENV_NAMES.DEMO,
+  [ENV_NAMES.NFT]: ENV_NAMES.NFT,
 };
 
-function asEnvKey(value: string | undefined): EnvKey {
-  const raw = String(value ?? environments.defaultEnv).trim().toLowerCase();
+export function asEnvKey(value: string): EnvKey {
+  const raw = String(value ?? "").trim().toLowerCase();
   const resolved = LEGACY_ENV_KEY_MAP[raw];
 
   if (!resolved || !environments.envs[resolved]) {
     throw new Error(
-      `Unknown TARGET_ENV='${value}'. Available: ${Object.keys(environments.envs).join(", ")}`
+      `Unknown environment='${value}'. Available: ${Object.keys(environments.envs).join(", ")}`
     );
   }
 
   return resolved;
 }
 
-const targetEnv = asEnvKey(process.env.TARGET_ENV);
-
-export const envConfig = {
-  name: targetEnv,
-  env: environments.envs[targetEnv],
-};
+export function resolveEnvConfig(environment: EnvKey): TargetEnvUrls {
+  return environments.envs[environment];
+}

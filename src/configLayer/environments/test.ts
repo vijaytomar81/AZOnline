@@ -1,11 +1,13 @@
 // src/configLayer/environments/test.ts
 
 import type { TargetEnvUrls } from "./types";
+import { ENV_NAMES } from "./envNames";
 import { PLATFORMS } from "../models/platform.config";
 import { APPLICATIONS } from "../models/application.config";
 import { PRODUCTS } from "../models/product.config";
 
 export const testEnv: TargetEnvUrls = {
+    envName: ENV_NAMES.TEST,
     startUrls: {
         [PLATFORMS.ATHENA]: {
             [APPLICATIONS.AZ_ONLINE]: {

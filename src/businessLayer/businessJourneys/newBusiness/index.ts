@@ -55,6 +55,7 @@ export async function runNewBusiness(
     const quoteNumber = buildQuoteNumber();
     const policyNumber = buildPolicyNumber();
     const calculatedEmail = buildCalculatedEmail({
+        envName: args.context.env.envName,
         testCaseId: args.item.testCaseRef,
         startFrom,
     });

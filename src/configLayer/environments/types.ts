@@ -6,6 +6,7 @@ import type {
     AthenaApplication,
 } from "../models/application.config";
 import type { Product } from "../models/product.config";
+import type { EnvKey } from "./envNames";
 
 export type StartUrls = Record<
     Platform,
@@ -22,14 +23,12 @@ export type ServiceUrls = {
 };
 
 export type TargetEnvUrls = {
+    envName: EnvKey;
     startUrls: StartUrls;
     serviceUrls: ServiceUrls;
 };
 
-export type EnvKey = "dev" | "test" | "demo" | "nft";
-
 export type EnvironmentsConfig = {
-    defaultEnv: EnvKey;
     envs: Record<EnvKey, TargetEnvUrls>;
     calculatedEmailBase: string;
 };

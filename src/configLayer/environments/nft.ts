@@ -1,11 +1,13 @@
 // src/configLayer/environments/nft.ts
 
 import type { TargetEnvUrls } from "./types";
+import { ENV_NAMES } from "./envNames";
 import { PLATFORMS } from "../models/platform.config";
 import { APPLICATIONS } from "../models/application.config";
 import { PRODUCTS } from "../models/product.config";
 
 export const nftEnv: TargetEnvUrls = {
+    envName: ENV_NAMES.NFT,
     startUrls: {
         [PLATFORMS.ATHENA]: {
             [APPLICATIONS.AZ_ONLINE]: {

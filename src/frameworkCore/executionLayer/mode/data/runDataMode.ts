@@ -9,7 +9,6 @@ import { runScenarios } from "@frameworkCore/executionLayer/core/runner";
 import { registerDefaultExecutors } from "@frameworkCore/executionLayer/runtime/defaults";
 import { buildDataScenarios } from "./buildDataScenarios";
 import type { DataModeArgs } from "./types";
-import { environments } from "@configLayer/environments";
 
 export async function runDataMode(
     args: DataModeArgs

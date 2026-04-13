@@ -1,8 +1,7 @@
 // src/utils/calculatedEmail.ts
 
 import { formatTimestamp } from "@utils/time";
-import { environments } from "@configLayer/environments";
-import { envConfig } from "@configLayer/env";
+import { environments, type EnvKey } from "@configLayer/environments";
 
 function normalize(value: string): string {
     return String(value || "")
@@ -17,13 +16,14 @@ function splitEmail(baseEmail: string) {
 }
 
 export function buildCalculatedEmail(args: {
+    envName: EnvKey;
     testCaseId?: string;
     startFrom?: string;
 }): string {
     const baseEmail = environments.calculatedEmailBase;
     const { local, domain } = splitEmail(baseEmail);
 
-    const env = normalize(envConfig.name); // azonlinetest
+    const env = normalize(args.envName);
     const startFrom = normalize(args.startFrom ?? "direct");
     const testCaseId = normalize(args.testCaseId ?? "unknown");
 

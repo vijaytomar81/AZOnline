@@ -15,6 +15,7 @@ export async function runScenarioWorker(args: {
 
     const result = await runExecutionScenario({
         scenario: args.scenario,
+        environment: args.runArgs.environment,
         registry: args.runArgs.registry,
         executionItemDataRegistry: args.runArgs.executionItemDataRegistry,
         logScope: getScenarioScope(args.scenario),
