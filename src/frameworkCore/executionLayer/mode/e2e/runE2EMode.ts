@@ -55,5 +55,8 @@ export async function runE2EMode(
         sheet: args.sheetName,
         registry: bootstrap.executorRegistry,
         executionItemDataRegistry: bootstrap.executionItemDataRegistry,
+        platform: args.platform,
+        application: args.application,
+        product: args.product,
     });
 }
