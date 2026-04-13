@@ -49,7 +49,7 @@ export async function runDataMode(
 
     await runScenarios({
         mode: "data",
-        environment: environments.defaultEnv,
+        environment: args.environment,
         scenarios,
         iterations: args.iterations ?? 1,
         parallel: args.parallel ?? 1,

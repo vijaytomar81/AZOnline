@@ -2,7 +2,6 @@
 
 import { getArg, hasFlag, normalizeArgv } from "@utils/argv";
 import { normalizeSpaces } from "@utils/text";
-import { AppError } from "@utils/errors";
 import { setLogVerbose } from "@frameworkCore/logging/core/logConfig";
 import {
     printDataModeHelp,
@@ -12,125 +11,20 @@ import {
     printE2EModeHelp,
     runE2EMode,
 } from "@frameworkCore/executionLayer/mode/e2e";
-import {
-    JOURNEY_TYPES,
-    MTA_TYPES,
-    type JourneyContext,
-    type MtaType,
-} from "@configLayer/models/journeyContext.config";
-import { parseParallel } from "./parseParallel";
-import {
-    parsePlatform,
-    parseApplication,
-    parseProduct,
-} from "./parseRoutingArgs";
-import { handleExecutionError } from "./handleExecutionError";
-
-function normalizeMode(raw?: string): "data" | "e2e" {
-    return String(raw ?? "e2e").trim().toLowerCase() === "data"
-        ? "data"
-        : "e2e";
-}
-
-function parseIterations(raw?: string): number {
-    const value = normalizeSpaces(String(raw ?? ""));
-
-    if (!value) {
-        return 1;
-    }
-
-    const num = Number(value);
-
-    if (!Number.isInteger(num) || num <= 0) {
-        return 1;
-    }
-
-    return num;
-}
-
-function parseScenarioFilter(raw?: string): string[] {
-    return String(raw ?? "")
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean);
-}
-
-function parseJourneySubType(raw?: string): MtaType | undefined {
-    const value = normalizeSpaces(String(raw ?? ""));
-
-    if (!value) {
-        return undefined;
-    }
-
-    const allowed = Object.values(MTA_TYPES);
-    const resolved = allowed.find(
-        (item) => item.toLowerCase() === value.toLowerCase()
-    );
-
-    if (resolved) {
-        return resolved;
-    }
-
-    throw new AppError({
-        code: "INVALID_JOURNEY_SUBTYPE",
-        stage: "cli-parse",
-        source: "main.ts",
-        message: `Invalid --journeySubType value "${raw}". Allowed: ${allowed.join(", ")}.`,
-    });
-}
-
-function parseJourneyContext(args: {
-    journeyContextRaw?: string;
-    journeySubTypeRaw?: string;
-}): JourneyContext | undefined {
-    const value = normalizeSpaces(String(args.journeyContextRaw ?? ""));
-    const subType = parseJourneySubType(args.journeySubTypeRaw);
-
-    if (!value) {
-        return undefined;
-    }
-
-    if (value === JOURNEY_TYPES.NEW_BUSINESS) {
-        return { type: JOURNEY_TYPES.NEW_BUSINESS };
-    }
-
-    if (value === JOURNEY_TYPES.RENEWAL) {
-        return { type: JOURNEY_TYPES.RENEWAL };
-    }
-
-    if (value === JOURNEY_TYPES.MTC) {
-        return { type: JOURNEY_TYPES.MTC };
-    }
-
-    if (value === JOURNEY_TYPES.MTA) {
-        if (!subType) {
-            throw new AppError({
-                code: "JOURNEY_SUBTYPE_MISSING",
-                stage: "cli-parse",
-                source: "main.ts",
-                message:
-                    `When --journeyContext is "${JOURNEY_TYPES.MTA}", ` +
-                    `--journeySubType is required. Allowed: ${Object.values(MTA_TYPES).join(", ")}.`,
-            });
-        }
-
-        return {
-            type: JOURNEY_TYPES.MTA,
-            subType,
-        };
-    }
-
-    throw new AppError({
-        code: "INVALID_JOURNEY_CONTEXT",
-        stage: "cli-parse",
-        source: "main.ts",
-        message: `Invalid --journeyContext value "${args.journeyContextRaw}".`,
-    });
-}
+import { parseMode } from "./parsers/mode/parseMode";
+import { parseIterations } from "./parsers/execution/parseIterations";
+import { parseParallel } from "./parsers/execution/parseParallel";
+import { parseScenarioFilter } from "./parsers/execution/parseScenarioFilter";
+import { parsePlatform } from "./parsers/routing/parsePlatform";
+import { parseApplication } from "./parsers/routing/parseApplication";
+import { parseProduct } from "./parsers/routing/parseProduct";
+import { parseJourneyContext } from "./parsers/journey/parseJourneyContext";
+import { parseEnvironment } from "./parsers/environment/parseEnvironment";
+import { handleExecutionError } from "./handlers/handleExecutionError";
 
 async function main(): Promise<void> {
     const argv = normalizeArgv(process.argv.slice(2));
-    const mode = normalizeMode(String(getArg(argv, "--mode") ?? "e2e"));
+    const mode = parseMode(String(getArg(argv, "--mode") ?? "e2e"));
 
     if (hasFlag(argv, "--help") || hasFlag(argv, "-h")) {
         if (mode === "data") {
@@ -150,6 +44,9 @@ async function main(): Promise<void> {
     );
     const parallel = parseParallel(
         String(getArg(argv, "--parallel") ?? "")
+    );
+    const environment = parseEnvironment(
+        String(getArg(argv, "--environment") ?? "")
     );
 
     const platform = parsePlatform(
@@ -178,6 +75,7 @@ async function main(): Promise<void> {
             iterations,
             parallel,
             verbose,
+            environment,
             platform,
             application,
             product,
@@ -201,6 +99,7 @@ async function main(): Promise<void> {
         iterations,
         parallel,
         verbose,
+        environment,
         platform,
         application,
         product,

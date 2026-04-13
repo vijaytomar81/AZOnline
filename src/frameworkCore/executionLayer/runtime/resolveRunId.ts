@@ -1,10 +1,15 @@
 // src/frameworkCore/executionLayer/runtime/resolveRunId.ts
 
 import { executionConfig } from "@configLayer/execution.config";
-import { environments } from "@configLayer/environments";
 
 function resolveEnv(): string {
-    return process.env.TARGET_ENV?.trim() || environments.defaultEnv;
+    const value = process.env.TARGET_ENV?.trim();
+
+    if (!value) {
+        throw new Error("TARGET_ENV is required to resolve run id.");
+    }
+
+    return value;
 }
 
 function resolveMode(): string {

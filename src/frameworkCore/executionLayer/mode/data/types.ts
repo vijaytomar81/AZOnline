@@ -2,6 +2,7 @@
 
 import type { CasesFile } from "@dataLayer/builder/types";
 import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
+import type { EnvKey } from "@configLayer/environments";
 import type { Platform } from "@configLayer/models/platform.config";
 import type { Application } from "@configLayer/models/application.config";
 import type { Product } from "@configLayer/models/product.config";
@@ -11,6 +12,7 @@ export type DataModeArgs = {
     iterations?: number;
     parallel?: number;
     verbose?: boolean;
+    environment: EnvKey;
     platform: Platform;
     application: Application;
     product: Product;
