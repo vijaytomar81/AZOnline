@@ -42,14 +42,20 @@ export class OutputRouter {
       parts.push(this.resolveTimestamp(args.payload));
     }
 
-    const extension = args.format === 'excel'
-      ? 'xlsx'
-      : args.format === 'console'
-        ? 'log'
-        : args.format;
+    const extension =
+      args.format === 'excel'
+        ? 'xlsx'
+        : args.format === 'console'
+          ? 'log'
+          : args.format;
 
     const file = `${parts.join('_')}.${extension}`;
-    return path.join(this.executionRoot(args.suiteName, args.executionId), args.format, file);
+
+    return path.join(
+      this.executionRoot(args.suiteName, args.executionId),
+      args.format,
+      file,
+    );
   }
 
   currentSuiteRoot(suiteName: string): string {
@@ -62,10 +68,7 @@ export class OutputRouter {
 
   private resolveTimestamp(payload?: Record<string, unknown>): string {
     if (this.fileNaming?.timestampSource === 'payload') {
-      const candidate =
-        payload?.artifactTimestamp ??
-        payload?.finishedAt ??
-        payload?.startedAt;
+      const candidate = payload?.artifactTimestamp;
 
       if (candidate) {
         const parsed = new Date(String(candidate));
