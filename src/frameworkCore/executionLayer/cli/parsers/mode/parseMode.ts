@@ -1,9 +1,12 @@
 // src/frameworkCore/executionLayer/cli/parsers/mode/parseMode.ts
 
-export type ExecutionMode = "data" | "e2e";
+import {
+    EXECUTION_MODES,
+    type ExecutionMode,
+} from "@configLayer/executionModes";
 
 export function parseMode(raw?: string): ExecutionMode {
-    return String(raw ?? "e2e").trim().toLowerCase() === "data"
-        ? "data"
-        : "e2e";
+    return String(raw ?? EXECUTION_MODES.E2E).trim().toLowerCase() === EXECUTION_MODES.DATA
+        ? EXECUTION_MODES.DATA
+        : EXECUTION_MODES.E2E;
 }

@@ -1,5 +1,6 @@
 // src/frameworkCore/executionLayer/mode/e2e/runE2EMode.ts
 
+import { EXECUTION_MODES } from "@configLayer/executionModes";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import { emitLog } from "@frameworkCore/logging/emitLog";
@@ -18,7 +19,7 @@ export async function runE2EMode(
         scope: "run",
         level: LOG_LEVELS.INFO,
         category: LOG_CATEGORIES.FRAMEWORK,
-        message: `Mode -> e2e | excel=${args.excelPath} | sheet=${args.sheetName} | iterations=${args.iterations}`,
+        message: `Mode -> ${EXECUTION_MODES.E2E} | excel=${args.excelPath} | sheet=${args.sheetName} | iterations=${args.iterations}`,
     });
 
     const bootstrap = createExecutionBootstrap();
@@ -45,7 +46,7 @@ export async function runE2EMode(
     });
 
     await runScenarios({
-        mode: "e2e",
+        mode: EXECUTION_MODES.E2E,
         environment: args.environment,
         scenarios,
         iterations: args.iterations,

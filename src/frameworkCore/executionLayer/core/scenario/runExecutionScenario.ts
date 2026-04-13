@@ -5,6 +5,7 @@ import type {
     ExecutionScenarioResult,
 } from "@frameworkCore/executionLayer/contracts";
 import type { EnvKey } from "@configLayer/environments";
+import type { ExecutionMode } from "@configLayer/executionModes";
 import type { ExecutorRegistry } from "@frameworkCore/executionLayer/core/registry";
 import type { ExecutionItemDataRegistry } from "@frameworkCore/executionLayer/runtime/itemData";
 import {
@@ -25,12 +26,10 @@ export async function runExecutionScenario(args: {
     logScope: string;
     overrideItemData?: Record<string, unknown>;
     stopOnFailure?: boolean;
-
-    // ✅ NEW: EvidenceFactory integration
     evidenceFactory?: any;
     runId?: string;
     suiteName?: string;
-    mode?: "e2e" | "data";
+    mode?: ExecutionMode;
 }): Promise<ExecutionScenarioResult> {
     const context = createScenarioExecutionContext(
         args.scenario,
@@ -49,8 +48,6 @@ export async function runExecutionScenario(args: {
             logScope: args.logScope,
             overrideItemData: args.overrideItemData,
             stopOnFailure: args.stopOnFailure,
-
-            // ✅ pass EvidenceFactory downstream
             evidenceFactory: args.evidenceFactory,
             runId: args.runId,
             suiteName: args.suiteName,

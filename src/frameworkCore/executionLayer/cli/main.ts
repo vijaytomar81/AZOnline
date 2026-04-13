@@ -2,6 +2,7 @@
 
 import { getArg, hasFlag, normalizeArgv } from "@utils/argv";
 import { normalizeSpaces } from "@utils/text";
+import { EXECUTION_MODES } from "@configLayer/executionModes";
 import { setLogVerbose } from "@frameworkCore/logging/core/logConfig";
 import {
     printDataModeHelp,
@@ -24,10 +25,12 @@ import { handleExecutionError } from "./handlers/handleExecutionError";
 
 async function main(): Promise<void> {
     const argv = normalizeArgv(process.argv.slice(2));
-    const mode = parseMode(String(getArg(argv, "--mode") ?? "e2e"));
+    const mode = parseMode(
+        String(getArg(argv, "--mode") ?? EXECUTION_MODES.E2E)
+    );
 
     if (hasFlag(argv, "--help") || hasFlag(argv, "-h")) {
-        if (mode === "data") {
+        if (mode === EXECUTION_MODES.DATA) {
             printDataModeHelp();
         } else {
             printE2EModeHelp();
@@ -59,7 +62,7 @@ async function main(): Promise<void> {
         String(getArg(argv, "--product") ?? "")
     );
 
-    if (mode === "data") {
+    if (mode === EXECUTION_MODES.DATA) {
         const journeyContext = parseJourneyContext({
             journeyContextRaw: String(getArg(argv, "--journeyContext") ?? ""),
             journeySubTypeRaw: String(getArg(argv, "--journeySubType") ?? ""),

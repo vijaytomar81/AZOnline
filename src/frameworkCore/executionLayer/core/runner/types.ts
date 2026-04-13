@@ -5,6 +5,7 @@ import type { ExecutorRegistry } from "@frameworkCore/executionLayer/core/regist
 import type { ExecutionItemDataRegistry } from "@frameworkCore/executionLayer/runtime/itemData";
 import type { EvidenceFactory } from "@evidenceFactory";
 import type { EnvKey } from "@configLayer/environments";
+import type { ExecutionMode } from "@configLayer/executionModes";
 
 export type RunOutput = {
     status: "passed" | "failed" | "not_executed";
@@ -13,7 +14,7 @@ export type RunOutput = {
 };
 
 export type RunScenariosArgs = {
-    mode: "data" | "e2e";
+    mode: ExecutionMode;
     environment: EnvKey;
     scenarios: ExecutionScenario[];
     iterations?: number;

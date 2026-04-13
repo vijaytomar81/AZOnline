@@ -1,12 +1,12 @@
 // src/frameworkCore/executionLayer/contracts/ExecutionPlan.ts
 
+import type { EnvKey } from "@configLayer/environments";
+import type { ExecutionMode } from "@configLayer/executionModes";
 import type { ExecutionScenario } from "./ExecutionScenario";
-
-export type ExecutionMode = "data" | "e2e";
 
 export type ExecutionPlan = {
     mode: ExecutionMode;
-    environment: string;
+    environment: EnvKey;
     scenarios: ExecutionScenario[];
     iterations: number;
     parallel?: number;

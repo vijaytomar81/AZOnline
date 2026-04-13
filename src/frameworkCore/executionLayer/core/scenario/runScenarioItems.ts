@@ -1,6 +1,7 @@
 // src/frameworkCore/executionLayer/core/scenario/runScenarioItems.ts
 
 import { nowIso } from "@utils/time";
+import type { ExecutionMode } from "@configLayer/executionModes";
 import type {
     ExecutionContext,
     ExecutionItem,
@@ -79,7 +80,7 @@ async function writeNotExecutedEvidence(args: {
     runId?: string;
     suiteName?: string;
     workerId?: string;
-    mode?: "e2e" | "data";
+    mode?: ExecutionMode;
 }): Promise<void> {
     const {
         evidenceFactory,
@@ -126,7 +127,7 @@ export async function runScenarioItems(args: {
     runId?: string;
     suiteName?: string;
     workerId?: string;
-    mode?: "e2e" | "data";
+    mode?: ExecutionMode;
 }): Promise<void> {
     const stopOnFailure = args.stopOnFailure !== false;
     const items = args.context.scenario.items;

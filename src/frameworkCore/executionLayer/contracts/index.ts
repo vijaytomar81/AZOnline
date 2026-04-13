@@ -26,4 +26,5 @@ export {
 
 export type { ExecutionContext } from "./ExecutionContext";
 
-export type { ExecutionMode, ExecutionPlan } from "./ExecutionPlan";
+export type { ExecutionPlan } from "./ExecutionPlan";
+export type { ExecutionMode } from "@configLayer/executionModes";

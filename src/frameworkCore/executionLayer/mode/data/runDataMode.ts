@@ -1,5 +1,6 @@
 // src/frameworkCore/executionLayer/mode/data/runDataMode.ts
 
+import { EXECUTION_MODES } from "@configLayer/executionModes";
 import { getCasesFile } from "@dataLayer/runtime/cases/getCasesFile";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
@@ -18,7 +19,7 @@ export async function runDataMode(
         level: LOG_LEVELS.INFO,
         category: LOG_CATEGORIES.FRAMEWORK,
         message:
-            `Mode -> data | platform=${args.platform} | application=${args.application} | ` +
+            `Mode -> ${EXECUTION_MODES.DATA} | platform=${args.platform} | application=${args.application} | ` +
             `product=${args.product} | journey=${args.journeyContext.type}`,
     });
 
@@ -47,7 +48,7 @@ export async function runDataMode(
     });
 
     await runScenarios({
-        mode: "data",
+        mode: EXECUTION_MODES.DATA,
         environment: args.environment,
         scenarios,
         iterations: args.iterations ?? 1,

@@ -3,6 +3,7 @@
 import { createRuntimeInfo } from "@utils/runtimeInfo";
 import type { RuntimeBrowserInfo } from "@utils/runtimeInfo";
 import { executionConfig } from "@configLayer/execution.config";
+import { EXECUTION_MODES } from "@configLayer/executionModes";
 import { resolveRunId } from "@frameworkCore/executionLayer/runtime/resolveRunId";
 import {
     formatDuration,
@@ -68,8 +69,10 @@ export async function runScenarios(
             schema: args.schema,
             source: args.source,
             sheet: args.sheet,
-            totalCases: args.mode === "data" ? runs.length : undefined,
-            totalScenarios: args.mode === "e2e" ? runs.length : undefined,
+            totalCases:
+                args.mode === EXECUTION_MODES.DATA ? runs.length : undefined,
+            totalScenarios:
+                args.mode === EXECUTION_MODES.E2E ? runs.length : undefined,
             platform: args.platform,
             application: args.application,
             product: args.product,

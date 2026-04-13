@@ -1,7 +1,8 @@
 // src/frameworkCore/executionLayer/logging/executionLogRenderer.ts
 
 import { failure, muted, success } from "@utils/cliFormat";
-import type { ExecutionMode } from "@frameworkCore/executionLayer/contracts";
+import { EXECUTION_MODES } from "@configLayer/executionModes";
+import type { ExecutionMode } from "@configLayer/executionModes";
 import { field, headerLine } from "./shared";
 
 export function formatDuration(startMs: number): string {
@@ -25,7 +26,7 @@ export function renderExecutionHeader(args: {
 }): string {
     const lines: string[] = [];
     const title =
-        args.mode === "data"
+        args.mode === EXECUTION_MODES.DATA
             ? success("[DATA-MODE EXECUTION]")
             : success("[E2E-MODE EXECUTION]");
 
@@ -33,7 +34,7 @@ export function renderExecutionHeader(args: {
     lines.push(headerLine(title));
     lines.push(field("Environment", args.environment));
 
-    if (args.mode === "data") {
+    if (args.mode === EXECUTION_MODES.DATA) {
         if (args.platform) {
             lines.push(field("Platform", args.platform));
         }

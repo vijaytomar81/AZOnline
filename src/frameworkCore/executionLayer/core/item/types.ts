@@ -1,5 +1,6 @@
 // src/frameworkCore/executionLayer/core/item/types.ts
 
+import type { ExecutionMode } from "@configLayer/executionModes";
 import type {
     ExecutionContext,
     ExecutionItem,
@@ -19,5 +20,5 @@ export type RunExecutionItemArgs = {
     runId?: string;
     suiteName?: string;
     workerId?: string;
-    mode?: "e2e" | "data";
+    mode?: ExecutionMode;
 };
