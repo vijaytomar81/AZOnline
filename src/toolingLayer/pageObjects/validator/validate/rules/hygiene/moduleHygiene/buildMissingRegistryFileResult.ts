@@ -1,17 +1,22 @@
 // src/toolingLayer/pageObjects/validator/validate/rules/hygiene/moduleHygiene/buildMissingRegistryFileResult.ts
 
+import {
+    VALIDATION_SEVERITIES,
+    type RegistryFileName,
+} from "@configLayer/tooling/validation";
+import { UI_SEVERITIES } from "@configLayer/core/uiSeverities";
 import type { ModuleHygieneRuleResult } from "./moduleHygieneTypes";
 
 export function buildMissingRegistryFileResult(
     ruleId: string,
-    fileName: "index.ts" | "pageManager.ts",
+    fileName: RegistryFileName,
     filePath: string
 ): ModuleHygieneRuleResult {
     return {
         issues: [
             {
                 ruleId,
-                severity: "ERROR",
+                severity: VALIDATION_SEVERITIES.ERROR,
                 issueLabel: "Missing",
                 message: `[${fileName}]`,
                 filePath,
@@ -24,7 +29,7 @@ export function buildMissingRegistryFileResult(
                     title: fileName,
                     children: [
                         {
-                            severity: "error",
+                            severity: UI_SEVERITIES.ERROR,
                             title: "Missing",
                             summary: `[${fileName}]`,
                         },

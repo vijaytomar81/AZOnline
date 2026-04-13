@@ -1,13 +1,19 @@
 // src/toolingLayer/pageObjects/generator/generator/report.ts
 
+import {
+    PAGE_OBJECT_FILE_STATUSES,
+    PAGE_OBJECT_GENERATION_STATUSES,
+    type PageObjectFileStatus,
+    type PageObjectGenerationStatus,
+} from "@configLayer/tooling/pageObjects";
 import type { SyncPageRegistryResult } from "./registry";
 
 export type RepairPageReport = {
     pageKey: string;
     changed: boolean;
-    elementsStatus: "generated" | "unchanged";
-    aliasesGeneratedStatus: "generated" | "unchanged";
-    pageObjectStatus: "generated" | "synced" | "unchanged";
+    elementsStatus: PageObjectGenerationStatus;
+    aliasesGeneratedStatus: PageObjectGenerationStatus;
+    pageObjectStatus: PageObjectFileStatus;
     registryStatus:
     | "already-registered"
     | "added-to-index"
@@ -96,9 +102,9 @@ export function buildRunSummary(params: {
 
     const filesGenerated = pageReports.reduce((sum, r) => {
         let count = 0;
-        if (r.elementsStatus === "generated") count++;
-        if (r.aliasesGeneratedStatus === "generated") count++;
-        if (r.pageObjectStatus === "generated") count++;
+        if (r.elementsStatus === PAGE_OBJECT_GENERATION_STATUSES.GENERATED) count++;
+        if (r.aliasesGeneratedStatus === PAGE_OBJECT_GENERATION_STATUSES.GENERATED) count++;
+        if (r.pageObjectStatus === PAGE_OBJECT_FILE_STATUSES.GENERATED) count++;
         return sum + count;
     }, 0);
 

@@ -1,15 +1,14 @@
 // src/toolingLayer/pageScanner/cli.ts
 
+import { PAGE_SCANNER_COMMANDS, type PageScannerCommand } from "@configLayer/tooling/pageScanner";
 import { createLogger } from "@utils/logger";
 import { runScanCommand } from "./commands/scan";
 import { normalizeArgv } from "@utils/argv";
 import { usage } from "./scannerHelp";
 import { printCommandTitle } from "@utils/cliFormat";
 
-type CommandName = "scan" | "help";
-
-function isCommand(x: string | undefined): x is CommandName {
-    return x === "scan" || x === "help";
+function isCommand(x: string | undefined): x is PageScannerCommand {
+    return x === PAGE_SCANNER_COMMANDS.SCAN || x === PAGE_SCANNER_COMMANDS.HELP;
 }
 
 const rootLog = createLogger({
@@ -31,11 +30,11 @@ async function main() {
     const args = argv.slice(1);
 
     switch (cmd) {
-        case "help":
+        case PAGE_SCANNER_COMMANDS.HELP:
             rootLog.info(usage());
             return;
 
-        case "scan":
+        case PAGE_SCANNER_COMMANDS.SCAN:
             await runScanCommand(args);
             return;
     }

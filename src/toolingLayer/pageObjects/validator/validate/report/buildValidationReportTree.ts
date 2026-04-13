@@ -2,6 +2,10 @@
 
 import type { TreeNode } from "@utils/cliTree";
 import { info, strong } from "@utils/cliFormat";
+import {
+    VALIDATION_REPORT_SEVERITIES,
+    type ValidationReportSeverity,
+} from "@configLayer/tooling/validation";
 import type { ValidationRuleExecutionResult } from "../types";
 import {
     countValidationErrors,
@@ -12,10 +16,10 @@ import { orderedValidationGroups, type RuleGroupBucket } from "./reportGroups";
 function ruleSeverity(
     hasErrors: boolean,
     hasWarnings: boolean
-): "error" | "warning" | "success" {
-    if (hasErrors) return "error";
-    if (hasWarnings) return "warning";
-    return "success";
+): ValidationReportSeverity {
+    if (hasErrors) return VALIDATION_REPORT_SEVERITIES.ERROR;
+    if (hasWarnings) return VALIDATION_REPORT_SEVERITIES.WARNING;
+    return VALIDATION_REPORT_SEVERITIES.SUCCESS;
 }
 
 function buildRuleSummary(rule: ValidationRuleExecutionResult): string {

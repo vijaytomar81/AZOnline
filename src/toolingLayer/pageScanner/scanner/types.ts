@@ -1,6 +1,11 @@
 // src/toolingLayer/pageScanner/scanner/types.ts
 
 import type { Logger } from "@utils/logger";
+import type {
+    ControlGroupType,
+    PageDiffStatus,
+    SelectorKind,
+} from "@configLayer/tooling/pageScanner";
 
 export type ScanPageOptions = {
     connectCdp: string;
@@ -13,7 +18,7 @@ export type ScanPageOptions = {
 };
 
 export type SelectorCandidate = {
-    kind: "css" | "role" | "text";
+    kind: SelectorKind;
     selector: string;
     score: number;
     reason: string;
@@ -85,7 +90,7 @@ export type PageMapElementEntry = {
 };
 
 export type PageMapGroupEntry = {
-    type: "radio-group" | "checkbox-group";
+    type: ControlGroupType;
     preferred: "";
     fallbacks: [];
     stableKey?: string;
@@ -116,7 +121,7 @@ export type PageMap = {
 
 export type PageDiffItem = {
     stableKey: string;
-    status: "added" | "removed" | "updated" | "unchanged";
+    status: PageDiffStatus;
     existingKey?: string;
     incomingKey?: string;
     reason?: string;

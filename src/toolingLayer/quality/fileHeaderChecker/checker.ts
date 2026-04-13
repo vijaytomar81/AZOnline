@@ -14,17 +14,21 @@ import {
     failure,
 } from "@utils/cliFormat";
 import { ICONS } from "@utils/icons";
+import {
+    HEADER_CHECK_MODES,
+    HEADER_FIX_STATUSES,
+    type HeaderCheckMode,
+    type HeaderFixStatus,
+} from "@configLayer/tooling/fileHeader";
+
+export type { HeaderCheckMode };
 
 const ROOT = process.cwd();
 const SRC_DIR = path.join(ROOT, "src");
 
-export type HeaderCheckMode = "checkMode" | "fixMode";
-
-type FixStatus = "ok" | "missing" | "incorrect";
-
 type FixResult = {
     changed: boolean;
-    status: FixStatus;
+    status: HeaderFixStatus;
     from: string;
     to: string;
 };
@@ -68,7 +72,12 @@ function fixOne(fileAbs: string, opts: { checkMode: boolean }): FixResult {
         const cur = first.trim();
 
         if (cur === want) {
-            return { changed: false, status: "ok", from: cur, to: want };
+            return {
+                changed: false,
+                status: HEADER_FIX_STATUSES.OK,
+                from: cur,
+                to: want,
+            };
         }
 
         lines[i] = want;
@@ -76,7 +85,12 @@ function fixOne(fileAbs: string, opts: { checkMode: boolean }): FixResult {
             fs.writeFileSync(fileAbs, lines.join("\n"), "utf8");
         }
 
-        return { changed: true, status: "incorrect", from: cur, to: want };
+        return {
+            changed: true,
+            status: HEADER_FIX_STATUSES.INCORRECT,
+            from: cur,
+            to: want,
+        };
     }
 
     lines.splice(i, 0, want);
@@ -84,11 +98,16 @@ function fixOne(fileAbs: string, opts: { checkMode: boolean }): FixResult {
         fs.writeFileSync(fileAbs, lines.join("\n"), "utf8");
     }
 
-    return { changed: true, status: "missing", from: "(missing)", to: want };
+    return {
+        changed: true,
+        status: HEADER_FIX_STATUSES.MISSING,
+        from: "(missing)",
+        to: want,
+    };
 }
 
 function logCheckIssue(fileRel: string, res: FixResult) {
-    if (res.status === "missing") {
+    if (res.status === HEADER_FIX_STATUSES.MISSING) {
         printStatus(ICONS.addIcon, fileRel);
         printIndented("status", "missing header");
         printIndented("expected", res.to);
@@ -96,7 +115,7 @@ function logCheckIssue(fileRel: string, res: FixResult) {
         return;
     }
 
-    if (res.status === "incorrect") {
+    if (res.status === HEADER_FIX_STATUSES.INCORRECT) {
         printStatus(ICONS.warningIcon, fileRel);
         printIndented("status", "incorrect header");
         printIndented("current", res.from);
@@ -113,7 +132,7 @@ function logFix(fileRel: string, res: FixResult) {
 }
 
 export function runHeaderChecker(mode: HeaderCheckMode) {
-    const checkMode = mode === "checkMode";
+    const checkMode = mode === HEADER_CHECK_MODES.CHECK;
 
     if (!fs.existsSync(SRC_DIR)) {
         printStatus(ICONS.failIcon, `Not found: ${SRC_DIR}`);
@@ -142,8 +161,8 @@ export function runHeaderChecker(mode: HeaderCheckMode) {
         const res = fixOne(f, { checkMode });
         const fileRel = normalizeSlashes(path.relative(ROOT, f));
 
-        if (res.status === "missing") missing++;
-        if (res.status === "incorrect") incorrect++;
+        if (res.status === HEADER_FIX_STATUSES.MISSING) missing++;
+        if (res.status === HEADER_FIX_STATUSES.INCORRECT) incorrect++;
 
         if (checkMode) {
             if (res.changed) {

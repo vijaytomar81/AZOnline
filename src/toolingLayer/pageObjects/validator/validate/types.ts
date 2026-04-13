@@ -1,8 +1,9 @@
 // src/toolingLayer/pageObjects/validator/validate/types.ts
 
 import type { TreeNode } from "@utils/cliTree";
+import type { ValidationSeverity } from "@configLayer/tooling/validation";
 
-export type ValidationSeverity = "INFO" | "WARN" | "ERROR";
+export type { ValidationSeverity };
 
 export type ValidationIssue = {
     ruleId: string;

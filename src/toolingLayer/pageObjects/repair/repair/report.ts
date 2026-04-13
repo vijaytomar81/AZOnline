@@ -7,9 +7,12 @@ import {
     success,
     warning,
 } from "@utils/cliFormat";
+import { UI_SEVERITIES } from "@configLayer/core/uiSeverities";
+import {
+    REPAIR_GROUP_KEYS,
+    type RepairGroupKey,
+} from "@configLayer/tooling/pageObjects";
 import type { RepairRuleExecutionResult, RepairRunResult } from "./types";
-
-type RepairGroupKey = "pageChain" | "manifest" | "registry" | "other";
 
 type RepairGroupBucket = {
     key: RepairGroupKey;
@@ -17,17 +20,22 @@ type RepairGroupBucket = {
 };
 
 function ruleGroupFromRuleId(ruleId: string): RepairGroupKey {
-    if (ruleId === "repair.elementsToGeneratedAliases") return "pageChain";
-    if (ruleId === "repair.generatedAliasesToAliases") return "pageChain";
-    if (ruleId === "repair.aliasesToPageObject") return "pageChain";
-    if (ruleId === "repair.manifest") return "manifest";
-    if (ruleId === "repair.indexExports") return "registry";
-    if (ruleId === "repair.pageManager") return "registry";
-    return "other";
+    if (ruleId === "repair.elementsToGeneratedAliases") return REPAIR_GROUP_KEYS.PAGE_CHAIN;
+    if (ruleId === "repair.generatedAliasesToAliases") return REPAIR_GROUP_KEYS.PAGE_CHAIN;
+    if (ruleId === "repair.aliasesToPageObject") return REPAIR_GROUP_KEYS.PAGE_CHAIN;
+    if (ruleId === "repair.manifest") return REPAIR_GROUP_KEYS.MANIFEST;
+    if (ruleId === "repair.indexExports") return REPAIR_GROUP_KEYS.REGISTRY;
+    if (ruleId === "repair.pageManager") return REPAIR_GROUP_KEYS.REGISTRY;
+    return REPAIR_GROUP_KEYS.OTHER;
 }
 
 function orderedGroups(perRule: RepairRuleExecutionResult[]): RepairGroupBucket[] {
-    const order: RepairGroupKey[] = ["pageChain", "manifest", "registry", "other"];
+    const order: RepairGroupKey[] = [
+        REPAIR_GROUP_KEYS.PAGE_CHAIN,
+        REPAIR_GROUP_KEYS.MANIFEST,
+        REPAIR_GROUP_KEYS.REGISTRY,
+        REPAIR_GROUP_KEYS.OTHER,
+    ];
     const buckets = new Map<RepairGroupKey, RepairRuleExecutionResult[]>();
 
     for (const item of perRule) {
@@ -73,7 +81,7 @@ function buildRuleNode(rule: RepairRuleExecutionResult, verbose: boolean): TreeN
     }
 
     return {
-        severity: changed ? "warning" : "success",
+        severity: changed ? UI_SEVERITIES.WARNING : UI_SEVERITIES.SUCCESS,
         title: executionRuleTitle(rule.ruleId),
         summary: changed
             ? info(`(${rule.changedFiles} file(s), ${pageKeyText(rule.repairedPages)})`)
@@ -89,7 +97,7 @@ function buildGroupNode(group: RepairGroupBucket, verbose: boolean): TreeNode {
 
     if (!verbose && changedRules.length === 0) {
         return {
-            severity: "success",
+            severity: UI_SEVERITIES.SUCCESS,
             title: group.key,
             summary: info(`(${group.rules.length} rule${group.rules.length === 1 ? "" : "s"}, no changes)`),
         };
@@ -100,7 +108,7 @@ function buildGroupNode(group: RepairGroupBucket, verbose: boolean): TreeNode {
         .filter((node): node is TreeNode => Boolean(node));
 
     return {
-        severity: changedRules.length > 0 ? "warning" : "success",
+        severity: changedRules.length > 0 ? UI_SEVERITIES.WARNING : UI_SEVERITIES.SUCCESS,
         title: group.key,
         summary: changedRules.length === 0
             ? info(`(${group.rules.length} rule${group.rules.length === 1 ? "" : "s"}, no changes)`)

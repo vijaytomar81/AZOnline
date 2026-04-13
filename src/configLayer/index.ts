@@ -14,4 +14,9 @@ export * from "./domain/journeyStepFolders";
 export * from "./domain/supportedProducts";
 export * from "./domain/partnerApplications";
 
+export * from "./tooling/fileHeader";
+export * from "./tooling/validation";
+export * from "./tooling/pageObjects";
+export * from "./tooling/pageScanner";
+
 export * from "./environments";

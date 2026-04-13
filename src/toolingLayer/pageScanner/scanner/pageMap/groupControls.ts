@@ -1,6 +1,12 @@
 // src/toolingLayer/pageScanner/scanner/pageMap/groupControls.ts
 
 import { uniq } from "@utils/collections";
+import {
+    CONTROL_GROUP_TYPES,
+    GROUP_KEY_PREFIXES,
+    type ControlGroupType,
+    type GroupKeyPrefix,
+} from "@configLayer/tooling/pageScanner";
 import type { PageMap, PageMapElementEntry, ScannedElement } from "../types";
 
 type BuiltElementRecord = {
@@ -11,7 +17,7 @@ type BuiltElementRecord = {
 };
 
 type GroupBucket = {
-    groupType: "radio-group" | "checkbox-group";
+    groupType: ControlGroupType;
     key: string;
     inputName?: string | null;
     ownerLabelText?: string | null;
@@ -44,9 +50,9 @@ function getGroupId(el: ScannedElement): string | undefined {
     );
 }
 
-function getGroupKeyPrefix(type: string): "groupRadio" | "groupCheckbox" | undefined {
-    if (type === "radio") return "groupRadio";
-    if (type === "checkbox") return "groupCheckbox";
+function getGroupKeyPrefix(type: string): GroupKeyPrefix | undefined {
+    if (type === "radio") return GROUP_KEY_PREFIXES.RADIO;
+    if (type === "checkbox") return GROUP_KEY_PREFIXES.CHECKBOX;
     return undefined;
 }
 
@@ -86,7 +92,10 @@ export function appendGroupedRadioCheckboxEntries(
             continue;
         }
 
-        const groupType = item.type === "radio" ? "radio-group" : "checkbox-group";
+        const groupType =
+            item.type === "radio"
+                ? CONTROL_GROUP_TYPES.RADIO
+                : CONTROL_GROUP_TYPES.CHECKBOX;
 
         let bucket = buckets.get(groupKey);
         if (!bucket) {
