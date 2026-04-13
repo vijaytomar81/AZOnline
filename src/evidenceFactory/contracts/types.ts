@@ -1,7 +1,63 @@
 // src/evidenceFactory/contracts/types.ts
 
-export type EvidenceOutputFormat = 'json' | 'xml' | 'csv' | 'console' | 'excel';
+// =========================
+// Output formats
+// =========================
+export const EVIDENCE_OUTPUT_FORMAT = {
+  JSON: 'json',
+  XML: 'xml',
+  CSV: 'csv',
+  CONSOLE: 'console',
+  EXCEL: 'excel',
+} as const;
 
+export type EvidenceOutputFormat =
+  (typeof EVIDENCE_OUTPUT_FORMAT)[keyof typeof EVIDENCE_OUTPUT_FORMAT];
+
+// =========================
+// Entry / event types
+// =========================
+export const EVIDENCE_ENTRY_TYPE = {
+  ITEM: 'item',
+  SUMMARY: 'summary',
+} as const;
+
+export type EvidenceEntryType =
+  (typeof EVIDENCE_ENTRY_TYPE)[keyof typeof EVIDENCE_ENTRY_TYPE];
+
+export const EVIDENCE_EVENT_TYPE = {
+  ITEM: 'item',
+  SUMMARY: 'summary',
+} as const;
+
+export type EvidenceEventType =
+  (typeof EVIDENCE_EVENT_TYPE)[keyof typeof EVIDENCE_EVENT_TYPE];
+
+// =========================
+// Console modes
+// =========================
+export const EVIDENCE_CONSOLE_MODE = {
+  DATA: 'data',
+  E2E: 'e2e',
+} as const;
+
+export type EvidenceConsoleMode =
+  (typeof EVIDENCE_CONSOLE_MODE)[keyof typeof EVIDENCE_CONSOLE_MODE];
+
+// =========================
+// File naming timestamp source
+// =========================
+export const EVIDENCE_TIMESTAMP_SOURCE = {
+  NOW: 'now',
+  PAYLOAD: 'payload',
+} as const;
+
+export type EvidenceTimestampSource =
+  (typeof EVIDENCE_TIMESTAMP_SOURCE)[keyof typeof EVIDENCE_TIMESTAMP_SOURCE];
+
+// =========================
+// Requests
+// =========================
 export type EvidenceWriteBaseRequest = {
   executionId: string;
   suiteName: string;
@@ -10,26 +66,31 @@ export type EvidenceWriteBaseRequest = {
 };
 
 export type EvidenceWriteItemRequest = EvidenceWriteBaseRequest & {
-  entryType: 'item';
+  entryType: typeof EVIDENCE_ENTRY_TYPE.ITEM;
   artifactId: string;
   artifactName?: string;
   status: string;
   payload: Record<string, unknown>;
-  consoleMode?: 'data' | 'e2e' | string;
+  consoleMode?: EvidenceConsoleMode | string;
 };
 
 export type EvidenceWriteSummaryRequest = EvidenceWriteBaseRequest & {
-  entryType: 'summary';
+  entryType: typeof EVIDENCE_ENTRY_TYPE.SUMMARY;
   metaPayload: Record<string, unknown>;
 };
 
-export type EvidenceWriteRequest = EvidenceWriteItemRequest | EvidenceWriteSummaryRequest;
+export type EvidenceWriteRequest =
+  | EvidenceWriteItemRequest
+  | EvidenceWriteSummaryRequest;
 
 export type FinalizeExecutionRequest = {
   executionId: string;
   suiteName: string;
 };
 
+// =========================
+// Responses
+// =========================
 export type ArtifactMetadata = {
   format: EvidenceOutputFormat;
   fileName?: string;
@@ -41,7 +102,7 @@ export type ArtifactMetadata = {
 
 export type EvidenceWriteResponse = {
   executionId: string;
-  entryType: 'item' | 'summary';
+  entryType: EvidenceEntryType;
   artifactId?: string;
   status?: string;
   generatedAt: string;
@@ -56,22 +117,25 @@ export type FinalizeExecutionResponse = {
   eventCount: number;
 };
 
+// =========================
+// Manifest events
+// =========================
 export type ManifestItemEvent = {
-  eventType: 'item';
+  eventType: typeof EVIDENCE_EVENT_TYPE.ITEM;
   executionId: string;
   suiteName: string;
   workerId: string;
   artifactId: string;
   artifactName?: string;
   status: string;
-  consoleMode?: string;
+  consoleMode?: EvidenceConsoleMode | string;
   outputFormats: [EvidenceOutputFormat, ...EvidenceOutputFormat[]];
   payload: Record<string, unknown>;
   createdAt: string;
 };
 
 export type ManifestSummaryEvent = {
-  eventType: 'summary';
+  eventType: typeof EVIDENCE_EVENT_TYPE.SUMMARY;
   executionId: string;
   suiteName: string;
   workerId: string;
@@ -82,6 +146,9 @@ export type ManifestSummaryEvent = {
 
 export type ManifestEvent = ManifestItemEvent | ManifestSummaryEvent;
 
+// =========================
+// Factory options
+// =========================
 export type EvidenceFactoryOptions = {
   rootDir?: string;
   archive?: {
@@ -91,7 +158,7 @@ export type EvidenceFactoryOptions = {
   };
   fileNaming?: {
     includeTimestamp?: boolean;
-    timestampSource?: 'now' | 'payload';
+    timestampSource?: EvidenceTimestampSource;
   };
 };
 

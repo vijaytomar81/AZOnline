@@ -32,7 +32,7 @@ export async function runScenarios(
         args.suiteName ??
         `${args.platform ?? "default"}-${args.application ?? "app"}`;
 
-    const rootDir = process.env.EVIDENCE_ROOT_DIR ?? "artifacts";
+    const rootDir = process.env.EVIDENCE_CREATION_ROOT_DIR ?? "artifacts";
     const evidenceDir = `${rootDir}/current/${suiteName}/${runId}`;
 
     const evidenceFactory =
