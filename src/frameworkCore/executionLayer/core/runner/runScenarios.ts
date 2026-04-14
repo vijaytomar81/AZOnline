@@ -47,9 +47,6 @@ export async function runScenarios(
     const suiteName = buildSuiteName(args);
 
     const rootDir = process.env.EVIDENCE_CREATION_ROOT_DIR;
-    const evidenceDir = rootDir
-        ? `${rootDir}/current/${suiteName}/${runId}`
-        : undefined;
 
     const evidenceFactory =
         args.evidenceFactory ??
@@ -114,6 +111,9 @@ export async function runScenarios(
             ? `${((passedCount / totalCount) * 100).toFixed(2)}%`
             : "0.00%";
 
+    let evidenceDir: string | undefined;
+    let archiveMessage: string | undefined;
+
     if (executionConfig.generatedEvidenceArtifacts.enabled) {
         const browserInfo = outputs.find((o) => o.browser)?.browser as
             | RuntimeBrowserInfo
@@ -173,13 +173,6 @@ export async function runScenarios(
             finalizedAt: finishedAt,
             artifactTimestamp: finishedAt,
 
-            ...(rootDir ? { outputRoot: rootDir } : {}),
-            ...(evidenceDir
-                ? {
-                    evidenceDir,
-                    evidenceDirectory: evidenceDir,
-                }
-                : {}),
             mergedCaseCount: runs.length,
         };
 
@@ -201,8 +194,8 @@ export async function runScenarios(
 
         const archiveResult = await evidenceFactory.archiveOldExecutions();
 
-        console.log({ runFolder: finalResult.executionRootPath });
-        console.log(archiveResult.message);
+        evidenceDir = finalResult.executionRootRelativePath;
+        archiveMessage = archiveResult.message;
     }
 
     console.log(
@@ -213,6 +206,7 @@ export async function runScenarios(
             totalTime,
             runId,
             evidenceDir,
+            archiveMessage,
         })
     );
 }

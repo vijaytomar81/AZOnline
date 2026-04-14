@@ -71,6 +71,7 @@ export function renderExecutionSummary(args: {
     totalTime: string;
     runId?: string;
     evidenceDir?: string;
+    archiveMessage?: string;
     passedEvidencePath?: string;
     failedEvidencePath?: string;
 }): string {
@@ -94,15 +95,19 @@ export function renderExecutionSummary(args: {
     lines.push(field("Total Time", muted(args.totalTime)));
 
     if (args.evidenceDir) {
-        lines.push(field("Evidence Dir", muted(args.evidenceDir)));
+        lines.push(field("Artifact Dir", muted(args.evidenceDir)));
+    }
+
+    if (args.archiveMessage) {
+        lines.push(field("Archived?", muted(args.archiveMessage)));
     }
 
     if (args.passedEvidencePath) {
-        lines.push(field("Passed Evidence", muted(args.passedEvidencePath)));
+        lines.push(field("Passed Artifact", muted(args.passedEvidencePath)));
     }
 
     if (args.failedEvidencePath) {
-        lines.push(field("Failed Evidence", muted(args.failedEvidencePath)));
+        lines.push(field("Failed Artifact", muted(args.failedEvidencePath)));
     }
 
     lines.push("================================================");
