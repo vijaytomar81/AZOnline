@@ -5,9 +5,9 @@ A config-driven evidence writer for AZOnline.
 This package is intentionally a **consumer only**. It does **not** define evidence fields.  
 It consumes the evidence configuration already defined in:
 
-- src/configLayer/models/evidence/types.ts
-- src/configLayer/models/evidence/views/*
-- src/configLayer/models/evidence/fields/*
+- `src/configLayer/models/evidence/types.ts`
+- `src/configLayer/models/evidence/views/*`
+- `src/configLayer/models/evidence/fields/*`
 
 ---
 
@@ -69,13 +69,13 @@ const factory = new EvidenceFactory({
   rootDir: process.env.EVIDENCE_ROOT_DIR ?? "artifacts",
   fileNaming: {
     includeTimestamp: false,
-    timestampSource: "payload"
+    timestampSource: EVIDENCE_TIMESTAMP_SOURCE.PAYLOAD,
   },
   archive: {
     olderThanDays: 14,
     zip: true,
-    maxCurrentExecutionsPerSuite: 30
-  }
+    maxCurrentExecutionsPerSuite: 30,
+  },
 });
 ```
 
@@ -102,15 +102,18 @@ to avoid duplicate timestamps in final filenames.
 ### Item entry
 ```ts
 await factory.writeEvidence({
-  entryType: "item",
+  entryType: EVIDENCE_ENTRY_TYPE.ITEM,
   executionId: "RUN-001",
   suiteName: "motor-regression",
   workerId: "0",
   artifactId: "TC001",
   artifactName: "create-quote",
   status: "passed",
-  consoleMode: "e2e",
-  outputFormats: ["json", "excel"],
+  consoleMode: EVIDENCE_CONSOLE_MODE.E2E,
+  outputFormats: [
+    EVIDENCE_OUTPUT_FORMAT.JSON,
+    EVIDENCE_OUTPUT_FORMAT.EXCEL,
+  ],
   payload: {
     scenarioId: "SCN-001",
     scenarioName: "Create Quote",
@@ -133,19 +136,22 @@ await factory.writeEvidence({
     calculatedEmail: "test@example.com",
     calculatedEmailId: "test",
     quoteNumber: "Q-10001",
-    policyNumber: "P-10001"
-  }
+    policyNumber: "P-10001",
+  },
 });
 ```
 
 ### Summary entry
 ```ts
 await factory.writeEvidence({
-  entryType: "summary",
+  entryType: EVIDENCE_ENTRY_TYPE.SUMMARY,
   executionId: "RUN-001",
   suiteName: "motor-regression",
   workerId: "0",
-  outputFormats: ["excel", "console"],
+  outputFormats: [
+    EVIDENCE_OUTPUT_FORMAT.EXCEL,
+    EVIDENCE_OUTPUT_FORMAT.CONSOLE,
+  ],
   metaPayload: {
     runId: "RUN-001",
     mode: "e2e",
@@ -154,17 +160,28 @@ await factory.writeEvidence({
     totalItems: 2,
     passedCount: 1,
     failedCount: 1,
-    passRate: "50.00%"
-  }
+    passRate: "50.00%",
+  },
 });
 ```
 
 ### Finalize execution
 ```ts
-await factory.finalizeExecution({
+const finalResult = await factory.finalizeExecution({
   executionId: "RUN-001",
-  suiteName: "motor-regression"
+  suiteName: "motor-regression",
 });
+```
+
+### Archive old executions
+```ts
+const archiveResult = await factory.archiveOldExecutions();
+
+console.log(archiveResult.message);
+
+for (const archived of archiveResult.archivedExecutions) {
+  console.log(archived.executionId, archived.archivedRelativePath);
+}
 ```
 
 ---
@@ -185,6 +202,66 @@ await factory.finalizeExecution({
 - reads all manifest files for the execution
 - treats manifest as the **source of truth**
 - generates only consolidated final files
+
+### `archiveOldExecutions()`
+- archives old execution folders
+- can zip archived runs
+- can trim current runs per suite
+- returns:
+  - archived execution count
+  - archived execution ids
+  - archived paths
+  - meaningful message when nothing was archived
+
+---
+
+## What `writeEvidence()` returns
+
+`writeEvidence()` returns a lightweight acknowledgement plus run-level paths.
+
+Example:
+```ts
+const result = await factory.writeEvidence(...);
+
+console.log(result.executionRootPath);
+console.log(result.executionRootRelativePath);
+console.log(result.archiveRootPath);
+console.log(result.archiveRootRelativePath);
+```
+
+This is useful for:
+- logging
+- debugging
+- run folder tracing from executionLayer
+
+---
+
+## What `finalizeExecution()` returns
+
+`finalizeExecution()` returns:
+- consolidated generated artifacts
+- execution root path
+- archive root path
+- total manifest event count
+
+Example:
+```ts
+const finalResult = await factory.finalizeExecution({
+  executionId: runId,
+  suiteName,
+});
+
+console.log({
+  runFolder: finalResult.executionRootPath,
+  archiveFolder: finalResult.archiveRootPath,
+  files: finalResult.artifacts,
+});
+```
+
+### Important
+
+`archiveRootPath` is the archive **base** path, not proof that this run has already been archived.  
+Actual archived run paths come from `archiveOldExecutions()`.
 
 ---
 
@@ -247,9 +324,9 @@ Each manifest entry carries its own `outputFormats`.
 
 That means:
 
-- item 1 → `["json"]` → included only in consolidated JSON
-- item 2 → `["excel"]` → included only in consolidated Excel
-- summary → `["excel", "console"]` → included only in consolidated Excel and Console
+- item 1 → `[EVIDENCE_OUTPUT_FORMAT.JSON]` → included only in consolidated JSON
+- item 2 → `[EVIDENCE_OUTPUT_FORMAT.EXCEL]` → included only in consolidated Excel
+- summary → `[EVIDENCE_OUTPUT_FORMAT.EXCEL, EVIDENCE_OUTPUT_FORMAT.CONSOLE]` → included only in consolidated Excel and Console
 
 There is **no coupling** between formats.
 
@@ -321,13 +398,39 @@ If `executionId` already contains timestamp, prefer `includeTimestamp: false`.
 
 Configurable:
 
-- `olderThanDays` → move old runs
+- `olderThanDays` → archive old runs by age
 - `zip` → compress archived runs
-- `maxCurrentExecutionsPerSuite` → keep limited runs
+- `maxCurrentExecutionsPerSuite` → keep limited runs in current suite folder
 
 Archive structure:
 ```text
 artifacts/archive/YYYY-MM/<suite>/<executionId>.zip
+```
+
+### Example archive response
+```ts
+{
+  archivedCount: 2,
+  archivedExecutions: [
+    {
+      suiteName: "motor-regression",
+      executionId: "RUN-001",
+      archivedPath: ".../artifacts/archive/2026-04/motor-regression/RUN-001.zip",
+      archivedRelativePath: "artifacts/archive/2026-04/motor-regression/RUN-001.zip",
+      zipped: true,
+    }
+  ],
+  message: "Archived 2 execution(s).",
+}
+```
+
+### If nothing archived
+```ts
+{
+  archivedCount: 0,
+  archivedExecutions: [],
+  message: "No executions qualified for archiving.",
+}
 ```
 
 ---
@@ -367,4 +470,7 @@ F --> G[Read and merge all manifest files]
 G --> H[Filter entries by outputFormats]
 H --> I[Generate consolidated final files]
 I --> J[json / xml / csv / console / excel]
+
+J --> K[archiveOldExecutions]
+K --> L[Archive by age / count / zip config]
 ```
