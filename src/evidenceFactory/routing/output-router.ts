@@ -19,7 +19,7 @@ export class OutputRouter {
       includeTimestamp?: boolean;
       timestampSource?: EvidenceTimestampSource;
     },
-  ) {}
+  ) { }
 
   executionRoot(suiteName: string, executionId: string): string {
     return path.join(
@@ -72,8 +72,12 @@ export class OutputRouter {
     return path.join(this.rootDir, safeFileName(suiteName));
   }
 
+  archiveRoot(): string {
+    return path.join(this.rootDir, 'archive');
+  }
+
   archiveSuiteRoot(bucket: string, suiteName: string): string {
-    return path.join(this.rootDir, 'archive', bucket, safeFileName(suiteName));
+    return path.join(this.archiveRoot(), bucket, safeFileName(suiteName));
   }
 
   private resolveTimestamp(payload?: Record<string, unknown>): string {

@@ -3,24 +3,36 @@ import path from 'path';
 import { readdir, rename, rm, stat } from 'fs/promises';
 import { createWriteStream } from 'fs';
 import archiver from 'archiver';
-import { ensureDir } from '../utils/path-utils';
+import { ensureDir, relativeFromProject } from '../utils/path-utils';
 import { daysOld, monthBucket } from '../utils/time-utils';
+import type {
+  ArchiveExecutionEntry,
+  ArchiveExecutionsResponse,
+} from '../contracts/types';
 
 export class ArchiveService {
-  constructor(private readonly artifactsRoot = path.join(process.cwd(), process.env.EVIDENCE_ROOT_DIR ?? 'artifacts')) { }
+  constructor(
+    private readonly artifactsRoot = path.join(
+      process.cwd(),
+      process.env.EVIDENCE_ROOT_DIR ?? 'artifacts',
+    ),
+  ) { }
 
   async archiveOldExecutions(args: {
     olderThanDays?: number;
     zip?: boolean;
     maxCurrentExecutionsPerSuite?: number;
-  }): Promise<{ archivedCount: number }> {
+  }): Promise<ArchiveExecutionsResponse> {
     const currentRoot = path.join(this.artifactsRoot);
-    let archivedCount = 0;
+    const archivedExecutions: ArchiveExecutionEntry[] = [];
 
     for (const suite of await safeReadDir(currentRoot)) {
+      if (suite === 'archive') {
+        continue;
+      }
+
       const suitePath = path.join(currentRoot, suite);
       const executions = await this.readExecutionDirs(suitePath);
-
       const sorted = executions.sort((a, b) => a.mtime.getTime() - b.mtime.getTime());
 
       for (const execution of sorted) {
@@ -28,10 +40,19 @@ export class ArchiveService {
           typeof args.olderThanDays === 'number' &&
           daysOld(execution.mtime) >= args.olderThanDays;
 
-        if (shouldArchiveByAge) {
-          await this.archiveExecution(suite, execution.name, execution.fullPath, execution.mtime, !!args.zip);
-          archivedCount += 1;
+        if (!shouldArchiveByAge) {
+          continue;
         }
+
+        archivedExecutions.push(
+          await this.archiveExecution(
+            suite,
+            execution.name,
+            execution.fullPath,
+            execution.mtime,
+            !!args.zip,
+          ),
+        );
       }
 
       if (typeof args.maxCurrentExecutionsPerSuite === 'number') {
@@ -40,17 +61,32 @@ export class ArchiveService {
 
         while (sortedRemaining.length > args.maxCurrentExecutionsPerSuite) {
           const oldest = sortedRemaining.shift();
+
           if (!oldest) {
             break;
           }
 
-          await this.archiveExecution(suite, oldest.name, oldest.fullPath, oldest.mtime, !!args.zip);
-          archivedCount += 1;
+          archivedExecutions.push(
+            await this.archiveExecution(
+              suite,
+              oldest.name,
+              oldest.fullPath,
+              oldest.mtime,
+              !!args.zip,
+            ),
+          );
         }
       }
     }
 
-    return { archivedCount };
+    return {
+      archivedCount: archivedExecutions.length,
+      archivedExecutions,
+      message:
+        archivedExecutions.length === 0
+          ? 'No executions qualified for archiving.'
+          : `Archived ${archivedExecutions.length} execution(s).`,
+    };
   }
 
   private async archiveExecution(
@@ -59,7 +95,7 @@ export class ArchiveService {
     executionPath: string,
     executionDate: Date,
     zip: boolean,
-  ): Promise<void> {
+  ): Promise<ArchiveExecutionEntry> {
     const bucket = monthBucket(executionDate);
     const targetDir = path.join(this.artifactsRoot, 'archive', bucket, suiteName);
     await ensureDir(targetDir);
@@ -68,23 +104,39 @@ export class ArchiveService {
       const zipPath = path.join(targetDir, `${executionId}.zip`);
       await zipDirectory(executionPath, zipPath);
       await rm(executionPath, { recursive: true, force: true });
-      return;
+
+      return {
+        suiteName,
+        executionId,
+        archivedPath: zipPath,
+        archivedRelativePath: relativeFromProject(zipPath),
+        zipped: true,
+      };
     }
 
-    await rename(executionPath, path.join(targetDir, executionId));
+    const targetPath = path.join(targetDir, executionId);
+    await rename(executionPath, targetPath);
+
+    return {
+      suiteName,
+      executionId,
+      archivedPath: targetPath,
+      archivedRelativePath: relativeFromProject(targetPath),
+      zipped: false,
+    };
   }
 
-  private async readExecutionDirs(suitePath: string): Promise<Array<{
-    name: string;
-    fullPath: string;
-    mtime: Date;
-  }>> {
+  private async readExecutionDirs(
+    suitePath: string,
+  ): Promise<Array<{ name: string; fullPath: string; mtime: Date }>> {
     const result: Array<{ name: string; fullPath: string; mtime: Date }> = [];
 
     for (const entry of await safeReadDir(suitePath)) {
       const fullPath = path.join(suitePath, entry);
+
       try {
         const info = await stat(fullPath);
+
         if (info.isDirectory()) {
           result.push({
             name: entry,

@@ -194,10 +194,15 @@ export async function runScenarios(
             }),
         });
 
-        await evidenceFactory.finalizeExecution({
+        const finalResult = await evidenceFactory.finalizeExecution({
             executionId: runId,
             suiteName,
         });
+
+        const archiveResult = await evidenceFactory.archiveOldExecutions();
+
+        console.log({ runFolder: finalResult.executionRootPath });
+        console.log(archiveResult.message);
     }
 
     console.log(

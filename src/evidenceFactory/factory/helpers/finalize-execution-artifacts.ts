@@ -1,5 +1,6 @@
 // src/evidenceFactory/factory/helpers/finalize-execution-artifacts.ts
 
+import { relativeFromProject } from '../../utils/path-utils';
 import { nowIso } from '../../utils/time-utils';
 import type { NdjsonStore } from '../../manifest/ndjson-store';
 import type { OutputRouter } from '../../routing/output-router';
@@ -9,7 +10,6 @@ import type { CsvWriter } from '../../writers/csv/csv-writer';
 import type { ConsoleWriter } from '../../writers/console/console-writer';
 import type { ExcelWriter } from '../../writers/excel/excel-writer';
 import {
-  EVIDENCE_ENTRY_TYPE,
   EVIDENCE_EVENT_TYPE,
   EVIDENCE_OUTPUT_FORMAT,
   type ArtifactMetadata,
@@ -156,10 +156,20 @@ export async function finalizeExecutionArtifacts(
     );
   }
 
+  const executionRootPath = args.router.executionRoot(
+    args.request.suiteName,
+    args.request.executionId,
+  );
+  const archiveRootPath = args.router.archiveRoot();
+
   return {
     executionId: args.request.executionId,
     suiteName: args.request.suiteName,
     generatedAt: nowIso(),
+    executionRootPath,
+    executionRootRelativePath: relativeFromProject(executionRootPath),
+    archiveRootPath,
+    archiveRootRelativePath: relativeFromProject(archiveRootPath),
     artifacts,
     eventCount: events.length,
   };

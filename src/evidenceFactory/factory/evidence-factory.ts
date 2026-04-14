@@ -1,6 +1,7 @@
 // src/evidenceFactory/factory/evidence-factory.ts
 
 import path from 'path';
+import { relativeFromProject } from '../utils/path-utils';
 import { JsonWriter } from '../writers/json/json-writer';
 import { XmlWriter } from '../writers/xml/xml-writer';
 import { CsvWriter } from '../writers/csv/csv-writer';
@@ -12,6 +13,7 @@ import { ArchiveService } from '../archiving/archive-service';
 import { nowIso } from '../utils/time-utils';
 import type {
   ArchiveExecutionsRequest,
+  ArchiveExecutionsResponse,
   EvidenceFactoryOptions,
   EvidenceWriteRequest,
   EvidenceWriteResponse,
@@ -22,6 +24,7 @@ import { buildItemManifestEvent } from './helpers/build-item-manifest-event';
 import { buildSummaryManifestEvent } from './helpers/build-summary-manifest-event';
 import { finalizeExecutionArtifacts } from './helpers/finalize-execution-artifacts';
 import { getWorkerId } from './helpers/get-worker-id';
+import { evidenceConfig } from '@configLayer/execution/evidence.config';
 
 export class EvidenceFactory {
   private readonly jsonWriter = new JsonWriter();
@@ -58,12 +61,22 @@ export class EvidenceFactory {
       event,
     );
 
+    const executionRootPath = this.router.executionRoot(
+      request.suiteName,
+      request.executionId,
+    );
+    const archiveRootPath = this.router.archiveRoot();
+
     return {
       executionId: request.executionId,
       entryType: request.entryType,
       artifactId: request.entryType === 'item' ? request.artifactId : undefined,
       status: request.entryType === 'item' ? request.status : undefined,
       generatedAt: nowIso(),
+      executionRootPath,
+      executionRootRelativePath: relativeFromProject(executionRootPath),
+      archiveRootPath,
+      archiveRootRelativePath: relativeFromProject(archiveRootPath),
       artifacts: [],
     };
   }
@@ -85,12 +98,22 @@ export class EvidenceFactory {
 
   async archiveOldExecutions(
     args: ArchiveExecutionsRequest = {},
-  ): Promise<{ archivedCount: number }> {
+  ): Promise<ArchiveExecutionsResponse> {
     return this.archiveService.archiveOldExecutions({
-      olderThanDays: args.olderThanDays ?? this.options.archive?.olderThanDays,
-      zip: args.zip ?? this.options.archive?.zip ?? false,
+      olderThanDays:
+        args.olderThanDays ??
+        this.options.archive?.olderThanDays ??
+        evidenceConfig.archive.olderThanDays,
+
+      zip:
+        args.zip ??
+        this.options.archive?.zip ??
+        evidenceConfig.archive.zip,
+
       maxCurrentExecutionsPerSuite:
-        args.maxCurrentExecutionsPerSuite ?? this.options.archive?.maxCurrentExecutionsPerSuite,
+        args.maxCurrentExecutionsPerSuite ??
+        this.options.archive?.maxCurrentExecutionsPerSuite ??
+        evidenceConfig.archive.maxCurrentExecutionsPerSuite,
     });
   }
 }

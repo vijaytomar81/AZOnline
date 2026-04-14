@@ -110,6 +110,10 @@ export type EvidenceWriteResponse = {
   artifactId?: string;
   status?: string;
   generatedAt: string;
+  executionRootPath: string;
+  executionRootRelativePath: string;
+  archiveRootPath: string;
+  archiveRootRelativePath: string;
   artifacts: ArtifactMetadata[];
 };
 
@@ -117,8 +121,26 @@ export type FinalizeExecutionResponse = {
   executionId: string;
   suiteName: string;
   generatedAt: string;
+  executionRootPath: string;
+  executionRootRelativePath: string;
+  archiveRootPath: string;
+  archiveRootRelativePath: string;
   artifacts: ArtifactMetadata[];
   eventCount: number;
+};
+
+export type ArchiveExecutionEntry = {
+  suiteName: string;
+  executionId: string;
+  archivedPath: string;
+  archivedRelativePath: string;
+  zipped: boolean;
+};
+
+export type ArchiveExecutionsResponse = {
+  archivedCount: number;
+  archivedExecutions: ArchiveExecutionEntry[];
+  message: string;
 };
 
 // =========================
