@@ -2,10 +2,7 @@
 
 import { executionConfig } from "@configLayer/execution/execution.config";
 import type { EnvKey } from "@configLayer/environments";
-
-function resolveMode(): string {
-    return process.env.RUN_MODE?.trim() || "run";
-}
+import type { ExecutionMode } from "@configLayer/core/executionModes";
 
 function buildTimestamp(): string {
     const now = new Date();
@@ -20,20 +17,23 @@ function buildTimestamp(): string {
     return `${yyyy}${mm}${dd}_${hh}${min}${ss}`;
 }
 
-export function resolveRunId(environment: EnvKey): string {
-    const mode = resolveMode();
+export function resolveRunId(
+    environment: EnvKey,
+    mode: ExecutionMode
+): string {
+    const resolvedMode = String(mode);
 
     if (process.env.RUN_ID?.trim()) {
-        return `${environment}-${mode}-${process.env.RUN_ID.trim()}`;
+        return `${environment}-${resolvedMode}-${process.env.RUN_ID.trim()}`;
     }
 
     if (process.env.BUILD_NUMBER) {
-        return `${environment}-${mode}-build-${process.env.BUILD_NUMBER}`;
+        return `${environment}-${resolvedMode}-build-${process.env.BUILD_NUMBER}`;
     }
 
     if (!executionConfig.generatedEvidenceArtifacts.withTimestamp) {
-        return `${environment}-${mode}`;
+        return `${environment}-${resolvedMode}`;
     }
 
-    return `${environment}-${mode}-${buildTimestamp()}`;
+    return `${environment}-${resolvedMode}-${buildTimestamp()}`;
 }

@@ -42,7 +42,7 @@ export async function runScenarios(
     const parallel = Math.max(1, args.parallel ?? 1);
     const iterations = args.iterations ?? 1;
     const runs = expandScenarios(args.scenarios, iterations);
-    const runId = args.runId ?? resolveRunId(args.environment);
+    const runId = args.runId ?? resolveRunId(args.environment, args.mode);
     const suiteName = buildSuiteName(args);
 
     const rootDir = process.env.EVIDENCE_CREATION_ROOT_DIR;
