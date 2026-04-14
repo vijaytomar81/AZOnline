@@ -28,7 +28,7 @@
     "smoke:direct": "npm run execution -- --mode data --environment test --platform Athena --application AzOnline --product Motor --journeyContext NewBusiness",
     "smoke:pcw": "npm run execution -- --mode data --platform PCW --application CTM --product Motor --journeyContext NewBusiness",
     "smoke:pcwtool": "npm run execution -- --mode data --platform PCWTool --application CTM --product Motor --journeyContext NewBusiness",
-    "smoke:e2e": "npm run execution -- --mode e2e --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\" --platform Athena --application AzOnline --product Motor",
+    "smoke:e2e": "npm run execution -- --mode e2e --environment test --excel \"sampleData/E2E Scenarios.xlsx\" --sheet \"Scenarios\" --platform Athena --application AzOnline --product Motor",
     "smoke:verbose:direct": "npm run execution -- --mode data --platform Athena --application AzOnline --product Motor --journeyContext NewBusiness --verbose",
     "smoke:verbose:pcw": "npm run execution -- --mode data --platform PCW --application CTM --product Motor --journeyContext NewBusiness --verbose",
     "smoke:verbose:pcwtool": "npm run execution -- --mode data --platform PCWTool --application CTM --product Motor --journeyContext NewBusiness --verbose",
