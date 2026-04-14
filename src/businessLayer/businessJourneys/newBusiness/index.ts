@@ -1,9 +1,13 @@
 // src/businessLayer/businessJourneys/newBusiness/index.ts
+
 import { buildCalculatedEmail } from "@utils/calculatedEmail";
 import { nowIso } from "@utils/time";
 import { AppError } from "@utils/errors";
-import { JOURNEY_START_SOURCES, type JourneyStartSource } from "@configLayer/domain/journeyEntryPoints";
-import { OUTPUT_KEYS } from "@frameworkCore/executionLayer/constants/outputKeys";
+import {
+    JOURNEY_START_SOURCES,
+    type JourneyStartSource,
+} from "@configLayer/domain/journeyEntryPoints";
+import { EVIDENCE_RUNTIME_FIELDS } from "@configLayer/models/evidence/fields";
 import type { ExecutionItemExecutorArgs } from "@frameworkCore/executionLayer/core/registry";
 
 function buildPolicyNumber(): string {
@@ -63,15 +67,31 @@ export async function runNewBusiness(
 
     const openedUrl = args.context.page.url();
 
-    setOutput(args, OUTPUT_KEYS.NEW_BUSINESS.LAST_ACTION, args.item.action);
-    setOutput(args, OUTPUT_KEYS.NEW_BUSINESS.OPENED_URL, openedUrl);
     setOutput(
         args,
-        OUTPUT_KEYS.NEW_BUSINESS.CALCULATED_EMAIL,
+        EVIDENCE_RUNTIME_FIELDS.LAST_ACTION.key,
+        args.item.action
+    );
+    setOutput(
+        args,
+        EVIDENCE_RUNTIME_FIELDS.OPENED_URL.key,
+        openedUrl
+    );
+    setOutput(
+        args,
+        EVIDENCE_RUNTIME_FIELDS.CALCULATED_EMAIL.key,
         calculatedEmail
     );
-    setOutput(args, OUTPUT_KEYS.NEW_BUSINESS.QUOTE, quoteNumber);
-    setOutput(args, OUTPUT_KEYS.NEW_BUSINESS.POLICY, policyNumber);
+    setOutput(
+        args,
+        EVIDENCE_RUNTIME_FIELDS.QUOTE_NUMBER.key,
+        quoteNumber
+    );
+    setOutput(
+        args,
+        EVIDENCE_RUNTIME_FIELDS.POLICY_NUMBER.key,
+        policyNumber
+    );
 
     args.context.currentQuoteNumber = quoteNumber;
     args.context.currentPolicyNumber = policyNumber;
