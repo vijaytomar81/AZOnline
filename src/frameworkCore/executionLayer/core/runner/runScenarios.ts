@@ -3,6 +3,7 @@
 import { createRuntimeInfo } from "@utils/runtimeInfo";
 import type { RuntimeBrowserInfo } from "@utils/runtimeInfo";
 import { executionConfig } from "@configLayer/execution/execution.config";
+import { evidenceConfig } from "@configLayer/execution/evidence.config";
 import { EXECUTION_MODES } from "@configLayer/core/executionModes";
 import { resolveRunId } from "@frameworkCore/executionLayer/runtime/resolveRunId";
 import {
@@ -55,7 +56,7 @@ export async function runScenarios(
         new EvidenceFactory({
             ...(rootDir ? { rootDir } : {}),
             fileNaming: {
-                includeTimestamp: true,
+                includeTimestamp: evidenceConfig.fileNaming.includeTimestamp,
                 timestampSource: EVIDENCE_TIMESTAMP_SOURCE.PAYLOAD,
             },
         });

@@ -8,6 +8,7 @@ export * from "./core/uiSeverities";
 export * from "./execution/execution.config";
 export * from "./execution/browserConfig";
 export * from "./execution/playwrightArtifacts";
+export * from "./execution/evidence.config";
 
 export * from "./domain/journeyEntryPoints";
 export * from "./domain/journeyStepFolders";
