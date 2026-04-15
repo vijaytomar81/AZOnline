@@ -1,25 +1,50 @@
 {
-  "generatedAt": "2026-04-03T18:37:37.113Z",
+  "generatedAt": "2026-04-09T11:53:04.886Z",
   "data": {
-    "new-business:direct:FlowNB": {
-      "key": "new-business:direct:FlowNB",
-      "domain": "new-business",
+    "Athena:AzOnline:Motor:NewBusiness": {
+      "key": "Athena:AzOnline:Motor:NewBusiness",
+      "platform": "Athena",
+      "application": "AzOnline",
+      "product": "Motor",
+      "journeyContext": {
+        "type": "NewBusiness"
+      },
       "sheetName": "FlowNB",
-      "schemaName": "direct",
-      "filePath": "src/dataLayer/generated/new-business/direct/FlowNB_20260403_203737_112.json",
-      "validationReportPath": "src/dataLayer/generated/new-business/direct/FlowNB.validation_20260403_203737_112.json",
+      "schemaName": "new_business_journey",
+      "filePath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/athena/azonline/motor/FlowNB_20260409_135304_885.json",
+      "validationReportPath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/athena/azonline/motor/FlowNB.validation_20260409_135304_886.json",
       "caseCount": 3,
-      "generatedAt": "2026-04-03T18:37:37.113Z"
+      "generatedAt": "2026-04-09T11:53:04.886Z"
     },
-    "new-business:pcw_tool:PCW-Tool": {
-      "key": "new-business:pcw_tool:PCW-Tool",
-      "domain": "new-business",
+    "PCW:CTM:Motor:NewBusiness": {
+      "key": "PCW:CTM:Motor:NewBusiness",
+      "platform": "PCW",
+      "application": "CTM",
+      "product": "Motor",
+      "journeyContext": {
+        "type": "NewBusiness"
+      },
+      "sheetName": "FlowNB",
+      "schemaName": "new_business_journey",
+      "filePath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/pcw/ctm/motor/FlowNB_20260408_181230_483.json",
+      "validationReportPath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/pcw/ctm/motor/FlowNB.validation_20260408_181230_483.json",
+      "caseCount": 3,
+      "generatedAt": "2026-04-08T16:12:30.483Z"
+    },
+    "PCWTool:CTM:Motor:NewBusiness": {
+      "key": "PCWTool:CTM:Motor:NewBusiness",
+      "platform": "PCWTool",
+      "application": "CTM",
+      "product": "Motor",
+      "journeyContext": {
+        "type": "NewBusiness"
+      },
       "sheetName": "PCW-Tool",
-      "schemaName": "pcw_tool",
-      "filePath": "src/dataLayer/generated/new-business/pcw-tool/PCW-Tool_20260330_185244_097.json",
-      "validationReportPath": "src/dataLayer/generated/new-business/pcw-tool/PCW-Tool.validation_20260330_185244_097.json",
+      "schemaName": "new_business_pcw_tool_message",
+      "filePath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/pcwtool/ctm/motor/PCW-Tool_20260408_194358_159.json",
+      "validationReportPath": "/Users/vijaytomar/AZOnline_Automation/AZOnline/src/dataLayer/generated/newbusiness/pcwtool/ctm/motor/PCW-Tool.validation_20260408_194358_160.json",
       "caseCount": 2,
-      "generatedAt": "2026-03-30T16:52:44.097Z"
+      "generatedAt": "2026-04-08T17:43:58.160Z"
     }
   }
 }

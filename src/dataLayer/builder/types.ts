@@ -1,5 +1,10 @@
 // src/dataLayer/builder/types.ts
 
+import type { Application } from "@configLayer/models/application.config";
+import type { JourneyContext } from "@configLayer/models/journeyContext.config";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Product } from "@configLayer/models/product.config";
+
 export type ScriptIdFilter = string;
 
 export type DataBuilderBaseArgs = {
@@ -11,6 +16,11 @@ export type DataBuilderBaseArgs = {
     excludeEmptyFields: boolean;
     strictValidation: boolean;
     verbose: boolean;
+
+    platform: Platform;
+    application: Application;
+    product: Product;
+    journeyContext: JourneyContext;
 };
 
 export type BuiltCase = {

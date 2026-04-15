@@ -5,9 +5,9 @@ import type { PipelinePlugin } from "../core/pipeline";
 import { DataBuilderError } from "../errors";
 import { extractTabularMeta } from "../core/extractMeta/extractTabularMeta";
 import { extractVerticalMeta } from "../core/extractMeta/extractVerticalMeta";
-import { emitLog } from "@logging/emitLog";
-import { LOG_CATEGORIES } from "@logging/core/logCategories";
-import { LOG_LEVELS } from "@logging/core/logLevels";
+import { emitLog } from "@frameworkCore/logging/emitLog";
+import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
+import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import {
     logTabularMeta,
     logVerticalMeta,

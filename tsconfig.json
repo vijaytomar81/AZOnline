@@ -18,54 +18,49 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
     "paths": {
       "@/*": [
         "src/*"
       ],
-      "@automation/*": [
-        "src/automation/*"
+      "@frameworkCore/*": [
+        "src/frameworkCore/*"
       ],
-      "@pageObjects/*": [
-        "src/pageObjects/*"
-      ],
-      "@page-maps/*": [
-        "src/pageObjects/maps/*"
-      ],
-      "@page-objects/*": [
-        "src/pageObjects/objects/*"
-      ],
-      "@page-manifest/*": [
-        "src/pageObjects/.manifest/*"
-      ],
-      "@pageActions/*": [
-        "src/pageActions/*"
-      ],
-      "@pageActionTools/*": [
-        "src/pageActionTools/*"
-      ],
-      "@pageObjectTools/*": [
-        "src/pageObjectTools/*"
-      ],
-      "@utils/*": [
-        "src/utils/*"
+      "@businessLayer/*": [
+        "src/businessLayer/*"
       ],
       "@dataLayer/*": [
         "src/dataLayer/*"
       ],
-      "@executionLayer/*": [
-        "src/executionLayer/*"
+      "@integrations/*": [
+        "src/integrations/*"
       ],
-      "@businessJourneys/*": [
-        "src/businessJourneys/*"
+      "@toolingLayer/*": [
+        "src/toolingLayer/*"
       ],
-      "@config/*": [
-        "src/config/*"
+      "@utils/*": [
+        "src/utils/*"
       ],
-      "@logging/*": [
-        "src/logging/*"
+      "@configLayer/*": [
+        "src/configLayer/*"
       ],
-      "@evidence/*": [
-        "src/evidence/*"
+      "@configLayer/core/*": [
+        "src/configLayer/core/*"
+      ],
+      "@configLayer/execution/*": [
+        "src/configLayer/execution/*"
+      ],
+      "@configLayer/environments/*": [
+        "src/configLayer/environments/*"
+      ],
+      "@configLayer/routing/*": [
+        "src/configLayer/routing/*"
+      ],
+      "@evidenceFactory": [
+        "src/evidenceFactory/index.ts"
+      ],
+      "@evidenceFactory/*": [
+        "src/evidenceFactory/*"
       ]
     }
   },

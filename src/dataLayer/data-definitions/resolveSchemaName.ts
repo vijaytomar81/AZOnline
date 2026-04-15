@@ -1,37 +1,47 @@
 // src/dataLayer/data-definitions/resolveSchemaName.ts
 
+import type { JourneyContext } from "@configLayer/models/journeyContext.config";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Product } from "@configLayer/models/product.config";
 import { DataBuilderError } from "../builder/errors";
-import { buildAvailableSheetMappingsText } from "./buildAvailableSheetMappingsText";
-import { findSchemaNameBySheetAlias } from "./listSheetAliases";
+import { resolveSchemaSelection } from "./schemaSelection.config";
 
 function normalizeSchemaName(name?: string): string {
     return String(name ?? "").trim().toLowerCase();
 }
 
-export function resolveSchemaName(name?: string, sheetName?: string): string {
-    const explicit = normalizeSchemaName(name);
+export function resolveSchemaName(args: {
+    schemaName?: string;
+    journeyContext: JourneyContext;
+    platform: Platform;
+    product: Product;
+}): string {
+    const explicit = normalizeSchemaName(args.schemaName);
     if (explicit) {
         return explicit;
     }
 
-    const mapped = findSchemaNameBySheetAlias(sheetName);
-    if (mapped) {
-        return mapped;
+    const resolved = resolveSchemaSelection({
+        journeyContext: args.journeyContext,
+        platform: args.platform,
+        product: args.product,
+    });
+
+    if (resolved) {
+        return resolved;
     }
 
     throw new DataBuilderError({
         code: "SCHEMA_NOT_AVAILABLE",
         stage: "schema-resolution",
-        source: "data-definitions",
-        message: [
-            `Schema not available from sheet "${sheetName}".`,
-            "",
-            "Available sheet → schema mappings:",
-            "",
-            buildAvailableSheetMappingsText(),
-            "",
-            "Please rename the sheet accordingly.",
-        ].join("\n"),
-        context: { sheetName },
+        source: "data-definitions/resolveSchemaName",
+        message:
+            `No schema available for journeyContext="${args.journeyContext.type}", ` +
+            `platform="${args.platform}", product="${args.product}".`,
+        context: {
+            journeyContext: args.journeyContext,
+            platform: args.platform,
+            product: args.product,
+        },
     });
 }

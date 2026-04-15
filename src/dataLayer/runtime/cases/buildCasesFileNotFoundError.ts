@@ -1,23 +1,35 @@
 // src/dataLayer/runtime/cases/buildCasesFileNotFoundError.ts
 
+import type { Application } from "@configLayer/models/application.config";
+import type { JourneyContext } from "@configLayer/models/journeyContext.config";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Product } from "@configLayer/models/product.config";
 import { DataBuilderError } from "../../builder/errors";
 import { findGeneratedManifestItem } from "@dataLayer/runtime/manifest/generatedManifest";
 
 export function buildCasesFileNotFoundError(args: {
-    sheetName: string;
+    platform: Platform;
+    application: Application;
+    product: Product;
+    journeyContext: JourneyContext;
     schemaName: string;
     attemptedPath?: string;
 }): DataBuilderError {
     const manifestItem = findGeneratedManifestItem({
-        sheetName: args.sheetName,
-        schemaName: args.schemaName,
+        platform: args.platform,
+        application: args.application,
+        product: args.product,
+        journeyContext: args.journeyContext,
     });
 
     const lines: string[] = [
         "No generated data JSON found via manifest.",
         "",
-        `Sheet   : ${args.sheetName}`,
-        `Schema  : ${args.schemaName}`,
+        `Platform       : ${args.platform}`,
+        `Application    : ${args.application}`,
+        `Product        : ${args.product}`,
+        `JourneyContext : ${JSON.stringify(args.journeyContext)}`,
+        `Schema         : ${args.schemaName}`,
         "",
     ];
 
@@ -28,6 +40,10 @@ export function buildCasesFileNotFoundError(args: {
 
         if (manifestItem.validationReportPath) {
             lines.push(`  Validation   : ${manifestItem.validationReportPath}`);
+        }
+
+        if (manifestItem.sheetName) {
+            lines.push(`  Sheet        : ${manifestItem.sheetName}`);
         }
 
         lines.push(`  Case Count   : ${manifestItem.caseCount}`);
@@ -46,7 +62,7 @@ export function buildCasesFileNotFoundError(args: {
 
     lines.push("Next step:");
     lines.push(
-        `  npm run data:build -- --excel <path> --sheet "${args.sheetName}"`
+        `  npm run data:build -- --excel <path> --sheet "<sheet>" --platform "${args.platform}" --application "${args.application}" --product "${args.product}" --journeyContext "${args.journeyContext.type}"`
     );
 
     return new DataBuilderError({
@@ -55,7 +71,10 @@ export function buildCasesFileNotFoundError(args: {
         source: "buildCasesFileNotFoundError",
         message: lines.join("\n"),
         context: {
-            sheetName: args.sheetName,
+            platform: args.platform,
+            application: args.application,
+            product: args.product,
+            journeyContext: args.journeyContext,
             schemaName: args.schemaName,
             filePath: args.attemptedPath ?? "",
             manifestKey: manifestItem?.key ?? "",

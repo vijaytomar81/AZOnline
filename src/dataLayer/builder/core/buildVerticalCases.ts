@@ -7,10 +7,10 @@ import { DataBuilderError } from "../errors";
 import { buildRowIndex } from "./spreadsheet";
 import { buildPayload } from "./schemaRuntime";
 import { createBuiltCase } from "./buildCases/shared/createBuiltCase";
-import { emitLog } from "@logging/emitLog";
-import { LOG_CATEGORIES } from "@logging/core/logCategories";
+import { emitLog } from "@frameworkCore/logging/emitLog";
+import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { logBuiltVerticalCase } from "./buildCases/vertical/logBuiltVerticalCase";
-import { LOG_LEVELS } from "@logging/core/logLevels";
+import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 
 type BuildVerticalCasesArgs = {
     ctx: DataBuilderContext;

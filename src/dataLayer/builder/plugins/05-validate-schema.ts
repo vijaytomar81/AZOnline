@@ -3,9 +3,9 @@
 import type ExcelJS from "exceljs";
 import type { PipelinePlugin } from "../core/pipeline";
 import { DataBuilderError } from "../errors";
-import { emitLog } from "@logging/emitLog";
-import { LOG_CATEGORIES } from "@logging/core/logCategories";
-import { LOG_LEVELS } from "@logging/core/logLevels";
+import { emitLog } from "@frameworkCore/logging/emitLog";
+import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
+import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import { runSchemaValidation } from "../core/validation/runSchemaValidation";
 import { logValidationSummary } from "../core/validation/logValidationSummary";
 import { logValidationDetails } from "../core/validation/logValidationDetails";
@@ -13,11 +13,13 @@ import { logValidationDetails } from "../core/validation/logValidationDetails";
 const plugin: PipelinePlugin = {
     name: "validate-schema",
     order: 5,
-    requires: ["sheet", "external:schemaName", "external:strictValidation"],
+    requires: ["sheet", "meta", "external:schemaName", "external:strictValidation"],
     provides: ["validationReport"],
 
     run: async (ctx) => {
         const ws = ctx.data.sheet as ExcelJS.Worksheet | undefined;
+        const meta = ctx.data.meta;
+
         if (!ws) {
             throw new DataBuilderError({
                 code: "SHEET_NOT_LOADED",
@@ -27,10 +29,23 @@ const plugin: PipelinePlugin = {
             });
         }
 
+        if (!meta) {
+            throw new DataBuilderError({
+                code: "META_NOT_EXTRACTED",
+                stage: "validate-schema",
+                source: "05-validate-schema",
+                message: "Sheet metadata not extracted.",
+            });
+        }
+
         const report = runSchemaValidation({
             ws,
+            meta,
             schemaName: ctx.data.schemaName,
             sheetName: ctx.data.sheetName,
+            platform: ctx.data.platform,
+            product: ctx.data.product,
+            journeyContext: ctx.data.journeyContext,
             strict: !!ctx.data.strictValidation,
         });
 
@@ -61,6 +76,10 @@ const plugin: PipelinePlugin = {
                 context: {
                     schemaName: ctx.data.schemaName,
                     sheetName: ctx.data.sheetName,
+                    platform: ctx.data.platform,
+                    application: ctx.data.application,
+                    product: ctx.data.product,
+                    journeyContext: ctx.data.journeyContext,
                     errorCount: report.errors.length,
                 },
             });

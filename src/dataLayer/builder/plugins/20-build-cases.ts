@@ -7,9 +7,9 @@ import { getSchema } from "../../data-definitions";
 import { buildVerticalCases } from "../core/buildVerticalCases";
 import { buildTabularCases } from "../core/buildTabularCases";
 import { DataBuilderError } from "../errors";
-import { emitLog } from "@logging/emitLog";
-import { LOG_CATEGORIES } from "@logging/core/logCategories";
-import { LOG_LEVELS } from "@logging/core/logLevels";
+import { emitLog } from "@frameworkCore/logging/emitLog";
+import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
+import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 
 const plugin: PipelinePlugin = {
     name: "build-cases",
@@ -37,7 +37,13 @@ const plugin: PipelinePlugin = {
             });
         }
 
-        const schema = getSchema(ctx.data.schemaName, ctx.data.sheetName);
+        const schema = getSchema({
+            schemaName: ctx.data.schemaName,
+            journeyContext: ctx.data.journeyContext,
+            platform: ctx.data.platform,
+            product: ctx.data.product,
+        });
+
         const includeEmpty = !ctx.data.excludeEmptyFields;
 
         if (verbose) {

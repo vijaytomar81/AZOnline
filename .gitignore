@@ -1,77 +1,96 @@
+# ------------------------------------------------------------
 # Node
+# ------------------------------------------------------------
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# ------------------------------------------------------------
 # OS
+# ------------------------------------------------------------
 .DS_Store
 Thumbs.db
 
+# ------------------------------------------------------------
 # Environment files
+# ------------------------------------------------------------
 .env
 .env.local
 .env.*
-
-# Build outputs
-dist/
-build/
-coverage/
+!.env.example
 
 # ------------------------------------------------------------
-# Test outputs (generated) - ignore contents but keep .gitkeep
+# Build outputs (root only)
+# ------------------------------------------------------------
+/dist/
+/build/
+/coverage/
+
+# ------------------------------------------------------------
+# Test outputs (generated)
 # ------------------------------------------------------------
 
 # Playwright outputs
-results/**
-!results/**/.gitkeep
+/results/**
+!/results/**/.gitkeep
 
 test-results/
 playwright-report/
 
-# Allure generated HTML (keep folder via .gitkeep)
+# Allure generated HTML
 reports/allure-report/**
 !reports/allure-report/.gitkeep
 
-# Generated reports (Excel) (keep folder via .gitkeep)
+# Generated reports (Excel)
 reports/excel/**
 !reports/excel/.gitkeep
 
+/artifacts/**
+
+# ------------------------------------------------------------
 # Logs
+# ------------------------------------------------------------
 *.log
 
+# ------------------------------------------------------------
 # TypeScript
+# ------------------------------------------------------------
 *.tsbuildinfo
 
+# ------------------------------------------------------------
 # IDE
+# ------------------------------------------------------------
 .vscode/
 .idea/
 
-# Optional: temp or cache
+# ------------------------------------------------------------
+# Optional temp/cache
+# ------------------------------------------------------------
 .tmp/
 .cache/
 
 # ------------------------------------------------------------
-# Gmail / Google API credentials
+# Gmail / Google API credentials (explicit only)
 # ------------------------------------------------------------
-
-# OAuth credentials
 credentials.json
 token.json
 
-# Recommended config folder for API credentials
-config/*.json
+# Safer config handling
+config/credentials.json
+config/token.json
 !config/.gitkeep
+!config/*.example.json
 
 # ------------------------------------------------------------
 # Data Builder (generated data + manifest)
 # ------------------------------------------------------------
 
-# Ignore all generated data files
+# Ignore all generated data
 src/data/generated/**
 src/data/generated/archive/**
 
-# Keep folder structure (optional)
+# Keep folder structure
 !src/data/generated/.gitkeep
 !src/data/generated/**/.gitkeep
 

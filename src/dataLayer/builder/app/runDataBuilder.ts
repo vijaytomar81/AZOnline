@@ -1,6 +1,5 @@
 // src/dataLayer/builder/app/runDataBuilder.ts
 
-import path from "node:path";
 import { printCommandTitle } from "@utils/cliFormat";
 import { startTimer } from "@utils/time";
 import { DATA_BUILDER_PLUGINS_DIR } from "@utils/paths";
@@ -12,10 +11,10 @@ import {
     resolvePluginRunOrder,
     runDiscoveredPlugins,
 } from "../core/pluginLoader";
-import { setLogVerbose } from "@logging/core/logConfig";
-import { emitLog } from "@logging/emitLog";
-import { LOG_CATEGORIES } from "@logging/core/logCategories";
-import { LOG_LEVELS } from "@logging/core/logLevels";
+import { setLogVerbose } from "@frameworkCore/logging/core/logConfig";
+import { emitLog } from "@frameworkCore/logging/emitLog";
+import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
+import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import {
     printAvailableSchemas,
     printBuilderEnvironment,
@@ -43,6 +42,10 @@ export async function runDataBuilder(): Promise<void> {
             excludeEmptyFields: args.excludeEmptyFields,
             strictValidation: args.strictValidation,
             verbose: args.verbose,
+            platform: args.platform,
+            application: args.application,
+            product: args.product,
+            journeyContext: args.journeyContext,
         },
     };
 
@@ -55,6 +58,10 @@ export async function runDataBuilder(): Promise<void> {
         excludeEmptyFields: String(args.excludeEmptyFields),
         strictValidation: String(args.strictValidation),
         verbose: String(args.verbose),
+        platform: args.platform,
+        application: args.application,
+        product: args.product,
+        journeyContext: JSON.stringify(args.journeyContext),
     });
 
     printAvailableSchemas(listSchemas());

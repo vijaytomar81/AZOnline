@@ -6,7 +6,7 @@
 
 The **Data Builder** converts structured **Excel test data** into normalized **JSON test cases** used by the automation framework.
 
-It reads Excel sheets maintained by business or QA users and transforms them into a consistent JSON structure driven by **schema definitions**.
+It reads Excel sheets maintained by business or QA users and transforms them into a consistent JSON structure driven by **journey-based schema selection**.
 
 The generated JSON files become the **runtime data source for automated tests**.
 
@@ -16,6 +16,8 @@ The Data Builder ensures that:
 - JSON remains **automation-friendly for test execution**
 - generated artifacts remain **traceable and discoverable**
 - execution can resolve the latest generated data via **manifest lookup**
+- schema selection follows the **new business model**
+- generated data is organized by **journey, platform, application, and product**
 
 ---
 
@@ -26,7 +28,8 @@ The Data Builder automates the transformation of Excel test sheets into structur
 Its primary goals are:
 
 - convert Excel test data into structured JSON
-- support multiple insurance journeys and entry points
+- support multiple insurance journeys
+- support multiple platforms, applications, and products
 - enforce consistent data structure
 - reduce manual JSON maintenance
 - allow business teams to maintain test data
@@ -41,8 +44,8 @@ Its primary goals are:
 flowchart LR
 
     subgraph Business Data Layouts
-        A1[Tabular Layout<br/>Direct / FlowNB]
-        A2[Vertical Layout<br/>PCW Tool]
+        A1[Journey Data Sheet]
+        A2[PCW Tool Message Sheet]
     end
 
     subgraph Scenario Layout
@@ -75,44 +78,46 @@ Each row = **field**
 
 ---
 
+## Business Selection Inputs
+
+Required:
+
+- platform
+- application
+- product
+- journeyContext
+
+---
+
 ## Sheet Name
 
-Examples:
+Used only for:
 
-- FlowNB
-- PCW-Tool
-- Direct
-- CNF
-- CTM
-- GoCo
-- MSM
+- selecting worksheet
+- naming output files
+
+NOT used for schema selection.
 
 ---
 
 ## Schema Resolution (IMPORTANT)
 
-Schema is auto-resolved from sheet name.
+Schema is resolved from:
 
-Priority:
+1. journeyContext
+2. platform
 
-1. CLI (`--schema`)
-2. ENV (`SCHEMA`)
-3. Sheet → Schema resolution
+Defined in:
 
-Example:
+src/dataLayer/data-definitions/schemaSelection.config.ts
 
-| Sheet | Schema |
-|------|--------|
-| FlowNB | direct |
-| Direct | direct |
-| PCW-Tool | pcw_tool |
-| CNF | cnf |
+Examples:
 
-Defined under:
-
-```
-src/data/data-definitions
-```
+| Journey Context | Platform | Selected Schema |
+|----------------|----------|-----------------|
+| NewBusiness | Athena | new_business_journey |
+| NewBusiness | PCW | new_business_journey |
+| NewBusiness | PCWTool | new_business_pcw_tool_message |
 
 ---
 
@@ -120,31 +125,32 @@ src/data/data-definitions
 
 ## Test Data JSON
 
-```
-src/data/generated/new-business/<schema>/<Sheet>.json
-src/data/generated/new-business/<schema>/<Sheet>_<timestamp>.json
-```
+src/dataLayer/generated/<journey>/<platform>/<application>/<product>/<Sheet>.json  
+src/dataLayer/generated/<journey>/<platform>/<application>/<product>/<Sheet>_<timestamp>.json  
+
+Example:
+
+src/dataLayer/generated/newbusiness/athena/azonline/motor/FlowNB.json
 
 ---
 
 ## Validation Report
 
-```
-src/data/generated/new-business/<schema>/<Sheet>.validation.json
-src/data/generated/new-business/<schema>/<Sheet>.validation_<timestamp>.json
-```
+src/dataLayer/generated/<journey>/<platform>/<application>/<product>/<Sheet>.validation.json  
+src/dataLayer/generated/<journey>/<platform>/<application>/<product>/<Sheet>.validation_<timestamp>.json  
 
 ---
 
 ## Generated Manifest
 
-```
-src/data/generated/index.json
-```
+src/dataLayer/generated/index.json
 
 Stores:
 
-- logical key
+- platform
+- application
+- product
+- journeyContext
 - sheet name
 - schema name
 - generated JSON path
@@ -158,33 +164,19 @@ Stores:
 
 ## Timestamp Mode
 
-```
 <name>_yyyymmdd_hhmmss_mmm.json
-```
 
 ---
 
 ## Archive Folder
 
-```
-src/data/generated/archive/
-```
-
-Organized by:
-
-```
-new-business/<schema>/
-```
+src/dataLayer/generated/archive/
 
 ---
 
 ## Config
 
-Defined in:
-
-```
-src/config/execution.config.ts
-```
+src/configLayer/execution.config.ts
 
 ---
 
@@ -192,27 +184,23 @@ src/config/execution.config.ts
 
 Key format:
 
-```
-<domain>:<schemaName>:<sheetName>
-```
+<platform>:<application>:<product>:<journeyContext>:<sheetName>
 
 Example:
 
-```
-new-business:direct:FlowNB
-new-business:pcw_tool:PCW-Tool
-```
+Athena:AzOnline:Motor:NewBusiness:FlowNB  
+PCWTool:CTM:Motor:NewBusiness:PCW-Tool  
 
 ---
 
 # 8. Runtime Resolution
 
-Execution resolves generated data in this order:
+Resolution order:
 
-1. explicit `CASES_FILE`
-2. manifest lookup via runtime module
+1. explicit CASES_FILE
+2. manifest lookup
 
-The manifest is the **single source of truth**.
+Manifest is the single source of truth.
 
 ---
 
@@ -220,26 +208,25 @@ The manifest is the **single source of truth**.
 
 Defined under:
 
-```
-src/data/data-definitions
-```
+src/dataLayer/data-definitions
 
 Supports:
 
 - nested groups
 - repeated groups
-- required/optional fields
+- required fields
+- optional fields
 - section-based validation
 
 ---
 
-# 10. Data Builder Pipeline (Plugin-Based)
+# 10. Data Builder Pipeline
 
 ~~~mermaid
 flowchart TD
 
-    A1[Tabular Layout]
-    A2[Vertical Layout]
+    A1[Journey Data Sheet]
+    A2[PCW Tool Message Sheet]
 
     A1 --> B[load-excel]
     A2 --> B
@@ -250,38 +237,24 @@ flowchart TD
     E --> F[filter-scriptIds]
     F --> G[transform-values]
     G --> H[write-json]
-
-    H --> I[Generated JSON]
-    H --> J[Validation Report]
-    H --> K[Manifest]
 ~~~
 
 ---
 
 # 11. Validation System
 
-~~~json
 {
   "errors": [],
   "missingSchemaFieldsInExcel": {},
   "missingExcelFieldsInSchema": {},
   "summary": {}
 }
-~~~
-
-Detects:
-
-- missing fields
-- duplicate fields (strict mode)
-- schema mismatches
 
 ---
 
 # 12. CLI Usage
 
-```
-npm run data -- --excel file.xlsx --sheet FlowNB
-```
+npm run data -- --excel file.xlsx --sheet FlowNB --platform Athena --application AzOnline --product Motor --journeyContext NewBusiness
 
 ---
 
@@ -289,8 +262,12 @@ npm run data -- --excel file.xlsx --sheet FlowNB
 
 | Argument | Description |
 |----------|------------|
-| `--excel` | Excel file path |
-| `--sheet` | Sheet name |
+| --excel | Excel file |
+| --sheet | Sheet |
+| --platform | Platform |
+| --application | Application |
+| --product | Product |
+| --journeyContext | Journey |
 
 ---
 
@@ -298,12 +275,11 @@ npm run data -- --excel file.xlsx --sheet FlowNB
 
 | Argument | Description |
 |----------|------------|
-| `--schema` | Override schema |
-| `--ids` | Filter Script IDs |
-| `--excludeEmptyFields` | Remove empty values |
-| `--strictValidation` | Enable strict validation |
-| `--out` | Custom output path |
-| `--verbose` | Debug logs |
+| --ids | Filter IDs |
+| --excludeEmptyFields | Remove empty |
+| --strictValidation | Strict mode |
+| --out | Custom output |
+| --verbose | Logs |
 
 ---
 
@@ -311,159 +287,53 @@ npm run data -- --excel file.xlsx --sheet FlowNB
 
 Adds:
 
-- duplicate checks
-- stricter schema enforcement
-- stronger consistency guarantees
+- duplicate detection
+- stricter schema checks
 
 ---
 
 # 16. Example Commands
 
-```
-npm run data -- --excel file.xlsx --sheet FlowNB
-npm run data -- --excel "sampleData/New Business.xlsx" --sheet "PCW-Tool"
-npm run data:build:strict
-npm run data:build:noEmpty:strict
-```
+npm run data -- --excel "sample.xlsx" --sheet "FlowNB" --platform "Athena" --application "AzOnline" --product "Motor" --journeyContext "NewBusiness"
 
 ---
 
 # 17. Adding New Journeys
 
-1. add or update schema
-2. update sheet alias mapping
-3. run builder
-4. verify JSON + validation + manifest
+1. add schema  
+2. register in registry.ts  
+3. update schemaSelection.config.ts  
+4. run builder  
 
 ---
 
-# 18. Utilities
+# 18. Design Principles
 
-```
-src/utils
-```
-
-Includes:
-
-- logging
-- CLI parsing
-- timers
-- file utilities
-- path helpers
-
----
-
-# 19. Design Principles
-
-The Data Builder is:
-
+- journey-driven
 - schema-driven
 - plugin-based
 - modular
 - scalable
-- business-friendly
-- automation-ready
 - manifest-backed
 
 ---
 
-# 20. Plugin Architecture
+# 19. Plugin Architecture
 
-The Data Builder runs as a **plugin pipeline**.
-
-Each plugin:
-
-- declares `requires`
-- declares `provides`
-- executes in dependency order
-- runs with shared context
-
-Core flow:
-
-```
 pluginDiscovery → pluginOrder → pluginExecutor
-```
 
 ---
 
-# 21. Data Builder + Runtime Resolution Flow
+# 20. Flow
 
 ~~~mermaid
 flowchart LR
 
-    subgraph Business_Data_Layouts
-        A0[Tabular Layout]
-        A00[Vertical Layout]
-    end
-
-    subgraph CLI
-        A[index.ts]
-        A1[cli/index.ts]
-    end
-
-    subgraph Core
-        B1[pluginDiscovery.ts]
-        B2[pluginOrder.ts]
-        B3[pluginExecutor.ts]
-        B4[pipeline.ts]
-
-        B5[spreadsheet/*]
-        B6[schemaValidation/*]
-        B7[extractMeta/*]
-        B8[buildCases/*]
-        B9[writeJson/*]
-    end
-
-    subgraph Schema
-        C1[data-definitions/index.ts]
-        C2[data-definitions/registry.ts]
-        C3[data-definitions/types.ts]
-    end
-
-    subgraph Plugins
-        D1[00-load-excel]
-        D2[05-validate-schema]
-        D3[10-extract-meta]
-        D4[20-build-cases]
-        D5[30-filter-scriptIds]
-        D6[50-transform-values]
-        D7[70-write-json]
-    end
-
-    subgraph Runtime
-        R1[manifest/*]
-        R2[cases/*]
-    end
-
-    subgraph Output
-        F1[generated JSON]
-        F2[validation JSON]
-        F3[archive]
-        F4[index.json]
-    end
-
-    A0 --> D1
-    A00 --> D1
-
-    A --> A1
-    A1 --> C1
-    A1 --> B1
-
-    B1 --> D1
-    D1 --> D2
-    D2 --> D3
-    D3 --> D4
-    D4 --> D5
-    D5 --> D6
-    D6 --> D7
-
-    D7 --> F1
-    D7 --> F2
-    D7 --> F3
-    D7 --> F4
-
-    F4 --> R1
-    R1 --> R2
+    A[Excel] --> B[Builder]
+    B --> C[JSON]
+    B --> D[Validation]
+    B --> E[Manifest]
+    E --> F[Runtime]
 ~~~
 
 ---
