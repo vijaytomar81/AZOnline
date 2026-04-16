@@ -14,7 +14,7 @@
     "elementsFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/insurance-type-selection/elements.ts",
     "aliasesGeneratedFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/insurance-type-selection/aliases.generated.ts",
     "aliasesFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/insurance-type-selection/aliases.ts",
-    "pageMapFile": "src/businessLayer/pageObjects/maps/athena.azonline.common.insurance-type-selection.json"
+    "pageMapFile": "src/businessLayer/pageScanner/athena/azonline/common/insurance-type-selection.json"
   },
   "pageMeta": {
     "urlPath": "/products",

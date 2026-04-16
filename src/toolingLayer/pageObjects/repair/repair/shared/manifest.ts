@@ -9,6 +9,13 @@ import { buildPageArtifact } from "@toolingLayer/pageObjects/common/artifacts/bu
 import { buildPageManifestEntry } from "@toolingLayer/pageObjects/common/manifest/buildPageManifestEntry";
 import { loadManifestIndex } from "@toolingLayer/pageObjects/common/manifest/loadManifestIndex";
 import { loadPageManifestEntry } from "@toolingLayer/pageObjects/common/manifest/loadPageManifestEntry";
+import {
+    getManifestEntryFile,
+    getManifestEntryRelativePath,
+    getManifestIndexFile,
+    normalizeManifestRoot,
+} from "@toolingLayer/pageObjects/common/manifest/manifestPaths";
+import { removeMissingPageManifestEntries } from "@toolingLayer/pageObjects/common/manifest/removeMissingPageManifestEntries";
 import { loadAllPageMaps } from "@toolingLayer/pageObjects/common/readPageMap";
 import type {
     ManifestIndex,
@@ -50,17 +57,6 @@ function emptyManifest(): PageObjectsManifest {
     return { version: 1, generatedAt: new Date(0).toISOString(), pages: {} };
 }
 
-function manifestPaths(manifestRoot: string): { indexFile: string; pagesDir: string } {
-    return {
-        indexFile: path.join(manifestRoot, "index.json"),
-        pagesDir: path.join(manifestRoot, "pages"),
-    };
-}
-
-function pageKeyToManifestFile(pagesDir: string, pageKey: string): string {
-    return path.join(pagesDir, `${pageKey}.json`);
-}
-
 function toRepairEntry(entry: PageManifestEntry): ManifestPageEntry {
     return {
         pageKey: entry.pageKey,
@@ -80,9 +76,7 @@ function toRepairEntry(entry: PageManifestEntry): ManifestPageEntry {
     };
 }
 
-function toCommonManifest(
-    manifest: PageObjectsManifest
-): CommonPageObjectsManifest {
+function toCommonManifest(manifest: PageObjectsManifest): CommonPageObjectsManifest {
     const pages = Object.fromEntries(
         Object.entries(manifest.pages).map(([pageKey, entry]) => [
             pageKey,
@@ -97,11 +91,7 @@ function toCommonManifest(
         ])
     );
 
-    return {
-        version: 1,
-        generatedAt: manifest.generatedAt,
-        pages,
-    };
+    return { version: 1, generatedAt: manifest.generatedAt, pages };
 }
 
 export function buildManifest(
@@ -124,66 +114,58 @@ export function buildManifest(
         }
     }
 
-    return {
-        version: 1,
-        generatedAt: new Date().toISOString(),
-        pages,
-    };
+    return { version: 1, generatedAt: new Date().toISOString(), pages };
 }
 
 export function readManifest(manifestRoot: string): PageObjectsManifest {
-    const { indexFile, pagesDir } = manifestPaths(manifestRoot);
-    const index = loadManifestIndex(indexFile);
+    const rootDir = normalizeManifestRoot(manifestRoot);
+    const index = loadManifestIndex(getManifestIndexFile(rootDir));
     const pages: Record<string, ManifestPageEntry> = {};
 
     for (const [pageKey, fileName] of Object.entries(index.pages)) {
-        const entry = loadPageManifestEntry(path.join(pagesDir, fileName));
+        const entry = loadPageManifestEntry(path.join(rootDir, fileName));
         if (entry) {
             pages[pageKey] = toRepairEntry(entry);
         }
     }
 
-    if (!index.generatedAt) return emptyManifest();
+    if (!index.generatedAt) {
+        return emptyManifest();
+    }
 
-    return {
-        version: index.version,
-        generatedAt: index.generatedAt,
-        pages,
-    };
+    return { version: index.version, generatedAt: index.generatedAt, pages };
 }
 
-export function writeManifest(
-    manifestRoot: string,
-    manifest: PageObjectsManifest
-): void {
-    const { indexFile, pagesDir } = manifestPaths(manifestRoot);
-    ensureDir(pagesDir);
+export function writeManifest(manifestRoot: string, manifest: PageObjectsManifest): void {
+    const rootDir = normalizeManifestRoot(manifestRoot);
+    ensureDir(rootDir);
 
     const commonManifest = toCommonManifest(manifest);
     const pageKeys = Object.keys(commonManifest.pages).sort((a, b) => a.localeCompare(b));
-    const index: ManifestIndex = {
-        version: 1,
-        generatedAt: new Date().toISOString(),
-        pages: Object.fromEntries(
-            pageKeys.map((pageKey) => [pageKey, `${pageKey}.json`])
-        ),
-    };
 
-    for (const file of fs.readdirSync(pagesDir)) {
-        if (!file.endsWith(".json")) continue;
-        const pageKey = file.slice(0, -5);
-        if (!(pageKey in commonManifest.pages)) {
-            fs.unlinkSync(path.join(pagesDir, file));
-        }
-    }
+    removeMissingPageManifestEntries(rootDir, pageKeys);
 
     for (const pageKey of pageKeys) {
+        const filePath = getManifestEntryFile(rootDir, pageKey);
+        ensureDir(path.dirname(filePath));
         fs.writeFileSync(
-            pageKeyToManifestFile(pagesDir, pageKey),
+            filePath,
             JSON.stringify(commonManifest.pages[pageKey], null, 2) + "\n",
             "utf8"
         );
     }
 
-    fs.writeFileSync(indexFile, JSON.stringify(index, null, 2) + "\n", "utf8");
+    const index: ManifestIndex = {
+        version: 1,
+        generatedAt: new Date().toISOString(),
+        pages: Object.fromEntries(
+            pageKeys.map((pageKey) => [pageKey, getManifestEntryRelativePath(pageKey)])
+        ),
+    };
+
+    fs.writeFileSync(
+        getManifestIndexFile(rootDir),
+        JSON.stringify(index, null, 2) + "\n",
+        "utf8"
+    );
 }

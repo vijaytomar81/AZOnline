@@ -3,10 +3,8 @@
 import path from "node:path";
 
 import { parsePageScope } from "@toolingLayer/pageObjects/common/manifest/parsePageScope";
-import { listPageMapFiles } from "@toolingLayer/pageObjects/common/readPageMap";
-import type { PageMap } from "@toolingLayer/pageObjects/generator/generator/types";
+import { loadAllPageMaps } from "@toolingLayer/pageObjects/common/readPageMap";
 import type { TreeNode } from "@utils/cliTree";
-import { safeReadJson } from "@utils/fs";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
 
@@ -17,37 +15,8 @@ export const checkPageMapSchema: ValidationRule = {
         const issues: ValidationIssue[] = [];
         const reportNodes: TreeNode[] = [];
 
-        for (const fileName of listPageMapFiles(ctx.mapsDir)) {
-            const absPath = path.join(ctx.mapsDir, fileName);
-            const pageMap = safeReadJson<PageMap>(absPath);
-
-            if (!pageMap) {
-                issues.push({
-                    ruleId: this.id,
-                    severity: "ERROR",
-                    issueLabel: "Invalid",
-                    message: "[json]",
-                    filePath: absPath,
-                });
-
-                reportNodes.push({
-                    title: fileName,
-                    children: [
-                        {
-                            title: fileName,
-                            children: [
-                                {
-                                    severity: "error",
-                                    title: "Invalid",
-                                    summary: "[json]",
-                                },
-                            ],
-                        },
-                    ],
-                });
-                continue;
-            }
-
+        for (const item of loadAllPageMaps(ctx.mapsDir)) {
+            const pageMap = item.pageMap;
             const missingItems: string[] = [];
 
             if (typeof pageMap.pageKey !== "string" || !pageMap.pageKey.trim()) {
@@ -60,24 +29,26 @@ export const checkPageMapSchema: ValidationRule = {
                 missingItems.push("elements");
             }
 
-            if (missingItems.length === 0) continue;
+            if (missingItems.length === 0) {
+                continue;
+            }
 
-            for (const item of missingItems) {
+            for (const missingItem of missingItems) {
                 issues.push({
                     ruleId: this.id,
                     severity: "ERROR",
                     issueLabel: "Missing",
-                    message: `[${item}]`,
+                    message: `[${missingItem}]`,
                     pageKey: pageMap.pageKey,
-                    filePath: absPath,
+                    filePath: item.absPath,
                 });
             }
 
             reportNodes.push({
-                title: pageMap.pageKey || fileName,
+                title: pageMap.pageKey || item.fileName,
                 children: [
                     {
-                        title: fileName,
+                        title: path.basename(item.absPath),
                         children: [
                             {
                                 severity: "error",

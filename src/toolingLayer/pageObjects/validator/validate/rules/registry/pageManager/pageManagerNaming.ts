@@ -6,8 +6,8 @@ function lastSegment(pageKey: string): string {
     return pageKey.split(".").slice(-1)[0] || "page";
 }
 
-function firstSegment(pageKey: string): string {
-    return pageKey.split(".")[0] || "common";
+function productSegment(pageKey: string): string {
+    return pageKey.split(".")[2] || "common";
 }
 
 export function expectedClassName(pageKey: string): string {
@@ -29,11 +29,14 @@ export function expectedMember(pageKey: string): string {
 }
 
 export function expectedKeyId(pageKey: string): string {
-    return `${firstSegment(pageKey)}.${expectedMember(pageKey)}`;
+    return `${productSegment(pageKey)}.${expectedMember(pageKey)}`;
 }
 
 export function pageKeyFromImportPath(importPath: string): string {
-    const match = importPath.match(/^@pageObjectsObjects\/(.+)\/[^/]+$/);
+    const match = importPath.match(
+        /^@businessLayer\/pageObjects\/objects\/(.+)\/[^/]+$/
+    );
+
     return match?.[1]?.replace(/\//g, ".") ?? importPath;
 }
 

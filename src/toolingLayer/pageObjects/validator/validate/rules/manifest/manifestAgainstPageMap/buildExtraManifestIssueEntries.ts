@@ -25,7 +25,7 @@ export function buildExtraManifestIssueEntries(
     for (const pageKey of extraManifestKeys) {
         issues.push({
             ruleId: args.ruleId,
-            severity: "WARN" as const,
+            severity: "ERROR" as const,
             issueLabel: "Extra",
             message: "[manifestEntryKey]",
             pageKey,
@@ -39,7 +39,7 @@ export function buildExtraManifestIssueEntries(
                     title: manifestFileName(args.manifestFile),
                     children: [
                         {
-                            severity: "warning",
+                            severity: "error",
                             title: "Extra",
                             summary: "[manifestEntryKey]",
                         },

@@ -14,7 +14,7 @@
     "elementsFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/manage-cookies/elements.ts",
     "aliasesGeneratedFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/manage-cookies/aliases.generated.ts",
     "aliasesFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/manage-cookies/aliases.ts",
-    "pageMapFile": "src/businessLayer/pageObjects/maps/athena.azonline.common.manage-cookies.json"
+    "pageMapFile": "src/businessLayer/pageScanner/athena/azonline/common/manage-cookies.json"
   },
   "pageMeta": {
     "urlPath": "/",

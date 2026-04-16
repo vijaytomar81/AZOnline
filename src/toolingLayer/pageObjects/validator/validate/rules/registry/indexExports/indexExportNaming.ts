@@ -19,6 +19,9 @@ export function pageKeyFromImportPath(importPath: string): string {
         return "registry.pageManager";
     }
 
-    const match = importPath.match(/^@pageObjectsObjects\/(.+)\/[^/]+$/);
+    const match = importPath.match(
+        /^@businessLayer\/pageObjects\/objects\/(.+)\/[^/]+$/
+    );
+
     return match?.[1]?.replace(/\//g, ".") ?? importPath;
 }

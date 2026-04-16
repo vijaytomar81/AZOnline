@@ -1,8 +1,6 @@
 // src/toolingLayer/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/buildManifestComparisonResult.ts
 
-import {
-    formatMismatchList,
-} from "./manifestAgainstPageMapFormatters";
+import type { ValidationIssue } from "../../../types";
 import { buildManifestComparisonReportNode } from "./buildManifestComparisonReportNode";
 import { collectManifestMismatchItems } from "./collectManifestMismatchItems";
 import type {
@@ -13,40 +11,57 @@ import type {
 export function buildManifestComparisonResult(
     input: ManifestComparisonInputs
 ): ManifestComparisonResult {
-    const issues = [];
-    const missingItems: string[] = [];
-    const mismatchItems = collectManifestMismatchItems(input);
     const pageKey = input.pageMapItem.pageMap.pageKey;
 
     if (!input.manifestEntry) {
-        missingItems.push("manifestEntryKey");
-        issues.push({
-            ruleId: input.ruleId,
-            severity: "WARN" as const,
-            issueLabel: "Missing",
-            message: "[manifestEntryKey]",
-            pageKey,
-            filePath: input.manifestFile,
-        });
+        const issues: ValidationIssue[] = [
+            {
+                ruleId: input.ruleId,
+                severity: "ERROR" as const,
+                issueLabel: "Missing",
+                message: "[manifestEntryKey]",
+                pageKey,
+                filePath: input.manifestFile,
+            },
+        ];
+
+        return {
+            issues,
+            reportNode: buildManifestComparisonReportNode({
+                pageKey,
+                manifestFile: input.manifestFile,
+                missingItems: ["manifestEntryKey"],
+                mismatchItems: [],
+            }),
+        };
     }
 
-    if (mismatchItems.length > 0) {
-        issues.push({
+    const mismatchItems = collectManifestMismatchItems(input);
+
+    if (mismatchItems.length === 0) {
+        return {
+            issues: [],
+            reportNode: undefined,
+        };
+    }
+
+    const issues: ValidationIssue[] = [
+        {
             ruleId: input.ruleId,
-            severity: "WARN" as const,
+            severity: "ERROR" as const,
             issueLabel: "Mismatch",
-            message: formatMismatchList(mismatchItems),
+            message: `[${mismatchItems.join(", ")}]`,
             pageKey,
             filePath: input.manifestFile,
-        });
-    }
+        },
+    ];
 
     return {
         issues,
         reportNode: buildManifestComparisonReportNode({
             pageKey,
             manifestFile: input.manifestFile,
-            missingItems,
+            missingItems: [],
             mismatchItems,
         }),
     };

@@ -14,7 +14,7 @@
     "elementsFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/login-or-registration/elements.ts",
     "aliasesGeneratedFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/login-or-registration/aliases.generated.ts",
     "aliasesFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/login-or-registration/aliases.ts",
-    "pageMapFile": "src/businessLayer/pageObjects/maps/athena.azonline.common.login-or-registration.json"
+    "pageMapFile": "src/businessLayer/pageScanner/athena/azonline/common/login-or-registration.json"
   },
   "pageMeta": {
     "urlPath": "/",

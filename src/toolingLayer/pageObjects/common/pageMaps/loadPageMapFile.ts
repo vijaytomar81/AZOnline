@@ -9,7 +9,7 @@ export function loadPageMapFile(
     mapsDir: string,
     file: string
 ): LoadedPageMapFile {
-    const loaded = loadAllPageMaps(mapsDir).find((m) => m.fileName === file);
+    const loaded = loadAllPageMaps(mapsDir).find((item) => item.fileName === file);
 
     if (!loaded) {
         throw new Error(`Page-map not found or invalid: ${file}`);

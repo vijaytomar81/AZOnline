@@ -14,7 +14,7 @@
     "elementsFile": "src/businessLayer/pageObjects/objects/athena/azonline/motor/ph-driving-licence-details/elements.ts",
     "aliasesGeneratedFile": "src/businessLayer/pageObjects/objects/athena/azonline/motor/ph-driving-licence-details/aliases.generated.ts",
     "aliasesFile": "src/businessLayer/pageObjects/objects/athena/azonline/motor/ph-driving-licence-details/aliases.ts",
-    "pageMapFile": "src/businessLayer/pageObjects/maps/athena.azonline.motor.ph-driving-licence-details.json"
+    "pageMapFile": "src/businessLayer/pageScanner/athena/azonline/motor/ph-driving-licence-details.json"
   },
   "pageMeta": {
     "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/drivingLicenceScan/69b442a3e1389c2e75667e1d",
