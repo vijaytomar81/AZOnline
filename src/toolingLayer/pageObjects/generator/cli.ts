@@ -8,9 +8,8 @@ import { usage } from "./elementGeneratorHelp";
 import {
     failure,
     printCommandTitle,
-    printSection,
-    printSectionBlock,
     success,
+    printEnvironment,
 } from "@utils/cliFormat";
 import { runElementsGenerator } from "./generator/runner";
 import {
@@ -57,33 +56,24 @@ function printGeneratorEnvironment(args: {
     logFilePath: string;
     verbose: boolean;
 }) {
-    printSection("Environment");
-
-    printSectionBlock("Paths", [
+    const rows: Array<[string, string | number | boolean]> = [
         ["mapsDir", args.mapsDir],
         ["pageObjectsDir", args.pageObjectsDir],
         ["pageRegistryDir", args.pageRegistryDir],
-    ]);
-
-    printSectionBlock("Mode", [
         ["merge", args.merge],
         ["changedOnly", args.changedOnly],
-    ]);
-
-    const loggingRows: Array<[string, string | number | boolean]> = [
         ["logToFile", args.logToFile],
         ["verbose", args.verbose],
     ];
 
     if (args.logToFile) {
-        loggingRows.push([
+        rows.push([
             "logFilePath",
             path.relative(process.cwd(), args.logFilePath),
         ]);
     }
 
-    printSectionBlock("Logging", loggingRows);
-    console.log("");
+    printEnvironment(rows);
 }
 
 async function main() {
