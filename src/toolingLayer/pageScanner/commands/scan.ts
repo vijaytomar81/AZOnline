@@ -34,8 +34,7 @@ function failedResult(pageKey: string, message: string): ScanPageResult {
 export async function runScanCommand(args: string[]) {
     const verbose = hasFlag(args, "--verbose");
     const logToFile = hasFlag(args, "--logToFile");
-    const logFilePath =
-        getArg(args, "--logFilePath") ?? PAGE_SCANNER_LOG_FILE;
+    const logFilePath = getArg(args, "--logFilePath") ?? PAGE_SCANNER_LOG_FILE;
 
     const log = createLogger({
         prefix: "[page-scanner]",

@@ -1,17 +1,13 @@
 // src/toolingLayer/pageScanner/scanner/runner.ts
 
-import path from "node:path";
-
+import { ensureDir, safeReadJson } from "@utils/fs";
 import {
     PAGE_SCAN_OPERATIONS,
     type PageScanOperation,
 } from "@configLayer/tooling/pageScanner";
-import { ensureDir, safeReadJson, safeWriteJson } from "@utils/fs";
 import {
     PAGE_SCANNER_DIR,
     PAGE_SCANNER_MANIFEST_DIR,
-    PAGE_SCANNER_MANIFEST_INDEX_FILE,
-    toRepoRelative,
 } from "@utils/paths";
 import { connectAndGetPage } from "./browser";
 import { extractDomElements } from "./domExtract";
@@ -19,73 +15,34 @@ import { parsePageKey } from "./pageKey/parsePageKey";
 import { buildPageMap } from "./pageMap/buildPageMap";
 import { diffPageMaps, type PageMapDiff } from "./pageMap/diffPageMaps";
 import { mergePageMaps } from "./pageMap/mergePageMaps";
+import {
+    buildManifestFilePath,
+    buildScannerFilePath,
+    saveManifestEntry,
+    writePageMapFile,
+} from "./persistence";
 import type { PageMap, ScanPageOptions } from "./types";
-import type { ScanPageResult, ScannerManifestIndex } from "./reporting/types";
+import type { ScanPageResult } from "./reporting/types";
 
 function emptyDiff(): PageMapDiff {
     return { added: [], updated: [], removed: [], unchanged: [] };
 }
 
-function buildScannerFilePath(rootDir: string, pageKey: string): string {
-    const scope = parsePageKey(pageKey);
-    return path.join(
-        rootDir,
-        scope.platform,
-        scope.application,
-        scope.product,
-        `${scope.name}.json`
-    );
-}
-
-function emptyManifest(): ScannerManifestIndex {
+function buildFailedResult(params: {
+    pageKey: string;
+    outFile: string;
+    message: string;
+    scope: ReturnType<typeof parsePageKey>;
+}): ScanPageResult {
     return {
-        version: 1,
-        generatedAt: new Date(0).toISOString(),
-        pages: {},
+        pageKey: params.pageKey,
+        operation: PAGE_SCAN_OPERATIONS.FAILED,
+        outFile: params.outFile,
+        elementsFound: 0,
+        diff: emptyDiff(),
+        errorMessage: params.message,
+        scope: params.scope,
     };
-}
-
-function loadManifestIndex(filePath: string): ScannerManifestIndex {
-    return safeReadJson<ScannerManifestIndex>(filePath) ?? emptyManifest();
-}
-
-function saveManifestIndexIfChanged(
-    filePath: string,
-    next: ScannerManifestIndex
-): void {
-    const current = loadManifestIndex(filePath);
-    const currentRaw = JSON.stringify(current);
-    const nextRaw = JSON.stringify(next);
-
-    if (currentRaw === nextRaw) {
-        return;
-    }
-
-    ensureDir(path.dirname(filePath));
-    safeWriteJson(filePath, next, true);
-}
-
-function saveManifestEntry(
-    manifestFile: string,
-    pageKey: string,
-    pageMapFile: string,
-    pageMap: PageMap
-): void {
-    const current = loadManifestIndex(manifestFile);
-    const nextPages = {
-        ...current.pages,
-        [pageKey]: {
-            file: toRepoRelative(pageMapFile),
-            elementCount: Object.keys(pageMap.elements).length,
-            scannedAt: pageMap.scannedAt,
-        },
-    };
-
-    saveManifestIndexIfChanged(manifestFile, {
-        version: 1,
-        generatedAt: new Date().toISOString(),
-        pages: nextPages,
-    });
 }
 
 function hasMapMetaChanges(existing: PageMap, incoming: PageMap): boolean {
@@ -124,14 +81,20 @@ function resolveOperation(
         : PAGE_SCAN_OPERATIONS.UNCHANGED;
 }
 
+function buildInitialDiff(pageMap: PageMap): PageMapDiff {
+    return {
+        added: Object.keys(pageMap.elements).sort(),
+        updated: [],
+        removed: [],
+        unchanged: [],
+    };
+}
+
 export async function scanPage(
     opts: ScanPageOptions
 ): Promise<ScanPageResult> {
     const rootDir = opts.outDir ?? PAGE_SCANNER_DIR;
-    const manifestFile = path.join(
-        rootDir,
-        path.relative(PAGE_SCANNER_DIR, PAGE_SCANNER_MANIFEST_INDEX_FILE)
-    );
+    const manifestFile = buildManifestFilePath(rootDir);
     const outFile = buildScannerFilePath(rootDir, opts.pageKey);
     const scope = parsePageKey(opts.pageKey);
 
@@ -141,32 +104,38 @@ export async function scanPage(
     const { page, detach, url } = await connectAndGetPage(opts);
 
     try {
-        const title = (await page.title().catch(() => "")) || undefined;
+        const rawTitle = await page.title().catch(() => "");
         const scanned = await extractDomElements(page);
 
         const pageMap = buildPageMap({
             pageKey: opts.pageKey,
             url,
-            title: title?.trim() || undefined,
+            title: rawTitle?.trim() || undefined,
             scanned,
             verbose: opts.verbose,
             onDebug: opts.verbose ? (message) => opts.log.debug(message) : undefined,
         });
 
+        const elementsFound = Object.keys(pageMap.elements).length;
+        if (elementsFound === 0) {
+            const message = `No interactive elements found on page: ${opts.pageKey}`;
+            opts.log.error(message);
+
+            return buildFailedResult({
+                pageKey: opts.pageKey,
+                outFile,
+                message,
+                scope,
+            });
+        }
+
         const existing = safeReadJson<PageMap>(outFile);
         const merged = existing ? mergePageMaps(existing, pageMap) : pageMap;
-        const diff = existing ? diffPageMaps(existing, merged) : {
-            added: Object.keys(pageMap.elements).sort(),
-            updated: [],
-            removed: [],
-            unchanged: [],
-        };
-
+        const diff = existing ? diffPageMaps(existing, merged) : buildInitialDiff(pageMap);
         const operation = resolveOperation(existing, merged, diff);
 
         if (operation !== PAGE_SCAN_OPERATIONS.UNCHANGED) {
-            ensureDir(path.dirname(outFile));
-            safeWriteJson(outFile, merged, true);
+            writePageMapFile(outFile, merged);
             opts.log.info(
                 `Page map ${existing ? "written (merged)" : "written"}: ${outFile}`
             );
@@ -174,14 +143,19 @@ export async function scanPage(
             opts.log.info(`No changes detected for page map: ${outFile}`);
         }
 
-        saveManifestEntry(manifestFile, opts.pageKey, outFile, merged);
+        saveManifestEntry({
+            manifestFile,
+            pageKey: opts.pageKey,
+            pageMapFile: outFile,
+            pageMap: merged,
+        });
 
         return {
             pageKey: opts.pageKey,
             scope,
             operation,
             outFile,
-            elementsFound: Object.keys(merged.elements).length,
+            elementsFound,
             diff,
         };
     } finally {

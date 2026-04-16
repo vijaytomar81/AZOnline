@@ -23,6 +23,7 @@ function failureNode(title: string, summary: string): TreeNode {
 
 function buildScopeSummary(result: ScanPageResult): string {
     const scope = result.scope;
+
     if (!scope) {
         return "scope unavailable";
     }
@@ -43,14 +44,14 @@ export function buildScanReportTree(result: ScanPageResult): TreeNode[] {
                 title: result.pageKey,
                 summary: `(operation=failed)`,
                 children: [
+                    failureNode("scope", buildScopeSummary(result)),
                     failureNode("scan", result.errorMessage ?? "Unknown scanner error"),
                 ],
             },
         ];
     }
 
-    const fileState =
-        result.operation === "unchanged" ? "unchanged" : "written";
+    const fileState = result.operation === "unchanged" ? "unchanged" : "written";
 
     return [
         {
@@ -60,10 +61,7 @@ export function buildScanReportTree(result: ScanPageResult): TreeNode[] {
             children: [
                 successNode("scope", buildScopeSummary(result)),
                 successNode("page-map", `elements=${result.elementsFound}`),
-                successNode(
-                    "file",
-                    `${fileState} (${toRepoRelative(result.outFile)})`
-                ),
+                successNode("file", `${fileState} (${toRepoRelative(result.outFile)})`),
                 successNode(
                     "diff",
                     `added=${result.diff.added.length}, updated=${result.diff.updated.length}, removed=${result.diff.removed.length}, unchanged=${result.diff.unchanged.length}`

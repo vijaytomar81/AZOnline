@@ -1,9 +1,9 @@
 // src/toolingLayer/pageScanner/scanner/reporting/types.ts
 
+import type { PageScanOperation } from "@configLayer/tooling/pageScanner";
 import type { TreeNode } from "@utils/cliTree";
 import type { PageKeyParts } from "../pageKey/types";
 import type { PageMapDiff } from "../pageMap/diffPageMaps";
-import type { PageScanOperation } from "@configLayer/tooling/pageScanner";
 
 export type ScannerManifestIndex = {
     version: 1;
