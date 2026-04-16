@@ -40,8 +40,13 @@ To kill browser:
 lsof -ti :9222 | xargs kill -9
 
 ------------------
+Windows:
 
-npm run scan:page:verbose `-- --connectCdp="$CDP" --pageKey="athena.motor.car-details"
+npm run scan:page:verbose `-- --connectCdp="$CDP" --pageKey="athena.azonline.motor.car-details"
+
+Mac:
+
+npm run scan:page:verbose -- --connectCdp="$CDP" --pageKey="athena.azonline.motor.car-details"
 
 ==============
 

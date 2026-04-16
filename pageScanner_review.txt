@@ -1,531 +1,234 @@
-==================== src/toolingLayer/pageScanner/README.md ====================
-<!-- src/tools/page-scanner/README.md -->
-
-# Page Scanner
-
----
-
-# 1. Overview
-
-The **Page Scanner** is responsible for discovering and extracting page structure from a running web application.
-
-It uses **Playwright and DOM analysis** to automatically identify page elements and produce structured **page-map JSON files** used by the automation framework.
-
-The scanner converts **live page DOM information into structured metadata** that later tools use to generate automation code.
-
-Output from the scanner becomes the **foundation of the page-object generation pipeline**.
-
----
-
-# 2. Purpose
-
-The Page Scanner automates the discovery of page elements and produces structured metadata describing the page.
-
-Its primary goals are:
-
-- automatically discover page elements
-- generate stable automation metadata
-- reduce manual locator creation
-- enforce consistent element naming
-- support scalable page automation
-
-Instead of manually defining page metadata, developers can **scan the page and generate the page-map automatically**.
-
----
-
-# 3. Toolchain Context
-
-Within the automation architecture, the scanner acts as the **metadata discovery layer**.
-
-```
-Browser (running session)
-      ↓
-Page Scanner
-      ↓
-Page Map JSON
-      ↓
-Page Object Generator
-```
-
-The scanner **does not generate automation code directly**.  
-It produces **page-map metadata**, which the generator converts into automation artifacts.
-
----
-
-# 4. Inputs
-
-The scanner requires:
-
-### Browser Session (CDP)
-
-The scanner connects to an already running browser using **Chrome DevTools Protocol (CDP)**.
-
-This allows scanning pages that:
-
-- require login
-- require manual navigation
-- are part of complex flows
-- already exist in a running browser session
-
-### Target Page
-
-The browser must already have the target page open.
-
-Example:
-
-```
-https://example.com/login
-```
-
-### Page Key
-
-Each scan requires a **pageKey** identifying the page.
-
-Example:
-
-```
-athena.common.login-or-registration
-```
-
-### Optional Existing Page Map
-
-Existing page maps can be merged with newly scanned data.
-
-Location:
-
-```
-src/pages/maps
-```
-
----
-
-# 5. Outputs
-
-The scanner generates **page-map JSON files**.
-
-Location:
-
-```
-src/pages/maps
-```
-
-Example output file:
-
-```
-src/pages/maps/athena.common.login-or-registration.json
-```
-
-Example page map structure:
-
-```json
-{
-  "pageKey": "athena.common.login-or-registration",
-  "url": "https://example.com/login",
-  "urlPath": "/login",
-  "title": "Login page",
-  "scannedAt": "2026-03-09T12:48:41.552Z",
-  "elements": {
-    "loginButton": {
-      "type": "button",
-      "preferred": "css=#login",
-      "fallbacks": [
-        "role=button[name=/login/i]"
-      ]
-    }
-  }
-}
-```
-
-These page maps are later consumed by the **page-object-generator**.
-
----
-
-# 6. Browser Connection (CDP Mode)
-
-The scanner connects to a browser using the **Chrome DevTools Protocol (CDP)**.
-
-This allows scanning pages that:
-
-- require authentication
-- require manual navigation
-- are part of complex flows
-- exist inside an already running browser session
-
-Instead of launching a new browser, the scanner attaches to an existing one.
-
----
-
-## Start Browser in CDP Mode
-
-Example using Microsoft Edge:
-
-```powershell
-$profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
-Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "--remote-debugging-port=9222 --user-data-dir=$profile"
-Start-Sleep -Seconds 2
-$CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerUrl
-```
-
----
-
-## Run Scanner
-
-```
-npm run scan:page:verbose -- --connectCdp="$CDP" --pageKey="athena.motor.car-details"
-```
-
-Parameters:
-
-| Parameter | Description |
-|--------|-------------|
-| `--connectCdp` | WebSocket URL used to connect to the running browser |
-| `--pageKey` | Page identifier used to generate the page-map |
-
----
-
-## Close Browser Session
-
-After scanning is complete, you can terminate the browser session:
-
-```
-taskkill /IM msedge.exe /F
-```
-
-This ensures the temporary CDP browser instance is fully closed.
-
----
-
-# 7. Scanning Pipeline
-
-The scanner follows a multi-stage pipeline to extract page metadata.
-
-```mermaid
-flowchart TD
-
-    A[Browser Running in CDP Mode] --> B[Open Target Page]
-    B --> C[Page Scanner]
-
-    C --> D[Extract DOM Elements]
-    D --> E[Classify Elements]
-    E --> F[Generate Stable Element Keys]
-    F --> G[Build Selectors]
-    G --> H[Build Page Map]
-    H --> I[Write Page Map JSON]
-```
-
-Each stage transforms raw DOM information into structured automation metadata.
-
----
-
-# 8. DOM Extraction
-
-DOM extraction collects interactive elements from the page.
-
-The scanner focuses on elements such as:
-
-- buttons
-- inputs
-- links
-- selects
-- checkboxes
-- radio buttons
-- textareas
-
-Extraction is implemented in:
-
-```
-scanner/domExtract.ts
-scanner/domExtractors/
-```
-
-DOM extraction runs inside the browser through Playwright.
-
----
-
-# 9. Element Classification
-
-After extraction, elements are classified into automation types.
-
-Examples:
-
-| HTML Element | Classified Type |
-|--------------|----------------|
-| button | button |
-| input[type=text] | textbox |
-| select | dropdown |
-| a | link |
-
-Classification logic is implemented in:
-
-```
-scanner/pageMap/classifyElementType.ts
-```
-
----
-
-# 10. Element Key Generation
-
-Each discovered element is assigned a **stable automation key**.
-
-Example:
-
-```
-loginButton
-submitFormButton
-emailTextbox
-```
-
-Key generation logic is located in:
-
-```
-scanner/keyNaming
-```
-
-Strategies include:
-
-- semantic naming
-- heuristic rules
-- normalization rules
-- DOM attribute analysis
-
-This ensures readable and stable element identifiers.
-
----
-
-# 11. Selector Generation
-
-Selectors are generated using multiple strategies.
-
-Location:
-
-```
-scanner/selectors
-```
-
-Selector strategies include:
-
-### CSS Strategy
-
-```
-css=#login
-```
-
-### Role Strategy
-
-```
-role=button[name=/login/i]
-```
-
-### Text Strategy
-
-```
-text=Login
-```
-
-Selectors are grouped into:
-
-```
-preferred
-fallbacks
-```
-
-This improves locator robustness.
-
----
-
-# 12. Page Map Builder
-
-The page map builder constructs the final page metadata object.
-
-Location:
-
-```
-scanner/pageMap/buildPageMap.ts
-```
-
-Responsibilities:
-
-- assembling page metadata
-- grouping elements
-- assigning selectors
-- attaching element types
-- generating element keys
-
-The builder outputs the final **page-map JSON structure**.
-
----
-
-# 13. Page Map Merge
-
-If a page map already exists, the scanner can merge updates.
-
-Location:
-
-```
-scanner/pageMap/mergePageMaps.ts
-```
-
-Merge behavior:
-
-- preserve existing element keys
-- update selectors if necessary
-- add newly discovered elements
-- retain manually edited metadata
-
-This ensures scanning does not overwrite manual improvements.
-
----
-
-# 14. Scanner Commands
-
-Available commands:
-
-```
-npm run scan:page
-npm run scan:page:verbose
-npm run scan:page:merge
-npm run scan:page:merge:verbose
-npm run scan:help
-```
-
----
-
-# 15. Scan Modes
-
-## Standard Scan
-
-```
-npm run scan:page
-```
-
-Scans a page and produces a new page map.
-
----
-
-## Merge Scan
-
-```
-npm run scan:page:merge
-```
-
-Updates an existing page map while preserving manual changes.
-
----
-
-# 16. Shared Utilities
-
-The scanner uses shared utilities from:
-
-```
-src/utils
-```
-
-These utilities provide:
-
-- CLI formatting
-- logging
-- argument parsing
-- filesystem helpers
-
-Scanner-specific types are located in:
-
-```
-scanner/types.ts
-```
-
----
-
-# 17. Example End-to-End Flow
-
-```mermaid
-flowchart LR
-
-    A[Start Browser in CDP Mode] --> B[Open Target Page]
-
-    B --> C[Page Scanner]
-
-    C --> D[Extract DOM Elements]
-    D --> E[Classify Elements]
-    E --> F[Generate Element Keys]
-    F --> G[Generate Selectors]
-    G --> H[Build Page Map]
-
-    subgraph Output
-        I[src/pages/maps/*.json]
-    end
-
-    H --> I
-
-    subgraph Shared Utilities
-        U1[src/utils]
-    end
-
-    U1 --> C
-```
-
-The scanner converts a live web page into structured **page-map metadata** that drives the rest of the automation framework.
-==================== src/toolingLayer/pageScanner/cli.ts ====================
-// src/toolingLayer/pageScanner/cli.ts
-
-import { PAGE_SCANNER_COMMANDS, type PageScannerCommand } from "@configLayer/tooling/pageScanner";
-import { createLogger } from "@utils/logger";
-import { runScanCommand } from "./commands/scan";
-import { normalizeArgv } from "@utils/argv";
-import { usage } from "./scannerHelp";
-import { printCommandTitle } from "@utils/cliFormat";
-
-function isCommand(x: string | undefined): x is PageScannerCommand {
-    return x === PAGE_SCANNER_COMMANDS.SCAN || x === PAGE_SCANNER_COMMANDS.HELP;
+==================== src/toolingLayer/pageScanner/scanner/runner.ts ====================
+// src/toolingLayer/pageScanner/scanner/runner.ts
+
+import path from "node:path";
+
+import {
+    PAGE_SCAN_OPERATIONS,
+    type PageScanOperation,
+} from "@configLayer/tooling/pageScanner";
+import { ensureDir, safeReadJson, safeWriteJson } from "@utils/fs";
+import {
+    PAGE_SCANNER_DIR,
+    PAGE_SCANNER_MANIFEST_DIR,
+    PAGE_SCANNER_MANIFEST_INDEX_FILE,
+    toRepoRelative,
+} from "@utils/paths";
+import { connectAndGetPage } from "./browser";
+import { extractDomElements } from "./domExtract";
+import { parsePageKey } from "./pageKey/parsePageKey";
+import { buildPageMap } from "./pageMap/buildPageMap";
+import { diffPageMaps, type PageMapDiff } from "./pageMap/diffPageMaps";
+import { mergePageMaps } from "./pageMap/mergePageMaps";
+import type { PageMap, ScanPageOptions } from "./types";
+import type { ScanPageResult, ScannerManifestIndex } from "./reporting/types";
+
+function emptyDiff(): PageMapDiff {
+    return { added: [], updated: [], removed: [], unchanged: [] };
 }
 
-const rootLog = createLogger({
-    prefix: "[page-scanner]",
-    withTimestamp: true,
-});
+function buildScannerFilePath(rootDir: string, pageKey: string): string {
+    const scope = parsePageKey(pageKey);
+    return path.join(
+        rootDir,
+        scope.platform,
+        scope.application,
+        scope.product,
+        `${scope.name}.json`
+    );
+}
 
-async function main() {
-    printCommandTitle("PAGE SCANNER", "pageScannerIcon");
-    const argv = normalizeArgv(process.argv.slice(2));
-    const cmd = argv[0];
+function emptyManifest(): ScannerManifestIndex {
+    return {
+        version: 1,
+        generatedAt: new Date(0).toISOString(),
+        pages: {},
+    };
+}
 
-    if (!isCommand(cmd)) {
-        rootLog.error(`Unknown or missing command: ${cmd ?? "(none)"}`);
-        rootLog.info(usage());
-        process.exit(1);
+function loadManifestIndex(filePath: string): ScannerManifestIndex {
+    return safeReadJson<ScannerManifestIndex>(filePath) ?? emptyManifest();
+}
+
+function saveManifestIndexIfChanged(
+    filePath: string,
+    next: ScannerManifestIndex
+): void {
+    const current = loadManifestIndex(filePath);
+    const currentRaw = JSON.stringify(current);
+    const nextRaw = JSON.stringify(next);
+
+    if (currentRaw === nextRaw) {
+        return;
     }
 
-    const args = argv.slice(1);
+    ensureDir(path.dirname(filePath));
+    safeWriteJson(filePath, next, true);
+}
 
-    switch (cmd) {
-        case PAGE_SCANNER_COMMANDS.HELP:
-            rootLog.info(usage());
-            return;
+function saveManifestEntry(
+    manifestFile: string,
+    pageKey: string,
+    pageMapFile: string,
+    pageMap: PageMap
+): void {
+    const current = loadManifestIndex(manifestFile);
+    const nextPages = {
+        ...current.pages,
+        [pageKey]: {
+            file: toRepoRelative(pageMapFile),
+            elementCount: Object.keys(pageMap.elements).length,
+            scannedAt: pageMap.scannedAt,
+        },
+    };
 
-        case PAGE_SCANNER_COMMANDS.SCAN:
-            await runScanCommand(args);
-            return;
+    saveManifestIndexIfChanged(manifestFile, {
+        version: 1,
+        generatedAt: new Date().toISOString(),
+        pages: nextPages,
+    });
+}
+
+function hasMapMetaChanges(existing: PageMap, incoming: PageMap): boolean {
+    return JSON.stringify({
+        pageKey: existing.pageKey,
+        url: existing.url,
+        urlPath: existing.urlPath,
+        title: existing.title,
+        readiness: existing.readiness,
+    }) !== JSON.stringify({
+        pageKey: incoming.pageKey,
+        url: incoming.url,
+        urlPath: incoming.urlPath,
+        title: incoming.title,
+        readiness: incoming.readiness,
+    });
+}
+
+function resolveOperation(
+    existing: PageMap | null,
+    merged: PageMap,
+    diff: PageMapDiff
+): PageScanOperation {
+    if (!existing) {
+        return PAGE_SCAN_OPERATIONS.CREATED;
+    }
+
+    const changed =
+        diff.added.length > 0 ||
+        diff.updated.length > 0 ||
+        diff.removed.length > 0 ||
+        hasMapMetaChanges(existing, merged);
+
+    return changed
+        ? PAGE_SCAN_OPERATIONS.MERGED
+        : PAGE_SCAN_OPERATIONS.UNCHANGED;
+}
+
+export async function scanPage(
+    opts: ScanPageOptions
+): Promise<ScanPageResult> {
+    const rootDir = opts.outDir ?? PAGE_SCANNER_DIR;
+    const manifestFile = path.join(
+        rootDir,
+        path.relative(PAGE_SCANNER_DIR, PAGE_SCANNER_MANIFEST_INDEX_FILE)
+    );
+    const outFile = buildScannerFilePath(rootDir, opts.pageKey);
+    const scope = parsePageKey(opts.pageKey);
+
+    ensureDir(rootDir);
+    ensureDir(PAGE_SCANNER_MANIFEST_DIR);
+
+    const { page, detach, url } = await connectAndGetPage(opts);
+
+    try {
+        const title = (await page.title().catch(() => "")) || undefined;
+        const scanned = await extractDomElements(page);
+
+        const pageMap = buildPageMap({
+            pageKey: opts.pageKey,
+            url,
+            title: title?.trim() || undefined,
+            scanned,
+            verbose: opts.verbose,
+            onDebug: opts.verbose ? (message) => opts.log.debug(message) : undefined,
+        });
+
+        const existing = safeReadJson<PageMap>(outFile);
+        const merged = existing ? mergePageMaps(existing, pageMap) : pageMap;
+        const diff = existing ? diffPageMaps(existing, merged) : {
+            added: Object.keys(pageMap.elements).sort(),
+            updated: [],
+            removed: [],
+            unchanged: [],
+        };
+
+        const operation = resolveOperation(existing, merged, diff);
+
+        if (operation !== PAGE_SCAN_OPERATIONS.UNCHANGED) {
+            ensureDir(path.dirname(outFile));
+            safeWriteJson(outFile, merged, true);
+            opts.log.info(
+                `Page map ${existing ? "written (merged)" : "written"}: ${outFile}`
+            );
+        } else {
+            opts.log.info(`No changes detected for page map: ${outFile}`);
+        }
+
+        saveManifestEntry(manifestFile, opts.pageKey, outFile, merged);
+
+        return {
+            pageKey: opts.pageKey,
+            scope,
+            operation,
+            outFile,
+            elementsFound: Object.keys(merged.elements).length,
+            diff,
+        };
+    } finally {
+        await detach();
     }
 }
 
-main().catch((e) => {
-    rootLog.error(e?.message || String(e));
-    process.exit(1);
-});
 ==================== src/toolingLayer/pageScanner/commands/scan.ts ====================
 // src/toolingLayer/pageScanner/commands/scan.ts
 
-import { createLogger } from "@utils/logger";
-import { scanPage } from "../scanner/runner";
 import { getArg, hasFlag, required } from "@utils/argv";
+import {
+    printEnvironment,
+    printSection,
+    printSummary,
+} from "@utils/cliFormat";
+import { printTree } from "@utils/cliTree";
+import { createLogger } from "@utils/logger";
+import {
+    PAGE_SCANNER_DIR,
+    PAGE_SCANNER_LOG_FILE,
+} from "@utils/paths";
+import { parsePageKey } from "../scanner/pageKey/parsePageKey";
+import { buildScanReportTree } from "../scanner/reporting/buildScanReportTree";
+import { buildScanResultText } from "../scanner/reporting/buildScanResultText";
+import { buildScanSummaryRows } from "../scanner/reporting/buildScanSummaryRows";
+import type { ScanPageResult } from "../scanner/reporting/types";
+import { scanPage } from "../scanner/runner";
 import { usage } from "../scannerHelp";
-import { PAGE_MAPS_DIR, PAGE_SCANNER_LOG_FILE } from "@utils/paths";
+
+function failedResult(pageKey: string, message: string): ScanPageResult {
+    return {
+        pageKey,
+        operation: "failed",
+        outFile: "",
+        elementsFound: 0,
+        diff: { added: [], updated: [], removed: [], unchanged: [] },
+        errorMessage: message,
+    };
+}
 
 export async function runScanCommand(args: string[]) {
     const verbose = hasFlag(args, "--verbose");
-
     const logToFile = hasFlag(args, "--logToFile");
     const logFilePath =
-        getArg(args, "--logFilePath") ?? PAGE_SCANNER_LOG_FILE
+        getArg(args, "--logFilePath") ?? PAGE_SCANNER_LOG_FILE;
 
     const log = createLogger({
         prefix: "[page-scanner]",
@@ -542,129 +245,59 @@ export async function runScanCommand(args: string[]) {
 
     const connectCdp = required("--connectCdp", getArg(args, "--connectCdp"));
     const pageKey = required("--pageKey", getArg(args, "--pageKey"));
-
-    const outDir =
-        getArg(args, "--outDir") ?? PAGE_MAPS_DIR
-
+    const outDir = getArg(args, "--outDir") ?? PAGE_SCANNER_DIR;
     const tabIndexRaw = getArg(args, "--tabIndex");
     const tabIndex = tabIndexRaw ? Number(tabIndexRaw) : 0;
+
     if (!Number.isFinite(tabIndex) || tabIndex < 0) {
         throw new Error(`Invalid --tabIndex '${tabIndexRaw}'. Must be 0 or greater.`);
     }
 
-    const merge = hasFlag(args, "--merge");
-
-    if (verbose) {
-        log.debug(
-            `Args: pageKey=${pageKey} outDir=${outDir} merge=${merge} tabIndex=${tabIndex} connectCdp=${connectCdp}`
-        );
-    }
+    printEnvironment([
+        ["connectCdp", connectCdp],
+        ["outDir", outDir],
+        ["tabIndex", tabIndex],
+        ["logToFile", logToFile],
+        ["verbose", verbose],
+    ]);
 
     log.info("Command: scan");
 
-    await scanPage({
-        connectCdp,
-        pageKey,
-        outDir,
-        merge,
-        tabIndex,
-        verbose,
-        log: log.child("runner"),
-    });
+    let result: ScanPageResult;
+
+    try {
+        parsePageKey(pageKey);
+
+        result = await scanPage({
+            connectCdp,
+            pageKey,
+            outDir,
+            tabIndex,
+            verbose,
+            log: log.child("runner"),
+        });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        log.error(message);
+        result = failedResult(pageKey, message);
+    }
+
+    printSection("Scan result");
+    printTree(buildScanReportTree(result));
+
+    printSummary(
+        "SCAN SUMMARY",
+        buildScanSummaryRows(result).map((row) => [row.label, row.value]),
+        buildScanResultText(result)
+    );
+
+    if (result.operation === "failed") {
+        process.exit(1);
+    }
 
     log.info("Done ✅");
 }
-==================== src/toolingLayer/pageScanner/scanner/runner.ts ====================
-// src/toolingLayer/pageScanner/scanner/runner.ts
 
-import fs from "node:fs";
-import path from "node:path";
-
-import { ensureDir, safeReadJson } from "@utils/fs";
-import { PAGE_MAPS_DIR } from "@utils/paths";
-import type { PageMap, ScanPageOptions } from "./types";
-import { connectAndGetPage } from "./browser";
-import { extractDomElements } from "./domExtract";
-import { buildPageMap } from "./pageMap/buildPageMap";
-import { mergePageMaps } from "./pageMap/mergePageMaps";
-import { diffPageMaps } from "./pageMap/diffPageMaps";
-
-export async function scanPage(opts: ScanPageOptions): Promise<void> {
-    const log = opts.log;
-
-    const outDir = opts.outDir ?? PAGE_MAPS_DIR;
-    ensureDir(outDir);
-
-    const outFile = path.join(outDir, `${opts.pageKey}.json`);
-
-    log.info(`Connecting to browser: ${opts.connectCdp}`);
-
-    const { page, detach, url } = await connectAndGetPage(opts);
-
-    try {
-        let title: string | undefined;
-        try {
-            const t = await page.title();
-            title = t?.trim() ? t.trim() : undefined;
-        } catch {
-            title = undefined;
-        }
-
-        log.info(`Scanning tab[${opts.tabIndex ?? 0}]: ${url}${title ? ` (title: ${title})` : ""}`);
-
-        const scanned = await extractDomElements(page);
-
-        const pageMap = buildPageMap({
-            pageKey: opts.pageKey,
-            url,
-            title,
-            scanned,
-            verbose: opts.verbose,
-            onDebug: opts.verbose ? (message) => log.debug(message) : undefined,
-        });
-
-        log.info(`Scanned entries found: ${Object.keys(pageMap.elements).length}`);
-
-        if (opts.merge) {
-            log.info(`Merging into existing mapper (if any): ${outFile}`);
-
-            const existing = safeReadJson<PageMap>(outFile);
-
-            if (!existing) {
-                fs.writeFileSync(outFile, JSON.stringify(pageMap, null, 2), "utf8");
-                log.info(`Mapper written (new file): ${outFile}`);
-                return;
-            }
-
-            const merged = mergePageMaps(existing, pageMap);
-            const diff = diffPageMaps(existing, merged);
-
-            fs.writeFileSync(outFile, JSON.stringify(merged, null, 2), "utf8");
-            log.info(`Mapper written (merged): ${outFile}`);
-
-            log.info(
-                `Page diff summary: added=${diff.added.length}, updated=${diff.updated.length}, removed=${diff.removed.length}, unchanged=${diff.unchanged.length}`
-            );
-
-            if (opts.verbose) {
-                if (diff.added.length) {
-                    log.debug(`Added: ${diff.added.join(", ")}`);
-                }
-                if (diff.updated.length) {
-                    log.debug(`Updated: ${diff.updated.join(", ")}`);
-                }
-                if (diff.removed.length) {
-                    log.debug(`Removed: ${diff.removed.join(", ")}`);
-                }
-            }
-        } else {
-            fs.writeFileSync(outFile, JSON.stringify(pageMap, null, 2), "utf8");
-            log.info(`Mapper written: ${outFile}`);
-        }
-    } finally {
-        await detach();
-    }
-}
 ==================== src/toolingLayer/pageScanner/scanner/types.ts ====================
 // src/toolingLayer/pageScanner/scanner/types.ts
 
@@ -679,7 +312,6 @@ export type ScanPageOptions = {
     connectCdp: string;
     pageKey: string;
     outDir?: string;
-    merge?: boolean;
     tabIndex?: number;
     verbose?: boolean;
     log: Logger;
@@ -696,28 +328,23 @@ export type ScannedElement = {
     tag: string;
     role: string | null;
     id: string | null;
-
     name: string | null;
     text: string | null;
     href: string | null;
-
     dataTestId: string | null;
     dataTest: string | null;
     dataQa: string | null;
-
     labelText?: string | null;
     ariaLabel?: string | null;
     placeholder?: string | null;
     inputName?: string | null;
     typeAttr?: string | null;
     valueAttr?: string | null;
-
     ownerId?: string | null;
     ownerLabelText?: string | null;
     ownerAriaLabel?: string | null;
     ownerGroupLabelFor?: string | null;
     isFrameworkSearchInput?: boolean;
-
     candidates: SelectorCandidate[];
     best?: SelectorCandidate;
     key: string;
@@ -727,21 +354,17 @@ export type PageMapElementMeta = {
     tag: string;
     role?: string | null;
     id?: string | null;
-
     name?: string | null;
     text?: string | null;
-
     labelText?: string | null;
     ariaLabel?: string | null;
     placeholder?: string | null;
     inputName?: string | null;
     typeAttr?: string | null;
-
     href?: string | null;
     dataTestId?: string | null;
     dataTest?: string | null;
     dataQa?: string | null;
-
     ownerId?: string | null;
     ownerLabelText?: string | null;
     ownerAriaLabel?: string | null;
@@ -801,913 +424,81 @@ export type PageDiffSummary = {
     updated: PageDiffItem[];
     unchanged: PageDiffItem[];
 };
-==================== src/toolingLayer/pageScanner/scanner/pageMap/buildPageMap.ts ====================
-// src/toolingLayer/pageScanner/scanner/pageMap/buildPageMap.ts
 
-import { nowIso } from "@utils/time";
-import { uniq, uniqueKey } from "@utils/collections";
-import type {
-    PageMap,
-    PageMapElementEntry,
-    ScannedElement,
-    SelectorCandidate,
-} from "../types";
-import { buildSelectors } from "../selectors/buildSelectors";
-import { getSmartElementKey } from "../getSmartElementsKey";
-import { appendGroupedRadioCheckboxEntries } from "./groupControls";
-import { classifyElementType } from "./classifyElementType";
-import { buildStableElementKey } from "./buildStableElementKey";
-import { pickReadinessAliases } from "./pickReadinessAliases";
+==================== src/toolingLayer/pageScanner/scannerHelp.ts ====================
+// src/toolingLayer/pageScanner/scannerHelp.ts
 
-function toPageMapEntry(
-    el: ScannedElement,
-    best: SelectorCandidate,
-    fallbacks: string[],
-    type: string
-): PageMapElementEntry {
-    const entry: PageMapElementEntry = {
-        type,
-        preferred: best.selector,
-        fallbacks,
-        meta: {
-            tag: el.tag,
-            role: el.role,
-            id: el.id,
-            name: el.name,
-            text: el.text,
-            labelText: el.labelText ?? null,
-            ariaLabel: el.ariaLabel ?? null,
-            placeholder: el.placeholder ?? null,
-            inputName: el.inputName ?? null,
-            typeAttr: el.typeAttr ?? null,
-            href: el.href ?? null,
-            dataTestId: el.dataTestId ?? null,
-            dataTest: el.dataTest ?? null,
-            dataQa: el.dataQa ?? null,
-            ownerId: el.ownerId ?? null,
-            ownerLabelText: el.ownerLabelText ?? null,
-            ownerAriaLabel: el.ownerAriaLabel ?? null,
-            ownerGroupLabelFor: el.ownerGroupLabelFor ?? null,
-            isFrameworkSearchInput: el.isFrameworkSearchInput ?? null,
-        },
-    };
+export function usage(): string {
+    return `
+Page Scanner CLI
 
-    entry.stableKey = buildStableElementKey(entry);
-    return entry;
+Usage:
+  npm run scan -- --connectCdp <wsUrl> --pageKey <key> [options]
+  node -r ts-node/register src/toolingLayer/pageScanner/cli.ts scan [options]
+
+Commands:
+  scan       Scan a page via CDP and synchronize page-map JSON
+  help       Show this help
+
+------------------------------------------------------------
+scan
+
+Required:
+  --connectCdp <wsUrl>      CDP websocket URL
+                            Example:
+                              ws://localhost:9222/devtools/browser/<id>
+
+  --pageKey <key>           Page key format:
+                              <platform>.<application>.<product>.<name>
+                            Example:
+                              athena.azonline.motor.car-details
+
+Optional:
+  --outDir <path>           Scanner output root
+                            Default:
+                              src/businessLayer/pageScanner
+
+  --tabIndex <n>            Which browser tab to scan (0-based)
+                            Default:
+                              0
+
+  --verbose                 Extra logs
+
+  --logToFile               Write logs to file too
+
+  --logFilePath <path>      Log file path
+                            Default:
+                              page-scanner.log
+
+  --help, -h                Show scan help
+
+------------------------------------------------------------
+Behavior
+
+- If page-map file does not exist -> operation = created
+- If page-map file exists and content changes -> operation = merged
+- If page-map file exists and no meaningful change is found -> operation = unchanged
+- Invalid pageKey or runtime failure -> operation = failed
+
+------------------------------------------------------------
+Examples
+
+npm run scan -- --connectCdp "$CDP" --pageKey athena.azonline.motor.car-details
+npm run scan -- --connectCdp "$CDP" --pageKey athena.azonline.motor.car-details --tabIndex 1
+npm run scan -- --connectCdp "$CDP" --pageKey athena.azonline.motor.car-details --verbose
+npm run scan -- --connectCdp "$CDP" --pageKey athena.azonline.motor.car-details --logToFile --logFilePath ./page-scanner.log
+
+------------------------------------------------------------
+Output
+
+Page maps are written as:
+
+  src/businessLayer/pageScanner/<platform>/<application>/<product>/<name>.json
+
+Scanner manifest index is written as:
+
+  src/businessLayer/pageScanner/.manifest/index.json
+
+`.trim();
 }
 
-export function buildPageMap(params: {
-    pageKey: string;
-    url: string;
-    title?: string;
-    scanned: ScannedElement[];
-    verbose?: boolean;
-    onDebug?: (message: string) => void;
-}): PageMap {
-    const { pageKey, url, title, scanned, verbose, onDebug } = params;
-
-    const usedKeys = new Set<string>();
-    const perBaseCounter = new Map<string, number>();
-
-    const pageMap: PageMap = {
-        pageKey,
-        url,
-        urlPath: (() => {
-            try {
-                return new URL(url).pathname;
-            } catch {
-                return undefined;
-            }
-        })(),
-        scannedAt: nowIso(),
-        title,
-        elements: {},
-    };
-
-    const builtElements: Array<{
-        key: string;
-        type: string;
-        element: ScannedElement;
-        entry: PageMapElementEntry;
-    }> = [];
-
-    for (let idx = 0; idx < scanned.length; idx++) {
-        const el = scanned[idx];
-
-        const baseKey = getSmartElementKey(el, idx + 1);
-        const bump = (perBaseCounter.get(baseKey) ?? 0) + 1;
-        perBaseCounter.set(baseKey, bump);
-
-        const finalKey = uniqueKey(
-            bump === 1 ? baseKey : `${baseKey}${bump}`,
-            usedKeys
-        );
-
-        const cands = buildSelectors(el);
-        const best = cands[0];
-        if (!best) continue;
-
-        const fallbacks = uniq(cands.slice(1).map((c) => c.selector));
-        const type = classifyElementType(el);
-        const entry = toPageMapEntry(el, best, fallbacks, type);
-
-        pageMap.elements[finalKey] = entry;
-        builtElements.push({
-            key: finalKey,
-            type,
-            element: el,
-            entry,
-        });
-
-        if (verbose && onDebug) {
-            onDebug(
-                `KEY=${finalKey} stableKey=${entry.stableKey} type=${type} best=${best.selector} (${best.reason})`
-            );
-        }
-    }
-
-    appendGroupedRadioCheckboxEntries(pageMap, builtElements);
-
-    pageMap.readiness = {
-        recommendedAliases: pickReadinessAliases(pageMap),
-    };
-
-    if (verbose && onDebug) {
-        onDebug(
-            `READINESS=${pageMap.readiness.recommendedAliases.join(", ")}`
-        );
-    }
-
-    return pageMap;
-}
-
-==================== src/toolingLayer/pageScanner/scanner/pageMap/mergePageMaps.ts ====================
-// src/toolingLayer/pageScanner/scanner/pageMap/mergePageMaps.ts
-
-import type { PageMap, PageMapElementEntry, PageMapEntry, PageMapGroupEntry } from "../types";
-
-function isGroupEntry(entry: PageMapEntry): entry is PageMapGroupEntry {
-    return entry.type === "radio-group" || entry.type === "checkbox-group";
-}
-
-function isElementEntry(entry: PageMapEntry): entry is PageMapElementEntry {
-    return !isGroupEntry(entry);
-}
-
-function getStableKey(entry: PageMapEntry): string | undefined {
-    return "stableKey" in entry ? entry.stableKey : undefined;
-}
-
-function mergeElement(cur: PageMapElementEntry, next: PageMapElementEntry): PageMapElementEntry {
-    let preferred = cur.preferred;
-    let fallbacks = [...(cur.fallbacks ?? [])];
-
-    if (preferred !== next.preferred) {
-        fallbacks = Array.from(
-            new Set(
-                [preferred, ...fallbacks, ...(next.fallbacks ?? [])].filter(
-                    (x) => x && x !== next.preferred
-                )
-            )
-        );
-        preferred = next.preferred;
-    } else {
-        fallbacks = Array.from(
-            new Set([...(cur.fallbacks ?? []), ...(next.fallbacks ?? [])])
-        );
-    }
-
-    return {
-        ...cur,
-        ...next,
-        stableKey: cur.stableKey ?? next.stableKey,
-        preferred,
-        fallbacks,
-        meta: {
-            ...(cur.meta ?? {}),
-            ...(next.meta ?? {}),
-            tag: next.meta?.tag ?? cur.meta?.tag ?? "element",
-        },
-    };
-}
-
-function mergeGroupEntry(
-    cur: PageMapGroupEntry,
-    next: PageMapGroupEntry
-): PageMapGroupEntry {
-    return {
-        ...cur,
-        ...next,
-        stableKey: cur.stableKey ?? next.stableKey,
-        options: {
-            ...(cur.options ?? {}),
-            ...(next.options ?? {}),
-        },
-        meta: {
-            ...(cur.meta ?? {}),
-            ...(next.meta ?? {}),
-        },
-    };
-}
-
-export function mergePageMaps(existing: PageMap, incoming: PageMap): PageMap {
-    const out: PageMap = {
-        ...existing,
-        pageKey: existing.pageKey || incoming.pageKey,
-        url: incoming.url || existing.url,
-        urlPath: incoming.urlPath ?? existing.urlPath,
-        scannedAt: incoming.scannedAt,
-        title: incoming.title ?? existing.title,
-        elements: { ...existing.elements },
-    };
-
-    const existingKeyByStableKey = new Map<string, string>();
-
-    for (const [existingKey, existingEntry] of Object.entries(existing.elements)) {
-        const stableKey = getStableKey(existingEntry);
-        if (stableKey) {
-            existingKeyByStableKey.set(stableKey, existingKey);
-        }
-    }
-
-    for (const [incomingKey, incomingEntry] of Object.entries(incoming.elements)) {
-        const incomingStableKey = getStableKey(incomingEntry);
-
-        const matchedExistingKey =
-            out.elements[incomingKey]
-                ? incomingKey
-                : incomingStableKey
-                    ? existingKeyByStableKey.get(incomingStableKey)
-                    : undefined;
-
-        if (!matchedExistingKey) {
-            out.elements[incomingKey] = incomingEntry;
-
-            if (incomingStableKey) {
-                existingKeyByStableKey.set(incomingStableKey, incomingKey);
-            }
-            continue;
-        }
-
-        const currentEntry = out.elements[matchedExistingKey];
-
-        if (isElementEntry(currentEntry) && isElementEntry(incomingEntry)) {
-            out.elements[matchedExistingKey] = mergeElement(currentEntry, incomingEntry);
-            continue;
-        }
-
-        if (isGroupEntry(currentEntry) && isGroupEntry(incomingEntry)) {
-            out.elements[matchedExistingKey] = mergeGroupEntry(currentEntry, incomingEntry);
-            continue;
-        }
-
-        // Fallback: if entry kinds changed, prefer latest scan but keep manual key
-        out.elements[matchedExistingKey] = incomingEntry;
-    }
-
-    return out;
-}
-==================== src/toolingLayer/pageScanner/scanner/pageMap/diffPageMaps.ts ====================
-// src/toolingLayer/pageScanner/scanner/pageMap/diffPageMaps.ts
-
-import type { PageMap, PageMapEntry } from "../types";
-
-export type PageMapDiff = {
-    added: string[];
-    updated: string[];
-    removed: string[];
-    unchanged: string[];
-};
-
-function stableStringify(value: unknown): string {
-    if (value === null || value === undefined) return String(value);
-
-    if (Array.isArray(value)) {
-        return `[${value.map(stableStringify).join(",")}]`;
-    }
-
-    if (typeof value === "object") {
-        const obj = value as Record<string, unknown>;
-        const keys = Object.keys(obj).sort();
-        return `{${keys.map((k) => `${k}:${stableStringify(obj[k])}`).join(",")}}`;
-    }
-
-    return JSON.stringify(value);
-}
-
-function areEntriesEqual(a: PageMapEntry, b: PageMapEntry): boolean {
-    return stableStringify(a) === stableStringify(b);
-}
-
-export function diffPageMaps(before: PageMap, after: PageMap): PageMapDiff {
-    const beforeKeys = new Set(Object.keys(before.elements));
-    const afterKeys = new Set(Object.keys(after.elements));
-
-    const added: string[] = [];
-    const updated: string[] = [];
-    const removed: string[] = [];
-    const unchanged: string[] = [];
-
-    for (const key of afterKeys) {
-        if (!beforeKeys.has(key)) {
-            added.push(key);
-            continue;
-        }
-
-        const beforeEntry = before.elements[key];
-        const afterEntry = after.elements[key];
-
-        if (areEntriesEqual(beforeEntry, afterEntry)) {
-            unchanged.push(key);
-        } else {
-            updated.push(key);
-        }
-    }
-
-    for (const key of beforeKeys) {
-        if (!afterKeys.has(key)) {
-            removed.push(key);
-        }
-    }
-
-    added.sort();
-    updated.sort();
-    removed.sort();
-    unchanged.sort();
-
-    return {
-        added,
-        updated,
-        removed,
-        unchanged,
-    };
-}
-==================== src/toolingLayer/pageScanner/scanner/keyNaming/normalize.ts ====================
-// src/toolingLayer/pageScanner/scanner/keyNaming/normalize.ts
-
-export function clean(value?: string | null): string | undefined {
-    const v = value?.replace(/\s+/g, " ").trim();
-    return v ? v : undefined;
-}
-
-export function isReactSelectInput(id?: string | null): boolean {
-    return !!id && /^react-select-\d+-input$/i.test(id);
-}
-
-export function isWeakValue(value?: string | null): boolean {
-    const v = clean(value);
-    if (!v) return true;
-
-    if (/^\d+$/.test(v)) return true;
-    if (/^[^a-zA-Z0-9]+$/.test(v)) return true;
-    if (/^react-select-\d+-input$/i.test(v)) return true;
-    if (/^(root|app|main|container|wrapper|content|page|section|panel)$/i.test(v)) {
-        return true;
-    }
-
-    return false;
-}
-
-function isAllCapsToken(value: string): boolean {
-    return /^[A-Z0-9]+$/.test(value) && /[A-Z]/.test(value);
-}
-
-function isCamelOrPascalToken(value: string): boolean {
-    return /^[A-Za-z][A-Za-z0-9]*$/.test(value);
-}
-
-function normalizeAcronymToken(part: string, idx: number): string {
-    if (idx === 0) {
-        return part.toLowerCase();
-    }
-    return part;
-}
-
-function normalizeWordToken(part: string, idx: number): string {
-    const lower = part.toLowerCase();
-
-    if (idx === 0) {
-        return lower.charAt(0).toLowerCase() + lower.slice(1);
-    }
-
-    return lower.charAt(0).toUpperCase() + lower.slice(1);
-}
-
-function normalizeIdentifierToken(part: string, idx: number): string {
-    if (isAllCapsToken(part)) {
-        return normalizeAcronymToken(part, idx);
-    }
-
-    if (isCamelOrPascalToken(part)) {
-        if (idx === 0) {
-            return part.charAt(0).toLowerCase() + part.slice(1);
-        }
-        return part.charAt(0).toUpperCase() + part.slice(1);
-    }
-
-    return normalizeWordToken(part, idx);
-}
-
-export function toKeyPreservingIdentifiers(value?: string | null): string | undefined {
-    const v = clean(value);
-    if (!v) return undefined;
-
-    if (/^[A-Za-z][A-Za-z0-9]*$/.test(v)) {
-        return v.charAt(0).toLowerCase() + v.slice(1);
-    }
-
-    const parts = v
-        .replace(/^[^A-Za-z0-9]+/, "")
-        .split(/[^A-Za-z0-9]+/)
-        .filter(Boolean);
-
-    if (!parts.length) return undefined;
-
-    return parts.map((part, idx) => normalizeIdentifierToken(part, idx)).join("");
-}
-
-export function upperFirst(value?: string): string | undefined {
-    if (!value) return value;
-    return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-export function normalizeBusinessPhrase(value?: string | null): string | undefined {
-    const v = clean(value);
-    if (!v) return undefined;
-
-    return v
-        .replace(/\bT\s*&\s*C(?:'s|s)?\b/gi, "Terms And Conditions")
-        .replace(/\bT&Cs\b/gi, "Terms And Conditions")
-        .replace(/\bT&C\b/gi, "Terms And Conditions")
-        .replace(/\bFAQs\b/gi, "Frequently Asked Questions");
-}
-==================== src/toolingLayer/pageScanner/scanner/keyNaming/heuristics.ts ====================
-// src/toolingLayer/pageScanner/scanner/keyNaming/heuristics.ts
-
-import type { ScannedElement } from "../types";
-import {
-    clean,
-    isReactSelectInput,
-    isWeakValue,
-    toKeyPreservingIdentifiers,
-} from "./normalize";
-
-export function isClickable(el: ScannedElement): boolean {
-    const tag = (el.tag || "").toLowerCase();
-    const role = (el.role || "").toLowerCase();
-    return tag === "a" || tag === "button" || role === "link" || role === "button";
-}
-
-export function isSearchLikeField(el: ScannedElement): boolean {
-    const tag = (el.tag || "").toLowerCase();
-    const role = (el.role || "").toLowerCase();
-    const type = (el.typeAttr || "").toLowerCase();
-
-    return (
-        tag === "input" ||
-        tag === "textarea" ||
-        tag === "select" ||
-        role === "textbox" ||
-        role === "combobox" ||
-        type === "search"
-    );
-}
-
-export function shouldUseOwnerContext(el: ScannedElement): boolean {
-    return (
-        isReactSelectInput(el.id) ||
-        !!el.isFrameworkSearchInput ||
-        (isSearchLikeField(el) && !!el.ownerId && isWeakValue(el.id))
-    );
-}
-
-export function splitIdentifierWords(value?: string | null): string[] {
-    const v = clean(value);
-    if (!v) return [];
-
-    return v
-        .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
-        .split(/[\s_\-]+/)
-        .filter(Boolean);
-}
-
-export function wordCount(value?: string | null): number {
-    return splitIdentifierWords(value).length;
-}
-
-export function isVerboseImplementationId(value?: string | null): boolean {
-    const v = clean(value);
-    if (!v) return false;
-
-    return (
-        v.length >= 20 ||
-        /saved|subscription|journey|process|wizard|panel|section|container|content|capture/i.test(v) ||
-        wordCount(v) >= 4
-    );
-}
-
-export function pickBestElementBase(el: ScannedElement): string | undefined {
-    const candidates = [
-        clean(el.id),
-        clean(el.dataTestId),
-        clean(el.dataTest),
-        clean(el.dataQa),
-        clean(el.inputName),
-        clean(el.ariaLabel),
-        clean(el.labelText),
-        clean(el.placeholder),
-        clean(el.text),
-        clean(el.name),
-    ];
-
-    for (const c of candidates) {
-        if (!isWeakValue(c)) return toKeyPreservingIdentifiers(c);
-    }
-
-    return undefined;
-}
-
-export function pickBestOwnerBase(el: ScannedElement): string | undefined {
-    const candidates = [
-        clean(el.inputName),
-        clean(el.ownerGroupLabelFor),
-        clean(el.ownerLabelText),
-        clean(el.ownerAriaLabel),
-        clean(el.ownerId),
-        clean(el.labelText),
-        clean(el.ariaLabel),
-        clean(el.placeholder),
-        clean(el.name),
-        clean(el.id),
-    ];
-
-    for (const c of candidates) {
-        if (!isWeakValue(c)) return toKeyPreservingIdentifiers(c);
-    }
-
-    return undefined;
-}
-
-export function pickBestDisplayBase(el: ScannedElement): string | undefined {
-    const candidates = [
-        clean(el.text),
-        clean(el.ariaLabel),
-        clean(el.labelText),
-        clean(el.name),
-    ];
-
-    for (const c of candidates) {
-        if (!isWeakValue(c)) return toKeyPreservingIdentifiers(c);
-    }
-
-    return undefined;
-}
-==================== src/toolingLayer/pageScanner/scanner/keyNaming/semantic.ts ====================
-// src/toolingLayer/pageScanner/scanner/keyNaming/semantic.ts
-
-import type { ScannedElement } from "../types";
-import {
-    isClickable,
-    isVerboseImplementationId,
-    pickBestElementBase,
-} from "./heuristics";
-import { clean, normalizeBusinessPhrase, toKeyPreservingIdentifiers } from "./normalize";
-
-function buildDisplayCandidate(el: ScannedElement): string | undefined {
-    const textCandidate = normalizeBusinessPhrase(el.text);
-    const ariaCandidate = normalizeBusinessPhrase(el.ariaLabel);
-    const labelCandidate = normalizeBusinessPhrase(el.labelText);
-    const nameCandidate = normalizeBusinessPhrase(el.name);
-
-    const raw =
-        (!isWeakActionText(textCandidate) ? textCandidate : undefined) ||
-        (!isWeakActionText(ariaCandidate) ? ariaCandidate : undefined) ||
-        (!isWeakActionText(labelCandidate) ? labelCandidate : undefined) ||
-        (!isWeakActionText(nameCandidate) ? nameCandidate : undefined);
-
-    return toKeyPreservingIdentifiers(raw);
-}
-
-function isWeakActionText(value?: string | null): boolean {
-    const v = clean(value)?.toLowerCase();
-    if (!v) return true;
-
-    return [
-        "click here",
-        "here",
-        "select",
-        "choose",
-        "continue",
-        "next",
-        "previous",
-        "back",
-        "submit",
-        "open",
-        "close",
-        "ok",
-        "yes",
-        "no",
-        "learn more",
-        "read more",
-        "more",
-    ].includes(v);
-}
-
-function isTooGenericDisplayKey(value?: string): boolean {
-    if (!value) return true;
-
-    return /^(clickHere|here|select|choose|continue|next|previous|back|submit|open|close|ok|yes|no|learnMore|readMore|more)$/i.test(
-        value
-    );
-}
-
-function shouldPreferDisplayOverId(
-    el: ScannedElement,
-    displayKey?: string,
-    ownBase?: string
-): boolean {
-    if (!displayKey) return false;
-    if (!ownBase) return true;
-    if (!el.id) return true;
-
-    if (isVerboseImplementationId(el.id)) return true;
-    if (ownBase.length >= displayKey.length + 10) return true;
-
-    return false;
-}
-
-export function buildSemanticKey(el: ScannedElement): string | undefined {
-    if (!isClickable(el)) return undefined;
-
-    const displayKey = buildDisplayCandidate(el);
-    const ownBase = pickBestElementBase(el);
-
-    if (!displayKey && !ownBase) return undefined;
-
-    if (displayKey && !isTooGenericDisplayKey(displayKey)) {
-        if (shouldPreferDisplayOverId(el, displayKey, ownBase)) {
-            return displayKey;
-        }
-    }
-
-    return undefined;
-}
-==================== src/toolingLayer/pageScanner/scanner/keyNaming/strategies.ts ====================
-// src/toolingLayer/pageScanner/scanner/keyNaming/strategies.ts
-
-import type { ScannedElement } from "../types";
-import {
-    normalizeBusinessPhrase,
-    toKeyPreservingIdentifiers,
-    upperFirst,
-} from "./normalize";
-
-function normalizeKeyPart(value?: string | null): string | undefined {
-    const normalized = normalizeBusinessPhrase(value ?? undefined);
-    const key = toKeyPreservingIdentifiers(normalized);
-    return key || undefined;
-}
-
-function normalizeOptionKeyPart(value?: string | null): string | undefined {
-    const normalized = normalizeBusinessPhrase(value ?? undefined);
-    const key = toKeyPreservingIdentifiers(normalized);
-    if (!key) return undefined;
-
-    if (/^(yes|no|other)$/i.test(normalized ?? "")) {
-        return upperFirst(key);
-    }
-
-    if (/^UK\b/i.test(normalized ?? "")) {
-        return `UK${key.slice(2)}`;
-    }
-
-    if (/^EU\b/i.test(normalized ?? "")) {
-        return `EU${key.slice(2)}`;
-    }
-
-    if (/^ID\b/i.test(normalized ?? "")) {
-        return `ID${key.slice(2)}`;
-    }
-
-    return upperFirst(key);
-}
-
-function buildChoiceGroupBase(el: ScannedElement): string | undefined {
-    return (
-        normalizeKeyPart(el.inputName) ||
-        normalizeKeyPart(el.ownerLabelText) ||
-        normalizeKeyPart(el.ownerAriaLabel) ||
-        normalizeKeyPart(el.ownerId) ||
-        normalizeKeyPart(el.ownerGroupLabelFor)
-    );
-}
-
-function buildChoiceOptionBase(el: ScannedElement): string | undefined {
-    return (
-        normalizeOptionKeyPart(el.labelText) ||
-        normalizeOptionKeyPart(el.ariaLabel) ||
-        normalizeOptionKeyPart(el.text) ||
-        normalizeOptionKeyPart(el.name) ||
-        normalizeOptionKeyPart(el.id)
-    );
-}
-
-function joinWithoutDup(left?: string, right?: string): string | undefined {
-    if (!left && !right) return undefined;
-    if (!left) return right;
-    if (!right) return left;
-
-    const leftLower = left.toLowerCase();
-    const rightLower = right.toLowerCase();
-
-    if (rightLower.startsWith(leftLower)) return right;
-    if (leftLower.endsWith(rightLower)) return left;
-
-    return `${left}${right}`;
-}
-
-export function buildRadioCheckboxKey(el: ScannedElement): string | undefined {
-    const type = (el.typeAttr || "").toLowerCase();
-    if (type !== "radio" && type !== "checkbox") return undefined;
-
-    const groupBase = buildChoiceGroupBase(el);
-    const optionBase = buildChoiceOptionBase(el);
-
-    return joinWithoutDup(groupBase, optionBase);
-}
-
-export function buildFrameworkSearchKey(el: ScannedElement): string | undefined {
-    if (!el.isFrameworkSearchInput) return undefined;
-
-    return (
-        normalizeKeyPart(el.ownerLabelText) ||
-        normalizeKeyPart(el.ownerAriaLabel) ||
-        normalizeKeyPart(el.ownerId) ||
-        normalizeKeyPart(el.id) ||
-        normalizeKeyPart(el.name)
-    );
-}
-
-export function buildGenericKey(el: ScannedElement, indexHint: number): string {
-    return (
-        normalizeKeyPart(el.id) ||
-        normalizeKeyPart(el.name) ||
-        normalizeKeyPart(el.labelText) ||
-        normalizeKeyPart(el.ariaLabel) ||
-        normalizeKeyPart(el.placeholder) ||
-        normalizeKeyPart(el.text) ||
-        normalizeKeyPart(el.tag) ||
-        `Element${indexHint}`
-    );
-}
-==================== src/utils/paths/toolingLayer.ts ====================
-// src/utils/paths/toolingLayer.ts
-
-import path from "node:path";
-import { TOOLING_LAYER_DIR } from "./core";
-
-export const PAGE_SCANNER_DIR = path.join(TOOLING_LAYER_DIR, "pageScanner");
-
-export const PAGE_OBJECT_TOOLS_DIR = path.join(
-    TOOLING_LAYER_DIR,
-    "pageObjects"
-);
-export const PAGE_OBJECT_COMMON_DIR = path.join(
-    PAGE_OBJECT_TOOLS_DIR,
-    "common"
-);
-export const PAGE_OBJECT_GENERATOR_DIR = path.join(
-    PAGE_OBJECT_TOOLS_DIR,
-    "generator"
-);
-export const PAGE_OBJECT_VALIDATOR_DIR = path.join(
-    PAGE_OBJECT_TOOLS_DIR,
-    "validator"
-);
-export const PAGE_OBJECT_REPAIR_DIR = path.join(
-    PAGE_OBJECT_TOOLS_DIR,
-    "repair"
-);
-
-export const PAGE_ACTION_TOOLS_DIR = path.join(
-    TOOLING_LAYER_DIR,
-    "pageActions"
-);
-export const PAGE_ACTION_GENERATOR_DIR = path.join(
-    PAGE_ACTION_TOOLS_DIR,
-    "generator"
-);
-
-export const BUSINESS_JOURNEY_TOOLS_DIR = path.join(
-    TOOLING_LAYER_DIR,
-    "businessJourneys"
-);
-export const BUSINESS_JOURNEY_GENERATOR_DIR = path.join(
-    BUSINESS_JOURNEY_TOOLS_DIR,
-    "generator"
-);
-
-export const QUALITY_TOOLS_DIR = path.join(TOOLING_LAYER_DIR, "quality");
-export const FILE_HEADER_CHECKER_DIR = path.join(
-    QUALITY_TOOLS_DIR,
-    "fileHeaderChecker"
-);
-
-export const SHARED_TOOLS_DIR = path.join(TOOLING_LAYER_DIR, "shared");
-
-==================== src/utils/paths/businessLayer.ts ====================
-// src/utils/paths/businessLayer.ts
-
-import path from "node:path";
-import { BUSINESS_LAYER_DIR } from "./core";
-
-export const PAGE_OBJECTS_ROOT_DIR = path.join(
-    BUSINESS_LAYER_DIR,
-    "pageObjects"
-);
-export const PAGE_MAPS_DIR = path.join(PAGE_OBJECTS_ROOT_DIR, "maps");
-export const PAGE_OBJECTS_DIR = path.join(PAGE_OBJECTS_ROOT_DIR, "objects");
-export const PAGE_REGISTRY_DIR = PAGE_OBJECTS_ROOT_DIR;
-
-export const PAGE_MANIFEST_DIR = path.join(PAGE_OBJECTS_ROOT_DIR, ".manifest");
-export const PAGE_MANIFEST_INDEX_FILE = path.join(
-    PAGE_MANIFEST_DIR,
-    "index.json"
-);
-export const PAGE_MANIFEST_PAGES_DIR = path.join(
-    PAGE_MANIFEST_DIR,
-    "pages"
-);
-
-export const PAGE_ACTIONS_DIR = path.join(BUSINESS_LAYER_DIR, "pageActions");
-export const PAGE_ACTIONS_ACTIONS_DIR = path.join(
-    PAGE_ACTIONS_DIR,
-    "actions"
-);
-export const PAGE_ACTIONS_MANIFEST_DIR = path.join(
-    PAGE_ACTIONS_DIR,
-    ".manifest"
-);
-export const PAGE_ACTIONS_MANIFEST_INDEX_FILE = path.join(
-    PAGE_ACTIONS_MANIFEST_DIR,
-    "index.json"
-);
-export const PAGE_ACTIONS_MANIFEST_ACTIONS_DIR = path.join(
-    PAGE_ACTIONS_MANIFEST_DIR,
-    "actions"
-);
-export const PAGE_ACTIONS_JOURNEY_PAGES_CONFIG_FILE = path.join(
-    PAGE_ACTIONS_DIR,
-    "businessJourneyPages.config.ts"
-);
-
-export const BUSINESS_JOURNEYS_DIR = path.join(
-    BUSINESS_LAYER_DIR,
-    "businessJourneys"
-);
-
-==================== src/configLayer/tooling/pageScanner.ts ====================
-// src/configLayer/tooling/pageScanner.ts
-
-export const PAGE_SCANNER_COMMANDS = {
-    SCAN: "scan",
-    HELP: "help",
-} as const;
-
-export type PageScannerCommand =
-    typeof PAGE_SCANNER_COMMANDS[keyof typeof PAGE_SCANNER_COMMANDS];
-
-export const SELECTOR_KINDS = {
-    CSS: "css",
-    ROLE: "role",
-    TEXT: "text",
-} as const;
-
-export type SelectorKind =
-    typeof SELECTOR_KINDS[keyof typeof SELECTOR_KINDS];
-
-export const CONTROL_GROUP_TYPES = {
-    RADIO: "radio-group",
-    CHECKBOX: "checkbox-group",
-} as const;
-
-export type ControlGroupType =
-    typeof CONTROL_GROUP_TYPES[keyof typeof CONTROL_GROUP_TYPES];
-
-export const PAGE_DIFF_STATUSES = {
-    ADDED: "added",
-    REMOVED: "removed",
-    UPDATED: "updated",
-    UNCHANGED: "unchanged",
-} as const;
-
-export type PageDiffStatus =
-    typeof PAGE_DIFF_STATUSES[keyof typeof PAGE_DIFF_STATUSES];
-
-export const GROUP_KEY_PREFIXES = {
-    RADIO: "groupRadio",
-    CHECKBOX: "groupCheckbox",
-} as const;
-
-export type GroupKeyPrefix =
-    typeof GROUP_KEY_PREFIXES[keyof typeof GROUP_KEY_PREFIXES];
