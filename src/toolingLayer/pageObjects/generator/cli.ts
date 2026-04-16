@@ -5,7 +5,13 @@ import path from "node:path";
 import { createLogger } from "@utils/logger";
 import { normalizeArgv, hasFlag, getArg } from "@utils/argv";
 import { usage } from "./elementGeneratorHelp";
-import { printCommandTitle, printEnvironment, failure, success } from "@utils/cliFormat";
+import {
+    failure,
+    printCommandTitle,
+    printSection,
+    printSectionBlock,
+    success,
+} from "@utils/cliFormat";
 import { runElementsGenerator } from "./generator/runner";
 import {
     PAGE_MAPS_DIR,
@@ -15,7 +21,10 @@ import {
 } from "@utils/paths";
 
 function buildRunLabel(): string {
-    const host = os.hostname().replace(/[^a-zA-Z0-9_-]/g, "").toLowerCase() || "unknown-host";
+    const host =
+        os.hostname().replace(/[^a-zA-Z0-9_-]/g, "").toLowerCase() ||
+        "unknown-host";
+
     return `${host}-${process.pid}-${Date.now().toString(36).slice(-6)}`;
 }
 
@@ -38,6 +47,45 @@ function isHelp(argv: string[]): boolean {
     );
 }
 
+function printGeneratorEnvironment(args: {
+    mapsDir: string;
+    pageObjectsDir: string;
+    pageRegistryDir: string;
+    merge: boolean;
+    changedOnly: boolean;
+    logToFile: boolean;
+    logFilePath: string;
+    verbose: boolean;
+}) {
+    printSection("Environment");
+
+    printSectionBlock("Paths", [
+        ["mapsDir", args.mapsDir],
+        ["pageObjectsDir", args.pageObjectsDir],
+        ["pageRegistryDir", args.pageRegistryDir],
+    ]);
+
+    printSectionBlock("Mode", [
+        ["merge", args.merge],
+        ["changedOnly", args.changedOnly],
+    ]);
+
+    const loggingRows: Array<[string, string | number | boolean]> = [
+        ["logToFile", args.logToFile],
+        ["verbose", args.verbose],
+    ];
+
+    if (args.logToFile) {
+        loggingRows.push([
+            "logFilePath",
+            path.relative(process.cwd(), args.logFilePath),
+        ]);
+    }
+
+    printSectionBlock("Logging", loggingRows);
+    console.log("");
+}
+
 async function main() {
     printCommandTitle("PAGE ELEMENTS GENERATOR", "elementsGeneratorIcon");
 
@@ -51,7 +99,8 @@ async function main() {
 
     const verbose = hasFlag(args, "--verbose");
     const logToFile = hasFlag(args, "--logToFile");
-    const logFilePath = getArg(args, "--logFilePath") ?? PAGE_OBJECT_GENERATOR_LOG_FILE;
+    const logFilePath =
+        getArg(args, "--logFilePath") ?? PAGE_OBJECT_GENERATOR_LOG_FILE;
 
     log = createLogger({
         prefix: `[page-elements-generator][${runLabel}]`,
@@ -62,34 +111,29 @@ async function main() {
     });
 
     const mapsDir = getArg(args, "--mapsDir") ?? PAGE_MAPS_DIR;
-    const pageObjectsDir = getArg(args, "--pageObjectsDir") ?? PAGE_OBJECTS_DIR;
-    const pageRegistryDir = getArg(args, "--pageRegistryDir") ?? PAGE_REGISTRY_DIR;
+    const pageObjectsDir =
+        getArg(args, "--pageObjectsDir") ?? PAGE_OBJECTS_DIR;
+    const pageRegistryDir =
+        getArg(args, "--pageRegistryDir") ?? PAGE_REGISTRY_DIR;
     const merge = hasFlag(args, "--merge");
     const changedOnly = hasFlag(args, "--changedOnly");
 
-    printEnvironment([
-        ["mapsDir", mapsDir],
-        ["pageObjectsDir", pageObjectsDir],
-        ["pageRegistryDir", pageRegistryDir],
-        ["merge", merge],
-        ["changedOnly", changedOnly],
-        ["verbose", verbose],
-    ]);
+    printGeneratorEnvironment({
+        mapsDir,
+        pageObjectsDir,
+        pageRegistryDir,
+        merge,
+        changedOnly,
+        logToFile,
+        logFilePath,
+        verbose,
+    });
 
     log.info("Command: generate");
     log.info(`Run label: ${runLabel}`);
 
     if (verbose) {
-        log.debug(
-            `Args:
-mapsDir=${mapsDir}
-pageObjectsDir=${pageObjectsDir}
-pageRegistryDir=${pageRegistryDir}
-merge=${merge}
-changedOnly=${changedOnly}
-logToFile=${logToFile}
-logFilePath=${path.relative(process.cwd(), logFilePath)}`
-        );
+        log.debug("Generator arguments parsed");
     }
 
     const summary = await runElementsGenerator({
@@ -110,7 +154,7 @@ logFilePath=${path.relative(process.cwd(), logFilePath)}`
     log.info(`Generate complete ${success("✅")}`);
 }
 
-main().catch((e) => {
-    log.error(e?.message || String(e));
+main().catch((error) => {
+    log.error(error?.message || String(error));
     process.exit(1);
 });
