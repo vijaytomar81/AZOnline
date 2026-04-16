@@ -21,6 +21,9 @@ import {
 import {
     applyRegistryStatusToReports,
     buildRunSummary,
+    printGenerationExecution,
+    printGenerationSummary,
+    type GenerationErrorReport,
     type InvalidPageReport,
     type RepairPageReport,
     type RepairRunReport,
@@ -46,6 +49,7 @@ export async function runElementsGenerator(
     const mapFiles = readAllPageMapFiles(opts.mapsDir);
     const pageReports: RepairPageReport[] = [];
     const invalidPages: InvalidPageReport[] = [];
+    const errorPages: GenerationErrorReport[] = [];
     const validPageKeys: string[] = [];
     let processed = 0;
 
@@ -53,123 +57,138 @@ export async function runElementsGenerator(
         const loaded = loadPageMapFile(opts.mapsDir, file);
         const pageKey = loaded.pageMap.pageKey;
 
-        const oldEntry = loadPageManifestEntry(
-            pageKeyToManifestFile(PAGE_MANIFEST_PAGES_DIR, pageKey)
-        );
-
-        const context = buildPageGenerationContext({
-            file,
-            raw: loaded.raw,
-            pageMap: loaded.pageMap,
-            pageObjectsDir: opts.pageObjectsDir,
-            oldHash: oldEntry?.source?.mapHash,
-            changedOnly: opts.changedOnly,
-        });
-
-        if (context.invalidPage) {
-            invalidPages.push(context.invalidPage);
-            manifestLog.info(
-                `Skipped invalid pageKey "${context.invalidPage.pageKey}": ${context.invalidPage.reason}`
+        try {
+            const oldEntry = loadPageManifestEntry(
+                pageKeyToManifestFile(PAGE_MANIFEST_PAGES_DIR, pageKey)
             );
-            continue;
-        }
 
-        if (!context.artifact || !context.scope) {
-            invalidPages.push({
-                pageKey,
-                reason: `Missing page generation context for "${pageKey}"`,
+            const context = buildPageGenerationContext({
+                file,
+                raw: loaded.raw,
+                pageMap: loaded.pageMap,
+                pageObjectsDir: opts.pageObjectsDir,
+                oldHash: oldEntry?.source?.mapHash,
+                changedOnly: opts.changedOnly,
             });
-            continue;
-        }
 
-        validPageKeys.push(pageKey);
-        buildRegistryEntry(pageKey, opts.pageObjectsDir);
+            if (context.invalidPage) {
+                invalidPages.push(context.invalidPage);
+                manifestLog.info(
+                    `Skipped invalid pageKey "${context.invalidPage.pageKey}": ${context.invalidPage.reason}`
+                );
+                continue;
+            }
 
-        const report: RepairPageReport = {
-            pageKey,
-            changed: false,
-            elementsStatus: "unchanged",
-            aliasesGeneratedStatus: "unchanged",
-            pageObjectStatus: "unchanged",
-            registryStatus: "already-registered",
-            scope: {
-                platform: context.scope.platform,
-                application: context.scope.application,
-                product: context.scope.product,
-                name: context.scope.name,
-            },
-        };
+            if (!context.artifact || !context.scope) {
+                errorPages.push({
+                    pageKey,
+                    reason: `Missing page generation context for "${pageKey}"`,
+                });
+                continue;
+            }
 
-        if (context.shouldSkip) {
-            pageReports.push(report);
-            continue;
-        }
+            validPageKeys.push(pageKey);
+            buildRegistryEntry(pageKey, opts.pageObjectsDir);
 
-        if (context.shouldScaffold) {
-            ensureScaffoldFiles({
-                pagesDir: opts.pageObjectsDir,
-                pageMap: context.pageMap,
-                verbose: opts.verbose,
+            const report: RepairPageReport = {
+                pageKey,
+                changed: false,
+                elementsStatus: "unchanged",
+                aliasesGeneratedStatus: "unchanged",
+                pageObjectStatus: "unchanged",
+                registryStatus: "already-registered",
+                scope: {
+                    platform: context.scope.platform,
+                    application: context.scope.application,
+                    product: context.scope.product,
+                    name: context.scope.name,
+                },
+            };
+
+            if (context.shouldSkip) {
+                pageReports.push(report);
+                continue;
+            }
+
+            if (context.shouldScaffold) {
+                ensureScaffoldFiles({
+                    pagesDir: opts.pageObjectsDir,
+                    pageMap: context.pageMap,
+                    verbose: opts.verbose,
+                    log,
+                });
+                report.pageObjectStatus = "generated";
+            }
+
+            const elementsRes = syncElementsTs(
+                context.artifact.elementsPath,
+                context.pageMap
+            );
+
+            const generatedRes = syncAliasesGeneratedFile(
+                context.artifact.aliasesGeneratedPath,
+                context.pageMap,
+                elementsRes.renameMap,
+                elementsRes.addedKeys
+            );
+
+            syncAliasesHumanFile({
+                aliasesHumanPath: context.artifact.aliasesHumanPath,
+                renameMap: generatedRes.renameMap,
+                newGeneratedKeys: generatedRes.addedKeys,
                 log,
             });
-        }
 
-        const elementsRes = syncElementsTs(
-            context.artifact.elementsPath,
-            context.pageMap
-        );
-
-        const generatedRes = syncAliasesGeneratedFile(
-            context.artifact.aliasesGeneratedPath,
-            context.pageMap,
-            elementsRes.renameMap,
-            elementsRes.addedKeys
-        );
-
-        syncAliasesHumanFile({
-            aliasesHumanPath: context.artifact.aliasesHumanPath,
-            renameMap: generatedRes.renameMap,
-            newGeneratedKeys: generatedRes.addedKeys,
-            log,
-        });
-
-        syncAliasesIntoPageObject({
-            pageTsPath: context.artifact.pageObjectPath,
-            elementsTsPath: context.artifact.elementsPath,
-            aliasesTsPath: context.artifact.aliasesHumanPath,
-        });
-
-        const manifestEntryResult = buildPageManifestEntry({
-            pageMap: context.pageMap,
-            artifact: context.artifact,
-            pageMapFilePath: loaded.absPath,
-            mapHash: context.hash,
-        });
-
-        if (!manifestEntryResult.ok) {
-            invalidPages.push({
-                pageKey: manifestEntryResult.pageKey,
-                reason: manifestEntryResult.reason,
+            syncAliasesIntoPageObject({
+                pageTsPath: context.artifact.pageObjectPath,
+                elementsTsPath: context.artifact.elementsPath,
+                aliasesTsPath: context.artifact.aliasesHumanPath,
             });
-            manifestLog.info(
-                `Skipped manifest save for "${manifestEntryResult.pageKey}": ${manifestEntryResult.reason}`
+
+            const manifestEntryResult = buildPageManifestEntry({
+                pageMap: context.pageMap,
+                artifact: context.artifact,
+                pageMapFilePath: loaded.absPath,
+                mapHash: context.hash,
+            });
+
+            if (!manifestEntryResult.ok) {
+                invalidPages.push({
+                    pageKey: manifestEntryResult.pageKey,
+                    reason: manifestEntryResult.reason,
+                });
+                manifestLog.info(
+                    `Skipped manifest save for "${manifestEntryResult.pageKey}": ${manifestEntryResult.reason}`
+                );
+                continue;
+            }
+
+            const manifestChanged = savePageManifestEntry(
+                pageKeyToManifestFile(PAGE_MANIFEST_PAGES_DIR, pageKey),
+                manifestEntryResult.entry
             );
-            continue;
+
+            processed++;
+
+            report.elementsStatus = elementsRes.changed ? "generated" : "unchanged";
+            report.aliasesGeneratedStatus = generatedRes.changed
+                ? "generated"
+                : "unchanged";
+
+            report.changed =
+                report.pageObjectStatus === "generated" ||
+                report.elementsStatus === "generated" ||
+                report.aliasesGeneratedStatus === "generated" ||
+                manifestChanged;
+
+            pageReports.push(report);
+        } catch (error) {
+            const reason =
+                error instanceof Error ? error.message : "Unknown generation failure";
+
+            errorPages.push({ pageKey, reason });
+            log.error(`Failed to process page "${pageKey}": ${reason}`);
         }
-
-        savePageManifestEntry(
-            pageKeyToManifestFile(PAGE_MANIFEST_PAGES_DIR, pageKey),
-            manifestEntryResult.entry
-        );
-
-        processed++;
-        report.changed = true;
-        report.elementsStatus = elementsRes.changed ? "generated" : "unchanged";
-        report.aliasesGeneratedStatus = generatedRes.changed
-            ? "generated"
-            : "unchanged";
-        report.pageObjectStatus = "synced";
-        pageReports.push(report);
     }
 
     const removed = removeMissingPageManifestEntries(
@@ -183,8 +202,14 @@ export async function runElementsGenerator(
         );
     }
 
-    saveManifestIndex(PAGE_MANIFEST_INDEX_FILE, validPageKeys);
-    manifestLog.info(`Manifest index updated: ${PAGE_MANIFEST_INDEX_FILE}`);
+    const manifestIndexChanged = saveManifestIndex(
+        PAGE_MANIFEST_INDEX_FILE,
+        validPageKeys
+    );
+
+    if (manifestIndexChanged) {
+        manifestLog.info(`Manifest index updated: ${PAGE_MANIFEST_INDEX_FILE}`);
+    }
 
     const syncRes = generatePageRegistryFromManifest(
         PAGE_MANIFEST_DIR,
@@ -198,10 +223,15 @@ export async function runElementsGenerator(
 
     const summary = buildRunSummary({
         pagesScanned: mapFiles.length,
+        pagesProcessed: processed,
         pageReports,
         syncRes,
         invalidPages,
+        errorPages,
     });
+
+    printGenerationExecution(summary);
+    printGenerationSummary(summary);
 
     endRun();
     return summary;
