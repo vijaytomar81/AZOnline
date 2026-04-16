@@ -23,13 +23,14 @@ export type PageManifestEntry = {
     className: string;
     paths: PageManifestPaths;
     pageMeta: {
-        url?: string;
         urlPath?: string;
-        urlPathPattern?: string;
+        urlPathRe?: string;
         title?: string;
         elementCount: number;
     };
+
     source: {
+        scannedUrl?: string;
         scannedAt?: string;
         mapHash: string;
     };

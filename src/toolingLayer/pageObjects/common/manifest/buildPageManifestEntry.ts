@@ -47,15 +47,13 @@ export function buildPageManifestEntry(params: {
             pageMapFile: toRelative(pageMapFilePath),
         },
         pageMeta: {
-            url: pageMap.url?.trim() || undefined,
-            urlPath,
-            urlPathPattern: urlPath
-                ? buildUrlReFromUrlPath(urlPath)
-                : undefined,
+            urlPath: pageMap.urlPath?.trim() || undefined,
+            urlPathRe: buildUrlReFromUrlPath(pageMap.urlPath?.trim() || ""),
             title: pageMap.title?.trim() || undefined,
             elementCount: Object.keys(pageMap.elements ?? {}).length,
         },
         source: {
+            scannedUrl: pageMap.url?.trim() || undefined,
             scannedAt: pageMap.scannedAt?.trim() || undefined,
             mapHash,
         },

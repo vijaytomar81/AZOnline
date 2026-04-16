@@ -17,13 +17,13 @@
     "pageMapFile": "src/businessLayer/pageObjects/maps/athena.azonline.common.insurance-type-selection.json"
   },
   "pageMeta": {
-    "url": "https://customer-portal-lv-test.athenapaas.com/products",
     "urlPath": "/products",
-    "urlPathPattern": "/^\\/products$/i",
+    "urlPathRe": "/^\\/products$/i",
     "title": "Get a new quote or view saved quotes",
     "elementCount": 7
   },
   "source": {
+    "scannedUrl": "https://customer-portal-lv-test.athenapaas.com/products",
     "scannedAt": "2026-03-13T10:57:20.737Z",
     "mapHash": "b6c20f23dde823cca27f2b0e214c714565035aa5"
   }

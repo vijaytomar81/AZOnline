@@ -17,13 +17,13 @@
     "pageMapFile": "src/businessLayer/pageObjects/maps/athena.azonline.common.manage-cookies.json"
   },
   "pageMeta": {
-    "url": "https://customer-portal-lv-test.athenapaas.com/",
     "urlPath": "/",
-    "urlPathPattern": "/^\\/$/i",
+    "urlPathRe": "/^\\/$/i",
     "title": "Allianz login page",
     "elementCount": 4
   },
   "source": {
+    "scannedUrl": "https://customer-portal-lv-test.athenapaas.com/",
     "scannedAt": "2026-04-01T10:40:09.711Z",
     "mapHash": "8f4cd8bad7840758bfe723e228c5fd17f8f347d9"
   }
