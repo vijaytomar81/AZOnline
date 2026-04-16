@@ -4,19 +4,22 @@ import type { TreeNode } from "@utils/cliTree";
 import { info, strong } from "@utils/cliFormat";
 import type { GenerationTreeInput } from "./types";
 
-function fileSeverity(status: string): "success" | "warning" | "error" {
-    if (status === "generated" || status === "added-to-both" || status === "added-to-index" || status === "added-to-page-manager") {
-        return "success";
-    }
-
-    if (status === "unchanged" || status === "already-registered") {
+function severityFromStatus(status: string): "success" | "warning" | "error" {
+    if (
+        status === "generated" ||
+        status === "added-to-both" ||
+        status === "added-to-index" ||
+        status === "added-to-page-manager" ||
+        status === "unchanged" ||
+        status === "already-registered"
+    ) {
         return "success";
     }
 
     return "warning";
 }
 
-function fileSummary(status: string): string {
+function statusSummary(status: string): string {
     if (status === "generated") return info("(generated)");
     if (status === "unchanged") return info("(unchanged)");
     if (status === "already-registered") return info("(already registered)");
@@ -27,34 +30,38 @@ function fileSummary(status: string): string {
 }
 
 function buildPageNode(page: GenerationTreeInput["pageReports"][number]): TreeNode {
-    const children: TreeNode[] = [
-        {
-            severity: fileSeverity(page.elementsStatus),
-            title: "elements.ts",
-            summary: fileSummary(page.elementsStatus),
-        },
-        {
-            severity: fileSeverity(page.aliasesGeneratedStatus),
-            title: "aliases.generated.ts",
-            summary: fileSummary(page.aliasesGeneratedStatus),
-        },
-        {
-            severity: fileSeverity(page.pageObjectStatus),
-            title: "pageObject.ts",
-            summary: fileSummary(page.pageObjectStatus),
-        },
-        {
-            severity: fileSeverity(page.registryStatus),
-            title: "registry",
-            summary: fileSummary(page.registryStatus),
-        },
-    ];
+    const changedChildren =
+        page.elementsStatus === "generated" ||
+        page.aliasesGeneratedStatus === "generated" ||
+        page.pageObjectStatus === "generated" ||
+        page.registryStatus !== "already-registered";
 
     return {
         severity: page.changed ? "success" : "success",
         title: page.pageKey,
         summary: info(page.changed ? "(changed)" : "(unchanged)"),
-        children,
+        children: [
+            {
+                severity: severityFromStatus(page.elementsStatus),
+                title: "elements.ts",
+                summary: statusSummary(page.elementsStatus),
+            },
+            {
+                severity: severityFromStatus(page.aliasesGeneratedStatus),
+                title: "aliases.generated.ts",
+                summary: statusSummary(page.aliasesGeneratedStatus),
+            },
+            {
+                severity: severityFromStatus(page.pageObjectStatus),
+                title: "pageObject.ts",
+                summary: statusSummary(page.pageObjectStatus),
+            },
+            {
+                severity: severityFromStatus(page.registryStatus),
+                title: "registry",
+                summary: statusSummary(page.registryStatus),
+            },
+        ].filter(() => true && (page.changed || changedChildren || true)),
     };
 }
 

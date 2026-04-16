@@ -56,6 +56,22 @@ function groupEntriesByProduct(
     return byProduct;
 }
 
+function extractImportLines(text: string | null): string[] {
+    if (!text) return [];
+    return text
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.startsWith("import { "));
+}
+
+function extractEntryLines(text: string | null): string[] {
+    if (!text) return [];
+    return text
+        .split("\n")
+        .map((line) => line.trimEnd())
+        .filter((line) => line.includes(': this.get("'));
+}
+
 export function generatePageManagerFromEntries(
     entries: PageManifestEntry[],
     pagesDir = PAGE_OBJECTS_ROOT_DIR
@@ -90,12 +106,20 @@ export function generatePageManagerFromEntries(
     lines.push(`    }`);
     lines.push(``);
 
+    const entryLines: string[] = [];
+
     for (const [product, productEntries] of [...byProduct.entries()].sort(([a], [b]) =>
         a.localeCompare(b)
     )) {
         lines.push(`    get ${product}() {`);
         lines.push(`        return {`);
-        for (const entry of productEntries) lines.push(buildEntryLine(entry));
+
+        for (const entry of productEntries) {
+            const entryLine = buildEntryLine(entry);
+            entryLines.push(entryLine.trimEnd());
+            lines.push(entryLine);
+        }
+
         lines.push(`        };`);
         lines.push(`    }`);
         lines.push(``);
@@ -110,11 +134,17 @@ export function generatePageManagerFromEntries(
         return { changed: false, addedImports: [], addedEntries: [] };
     }
 
+    const previousImports = new Set(extractImportLines(prevText));
+    const previousEntries = new Set(extractEntryLines(prevText));
+
+    const addedImports = importLines.filter((line) => !previousImports.has(line));
+    const addedEntries = entryLines.filter((line) => !previousEntries.has(line));
+
     safeWriteText(file, nextText);
 
     return {
         changed: true,
-        addedImports: importLines,
-        addedEntries: sortedEntries.map(buildEntryLine),
+        addedImports,
+        addedEntries,
     };
 }

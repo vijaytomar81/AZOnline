@@ -5,7 +5,7 @@ import path from "node:path";
 import { createLogger } from "@utils/logger";
 import { normalizeArgv, hasFlag, getArg } from "@utils/argv";
 import { usage } from "./elementGeneratorHelp";
-import { printCommandTitle } from "@utils/cliFormat";
+import { printCommandTitle, printEnvironment, failure, success } from "@utils/cliFormat";
 import { runElementsGenerator } from "./generator/runner";
 import {
     PAGE_MAPS_DIR,
@@ -67,6 +67,15 @@ async function main() {
     const merge = hasFlag(args, "--merge");
     const changedOnly = hasFlag(args, "--changedOnly");
 
+    printEnvironment([
+        ["mapsDir", mapsDir],
+        ["pageObjectsDir", pageObjectsDir],
+        ["pageRegistryDir", pageRegistryDir],
+        ["merge", merge],
+        ["changedOnly", changedOnly],
+        ["verbose", verbose],
+    ]);
+
     log.info("Command: generate");
     log.info(`Run label: ${runLabel}`);
 
@@ -83,7 +92,7 @@ logFilePath=${path.relative(process.cwd(), logFilePath)}`
         );
     }
 
-    await runElementsGenerator({
+    const summary = await runElementsGenerator({
         mapsDir,
         pageObjectsDir,
         pageRegistryDir,
@@ -93,7 +102,12 @@ logFilePath=${path.relative(process.cwd(), logFilePath)}`
         log: log.child("runner"),
     });
 
-    log.info("Generate complete ✅");
+    if (summary.exitCode > 0) {
+        log.error(`Generate finished with errors ${failure("✖")}`);
+        process.exit(summary.exitCode);
+    }
+
+    log.info(`Generate complete ${success("✅")}`);
 }
 
 main().catch((e) => {
