@@ -1,0 +1,30 @@
+{
+  "pageKey": "athena.azonline.motor.ph-driving-licence-details",
+  "scope": {
+    "platform": "athena",
+    "application": "azonline",
+    "product": "motor",
+    "name": "ph-driving-licence-details",
+    "namespace": "athena.azonline.motor"
+  },
+  "className": "PhDrivingLicenceDetailsPage",
+  "paths": {
+    "pageObjectImport": "@businessLayer/pageObjects/objects/athena/azonline/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage",
+    "pageObjectFile": "src/businessLayer/pageObjects/objects/athena/azonline/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage.ts",
+    "elementsFile": "src/businessLayer/pageObjects/objects/athena/azonline/motor/ph-driving-licence-details/elements.ts",
+    "aliasesGeneratedFile": "src/businessLayer/pageObjects/objects/athena/azonline/motor/ph-driving-licence-details/aliases.generated.ts",
+    "aliasesFile": "src/businessLayer/pageObjects/objects/athena/azonline/motor/ph-driving-licence-details/aliases.ts",
+    "pageMapFile": "src/businessLayer/pageObjects/maps/athena.motor.ph-driving-licence-details.json"
+  },
+  "pageMeta": {
+    "url": "https://customer-portal-lv-test.athenapaas.com/journey/show/product/AnnualMotorInsurance/process/nb/drivingLicenceScan/69b442a3e1389c2e75667e1d",
+    "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/drivingLicenceScan/69b442a3e1389c2e75667e1d",
+    "urlPathPattern": "/\\/journey\\/show\\/product\\/AnnualMotorInsurance\\/process\\/nb\\/drivingLicenceScan\\/[a-z0-9]+/i",
+    "title": "Driving licence details",
+    "elementCount": 49
+  },
+  "source": {
+    "scannedAt": "2026-03-13T17:03:49.922Z",
+    "mapHash": "66f3a5371449f96c670fec205227f939ecd1fe2f"
+  }
+}

@@ -8,6 +8,13 @@ import { loadPageManifest } from "@toolingLayer/pageObjects/generator/generator/
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
 
+type ManifestFileField =
+    | "pageObjectFile"
+    | "elementsFile"
+    | "aliasesGeneratedFile"
+    | "aliasesFile"
+    | "pageMapFile";
+
 function formatKeyList(keys: string[]): string {
     return `[${keys.sort((a, b) => a.localeCompare(b)).join(", ")}]`;
 }
@@ -15,13 +22,6 @@ function formatKeyList(keys: string[]): string {
 function manifestFileName(manifestFile: string): string {
     return path.basename(manifestFile);
 }
-
-type ManifestFileField =
-    | "pageObjectFile"
-    | "elementsFile"
-    | "aliasesGeneratedFile"
-    | "aliasesFile"
-    | "pageMapFile";
 
 export const checkManifestFiles: ValidationRule = {
     id: "manifest.checkManifestFiles",
@@ -33,7 +33,6 @@ export const checkManifestFiles: ValidationRule = {
 
         for (const entry of Object.values(manifest.pages)) {
             const missingItems: string[] = [];
-
             const fileFields: Array<[ManifestFileField, string | undefined]> = [
                 ["pageObjectFile", entry.paths.pageObjectFile],
                 ["elementsFile", entry.paths.elementsFile],
@@ -53,32 +52,32 @@ export const checkManifestFiles: ValidationRule = {
                 }
             }
 
-            if (missingItems.length > 0) {
-                issues.push({
-                    ruleId: this.id,
-                    severity: "WARN",
-                    issueLabel: "Missing",
-                    message: formatKeyList(missingItems),
-                    pageKey: entry.pageKey,
-                    filePath: ctx.manifestFile,
-                });
+            if (missingItems.length === 0) continue;
 
-                reportNodes.push({
-                    title: entry.pageKey,
-                    children: [
-                        {
-                            title: manifestFileName(ctx.manifestFile),
-                            children: [
-                                {
-                                    severity: "warning",
-                                    title: "Missing",
-                                    summary: formatKeyList(missingItems),
-                                },
-                            ],
-                        },
-                    ],
-                });
-            }
+            issues.push({
+                ruleId: this.id,
+                severity: "WARN",
+                issueLabel: "Missing",
+                message: formatKeyList(missingItems),
+                pageKey: entry.pageKey,
+                filePath: ctx.manifestFile,
+            });
+
+            reportNodes.push({
+                title: entry.pageKey,
+                children: [
+                    {
+                        title: manifestFileName(ctx.manifestFile),
+                        children: [
+                            {
+                                severity: "warning",
+                                title: "Missing",
+                                summary: formatKeyList(missingItems),
+                            },
+                        ],
+                    },
+                ],
+            });
         }
 
         return { issues, reportNodes };

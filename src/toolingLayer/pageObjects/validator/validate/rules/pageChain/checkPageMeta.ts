@@ -2,12 +2,12 @@
 
 import fs from "node:fs";
 
-import type { TreeNode } from "@utils/cliTree";
-import type { ValidationRule } from "../../pipeline/types";
-import type { ValidationIssue } from "../../types";
 import { extractStringFieldFromExportedObject } from "@toolingLayer/pageObjects/common/extractTsObjectKeys";
 import { getPageArtifactPaths } from "@toolingLayer/pageObjects/common/pagePaths";
 import { loadAllPageMaps } from "@toolingLayer/pageObjects/common/readPageMap";
+import type { TreeNode } from "@utils/cliTree";
+import type { ValidationRule } from "../../pipeline/types";
+import type { ValidationIssue } from "../../types";
 
 function formatKeyList(keys: string[]): string {
     return `[${keys.sort((a, b) => a.localeCompare(b)).join(", ")}]`;
@@ -25,54 +25,54 @@ export const checkPageMeta: ValidationRule = {
             if (!fs.existsSync(artifact.aliasesGeneratedPath)) continue;
 
             const generatedTs = fs.readFileSync(artifact.aliasesGeneratedPath, "utf8");
+            const generatedPageKey = extractStringFieldFromExportedObject(
+                generatedTs,
+                "pageMeta",
+                "pageKey"
+            );
+            const generatedUrlPath = extractStringFieldFromExportedObject(
+                generatedTs,
+                "pageMeta",
+                "urlPath"
+            );
+            const generatedTitle = extractStringFieldFromExportedObject(
+                generatedTs,
+                "pageMeta",
+                "title"
+            );
 
-            const generatedPageKey = extractStringFieldFromExportedObject(generatedTs, "pageMeta", "pageKey");
-            const generatedUrlPath = extractStringFieldFromExportedObject(generatedTs, "pageMeta", "urlPath");
-            const generatedTitle = extractStringFieldFromExportedObject(generatedTs, "pageMeta", "title");
-
-            const missingItems: string[] = [];
             const mismatchItems: string[] = [];
+            if (generatedPageKey !== item.pageMap.pageKey) mismatchItems.push("pageKey");
+            if ((item.pageMap.urlPath ?? undefined) !== generatedUrlPath) mismatchItems.push("urlPath");
+            if ((item.pageMap.title ?? undefined) !== generatedTitle) mismatchItems.push("title");
+            if (mismatchItems.length === 0) continue;
 
-            if (generatedPageKey !== item.pageMap.pageKey) {
-                mismatchItems.push("pageKey");
-            }
+            const severity = mismatchItems.includes("pageKey") ? "error" : "warning";
 
-            if ((item.pageMap.urlPath ?? undefined) !== generatedUrlPath) {
-                mismatchItems.push("urlPath");
-            }
+            issues.push({
+                ruleId: this.id,
+                severity: mismatchItems.includes("pageKey") ? "ERROR" : "WARN",
+                issueLabel: "Mismatch",
+                message: formatKeyList(mismatchItems),
+                pageKey: item.pageMap.pageKey,
+                filePath: artifact.aliasesGeneratedPath,
+            });
 
-            if ((item.pageMap.title ?? undefined) !== generatedTitle) {
-                mismatchItems.push("title");
-            }
-
-            if (missingItems.length > 0 || mismatchItems.length > 0) {
-                const severity = mismatchItems.includes("pageKey") ? "error" : "warning";
-
-                issues.push({
-                    ruleId: this.id,
-                    severity: mismatchItems.includes("pageKey") ? "ERROR" : "WARN",
-                    issueLabel: "Mismatch",
-                    message: formatKeyList(mismatchItems),
-                    pageKey: item.pageMap.pageKey,
-                    filePath: artifact.aliasesGeneratedPath,
-                });
-
-                reportNodes.push({
-                    title: item.pageMap.pageKey,
-                    children: [
-                        {
-                            title: "aliases.generated.ts",
-                            children: [
-                                {
-                                    severity,
-                                    title: "Mismatch",
-                                    summary: formatKeyList(mismatchItems),
-                                },
-                            ],
-                        },
-                    ],
-                });
-            }
+            reportNodes.push({
+                title: item.pageMap.pageKey,
+                children: [
+                    {
+                        title: "aliases.generated.ts",
+                        children: [
+                            {
+                                severity,
+                                title: "Mismatch",
+                                summary: formatKeyList(mismatchItems),
+                            },
+                        ],
+                    },
+                ],
+            });
         }
 
         return { issues, reportNodes };

@@ -1,10 +1,10 @@
 // src/toolingLayer/pageObjects/generator/builders/buildElementsTs.ts
 
-import type { PageMap, PageMapElement } from "../generator/types";
 import { escapeTsString, isValidTsIdentifier } from "@utils/ts";
+import type { PageMap, PageMapElement } from "../generator/types";
 import {
-    headerFilePath,
     getPageObjectFileParts,
+    headerFilePath,
 } from "../utils/buildGeneratedHeader";
 
 type ElementEntry = {
@@ -19,13 +19,13 @@ function prop(key: string): string {
 function renderEntry(entry: ElementEntry): string[] {
     const { key, value } = entry;
     const fallbacks = Array.isArray(value.fallbacks) ? value.fallbacks : [];
-    const items = fallbacks.map((f) => `"${escapeTsString(f)}"`).join(", ");
-    const lines: string[] = [];
-
-    lines.push(`  ${prop(key)}: {`);
-    lines.push(`    type: "${escapeTsString(value.type)}",`);
-    lines.push(`    preferred: "${escapeTsString(value.preferred)}",`);
-    lines.push(`    fallbacks: [${items}],`);
+    const items = fallbacks.map((item) => `"${escapeTsString(item)}"`).join(", ");
+    const lines: string[] = [
+        `  ${prop(key)}: {`,
+        `    type: "${escapeTsString(value.type)}",`,
+        `    preferred: "${escapeTsString(value.preferred)}",`,
+        `    fallbacks: [${items}],`,
+    ];
 
     if (value.stableKey) {
         lines.push(`    stableKey: "${escapeTsString(value.stableKey)}",`);
@@ -36,24 +36,25 @@ function renderEntry(entry: ElementEntry): string[] {
 }
 
 export function buildElementsTs(pageMap: PageMap): string {
-    const entries = Object.entries(pageMap.elements).map(([key, value]) => ({ key, value }));
-    const lines: string[] = [];
+    const entries = Object.entries(pageMap.elements).map(([key, value]) => ({
+        key,
+        value,
+    }));
 
-    lines.push(
-        headerFilePath(getPageObjectFileParts(pageMap.pageKey, "elements.ts"))
-    );
-
-    lines.push(`// pageKey: ${pageMap.pageKey}`);
-    lines.push(`// scannedAt: ${pageMap.scannedAt ?? new Date().toISOString()}`);
-    lines.push(``);
-    lines.push(`export type ElementDef = {`);
-    lines.push(`  type: string;`);
-    lines.push(`  preferred: string;`);
-    lines.push(`  fallbacks: readonly string[];`);
-    lines.push(`  stableKey?: string;`);
-    lines.push(`};`);
-    lines.push(``);
-    lines.push(`export const elements = {`);
+    const lines: string[] = [
+        headerFilePath(getPageObjectFileParts(pageMap.pageKey, "elements.ts")),
+        `// pageKey: ${pageMap.pageKey}`,
+        `// scannedAt: ${pageMap.scannedAt ?? new Date().toISOString()}`,
+        ``,
+        `export type ElementDef = {`,
+        `  type: string;`,
+        `  preferred: string;`,
+        `  fallbacks: readonly string[];`,
+        `  stableKey?: string;`,
+        `};`,
+        ``,
+        `export const elements = {`,
+    ];
 
     for (const entry of entries) {
         lines.push(...renderEntry(entry));

@@ -6,7 +6,7 @@ import path from "node:path";
 import type { Logger } from "@utils/logger";
 import { ensureDir, safeWriteText } from "@utils/fs";
 import type { PageMap } from "./types";
-import { buildPageArtifact } from "./pageArtifact";
+import { buildPageArtifact } from "@toolingLayer/pageObjects/common/artifacts/buildPageArtifact";
 import { buildAliasesGeneratedTs } from "../builders/buildAliasesGeneratedTs";
 import { buildAliasesHumanTs } from "../builders/buildAliasesHumanTs";
 import { buildPageTsStub } from "../builders/buildPageTsStub";
@@ -18,7 +18,10 @@ function writeIfMissing(filePath: string, content: string): boolean {
     return true;
 }
 
-export function hasMissingGeneratedOutputs(params: { pagesDir: string; pageKey: string }): boolean {
+export function hasMissingGeneratedOutputs(params: {
+    pagesDir: string;
+    pageKey: string;
+}): boolean {
     const artifact = buildPageArtifact(params.pagesDir, params.pageKey);
     const required = [
         artifact.folderPath,
@@ -28,7 +31,7 @@ export function hasMissingGeneratedOutputs(params: { pagesDir: string; pageKey: 
         artifact.pageObjectPath,
     ];
 
-    return required.some((p) => !fs.existsSync(p));
+    return required.some((targetPath) => !fs.existsSync(targetPath));
 }
 
 export function ensureScaffoldFiles(params: {
@@ -46,7 +49,12 @@ export function ensureScaffoldFiles(params: {
         log.info(`Scaffolded: ${artifact.aliasesHumanPath}`);
     }
 
-    if (writeIfMissing(artifact.aliasesGeneratedPath, buildAliasesGeneratedTs(pageMap))) {
+    if (
+        writeIfMissing(
+            artifact.aliasesGeneratedPath,
+            buildAliasesGeneratedTs(pageMap)
+        )
+    ) {
         log.info(`Scaffolded: ${artifact.aliasesGeneratedPath}`);
     }
 
@@ -61,6 +69,11 @@ export function ensureScaffoldFiles(params: {
     });
 
     if (verbose) {
-        log.debug(`Synced page object aliases region: ${path.relative(process.cwd(), artifact.pageObjectPath)}`);
+        log.debug(
+            `Synced page object aliases region: ${path.relative(
+                process.cwd(),
+                artifact.pageObjectPath
+            )}`
+        );
     }
 }

@@ -11,7 +11,7 @@ import { loadAllPageMaps } from "@toolingLayer/pageObjects/common/readPageMap";
 
 export function extractIndexExportPaths(tsText: string): string[] {
     return [...tsText.matchAll(/export\s+\*\s+from\s+"([^"]+)";/g)]
-        .map((m) => m[1] ?? "")
+        .map((match) => match[1] ?? "")
         .filter(Boolean)
         .sort((a, b) => a.localeCompare(b));
 }
@@ -21,14 +21,8 @@ export function buildExpectedIndexExports(
     mapsDir: string
 ): string[] {
     return loadAllPageMaps(mapsDir)
-        .map((item) => {
-            const artifact = getPageArtifactPaths(pageObjectsDir, item.pageMap.pageKey);
-            const parts = item.pageMap.pageKey.split(".");
-            const product = parts[0] ?? "unknown";
-            const group = parts[1] ?? "common";
-            const name = parts.slice(2).join(".");
-            return `@businessLayer/pageObjects/objects/${product}/${group}/${name}/${artifact.className}`;
-        })
+        .map((item) => getPageArtifactPaths(pageObjectsDir, item.pageMap.pageKey))
+        .map((artifact) => artifact.registryImportPath)
         .sort((a, b) => a.localeCompare(b));
 }
 
@@ -39,15 +33,15 @@ export function buildIndexFileContent(
 ): string {
     const exportPaths = buildExpectedIndexExports(pageObjectsDir, mapsDir);
     const filePath = getIndexFile(pageRegistryDir);
-    const lines: string[] = [];
-
-    lines.push(`// ${toRepoRelative(filePath)}`);
-    lines.push(`// AUTO-GENERATED from src/pageObjects/.manifest/`);
-    lines.push(``);
-    lines.push(`export { PageManager } from "./pageManager";`);
-    lines.push(``);
-    lines.push(`// Export individual pages too (optional, but useful sometimes)`);
-    lines.push(``);
+    const lines: string[] = [
+        `// ${toRepoRelative(filePath)}`,
+        `// AUTO-GENERATED from src/pageObjects/.manifest/`,
+        ``,
+        `export { PageManager } from "./pageManager";`,
+        ``,
+        `// Export individual pages too (optional, but useful sometimes)`,
+        ``,
+    ];
 
     for (const exportPath of exportPaths) {
         lines.push(`export * from "${exportPath}";`);

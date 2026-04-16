@@ -1,17 +1,12 @@
 // src/toolingLayer/pageObjects/validator/validate/rules/registry/pageManager/collectPageManagerIssues.ts
 
+import { toCamelFromText } from "@utils/text";
 import type { ValidationIssue } from "../../../types";
 import type {
     GroupedPageManagerIssues,
     PageManagerExpectedState,
 } from "./pageManagerTypes";
 import { formatKeyList } from "./formatKeyList";
-import {
-    expectedClassName,
-    expectedMember,
-    pageKeyFromImportPath,
-    pageKeyFromKeyId,
-} from "./pageManagerNaming";
 
 type CollectPageManagerIssuesArgs = {
     ruleId: string;
@@ -20,6 +15,19 @@ type CollectPageManagerIssuesArgs = {
     actualImports: Map<string, string>;
     actualKeyIds: Set<string>;
 };
+
+function pageMember(pageKey: string): string {
+    const pageName = pageKey.split(".").slice(-1)[0] || "page";
+    return toCamelFromText(pageName);
+}
+
+function pageKeyFromImportPath(importPath: string): string {
+    return importPath.replace("@businessLayer/pageObjects/objects/", "").replace(/\/[^/]+$/, "").replace(/\//g, ".");
+}
+
+function pageKeyFromKeyId(keyId: string): string {
+    return keyId;
+}
 
 function pushGroupedValue(
     map: Map<string, string[]>,
@@ -43,14 +51,14 @@ export function collectPageManagerIssues(
             continue;
         }
 
-        const value = expectedClassName(pageKey);
-        pushGroupedValue(missingByPage, pageKey, value);
+        const className = importPath.split("/").slice(-1)[0] || "UnknownPage";
+        pushGroupedValue(missingByPage, pageKey, className);
 
         issues.push({
             ruleId: args.ruleId,
             severity: "ERROR",
             issueLabel: "Missing",
-            message: formatKeyList([value]),
+            message: formatKeyList([className]),
             pageKey,
             filePath: args.filePath,
         });
@@ -61,14 +69,14 @@ export function collectPageManagerIssues(
             continue;
         }
 
-        const value = expectedMember(pageKey);
-        pushGroupedValue(missingByPage, pageKey, value);
+        const member = pageMember(pageKey);
+        pushGroupedValue(missingByPage, pageKey, member);
 
         issues.push({
             ruleId: args.ruleId,
             severity: "ERROR",
             issueLabel: "Missing",
-            message: formatKeyList([value]),
+            message: formatKeyList([member]),
             pageKey,
             filePath: args.filePath,
         });

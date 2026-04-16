@@ -19,9 +19,7 @@ export function buildManifestExpectedValues(
 
     return {
         className: artifact.className,
-        pageObjectImport: `@businessLayer/pageObjects/objects/${pageMapItem.pageMap.pageKey
-            .split(".")
-            .join("/")}/${artifact.className}`,
+        pageObjectImport: artifact.registryImportPath,
         elementCount: Object.keys(pageMapItem.pageMap.elements ?? {}).length,
         urlPath: pageMapItem.pageMap.urlPath ?? undefined,
         title: pageMapItem.pageMap.title ?? undefined,

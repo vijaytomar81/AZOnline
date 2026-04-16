@@ -8,6 +8,11 @@ import {
 } from "@configLayer/tooling/pageObjects";
 import type { SyncPageRegistryResult } from "./registry";
 
+export type InvalidPageReport = {
+    pageKey: string;
+    reason: string;
+};
+
 export type RepairPageReport = {
     pageKey: string;
     changed: boolean;
@@ -15,10 +20,16 @@ export type RepairPageReport = {
     aliasesGeneratedStatus: PageObjectGenerationStatus;
     pageObjectStatus: PageObjectFileStatus;
     registryStatus:
-    | "already-registered"
-    | "added-to-index"
-    | "added-to-page-manager"
-    | "added-to-both";
+        | "already-registered"
+        | "added-to-index"
+        | "added-to-page-manager"
+        | "added-to-both";
+    scope?: {
+        platform: string;
+        application: string;
+        product: string;
+        name: string;
+    };
 };
 
 export type RepairRunReport = {
@@ -26,6 +37,7 @@ export type RepairRunReport = {
     pagesChanged: number;
     filesGenerated: number;
     registryUpdates: number;
+    invalidPages: InvalidPageReport[];
     pageReports: RepairPageReport[];
 };
 
@@ -50,14 +62,14 @@ export function applyRegistryStatusToReports(
 ): void {
     const addedIndexPaths = new Set(
         syncRes.index.added.map((line) => {
-            const m = line.match(/@pageObjectsObjects\/(.+)\/[^/]+"?;?$/);
+            const m = line.match(/@businessLayer\/pageObjects\/objects\/(.+)\/[^/]+"?;?$/);
             return m?.[1] ?? "";
         })
     );
 
     const addedManagerImports = new Set(
         syncRes.pageManager.addedImports.map((line) => {
-            const m = line.match(/@pageObjectsObjects\/(.+)\/[^/]+"?;?$/);
+            const m = line.match(/@businessLayer\/pageObjects\/objects\/(.+)\/[^/]+"?;?$/);
             return m?.[1] ?? "";
         })
     );
@@ -67,7 +79,7 @@ export function applyRegistryStatusToReports(
     for (const report of pageReports) {
         const pagePath = report.pageKey.split(".").join("/");
         const memberCamel = toMemberCamel(report.pageKey);
-        const product = report.pageKey.split(".")[0] || "common";
+        const product = report.scope?.product ?? "common";
         const entrySnippet = `${memberCamel}: this.get("${product}.${memberCamel}"`;
 
         const addedToIndex = addedIndexPaths.has(pagePath);
@@ -95,9 +107,9 @@ export function buildRunSummary(params: {
     pagesScanned: number;
     pageReports: RepairPageReport[];
     syncRes: SyncPageRegistryResult;
+    invalidPages?: InvalidPageReport[];
 }): RepairRunReport {
-    const { pagesScanned, pageReports, syncRes } = params;
-
+    const { pagesScanned, pageReports, syncRes, invalidPages = [] } = params;
     const pagesChanged = pageReports.filter((r) => r.changed).length;
 
     const filesGenerated = pageReports.reduce((sum, r) => {
@@ -118,6 +130,7 @@ export function buildRunSummary(params: {
         pagesChanged,
         filesGenerated,
         registryUpdates,
+        invalidPages,
         pageReports,
     };
 }

@@ -2,7 +2,7 @@
 
 import path from "node:path";
 
-import { buildPageArtifact } from "@toolingLayer/pageObjects/generator/generator/pageArtifact";
+import { buildPageArtifact } from "./artifacts/buildPageArtifact";
 
 export function getPageArtifactPaths(pageObjectsDir: string, pageKey: string) {
     return buildPageArtifact(pageObjectsDir, pageKey);

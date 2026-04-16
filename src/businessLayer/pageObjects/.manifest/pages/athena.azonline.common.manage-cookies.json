@@ -1,0 +1,30 @@
+{
+  "pageKey": "athena.azonline.common.manage-cookies",
+  "scope": {
+    "platform": "athena",
+    "application": "azonline",
+    "product": "common",
+    "name": "manage-cookies",
+    "namespace": "athena.azonline.common"
+  },
+  "className": "ManageCookiesPage",
+  "paths": {
+    "pageObjectImport": "@businessLayer/pageObjects/objects/athena/azonline/common/manage-cookies/ManageCookiesPage",
+    "pageObjectFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/manage-cookies/ManageCookiesPage.ts",
+    "elementsFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/manage-cookies/elements.ts",
+    "aliasesGeneratedFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/manage-cookies/aliases.generated.ts",
+    "aliasesFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/manage-cookies/aliases.ts",
+    "pageMapFile": "src/businessLayer/pageObjects/maps/athena.common.manage-cookies.json"
+  },
+  "pageMeta": {
+    "url": "https://customer-portal-lv-test.athenapaas.com/",
+    "urlPath": "/",
+    "urlPathPattern": "/^\\/$/i",
+    "title": "Allianz login page",
+    "elementCount": 4
+  },
+  "source": {
+    "scannedAt": "2026-04-01T10:40:09.711Z",
+    "mapHash": "8f4cd8bad7840758bfe723e228c5fd17f8f347d9"
+  }
+}

@@ -1,17 +1,15 @@
 // src/toolingLayer/pageObjects/generator/generator/runner.ts
 
-import path from "node:path";
-
 import { ensureDir } from "@utils/fs";
+import {
+    PAGE_MANIFEST_DIR,
+    PAGE_MANIFEST_INDEX_FILE,
+    PAGE_MANIFEST_PAGES_DIR,
+} from "@utils/paths";
 import type { GenOptions } from "./types";
 import { buildRegistryEntry } from "./changeDetection";
 import { buildPageGenerationContext } from "./pageGenerationContext";
-import { readAllPageMapFiles, loadPageMapFile } from "./pageMapLoader";
-import { ensureScaffoldFiles } from "./scaffold";
-import { syncElementsTs } from "./syncElementsTs";
-import { syncAliasesGeneratedFile } from "./syncAliasesGenerated";
-import { syncAliasesHumanFile } from "./syncAliasesHuman";
-import { syncAliasesIntoPageObject } from "./pageObject";
+import { loadPageMapFile, readAllPageMapFiles } from "./pageMapLoader";
 import {
     buildPageManifestEntry,
     loadPageManifestEntry,
@@ -20,17 +18,23 @@ import {
     saveManifestIndex,
     savePageManifestEntry,
 } from "./pageManifest";
-import { generatePageRegistryFromManifest } from "./registry";
 import {
     applyRegistryStatusToReports,
     buildRunSummary,
+    type InvalidPageReport,
     type RepairPageReport,
     type RepairRunReport,
 } from "./report";
-import { PAGE_MANIFEST_DIR, PAGE_MANIFEST_INDEX_FILE, PAGE_MANIFEST_PAGES_DIR } from "@utils/paths";
+import { generatePageRegistryFromManifest } from "./registry";
+import { ensureScaffoldFiles } from "./scaffold";
+import { syncAliasesGeneratedFile } from "./syncAliasesGenerated";
+import { syncAliasesHumanFile } from "./syncAliasesHuman";
+import { syncElementsTs } from "./syncElementsTs";
+import { syncAliasesIntoPageObject } from "./pageObject";
 
-
-export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunReport> {
+export async function runElementsGenerator(
+    opts: GenOptions
+): Promise<RepairRunReport> {
     const log = opts.log;
     const registryLog = log.child("registry");
     const manifestLog = log.child("manifest");
@@ -41,13 +45,16 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
 
     const mapFiles = readAllPageMapFiles(opts.mapsDir);
     const pageReports: RepairPageReport[] = [];
+    const invalidPages: InvalidPageReport[] = [];
     const validPageKeys: string[] = [];
     let processed = 0;
 
     for (const file of mapFiles) {
         const loaded = loadPageMapFile(opts.mapsDir, file);
+        const pageKey = loaded.pageMap.pageKey;
+
         const oldEntry = loadPageManifestEntry(
-            pageKeyToManifestFile(PAGE_MANIFEST_PAGES_DIR, loaded.pageMap.pageKey)
+            pageKeyToManifestFile(PAGE_MANIFEST_PAGES_DIR, pageKey)
         );
 
         const context = buildPageGenerationContext({
@@ -55,20 +62,42 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
             raw: loaded.raw,
             pageMap: loaded.pageMap,
             pageObjectsDir: opts.pageObjectsDir,
-            oldHash: oldEntry?.mapHash,
+            oldHash: oldEntry?.source?.mapHash,
             changedOnly: opts.changedOnly,
         });
 
-        validPageKeys.push(context.pageMap.pageKey);
-        buildRegistryEntry(context.pageMap.pageKey, opts.pageObjectsDir);
+        if (context.invalidPage) {
+            invalidPages.push(context.invalidPage);
+            manifestLog.info(
+                `Skipped invalid pageKey "${context.invalidPage.pageKey}": ${context.invalidPage.reason}`
+            );
+            continue;
+        }
+
+        if (!context.artifact || !context.scope) {
+            invalidPages.push({
+                pageKey,
+                reason: `Missing page generation context for "${pageKey}"`,
+            });
+            continue;
+        }
+
+        validPageKeys.push(pageKey);
+        buildRegistryEntry(pageKey, opts.pageObjectsDir);
 
         const report: RepairPageReport = {
-            pageKey: context.pageMap.pageKey,
+            pageKey,
             changed: false,
             elementsStatus: "unchanged",
             aliasesGeneratedStatus: "unchanged",
             pageObjectStatus: "unchanged",
             registryStatus: "already-registered",
+            scope: {
+                platform: context.scope.platform,
+                application: context.scope.application,
+                product: context.scope.product,
+                name: context.scope.name,
+            },
         };
 
         if (context.shouldSkip) {
@@ -85,7 +114,11 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
             });
         }
 
-        const elementsRes = syncElementsTs(context.artifact.elementsPath, context.pageMap);
+        const elementsRes = syncElementsTs(
+            context.artifact.elementsPath,
+            context.pageMap
+        );
+
         const generatedRes = syncAliasesGeneratedFile(
             context.artifact.aliasesGeneratedPath,
             context.pageMap,
@@ -106,33 +139,58 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
             aliasesTsPath: context.artifact.aliasesHumanPath,
         });
 
+        const manifestEntryResult = buildPageManifestEntry({
+            pageMap: context.pageMap,
+            artifact: context.artifact,
+            pageMapFilePath: loaded.absPath,
+            mapHash: context.hash,
+        });
+
+        if (!manifestEntryResult.ok) {
+            invalidPages.push({
+                pageKey: manifestEntryResult.pageKey,
+                reason: manifestEntryResult.reason,
+            });
+            manifestLog.info(
+                `Skipped manifest save for "${manifestEntryResult.pageKey}": ${manifestEntryResult.reason}`
+            );
+            continue;
+        }
+
         savePageManifestEntry(
-            pageKeyToManifestFile(PAGE_MANIFEST_PAGES_DIR, context.pageMap.pageKey),
-            buildPageManifestEntry({
-                pageMap: context.pageMap,
-                artifact: context.artifact,
-                pageMapFilePath: loaded.absPath,
-                mapHash: context.hash,
-            })
+            pageKeyToManifestFile(PAGE_MANIFEST_PAGES_DIR, pageKey),
+            manifestEntryResult.entry
         );
 
         processed++;
         report.changed = true;
         report.elementsStatus = elementsRes.changed ? "generated" : "unchanged";
-        report.aliasesGeneratedStatus = generatedRes.changed ? "generated" : "unchanged";
+        report.aliasesGeneratedStatus = generatedRes.changed
+            ? "generated"
+            : "unchanged";
         report.pageObjectStatus = "synced";
         pageReports.push(report);
     }
 
-    const removed = removeMissingPageManifestEntries(PAGE_MANIFEST_PAGES_DIR, validPageKeys);
+    const removed = removeMissingPageManifestEntries(
+        PAGE_MANIFEST_PAGES_DIR,
+        validPageKeys
+    );
+
     if (removed > 0) {
-        manifestLog.info(`Removed ${removed} stale page manifest entr${removed === 1 ? "y" : "ies"}.`);
+        manifestLog.info(
+            `Removed ${removed} stale page manifest entr${removed === 1 ? "y" : "ies"}.`
+        );
     }
 
     saveManifestIndex(PAGE_MANIFEST_INDEX_FILE, validPageKeys);
     manifestLog.info(`Manifest index updated: ${PAGE_MANIFEST_INDEX_FILE}`);
 
-    const syncRes = generatePageRegistryFromManifest(PAGE_MANIFEST_DIR, opts.pageRegistryDir);
+    const syncRes = generatePageRegistryFromManifest(
+        PAGE_MANIFEST_DIR,
+        opts.pageRegistryDir
+    );
+
     applyRegistryStatusToReports(pageReports, syncRes);
 
     registryLog.info(`Registry synced from manifest: ${PAGE_MANIFEST_DIR}`);
@@ -142,6 +200,7 @@ export async function runElementsGenerator(opts: GenOptions): Promise<RepairRunR
         pagesScanned: mapFiles.length,
         pageReports,
         syncRes,
+        invalidPages,
     });
 
     endRun();

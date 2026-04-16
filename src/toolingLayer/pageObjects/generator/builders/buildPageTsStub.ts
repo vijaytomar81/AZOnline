@@ -1,10 +1,10 @@
 // src/toolingLayer/pageObjects/generator/builders/buildPageTsStub.ts
 
-import type { PageMap } from "../generator/types";
 import { toPascal } from "@utils/ts";
+import type { PageMap } from "../generator/types";
 import {
-    headerFilePath,
     getPageObjectFileParts,
+    headerFilePath,
 } from "../utils/buildGeneratedHeader";
 
 function buildReadinessLocatorLines(pageMap: PageMap): string[] {
@@ -14,8 +14,7 @@ function buildReadinessLocatorLines(pageMap: PageMap): string[] {
         return [`    const readinessLocators: Locator[] = [];`];
     }
 
-    const lines: string[] = [];
-    lines.push(`    const readinessLocators: Locator[] = await Promise.all([`);
+    const lines: string[] = [`    const readinessLocators: Locator[] = await Promise.all([`];
 
     for (const alias of aliases) {
         lines.push(
@@ -32,83 +31,80 @@ export function buildPageTsStub(pageMap: PageMap): string {
     const lastSeg = pageKey.split(".").slice(-1)[0] || "page";
     const className = `${toPascal(lastSeg)}Page`;
 
-    const lines: string[] = [];
-
-    lines.push(
-        headerFilePath(getPageObjectFileParts(pageKey, `${className}.ts`))
-    );
-
-    lines.push(`// pageKey: ${pageKey}`);
-    lines.push(``);
-    lines.push(`import type { Locator, Page } from "@playwright/test";`);
-    lines.push(`import { expect } from "@playwright/test";`);
-    lines.push(`import { BasePage } from "@frameworkCore/automation/base";`);
-    lines.push(`import { elements } from "./elements";`);
-    lines.push(`import { aliases, aliasKeys } from "./aliases";`);
-    lines.push(`import { pageMeta } from "./aliases.generated";`);
-    lines.push(``);
-    lines.push(`const PAGE_KEY = ${JSON.stringify(pageKey)} as const;`);
-    lines.push(``);
-    lines.push(`export class ${className} extends BasePage {`);
-    lines.push(`  constructor(page: Page) {`);
-    lines.push(`    super(page, PAGE_KEY);`);
-    lines.push(`  }`);
-    lines.push(``);
-    lines.push(`  async waitUntilReady() {`);
-    lines.push(...buildReadinessLocatorLines(pageMap));
-    lines.push(``);
-    lines.push(`    await this.waitForStandardReady({`);
-    lines.push(`      expectedUrlPart: pageMeta.urlPath || undefined,`);
-    lines.push(`      readinessLocators,`);
-    lines.push(`      dismissOverlays: true,`);
-    lines.push(`      waitForNetworkIdle: false,`);
-    lines.push(`    });`);
-    lines.push(``);
-    lines.push(`    if ((pageMeta as any).titleRe) {`);
-    lines.push(`      await expect(this.page).toHaveTitle((pageMeta as any).titleRe);`);
-    lines.push(`    } else if ((pageMeta as any).title) {`);
-    lines.push(`      await expect(this.page).toHaveTitle((pageMeta as any).title);`);
-    lines.push(`    }`);
-    lines.push(`  }`);
-    lines.push(``);
-    lines.push(`  async assertOnPage() {`);
-    lines.push(`    if (pageMeta.urlRe) {`);
-    lines.push(`      await expect(this.page).toHaveURL(pageMeta.urlRe);`);
-    lines.push(`    } else if (pageMeta.urlPath) {`);
-    lines.push(`      await expect(this.page).toHaveURL(new RegExp(pageMeta.urlPath));`);
-    lines.push(`    }`);
-    lines.push(``);
-    lines.push(`    if ((pageMeta as any).titleRe) {`);
-    lines.push(`      await expect(this.page).toHaveTitle((pageMeta as any).titleRe);`);
-    lines.push(`    } else if ((pageMeta as any).title) {`);
-    lines.push(`      await expect(this.page).toHaveTitle((pageMeta as any).title);`);
-    lines.push(`    }`);
-    lines.push(`  }`);
-    lines.push(``);
-    lines.push(`  protected async clickAliasKey(aliasKey: keyof typeof aliases) {`);
-    lines.push(`    await this.actions.clickByAlias(aliases, elements, aliasKey);`);
-    lines.push(`  }`);
-    lines.push(``);
-    lines.push(`  protected async fillAliasKey(aliasKey: keyof typeof aliases, value: string) {`);
-    lines.push(`    await this.actions.fillByAlias(aliases, elements, aliasKey, value);`);
-    lines.push(`  }`);
-    lines.push(``);
-    lines.push(`  protected async selectAliasKey(aliasKey: keyof typeof aliases, value: string) {`);
-    lines.push(`    await this.actions.selectOptionByAlias(aliases, elements, aliasKey, value);`);
-    lines.push(`  }`);
-    lines.push(``);
-    lines.push(`  protected async setCheckedAliasKey(aliasKey: keyof typeof aliases, checked: boolean = true) {`);
-    lines.push(`    const { locator } = await this.resolveAliasLocator(aliases, elements, aliasKey);`);
-    lines.push(`    await locator.setChecked(checked);`);
-    lines.push(`  }`);
-    lines.push(``);
-    lines.push(`  // <scanner:aliases>`);
-    lines.push(`  // This region is auto-managed. Do not edit by hand.`);
-    lines.push(`  // </scanner:aliases>`);
-    lines.push(``);
-    lines.push(`  // You can add custom business logic methods below (safe zone).`);
-    lines.push(`}`);
-    lines.push(``);
+    const lines: string[] = [
+        headerFilePath(getPageObjectFileParts(pageKey, `${className}.ts`)),
+        `// pageKey: ${pageKey}`,
+        ``,
+        `import type { Locator, Page } from "@playwright/test";`,
+        `import { expect } from "@playwright/test";`,
+        `import { BasePage } from "@frameworkCore/automation/base";`,
+        `import { elements } from "./elements";`,
+        `import { aliases, aliasKeys } from "./aliases";`,
+        `import { pageMeta } from "./aliases.generated";`,
+        ``,
+        `const PAGE_KEY = ${JSON.stringify(pageKey)} as const;`,
+        ``,
+        `export class ${className} extends BasePage {`,
+        `  constructor(page: Page) {`,
+        `    super(page, PAGE_KEY);`,
+        `  }`,
+        ``,
+        `  async waitUntilReady() {`,
+        ...buildReadinessLocatorLines(pageMap),
+        ``,
+        `    await this.waitForStandardReady({`,
+        `      expectedUrlPart: pageMeta.urlPath || undefined,`,
+        `      readinessLocators,`,
+        `      dismissOverlays: true,`,
+        `      waitForNetworkIdle: false,`,
+        `    });`,
+        ``,
+        `    if ((pageMeta as any).titleRe) {`,
+        `      await expect(this.page).toHaveTitle((pageMeta as any).titleRe);`,
+        `    } else if ((pageMeta as any).title) {`,
+        `      await expect(this.page).toHaveTitle((pageMeta as any).title);`,
+        `    }`,
+        `  }`,
+        ``,
+        `  async assertOnPage() {`,
+        `    if (pageMeta.urlRe) {`,
+        `      await expect(this.page).toHaveURL(pageMeta.urlRe);`,
+        `    } else if (pageMeta.urlPath) {`,
+        `      await expect(this.page).toHaveURL(new RegExp(pageMeta.urlPath));`,
+        `    }`,
+        ``,
+        `    if ((pageMeta as any).titleRe) {`,
+        `      await expect(this.page).toHaveTitle((pageMeta as any).titleRe);`,
+        `    } else if ((pageMeta as any).title) {`,
+        `      await expect(this.page).toHaveTitle((pageMeta as any).title);`,
+        `    }`,
+        `  }`,
+        ``,
+        `  protected async clickAliasKey(aliasKey: keyof typeof aliases) {`,
+        `    await this.actions.clickByAlias(aliases, elements, aliasKey);`,
+        `  }`,
+        ``,
+        `  protected async fillAliasKey(aliasKey: keyof typeof aliases, value: string) {`,
+        `    await this.actions.fillByAlias(aliases, elements, aliasKey, value);`,
+        `  }`,
+        ``,
+        `  protected async selectAliasKey(aliasKey: keyof typeof aliases, value: string) {`,
+        `    await this.actions.selectOptionByAlias(aliases, elements, aliasKey, value);`,
+        `  }`,
+        ``,
+        `  protected async setCheckedAliasKey(aliasKey: keyof typeof aliases, checked: boolean = true) {`,
+        `    const { locator } = await this.resolveAliasLocator(aliases, elements, aliasKey);`,
+        `    await locator.setChecked(checked);`,
+        `  }`,
+        ``,
+        `  // <scanner:aliases>`,
+        `  // This region is auto-managed. Do not edit by hand.`,
+        `  // </scanner:aliases>`,
+        ``,
+        `  // You can add custom business logic methods below (safe zone).`,
+        `}`,
+        ``,
+    ];
 
     return lines.join("\n");
 }

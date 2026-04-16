@@ -15,11 +15,17 @@ export function collectManifestMismatchItems(
         input.pageObjectsDir,
         input.pageMapItem
     );
+
     const mismatchItems: string[] = [];
+    const actualMeta = input.manifestEntry.pageMeta ?? {};
 
     if (input.manifestEntry.className !== expected.className) {
         mismatchItems.push(
-            mismatchText("className", input.manifestEntry.className, expected.className)
+            mismatchText(
+                "className",
+                input.manifestEntry.className,
+                expected.className
+            )
         );
     }
 
@@ -33,21 +39,25 @@ export function collectManifestMismatchItems(
         );
     }
 
-    if (input.manifestEntry.elementCount !== expected.elementCount) {
+    if (actualMeta.elementCount !== expected.elementCount) {
         mismatchItems.push(
-            mismatchText("elementCount", input.manifestEntry.elementCount, expected.elementCount)
+            mismatchText(
+                "elementCount",
+                actualMeta.elementCount,
+                expected.elementCount
+            )
         );
     }
 
-    if ((input.manifestEntry.urlPath ?? undefined) !== expected.urlPath) {
+    if ((actualMeta.urlPath ?? undefined) !== expected.urlPath) {
         mismatchItems.push(
-            mismatchText("urlPath", input.manifestEntry.urlPath, expected.urlPath)
+            mismatchText("urlPath", actualMeta.urlPath, expected.urlPath)
         );
     }
 
-    if ((input.manifestEntry.title ?? undefined) !== expected.title) {
+    if ((actualMeta.title ?? undefined) !== expected.title) {
         mismatchItems.push(
-            mismatchText("title", input.manifestEntry.title, expected.title)
+            mismatchText("title", actualMeta.title, expected.title)
         );
     }
 
