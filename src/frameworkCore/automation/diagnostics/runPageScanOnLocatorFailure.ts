@@ -9,6 +9,7 @@ import { emitLog } from "@frameworkCore/logging/emitLog";
 import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import { scanPage } from "@toolingLayer/pageScanner/scanner/runner";
+import { parsePageKey } from "@toolingLayer/pageScanner/scanner/pageKey/parsePageKey";
 import { toRepoRelative } from "@utils/paths";
 import { isLocatorFailure } from "./isLocatorFailure";
 
@@ -26,6 +27,18 @@ function resolvePageScanOutDir(screenshotPath?: string): string {
     }
 
     return executionConfig.automation.diagnostics.pageScanOutDir;
+}
+
+function buildScannerOutputPath(outDir: string, pageKey: string): string {
+    const scope = parsePageKey(pageKey);
+
+    return path.join(
+        outDir,
+        scope.platform,
+        scope.application,
+        scope.product,
+        `${scope.name}.json`
+    );
 }
 
 export async function runPageScanOnLocatorFailure(args: {
@@ -105,7 +118,7 @@ export async function runPageScanOnLocatorFailure(args: {
     }
 
     const outDir = resolvePageScanOutDir(args.screenshotPath);
-    const outputPath = path.join(outDir, `${args.pageKey}.json`);
+    const outputPath = buildScannerOutputPath(outDir, args.pageKey);
 
     try {
         await fs.mkdir(outDir, { recursive: true });
@@ -119,13 +132,10 @@ export async function runPageScanOnLocatorFailure(args: {
             )}`,
         });
 
-        await scanPage({
+        const result = await scanPage({
             connectCdp,
             pageKey: args.pageKey,
             outDir,
-            merge:
-                executionConfig.automation.diagnostics
-                    .pageScanMergeIntoExistingPageMap,
             tabIndex: 0,
             verbose: executionConfig.automation.diagnostics.pageScanVerbose,
             log: createScopedLogger(
@@ -133,6 +143,23 @@ export async function runPageScanOnLocatorFailure(args: {
                 LOG_CATEGORIES.DIAGNOSTIC
             ),
         });
+
+        if (result.operation === "failed") {
+            const note = `Page scan failed: ${result.errorMessage ?? "Unknown scanner error"}`;
+
+            emitLog({
+                scope: PAGE_SCAN_LOG_SCOPE,
+                level: LOG_LEVELS.ERROR,
+                category: LOG_CATEGORIES.DIAGNOSTIC,
+                message: note,
+            });
+
+            return {
+                triggered: false,
+                note,
+                outputPath,
+            };
+        }
 
         const note = `Page scan completed: ${toRepoRelative(outputPath)}`;
 

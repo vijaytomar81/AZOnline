@@ -3,6 +3,13 @@
 import path from "node:path";
 import { BUSINESS_LAYER_DIR } from "./core";
 
+export const PAGE_SCANNER_DIR = path.join(BUSINESS_LAYER_DIR, "pageScanner");
+export const PAGE_SCANNER_MANIFEST_DIR = path.join(PAGE_SCANNER_DIR, ".manifest");
+export const PAGE_SCANNER_MANIFEST_INDEX_FILE = path.join(
+    PAGE_SCANNER_MANIFEST_DIR,
+    "index.json"
+);
+
 export const PAGE_OBJECTS_ROOT_DIR = path.join(
     BUSINESS_LAYER_DIR,
     "pageObjects"

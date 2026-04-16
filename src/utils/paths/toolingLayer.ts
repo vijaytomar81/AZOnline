@@ -3,8 +3,6 @@
 import path from "node:path";
 import { TOOLING_LAYER_DIR } from "./core";
 
-export const PAGE_SCANNER_DIR = path.join(TOOLING_LAYER_DIR, "pageScanner");
-
 export const PAGE_OBJECT_TOOLS_DIR = path.join(
     TOOLING_LAYER_DIR,
     "pageObjects"

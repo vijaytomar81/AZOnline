@@ -6,10 +6,10 @@ Page Scanner CLI
 
 Usage:
   npm run scan -- --connectCdp <wsUrl> --pageKey <key> [options]
-  node -r ts-node/register src/page-scanner/cli.ts scan [options]
+  node -r ts-node/register src/toolingLayer/pageScanner/cli.ts scan [options]
 
 Commands:
-  scan       Scan a page via CDP and write a page-map JSON
+  scan       Scan a page via CDP and synchronize page-map JSON
   help       Show this help
 
 ------------------------------------------------------------
@@ -20,22 +20,19 @@ Required:
                             Example:
                               ws://localhost:9222/devtools/browser/<id>
 
-  --pageKey <key>           Page key used as filename and folder mapping
+  --pageKey <key>           Page key format:
+                              <platform>.<application>.<product>.<name>
                             Example:
-                              motor.car-details
+                              athena.azonline.motor.car-details
 
 Optional:
-  --outDir <path>           Output folder for page-maps
+  --outDir <path>           Scanner output root
                             Default:
-                              src/page-scanner/page-maps
+                              src/businessLayer/pageScanner
 
   --tabIndex <n>            Which browser tab to scan (0-based)
                             Default:
                               0
-
-  --merge                   Merge into existing <pageKey>.json (keeps keys stable)
-                            Default:
-                              false
 
   --verbose                 Extra logs
 
@@ -43,42 +40,36 @@ Optional:
 
   --logFilePath <path>      Log file path
                             Default:
-                              scanner.log
+                              page-scanner.log
 
   --help, -h                Show scan help
 
 ------------------------------------------------------------
-Examples
+Behavior
 
-# 1) Minimal scan (writes new JSON)
-npm run scan -- --connectCdp "$CDP" --pageKey motor.car-details
-
-# 2) Scan + merge (recommended; keeps stable keys)
-npm run scan -- --connectCdp "$CDP" --pageKey motor.car-details --merge
-
-# 3) Scan a different tab (tabIndex=1 means 2nd tab)
-npm run scan -- --connectCdp "$CDP" --pageKey motor.car-details --merge --tabIndex 1
-
-# 4) Write page-map into a custom folder
-npm run scan -- --connectCdp "$CDP" --pageKey motor.car-details --merge --outDir ./tmp/page-maps
-
-# 5) Verbose mode (debug logs)
-npm run scan -- --connectCdp "$CDP" --pageKey motor.car-details --merge --verbose
-
-# 6) Log to file (plus console)
-npm run scan -- --connectCdp "$CDP" --pageKey motor.car-details --merge --logToFile --logFilePath ./scanner.log
-
-# Windows PowerShell examples:
-npm run scan -- --connectCdp "$CDP" --pageKey motor.car-details --merge --verbose
-npm run scan -- --connectCdp "$CDP" --pageKey motor.car-details --merge --tabIndex 1
+- If page-map file does not exist -> operation = created
+- If page-map file exists and content changes -> operation = merged
+- If page-map file exists and no meaningful change is found -> operation = unchanged
+- Invalid pageKey or runtime failure -> operation = failed
 
 ------------------------------------------------------------
-Notes
+Examples
 
-- Page maps are written to: src/page-scanner/page-maps (by default)
-- Use --merge to keep stable keys across scans.
-- If npm eats your args, ensure you include the extra "--" after the script:
-    npm run scan -- --connectCdp "$CDP" --pageKey motor.car-details
+npm run scan -- --connectCdp "$CDP" --pageKey athena.azonline.motor.car-details
+npm run scan -- --connectCdp "$CDP" --pageKey athena.azonline.motor.car-details --tabIndex 1
+npm run scan -- --connectCdp "$CDP" --pageKey athena.azonline.motor.car-details --verbose
+npm run scan -- --connectCdp "$CDP" --pageKey athena.azonline.motor.car-details --logToFile --logFilePath ./page-scanner.log
+
+------------------------------------------------------------
+Output
+
+Page maps are written as:
+
+  src/businessLayer/pageScanner/<platform>/<application>/<product>/<name>.json
+
+Scanner manifest index is written as:
+
+  src/businessLayer/pageScanner/.manifest/index.json
 
 `.trim();
 }

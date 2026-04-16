@@ -42,3 +42,19 @@ export const GROUP_KEY_PREFIXES = {
 
 export type GroupKeyPrefix =
     typeof GROUP_KEY_PREFIXES[keyof typeof GROUP_KEY_PREFIXES];
+
+export const PAGE_KEY_RULES = {
+    SEGMENT_COUNT: 4,
+    FORMAT_LABEL: "<platform>.<application>.<product>.<name>",
+    PATTERN: /^[a-z0-9]+(?:\.[a-z0-9-]+){3}$/,
+} as const;
+
+export const PAGE_SCAN_OPERATIONS = {
+    CREATED: "created",
+    MERGED: "merged",
+    UNCHANGED: "unchanged",
+    FAILED: "failed",
+} as const;
+
+export type PageScanOperation =
+    typeof PAGE_SCAN_OPERATIONS[keyof typeof PAGE_SCAN_OPERATIONS];
