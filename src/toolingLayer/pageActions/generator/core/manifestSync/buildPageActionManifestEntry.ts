@@ -26,6 +26,5 @@ export function buildPageActionManifestEntry(args: {
             rootIndexFile: toRepoRelative(args.paths.rootIndexFile),
             sourcePageObjectFile: args.page.paths.pageObjectFile,
         },
-        generatedAt: new Date().toISOString(),
     };
 }

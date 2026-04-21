@@ -59,5 +59,4 @@ export type PageActionManifestEntry = {
         rootIndexFile: string;
         sourcePageObjectFile: string;
     };
-    generatedAt: string;
 };
