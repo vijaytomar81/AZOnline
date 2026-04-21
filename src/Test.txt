@@ -12,6 +12,11 @@ npx ts-prune | grep -v "used in module" | grep page-scanner
 line of code: find src/data -type f -name "*.ts" -exec wc -l {} + | sed '$d' | awk '{print $1 " - " $2}'
 
 
+empty files in given folder:
+
+find src/toolingLayer/pageActions/validator -type f -empty
+
+
 =========
 For Windows:
 
