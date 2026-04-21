@@ -7,18 +7,19 @@ import { toPascalCase } from "../../shared/naming";
 export function buildActionName(
     page: PageObjectManifestPage
 ): ActionNaming {
-    const namePascal = toPascalCase(page.name);
-    const prefix = page.group === "common" ? "handle" : "fill";
+    const { platform, application, product, name } = page.scope;
+    const namePascal = toPascalCase(name);
+    const prefix = product === "common" ? "handle" : "fill";
     const actionName = `${prefix}${namePascal}Action`;
     const actionFileName = `${prefix}${namePascal}.action.ts`;
-
-    const [platform, group] = page.pageKey.split(".");
-    const actionNameKebab = `${prefix}-${page.name}`;
-    const actionKey = `${platform}.${group}.${actionNameKebab}.action`;
+    const actionSlug = `${prefix}-${name}`;
+    const actionKey =
+        `${platform}.${application}.${product}.${actionSlug}.action`;
 
     return {
         actionName,
         actionFileName,
         actionKey,
+        actionSlug,
     };
 }

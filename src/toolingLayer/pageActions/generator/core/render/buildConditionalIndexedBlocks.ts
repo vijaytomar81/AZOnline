@@ -66,6 +66,9 @@ export function buildConditionalIndexedBlocks(args: {
     });
 
     const lines: string[] = [];
+    const pageAccessor = toCamelCase(args.page.scope.name);
+    const platformAccessor = toCamelCase(args.page.scope.platform);
+    const productAccessor = toCamelCase(args.page.scope.product);
 
     for (const family of Array.from(familyMap.keys()).sort()) {
         const entry = familyMap.get(family)!;
@@ -87,9 +90,8 @@ export function buildConditionalIndexedBlocks(args: {
             lines.push(`    if (${countField} >= ${index}) {`);
 
             if (index > 1 && entry.addAnotherControl) {
-                const pageAccessor = toCamelCase(args.page.name);
                 lines.push(
-                    `        await context.pages.athena.${pageAccessor}.${entry.addAnotherControl.name}();`,
+                    `        await context.pages.${platformAccessor}.${productAccessor}.${pageAccessor}.${entry.addAnotherControl.name}();`,
                     ""
                 );
             }

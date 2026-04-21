@@ -8,8 +8,8 @@ import {
     printSummary,
     success,
     warning,
+    failure,
 } from "@utils/cliFormat";
-import { ICONS } from "@utils/icons";
 import {
     PAGE_ACTIONS_ACTIONS_DIR,
     PAGE_ACTIONS_MANIFEST_DIR,
@@ -45,20 +45,31 @@ function main(): void {
     });
 
     const resultText =
-        summary.generatedActions > 0
-            ? success("UPDATED")
-            : warning("UP TO DATE");
+        summary.exitCode > 0
+            ? failure("ERROR FOUND")
+            : summary.created > 0 || summary.updated > 0
+              ? success("UPDATED")
+              : warning("UP TO DATE");
 
     printSummary(
         "GENERATION SUMMARY",
         [
-            ["Page objects", summary.totalPages],
-            ["Existing actions", summary.existingActions],
-            ["New actions", summary.generatedActions],
-            ["Skipped actions", summary.skippedActions],
+            ["Available page objects", summary.availablePages],
+            ["Created", summary.created],
+            ["Updated", summary.updated],
+            ["Unchanged", summary.unchanged],
+            ["Failed", summary.failed],
+            ["Files generated", summary.filesGenerated],
+            ["Registry files updated", summary.registryFilesUpdated],
+            ["Invalid pages", summary.invalidPages],
+            ["Exit code", summary.exitCode],
         ],
         resultText
     );
+
+    if (summary.exitCode > 0) {
+        process.exit(summary.exitCode);
+    }
 }
 
 main();

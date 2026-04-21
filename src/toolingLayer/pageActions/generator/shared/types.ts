@@ -1,5 +1,7 @@
 // src/toolingLayer/pageActions/generator/shared/types.ts
 
+import type { PageScope } from "../manifest/types";
+
 export type ExtractedMethod = {
     name: string;
     hasArguments: boolean;
@@ -17,25 +19,55 @@ export type ActionNaming = {
     actionName: string;
     actionFileName: string;
     actionKey: string;
+    actionSlug: string;
 };
 
 export type ActionPathInfo = {
     platform: string;
-    group: string;
+    application: string;
+    product: string;
     actionDir: string;
     actionFile: string;
-    leafIndexFile: string;
+    productIndexFile: string;
+    applicationIndexFile: string;
     platformIndexFile: string;
+    actionsIndexFile: string;
     rootIndexFile: string;
     manifestDir: string;
     manifestIndexFile: string;
-    manifestActionsDir: string;
     manifestEntryFile: string;
 };
 
+export type ActionRegistryEntry = {
+    pageKey: string;
+    scope: PageScope;
+    actionName: string;
+    actionFileName: string;
+    paths: Pick<
+        ActionPathInfo,
+        | "productIndexFile"
+        | "applicationIndexFile"
+        | "platformIndexFile"
+        | "actionsIndexFile"
+        | "rootIndexFile"
+    >;
+};
+
+export type PageActionOperation =
+    | "created"
+    | "updated"
+    | "unchanged"
+    | "failed";
+
 export type GenerateSummary = {
-    totalPages: number;
+    availablePages: number;
     existingActions: number;
-    generatedActions: number;
-    skippedActions: number;
+    created: number;
+    updated: number;
+    unchanged: number;
+    failed: number;
+    filesGenerated: number;
+    registryFilesUpdated: number;
+    invalidPages: number;
+    exitCode: number;
 };
