@@ -1,4 +1,5 @@
 // src/toolingLayer/pageObjects/generator/cli.ts
+
 import os from "node:os";
 import path from "node:path";
 
@@ -35,23 +36,24 @@ let log = createLogger({
     withTimestamp: true,
 });
 
-function isHelp(argv: string[]): boolean {
+function shouldShowHelp(argv: string[]): boolean {
     const args = normalizeArgv(argv);
 
-    return (
-        args.length === 0 ||
-        args[0] === "help" ||
-        args.includes("--help") ||
-        args.includes("-h")
-    );
+    if (args.length === 0) {
+        return true;
+    }
+
+    if (args[0] === "help") {
+        return true;
+    }
+
+    return args.includes("--help") || args.includes("-h");
 }
 
 function printGeneratorEnvironment(args: {
     mapsDir: string;
     pageObjectsDir: string;
     pageRegistryDir: string;
-    merge: boolean;
-    changedOnly: boolean;
     logToFile: boolean;
     logFilePath: string;
     verbose: boolean;
@@ -60,8 +62,6 @@ function printGeneratorEnvironment(args: {
         ["mapsDir", args.mapsDir],
         ["pageObjectsDir", args.pageObjectsDir],
         ["pageRegistryDir", args.pageRegistryDir],
-        ["merge", args.merge],
-        ["changedOnly", args.changedOnly],
         ["logToFile", args.logToFile],
         ["verbose", args.verbose],
     ];
@@ -80,12 +80,13 @@ async function main() {
     printCommandTitle("PAGE ELEMENTS GENERATOR", "elementsGeneratorIcon");
 
     const argv = normalizeArgv(process.argv.slice(2));
-    const args = argv[0] === "generate" ? argv.slice(1) : argv;
 
-    if (isHelp(args)) {
+    if (shouldShowHelp(argv)) {
         log.info(usage());
         return;
     }
+
+    const args = argv[0] === "generate" ? argv.slice(1) : argv;
 
     const verbose = hasFlag(args, "--verbose");
     const logToFile = hasFlag(args, "--logToFile");
@@ -105,15 +106,11 @@ async function main() {
         getArg(args, "--pageObjectsDir") ?? PAGE_OBJECTS_DIR;
     const pageRegistryDir =
         getArg(args, "--pageRegistryDir") ?? PAGE_REGISTRY_DIR;
-    const merge = hasFlag(args, "--merge");
-    const changedOnly = hasFlag(args, "--changedOnly");
 
     printGeneratorEnvironment({
         mapsDir,
         pageObjectsDir,
         pageRegistryDir,
-        merge,
-        changedOnly,
         logToFile,
         logFilePath,
         verbose,
@@ -130,8 +127,6 @@ async function main() {
         mapsDir,
         pageObjectsDir,
         pageRegistryDir,
-        merge,
-        changedOnly,
         verbose,
         log: log.child("runner"),
     });

@@ -1,27 +1,25 @@
 // src/toolingLayer/pageObjects/generator/generator/reporting/buildGenerationSummaryRows.ts
 
 export function buildGenerationSummaryRows(params: {
-    pagesScanned: number;
-    pagesProcessed: number;
-    pagesChanged: number;
+    availablePageMaps: number;
+    createdCount: number;
+    updatedCount: number;
+    unchangedCount: number;
+    failedCount: number;
     filesGenerated: number;
-    registryUpdates: number;
+    registryPagesUpdated: number;
     invalidPages: number;
-    errorPages: number;
-    warnings: number;
-    errors: number;
     exitCode: number;
 }): Array<[string, string | number]> {
     return [
-        ["Pages scanned", params.pagesScanned],
-        ["Pages processed", params.pagesProcessed],
-        ["Pages changed", params.pagesChanged],
+        ["Available Page Maps", params.availablePageMaps],
+        ["Created", params.createdCount],
+        ["Updated", params.updatedCount],
+        ["Unchanged", params.unchangedCount],
+        ["Failed", params.failedCount],
         ["Files generated", params.filesGenerated],
-        ["Registry updates", params.registryUpdates],
+        ["Registry pages updated", params.registryPagesUpdated],
         ["Invalid pages", params.invalidPages],
-        ["Failed pages", params.errorPages],
-        ["Warnings", params.warnings],
-        ["Errors", params.errors],
         ["Exit code", params.exitCode],
     ];
 }

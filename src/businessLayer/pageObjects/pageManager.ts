@@ -5,6 +5,7 @@ import type { Page } from "@playwright/test";
 import { InsuranceTypeSelectionPage } from "@businessLayer/pageObjects/objects/athena/azonline/common/insurance-type-selection/InsuranceTypeSelectionPage";
 import { LoginOrRegistrationPage } from "@businessLayer/pageObjects/objects/athena/azonline/common/login-or-registration/LoginOrRegistrationPage";
 import { ManageCookiesPage } from "@businessLayer/pageObjects/objects/athena/azonline/common/manage-cookies/ManageCookiesPage";
+import { CarDetailsPage } from "@businessLayer/pageObjects/objects/athena/azonline/motor/car-details/CarDetailsPage";
 import { PhDrivingLicenceDetailsPage } from "@businessLayer/pageObjects/objects/athena/azonline/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage";
 
 type PageFactory<T> = () => T;
@@ -32,6 +33,7 @@ export class PageManager {
 
     get motor() {
         return {
+            carDetails: this.get("motor.carDetails", () => new CarDetailsPage(this.page)),
             phDrivingLicenceDetails: this.get("motor.phDrivingLicenceDetails", () => new PhDrivingLicenceDetailsPage(this.page)),
         };
     }

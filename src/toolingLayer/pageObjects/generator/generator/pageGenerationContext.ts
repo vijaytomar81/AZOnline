@@ -4,12 +4,8 @@ import { hashContent } from "@utils/hash";
 import type { PageMap } from "./types";
 import { buildPageArtifact, type PageArtifact } from "./pageArtifact";
 import { hasMissingGeneratedOutputs } from "./scaffold";
-import {
-    parsePageScope,
-} from "@toolingLayer/pageObjects/common/manifest/parsePageScope";
-import type {
-    PageScope,
-} from "@toolingLayer/pageObjects/common/manifest/types";
+import { parsePageScope } from "@toolingLayer/pageObjects/common/manifest/parsePageScope";
+import type { PageScope } from "@toolingLayer/pageObjects/common/manifest/types";
 
 export type InvalidPageInfo = {
     pageKey: string;
@@ -37,9 +33,8 @@ export function buildPageGenerationContext(params: {
     pageMap: PageMap;
     pageObjectsDir: string;
     oldHash?: string;
-    changedOnly?: boolean;
 }): PageGenerationContext {
-    const { file, raw, pageMap, pageObjectsDir, oldHash, changedOnly = false } = params;
+    const { file, raw, pageMap, pageObjectsDir, oldHash } = params;
 
     const hash = hashContent(raw);
     const changed = oldHash !== hash;
@@ -80,6 +75,6 @@ export function buildPageGenerationContext(params: {
         changed,
         missingOutputs,
         shouldScaffold: missingOutputs,
-        shouldSkip: changedOnly && !changed && !missingOutputs,
+        shouldSkip: !changed && !missingOutputs,
     };
 }

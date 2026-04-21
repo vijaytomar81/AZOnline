@@ -29,7 +29,6 @@ export async function runElementsGenerator(
     const invalidPages: InvalidPageReport[] = [];
     const errorPages: GenerationErrorReport[] = [];
     const validPageKeys: string[] = [];
-    let processed = 0;
 
     for (const file of mapFiles) {
         const loaded = loadPageMapFile(opts.mapsDir, file);
@@ -67,16 +66,11 @@ export async function runElementsGenerator(
                 `Failed to process page "${result.errorPage.pageKey}": ${result.errorPage.reason}`
             );
         }
-
-        if (result.processed) {
-            processed++;
-        }
     }
 
     const summary = finalizeGenerationRun({
         opts,
-        pagesScanned: mapFiles.length,
-        processed,
+        availablePageMaps: mapFiles.length,
         pageReports,
         invalidPages,
         errorPages,

@@ -4,6 +4,12 @@ import type { TreeNode } from "@utils/cliTree";
 
 export type GenerationResult = "SUCCESS" | "WARN" | "ERROR";
 
+export type GenerationOperation =
+    | "created"
+    | "updated"
+    | "unchanged"
+    | "failed";
+
 export type GenerationSummaryRow = {
     label: string;
     value: string | number;
@@ -17,9 +23,10 @@ export type GenerationIssueCounts = {
 export type GenerationTreeInput = {
     pageReports: Array<{
         pageKey: string;
-        changed: boolean;
+        operation: Exclude<GenerationOperation, "failed">;
         elementsStatus: string;
         aliasesGeneratedStatus: string;
+        aliasesHumanStatus: string;
         pageObjectStatus: string;
         registryStatus: string;
     }>;

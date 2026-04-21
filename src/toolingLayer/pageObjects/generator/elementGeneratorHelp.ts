@@ -5,7 +5,8 @@ export function usage(): string {
 Page Elements Generator CLI
 
 Usage:
-  npm run generator -- generate [options]
+  npm run pageobjects:generate
+  npm run pageobjects:generate -- [options]
 
 Description:
   Generates and incrementally syncs:
@@ -15,21 +16,24 @@ Description:
     - <PageName>Page.ts
   from page-map JSON files.
 
+Behavior:
+  The generator uses a single command path and determines the result per page:
+
+    - created   : generated outputs were missing and created
+    - updated   : existing outputs were updated from changed page-map input
+    - unchanged : no updates were required
+    - failed    : generation failed for that page
+
 Options
 
   --mapsDir <path>         Page-maps directory
-                           (default: src/pages/maps)
+                           (default: src/businessLayer/pageScanner)
 
   --pageObjectsDir <path>  Page objects output directory
-                           (default: src/pages/objects)
+                           (default: src/businessLayer/pageObjects/objects)
 
   --pageRegistryDir <path> Page registry directory
-                           (default: src/pages)
-
-  --merge                  Incremental merge/update mode
-
-  --changedOnly            Only process page-maps whose hash differs
-                           from src/pages/.manifest/pages/<pageKey>.json
+                           (default: src/businessLayer/pageObjects)
 
   --verbose                Enable debug logging
 
@@ -41,10 +45,8 @@ Options
 
 Examples
 
-  npm run generator:elements
-  npm run generator:elements:verbose
-  npm run generator:elements:changed
-  npm run generator:elements:changed:verbose
+  npm run pageobjects:generate
+  npm run pageobjects:generate -- --verbose
 
 Notes
 
@@ -52,5 +54,6 @@ Notes
   - elements.ts includes stableKey when present in page-map.
   - aliases.ts preserves business-friendly LHS alias names.
   - PageObject.ts syncs managed methods from aliases.ts.
+  - There is no separate changed-only or merge command.
 `.trim();
 }

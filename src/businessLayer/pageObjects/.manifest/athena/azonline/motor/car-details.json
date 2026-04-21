@@ -1,0 +1,30 @@
+{
+  "pageKey": "athena.azonline.motor.car-details",
+  "scope": {
+    "platform": "athena",
+    "application": "azonline",
+    "product": "motor",
+    "name": "car-details",
+    "namespace": "athena.azonline.motor"
+  },
+  "className": "CarDetailsPage",
+  "paths": {
+    "pageObjectImport": "@businessLayer/pageObjects/objects/athena/azonline/motor/car-details/CarDetailsPage",
+    "pageObjectFile": "src/businessLayer/pageObjects/objects/athena/azonline/motor/car-details/CarDetailsPage.ts",
+    "elementsFile": "src/businessLayer/pageObjects/objects/athena/azonline/motor/car-details/elements.ts",
+    "aliasesGeneratedFile": "src/businessLayer/pageObjects/objects/athena/azonline/motor/car-details/aliases.generated.ts",
+    "aliasesFile": "src/businessLayer/pageObjects/objects/athena/azonline/motor/car-details/aliases.ts",
+    "pageMapFile": "src/businessLayer/pageScanner/athena/azonline/motor/car-details.json"
+  },
+  "pageMeta": {
+    "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/numberPlateScan/69e13d24db62f63f1acab464",
+    "urlPathRe": "/\\/journey\\/show\\/product\\/AnnualMotorInsurance\\/process\\/nb\\/numberPlateScan\\/[a-z0-9]+/i",
+    "title": "Car details",
+    "elementCount": 7
+  },
+  "source": {
+    "scannedUrl": "https://myinsurance.allianz.co.uk/journey/show/product/AnnualMotorInsurance/process/nb/numberPlateScan/69e13d24db62f63f1acab464",
+    "scannedAt": "2026-04-16T19:49:15.528Z",
+    "mapHash": "9123edd85bef728a057d0efac2e969f0441b6444"
+  }
+}

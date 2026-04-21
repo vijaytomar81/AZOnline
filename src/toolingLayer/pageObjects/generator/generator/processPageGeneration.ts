@@ -28,12 +28,31 @@ type ProcessPageGenerationArgs = {
 };
 
 export type ProcessPageGenerationResult = {
-    processed: boolean;
     validPageKey?: string;
     pageReport?: RepairPageReport;
     invalidPage?: InvalidPageReport;
     errorPage?: GenerationErrorReport;
 };
+
+function resolveOperation(args: {
+    shouldScaffold: boolean;
+    elementsStatus: RepairPageReport["elementsStatus"];
+    aliasesGeneratedStatus: RepairPageReport["aliasesGeneratedStatus"];
+    aliasesHumanStatus: RepairPageReport["aliasesHumanStatus"];
+    pageObjectStatus: RepairPageReport["pageObjectStatus"];
+}): RepairPageReport["operation"] {
+    if (args.shouldScaffold) {
+        return "created";
+    }
+
+    const hasVisibleChange =
+        args.elementsStatus === "generated" ||
+        args.aliasesGeneratedStatus === "generated" ||
+        args.aliasesHumanStatus === "generated" ||
+        args.pageObjectStatus === "generated";
+
+    return hasVisibleChange ? "updated" : "unchanged";
+}
 
 export function processPageGeneration(
     args: ProcessPageGenerationArgs
@@ -51,19 +70,16 @@ export function processPageGeneration(
             pageMap: args.pageMap,
             pageObjectsDir: args.opts.pageObjectsDir,
             oldHash: oldEntry?.source?.mapHash,
-            changedOnly: args.opts.changedOnly,
         });
 
         if (context.invalidPage) {
             return {
-                processed: false,
                 invalidPage: context.invalidPage,
             };
         }
 
         if (!context.artifact || !context.scope) {
             return {
-                processed: false,
                 errorPage: {
                     pageKey,
                     reason: `Missing page generation context for "${pageKey}"`,
@@ -73,43 +89,63 @@ export function processPageGeneration(
 
         buildRegistryEntry(pageKey, args.opts.pageObjectsDir);
 
-        const report: RepairPageReport = {
-            pageKey,
-            changed: false,
-            elementsStatus: "unchanged",
-            aliasesGeneratedStatus: "unchanged",
-            pageObjectStatus: "unchanged",
-            registryStatus: "already-registered",
-            scope: {
-                platform: context.scope.platform,
-                application: context.scope.application,
-                product: context.scope.product,
-                name: context.scope.name,
-            },
-        };
-
         if (context.shouldSkip) {
             return {
-                processed: false,
                 validPageKey: pageKey,
-                pageReport: report,
+                pageReport: {
+                    pageKey,
+                    operation: "unchanged",
+                    elementsStatus: "unchanged",
+                    aliasesGeneratedStatus: "unchanged",
+                    aliasesHumanStatus: "unchanged",
+                    pageObjectStatus: "unchanged",
+                    registryStatus: "already-registered",
+                    scope: {
+                        platform: context.scope.platform,
+                        application: context.scope.application,
+                        product: context.scope.product,
+                        name: context.scope.name,
+                    },
+                },
             };
         }
 
-        if (context.shouldScaffold) {
-            ensureScaffoldFiles({
-                pagesDir: args.opts.pageObjectsDir,
-                pageMap: context.pageMap,
-                verbose: args.opts.verbose,
-                log: args.opts.log,
-            });
-            report.pageObjectStatus = "generated";
+        let aliasesGeneratedStatus: RepairPageReport["aliasesGeneratedStatus"] =
+            "unchanged";
+        let aliasesHumanStatus: RepairPageReport["aliasesHumanStatus"] =
+            "unchanged";
+        let pageObjectStatus: RepairPageReport["pageObjectStatus"] = "unchanged";
+
+        const scaffold = context.shouldScaffold
+            ? ensureScaffoldFiles({
+                  pagesDir: args.opts.pageObjectsDir,
+                  pageMap: context.pageMap,
+                  verbose: args.opts.verbose,
+                  log: args.opts.log,
+              })
+            : {
+                  aliasesHumanCreated: false,
+                  aliasesGeneratedCreated: false,
+                  pageObjectCreated: false,
+              };
+
+        if (scaffold.aliasesGeneratedCreated) {
+            aliasesGeneratedStatus = "generated";
+        }
+
+        if (scaffold.aliasesHumanCreated) {
+            aliasesHumanStatus = "generated";
+        }
+
+        if (scaffold.pageObjectCreated) {
+            pageObjectStatus = "generated";
         }
 
         const elementsRes = syncElementsTs(
             context.artifact.elementsPath,
             context.pageMap
         );
+
         const generatedRes = syncAliasesGeneratedFile(
             context.artifact.aliasesGeneratedPath,
             context.pageMap,
@@ -117,18 +153,30 @@ export function processPageGeneration(
             elementsRes.addedKeys
         );
 
-        syncAliasesHumanFile({
+        if (generatedRes.changed) {
+            aliasesGeneratedStatus = "generated";
+        }
+
+        const aliasesHumanRes = syncAliasesHumanFile({
             aliasesHumanPath: context.artifact.aliasesHumanPath,
             renameMap: generatedRes.renameMap,
             newGeneratedKeys: generatedRes.addedKeys,
             log: args.opts.log,
         });
 
-        syncAliasesIntoPageObject({
+        if (aliasesHumanRes.changed) {
+            aliasesHumanStatus = "generated";
+        }
+
+        const pageObjectChanged = syncAliasesIntoPageObject({
             pageTsPath: context.artifact.pageObjectPath,
             elementsTsPath: context.artifact.elementsPath,
             aliasesTsPath: context.artifact.aliasesHumanPath,
         });
+
+        if (pageObjectChanged) {
+            pageObjectStatus = "generated";
+        }
 
         const manifestEntryResult = args.buildPageManifestEntry({
             pageMap: context.pageMap,
@@ -139,7 +187,6 @@ export function processPageGeneration(
 
         if (!manifestEntryResult.ok) {
             return {
-                processed: false,
                 validPageKey: pageKey,
                 invalidPage: {
                     pageKey: manifestEntryResult.pageKey,
@@ -148,27 +195,39 @@ export function processPageGeneration(
             };
         }
 
-        const manifestChanged = args.savePageManifestEntry(
+        args.savePageManifestEntry(
             args.pageKeyToManifestFile(args.manifestRoot, pageKey),
             manifestEntryResult.entry
         );
 
-        report.elementsStatus = elementsRes.changed ? "generated" : "unchanged";
-        report.aliasesGeneratedStatus = generatedRes.changed ? "generated" : "unchanged";
-        report.changed =
-            report.pageObjectStatus === "generated" ||
-            report.elementsStatus === "generated" ||
-            report.aliasesGeneratedStatus === "generated" ||
-            manifestChanged;
+        const elementsStatus = elementsRes.changed ? "generated" : "unchanged";
 
         return {
-            processed: true,
             validPageKey: pageKey,
-            pageReport: report,
+            pageReport: {
+                pageKey,
+                operation: resolveOperation({
+                    shouldScaffold: context.shouldScaffold,
+                    elementsStatus,
+                    aliasesGeneratedStatus,
+                    aliasesHumanStatus,
+                    pageObjectStatus,
+                }),
+                elementsStatus,
+                aliasesGeneratedStatus,
+                aliasesHumanStatus,
+                pageObjectStatus,
+                registryStatus: "already-registered",
+                scope: {
+                    platform: context.scope.platform,
+                    application: context.scope.application,
+                    product: context.scope.product,
+                    name: context.scope.name,
+                },
+            },
         };
     } catch (error) {
         return {
-            processed: false,
             errorPage: {
                 pageKey,
                 reason:
