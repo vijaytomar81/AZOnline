@@ -59,7 +59,7 @@ export function finalizeGenerationRun(
     applyRegistryStatusToReports(args.pageReports, syncRes);
 
     registryLog.info(`Registry synced from manifest: ${PAGE_MANIFEST_DIR}`);
-    args.opts.log.info(`Handled pages: ${args.pageReports.length}`);
+    args.opts.log.info(`Available page maps: ${args.availablePageMaps}`);
 
     const summary = buildRunSummary({
         availablePageMaps: args.availablePageMaps,

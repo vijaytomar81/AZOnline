@@ -4,12 +4,12 @@ import type { TreeNode, TreeSeverity } from "@utils/cliTree";
 import { info, strong, success } from "@utils/cliFormat";
 import type { GenerationTreeInput } from "./types";
 
-function successStatus(status: string): string {
-    return success(`(${status})`);
+function successStatus(label: string): string {
+    return success(`(${label})`);
 }
 
-function infoStatus(status: string): string {
-    return info(`(${status})`);
+function infoStatus(label: string): string {
+    return info(`(${label})`);
 }
 
 function severityFromOperation(operation: string): TreeSeverity {
@@ -37,21 +37,43 @@ function severityFromStatus(status: string): TreeSeverity {
     return "warning" as TreeSeverity;
 }
 
+function displayStatus(status: string): string {
+    if (status === "added-to-both") {
+        return "added to both";
+    }
+
+    if (status === "added-to-index") {
+        return "added to index";
+    }
+
+    if (status === "added-to-page-manager") {
+        return "added to page manager";
+    }
+
+    if (status === "already-registered") {
+        return "already registered";
+    }
+
+    return status;
+}
+
 function statusSummary(status: string): string {
+    const label = displayStatus(status);
+
     if (
         status === "generated" ||
         status === "added-to-both" ||
         status === "added-to-index" ||
         status === "added-to-page-manager"
     ) {
-        return successStatus(status);
+        return successStatus(label);
     }
 
     if (status === "unchanged" || status === "already-registered") {
-        return infoStatus(status);
+        return infoStatus(label);
     }
 
-    return info(`(${status})`);
+    return info(`(${label})`);
 }
 
 function operationSummary(operation: string): string {

@@ -31,7 +31,7 @@ function buildRunLabel(): string {
 const runLabel = buildRunLabel();
 
 let log = createLogger({
-    prefix: `[page-elements-generator][${runLabel}]`,
+    prefix: `[page-object-generator][${runLabel}]`,
     logLevel: "info",
     withTimestamp: true,
 });
@@ -77,7 +77,7 @@ function printGeneratorEnvironment(args: {
 }
 
 async function main() {
-    printCommandTitle("PAGE ELEMENTS GENERATOR", "elementsGeneratorIcon");
+    printCommandTitle("PAGE OBJECT GENERATOR", "elementsGeneratorIcon");
 
     const argv = normalizeArgv(process.argv.slice(2));
 
@@ -94,7 +94,7 @@ async function main() {
         getArg(args, "--logFilePath") ?? PAGE_OBJECT_GENERATOR_LOG_FILE;
 
     log = createLogger({
-        prefix: `[page-elements-generator][${runLabel}]`,
+        prefix: `[page-object-generator][${runLabel}]`,
         logLevel: verbose ? "debug" : "info",
         withTimestamp: true,
         logToFile,
