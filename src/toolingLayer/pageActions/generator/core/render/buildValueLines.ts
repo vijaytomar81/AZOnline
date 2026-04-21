@@ -13,7 +13,6 @@ export function buildValueLines(args: {
     indent?: string;
 }): string[] {
     const pageAccessor = toCamelCase(args.page.scope.name);
-    const platformAccessor = toCamelCase(args.page.scope.platform);
     const productAccessor = toCamelCase(args.page.scope.product);
     const indent = args.indent ?? "    ";
 
@@ -26,7 +25,7 @@ export function buildValueLines(args: {
             `${indent}    fieldName: "${fieldName}",`,
             `${indent}    source: "${args.page.className}",`,
             `${indent}});`,
-            `${indent}await context.pages.${platformAccessor}.${productAccessor}.${pageAccessor}.${method.name}(${fieldName});`,
+            `${indent}await context.pages.${productAccessor}.${pageAccessor}.${method.name}(${fieldName});`,
             "",
         ];
     });

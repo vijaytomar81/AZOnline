@@ -43,7 +43,7 @@ export function buildConditionalIndexedBlocks(args: {
         };
 
         const index = hasNumericToken(fieldName)
-            ? Number(fieldName.match(/\d+/)?.[0] ?? 1)
+            ? Number(fieldName.match(/\\d+/)?.[0] ?? 1)
             : 1;
 
         const current = entry.byIndex.get(index) ?? [];
@@ -67,7 +67,6 @@ export function buildConditionalIndexedBlocks(args: {
 
     const lines: string[] = [];
     const pageAccessor = toCamelCase(args.page.scope.name);
-    const platformAccessor = toCamelCase(args.page.scope.platform);
     const productAccessor = toCamelCase(args.page.scope.product);
 
     for (const family of Array.from(familyMap.keys()).sort()) {
@@ -91,7 +90,7 @@ export function buildConditionalIndexedBlocks(args: {
 
             if (index > 1 && entry.addAnotherControl) {
                 lines.push(
-                    `        await context.pages.${platformAccessor}.${productAccessor}.${pageAccessor}.${entry.addAnotherControl.name}();`,
+                    `        await context.pages.${productAccessor}.${pageAccessor}.${entry.addAnotherControl.name}();`,
                     ""
                 );
             }
