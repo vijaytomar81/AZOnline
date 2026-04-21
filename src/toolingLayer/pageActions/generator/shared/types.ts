@@ -66,7 +66,7 @@ export type GenerateSummary = {
     updated: number;
     unchanged: number;
     failed: number;
-    filesGenerated: number;
+    registryFilesCreated: number;
     registryFilesUpdated: number;
     invalidPages: number;
     exitCode: number;

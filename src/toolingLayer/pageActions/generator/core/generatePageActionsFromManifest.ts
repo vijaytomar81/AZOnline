@@ -7,7 +7,6 @@ import {
     printSection,
     printStatus,
     success,
-    warning,
     failure,
 } from "@utils/cliFormat";
 import { ICONS } from "@utils/icons";
@@ -38,10 +37,6 @@ import { ensurePageActionIndexes } from "./registry/ensurePageActionIndexes";
 
 function readTextIfExists(filePath: string): string | null {
     return fs.existsSync(filePath) ? fs.readFileSync(filePath, "utf8") : null;
-}
-
-function toJsonText(value: unknown): string {
-    return `${JSON.stringify(value, null, 2)}\n`;
 }
 
 function printPageResult(
@@ -90,7 +85,7 @@ export function generatePageActionsFromManifest(args: {
     const pageActionIndex = loadPageActionManifestIndex();
     const nextIndex: PageActionManifestIndex = {
         version: 1,
-        generatedAt: new Date().toISOString(),
+        generatedAt: pageActionIndex.generatedAt,
         actions: {},
     };
 
@@ -100,8 +95,7 @@ export function generatePageActionsFromManifest(args: {
     let updated = 0;
     let unchanged = 0;
     let failed = 0;
-    let filesGenerated = 0;
-    const invalidPages = 0;
+    let invalidPages = 0;
 
     printSection("Generation details");
 
@@ -132,8 +126,9 @@ export function generatePageActionsFromManifest(args: {
 
             const actionBefore = readTextIfExists(paths.actionFile);
             const manifestBefore = readTextIfExists(paths.manifestEntryFile);
+            const manifestText = `${JSON.stringify(entry, null, 2)}\n`;
+
             const actionChanged = actionBefore !== content;
-            const manifestText = toJsonText(entry);
             const manifestChanged =
                 manifestBefore !== manifestText ||
                 pageActionIndex.actions[pageKey] !== manifestRelativePath;
@@ -142,7 +137,6 @@ export function generatePageActionsFromManifest(args: {
 
             if (actionChanged) {
                 fs.writeFileSync(paths.actionFile, content, "utf8");
-                filesGenerated++;
             }
 
             if (manifestChanged) {
@@ -150,15 +144,16 @@ export function generatePageActionsFromManifest(args: {
                     filePath: paths.manifestEntryFile,
                     entry,
                 });
-                filesGenerated++;
             }
 
             nextIndex.actions[pageKey] = manifestRelativePath;
 
             const operation: PageActionOperation =
-                actionBefore === null ? "created" : actionChanged || manifestChanged
-                    ? "updated"
-                    : "unchanged";
+                actionBefore === null
+                    ? "created"
+                    : actionChanged || manifestChanged
+                      ? "updated"
+                      : "unchanged";
 
             if (operation === "created") {
                 created++;
@@ -198,26 +193,18 @@ export function generatePageActionsFromManifest(args: {
         }
     }
 
-    const currentIndexText = readTextIfExists(PAGE_ACTIONS_MANIFEST_INDEX_FILE);
-    const nextIndexText = toJsonText(nextIndex);
-
-    if (currentIndexText !== nextIndexText) {
+    if (
         writePageActionManifestIndex({
             filePath: PAGE_ACTIONS_MANIFEST_INDEX_FILE,
             index: nextIndex,
-        });
-        filesGenerated++;
+        })
+    ) {
+        // Manifest index changed, but this is not shown as a separate summary row.
     }
 
     const registryResult = ensurePageActionIndexes({
         entries: registryEntries,
     });
-
-    filesGenerated += registryResult.changedFiles;
-
-    if (!verbose && created === 0 && updated === 0 && failed === 0) {
-        printStatus(ICONS.hintIcon, info("No page action changes detected"));
-    }
 
     return {
         availablePages: pageKeys.length,
@@ -226,8 +213,8 @@ export function generatePageActionsFromManifest(args: {
         updated,
         unchanged,
         failed,
-        filesGenerated,
-        registryFilesUpdated: registryResult.changedFiles,
+        registryFilesCreated: registryResult.createdFiles,
+        registryFilesUpdated: registryResult.updatedFiles,
         invalidPages,
         exitCode: failed > 0 ? 1 : 0,
     };

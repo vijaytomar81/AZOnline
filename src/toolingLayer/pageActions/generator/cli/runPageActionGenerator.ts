@@ -59,7 +59,7 @@ function main(): void {
             ["Updated", summary.updated],
             ["Unchanged", summary.unchanged],
             ["Failed", summary.failed],
-            ["Files generated", summary.filesGenerated],
+            ["Registry files created", summary.registryFilesCreated],
             ["Registry files updated", summary.registryFilesUpdated],
             ["Invalid pages", summary.invalidPages],
             ["Exit code", summary.exitCode],

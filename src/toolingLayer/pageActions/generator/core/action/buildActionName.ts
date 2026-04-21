@@ -2,24 +2,20 @@
 
 import type { PageObjectManifestPage } from "../../manifest/types";
 import type { ActionNaming } from "../../shared/types";
-import { toPascalCase } from "../../shared/naming";
+import {
+    toCamelCase,
+} from "../../shared/naming";
 
 export function buildActionName(
     page: PageObjectManifestPage
 ): ActionNaming {
-    const { platform, application, product, name } = page.scope;
-    const namePascal = toPascalCase(name);
-    const prefix = product === "common" ? "handle" : "fill";
-    const actionName = `${prefix}${namePascal}Action`;
-    const actionFileName = `${prefix}${namePascal}.action.ts`;
-    const actionSlug = `${prefix}-${name}`;
-    const actionKey =
-        `${platform}.${application}.${product}.${actionSlug}.action`;
+    const actionSlug = page.scope.name;
+    const actionBase = toCamelCase(actionSlug);
 
     return {
-        actionName,
-        actionFileName,
-        actionKey,
+        actionName: `${actionBase}Action`,
+        actionFileName: `${actionBase}.action.ts`,
+        actionKey: `${page.pageKey}.action`,
         actionSlug,
     };
 }
