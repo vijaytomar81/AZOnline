@@ -2,12 +2,22 @@
 
 import fs from "node:fs";
 
-import { toRepoRelative } from "@utils/paths";
+import { safeReadText } from "@utils/fs";
+import { PAGE_OBJECTS_ROOT_DIR } from "@utils/paths";
 import {
     getIndexFile,
     getPageArtifactPaths,
 } from "@toolingLayer/pageObjects/common/pagePaths";
 import { loadAllPageMaps } from "@toolingLayer/pageObjects/common/readPageMap";
+import {
+    headerFilePath,
+    headerGeneratedFromManifest,
+    getIndexFileParts,
+} from "@toolingLayer/pageObjects/generator/utils/buildGeneratedHeader";
+
+function ensureTrailingNewline(text: string): string {
+    return text.endsWith("\n") ? text : `${text}\n`;
+}
 
 export function extractIndexExportPaths(tsText: string): string[] {
     return [...tsText.matchAll(/export\s+\*\s+from\s+"([^"]+)";/g)]
@@ -29,30 +39,28 @@ export function buildExpectedIndexExports(
 export function buildIndexFileContent(
     pageObjectsDir: string,
     mapsDir: string,
-    pageRegistryDir: string
+    pageRegistryDir = PAGE_OBJECTS_ROOT_DIR
 ): string {
     const exportPaths = buildExpectedIndexExports(pageObjectsDir, mapsDir);
-    const filePath = getIndexFile(pageRegistryDir);
     const lines: string[] = [
-        `// ${toRepoRelative(filePath)}`,
-        `// AUTO-GENERATED from src/pageObjects/.manifest/`,
+        headerFilePath(getIndexFileParts()),
+        headerGeneratedFromManifest(),
         ``,
-        `export { PageManager } from "./pageManager";`,
-        ``,
-        `// Export individual pages too (optional, but useful sometimes)`,
+        `export * from "./pageManager";`,
+        ...exportPaths.map((exportPath) => `export * from "${exportPath}";`),
         ``,
     ];
 
-    for (const exportPath of exportPaths) {
-        lines.push(`export * from "${exportPath}";`);
-    }
-
-    lines.push(``);
-    return lines.join("\n");
+    return ensureTrailingNewline(lines.join("\n"));
 }
 
 export function readActualIndexExports(pageRegistryDir: string): string[] {
     const filePath = getIndexFile(pageRegistryDir);
     if (!fs.existsSync(filePath)) return [];
     return extractIndexExportPaths(fs.readFileSync(filePath, "utf8"));
+}
+
+export function readActualIndexFile(pageRegistryDir: string): string {
+    const filePath = getIndexFile(pageRegistryDir);
+    return safeReadText(filePath) ?? "";
 }
