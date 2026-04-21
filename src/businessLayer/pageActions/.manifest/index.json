@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "generatedAt": "2026-04-21T16:59:24.019Z",
+  "actions": {
+    "athena.azonline.common.insurance-type-selection": "athena/azonline/common/insurance-type-selection.action.json",
+    "athena.azonline.common.login-or-registration": "athena/azonline/common/login-or-registration.action.json",
+    "athena.azonline.common.manage-cookies": "athena/azonline/common/manage-cookies.action.json",
+    "athena.azonline.motor.car-details": "athena/azonline/motor/car-details.action.json",
+    "athena.azonline.motor.ph-driving-licence-details": "athena/azonline/motor/ph-driving-licence-details.action.json"
+  }
+}

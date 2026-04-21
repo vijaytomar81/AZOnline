@@ -1,0 +1,21 @@
+{
+  "pageKey": "athena.azonline.common.insurance-type-selection",
+  "actionKey": "athena.azonline.common.insurance-type-selection.action",
+  "actionName": "insuranceTypeSelectionAction",
+  "scope": {
+    "platform": "athena",
+    "application": "azonline",
+    "product": "common",
+    "name": "insurance-type-selection",
+    "namespace": "athena.azonline.common"
+  },
+  "paths": {
+    "actionFile": "src/businessLayer/pageActions/actions/athena/azonline/common/insuranceTypeSelection.action.ts",
+    "productIndexFile": "src/businessLayer/pageActions/actions/athena/azonline/common/index.ts",
+    "applicationIndexFile": "src/businessLayer/pageActions/actions/athena/azonline/index.ts",
+    "platformIndexFile": "src/businessLayer/pageActions/actions/athena/index.ts",
+    "actionsIndexFile": "src/businessLayer/pageActions/actions/index.ts",
+    "rootIndexFile": "src/businessLayer/pageActions/index.ts",
+    "sourcePageObjectFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/insurance-type-selection/InsuranceTypeSelectionPage.ts"
+  }
+}

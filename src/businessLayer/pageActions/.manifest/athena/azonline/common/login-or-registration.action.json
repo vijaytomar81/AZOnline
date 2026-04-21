@@ -1,0 +1,21 @@
+{
+  "pageKey": "athena.azonline.common.login-or-registration",
+  "actionKey": "athena.azonline.common.login-or-registration.action",
+  "actionName": "loginOrRegistrationAction",
+  "scope": {
+    "platform": "athena",
+    "application": "azonline",
+    "product": "common",
+    "name": "login-or-registration",
+    "namespace": "athena.azonline.common"
+  },
+  "paths": {
+    "actionFile": "src/businessLayer/pageActions/actions/athena/azonline/common/loginOrRegistration.action.ts",
+    "productIndexFile": "src/businessLayer/pageActions/actions/athena/azonline/common/index.ts",
+    "applicationIndexFile": "src/businessLayer/pageActions/actions/athena/azonline/index.ts",
+    "platformIndexFile": "src/businessLayer/pageActions/actions/athena/index.ts",
+    "actionsIndexFile": "src/businessLayer/pageActions/actions/index.ts",
+    "rootIndexFile": "src/businessLayer/pageActions/index.ts",
+    "sourcePageObjectFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/login-or-registration/LoginOrRegistrationPage.ts"
+  }
+}
