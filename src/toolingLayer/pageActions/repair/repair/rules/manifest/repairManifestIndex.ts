@@ -20,16 +20,36 @@ type ExistingManifestIndex = {
     actions?: Record<string, string>;
 };
 
+function countChangedEntries(
+    currentActions: Record<string, string>,
+    nextActions: Record<string, string>
+): number {
+    const keys = new Set([
+        ...Object.keys(currentActions),
+        ...Object.keys(nextActions),
+    ]);
+
+    let changed = 0;
+
+    keys.forEach((key) => {
+        if (currentActions[key] !== nextActions[key]) {
+            changed++;
+        }
+    });
+
+    return changed;
+}
+
 export function repairManifestIndex(
     _context: RepairContext
 ): RepairRuleResult {
     const sourceIndex = loadPageObjectManifestIndex();
 
-    const actions: Record<string, string> = {};
+    const nextActions: Record<string, string> = {};
 
     Object.entries(sourceIndex.pages).forEach(
         ([pageKey, relativePath]) => {
-            actions[pageKey] = relativePath.replace(
+            nextActions[pageKey] = relativePath.replace(
                 /\.json$/,
                 ".action.json"
             );
@@ -50,17 +70,19 @@ export function repairManifestIndex(
         }
     }
 
-    const actionsChanged =
-        JSON.stringify(current?.actions ?? {}) !==
-        JSON.stringify(actions);
+    const currentActions = current?.actions ?? {};
+    const repairedItems = countChangedEntries(
+        currentActions,
+        nextActions
+    );
 
     const content = JSON.stringify(
         {
             version: current?.version ?? 1,
-            generatedAt: actionsChanged
-                ? new Date().toISOString()
-                : current?.generatedAt ?? new Date().toISOString(),
-            actions,
+            generatedAt:
+                current?.generatedAt ??
+                new Date().toISOString(),
+            actions: nextActions,
         },
         null,
         2
@@ -76,7 +98,7 @@ export function repairManifestIndex(
         name: "repairManifestIndex",
         status: write.changed ? "repaired" : "unchanged",
         changedFiles: write.changed ? 1 : 0,
-        repairedItems: actionsChanged ? Object.keys(actions).length : 0,
+        repairedItems: write.changed ? repairedItems : 0,
         warnings: 0,
         errors: 0,
         details: [],
