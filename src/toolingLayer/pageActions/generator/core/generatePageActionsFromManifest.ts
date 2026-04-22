@@ -27,10 +27,12 @@ import { classifyPageObjectMethods } from "./action/classifyPageObjectMethods";
 import { extractPageObjectMethods } from "./action/extractPageObjectMethods";
 import { readPageObjectFile } from "./action/readPageObjectFile";
 import { renderPageActionFile } from "./action/renderPageActionFile";
-import { buildPageActionManifestEntry } from "./manifestSync/buildPageActionManifestEntry";
-import { loadPageActionManifestIndex } from "./manifestSync/loadPageActionManifestIndex";
-import { loadPageObjectManifestIndex } from "./manifestSync/loadPageObjectManifestIndex";
-import { loadPageObjectManifestPage } from "./manifestSync/loadPageObjectManifestPage";
+import {
+    buildExpectedManifestEntry,
+    loadPageActionManifestIndex,
+    loadPageObjectManifestIndex,
+    loadPageObjectManifestPage,
+} from "@toolingLayer/pageActions/common";
 import { writePageActionManifestEntry } from "./manifestSync/writePageActionManifestEntry";
 import { writePageActionManifestIndex } from "./manifestSync/writePageActionManifestIndex";
 import { ensurePageActionIndexes } from "./registry/ensurePageActionIndexes";
@@ -49,22 +51,22 @@ function printPageResult(
         operation === "failed"
             ? ICONS.failIcon
             : operation === "unchanged"
-              ? ICONS.hintIcon
-              : ICONS.successIcon;
+                ? ICONS.hintIcon
+                : ICONS.successIcon;
 
     const text =
         operation === "failed"
             ? failure(pageKey)
             : operation === "unchanged"
-              ? info(pageKey)
-              : success(pageKey);
+                ? info(pageKey)
+                : success(pageKey);
 
     const summary =
         operation === "failed"
             ? failure("(failed)")
             : operation === "unchanged"
-              ? info("(unchanged)")
-              : success(`(${operation})`);
+                ? info("(unchanged)")
+                : success(`(${operation})`);
 
     printStatus(icon, `${text} ${summary}`);
 
@@ -114,7 +116,7 @@ export function generatePageActionsFromManifest(args: {
                 actionFilePath: paths.actionFile,
             });
 
-            const entry = buildPageActionManifestEntry({
+            const entry = buildExpectedManifestEntry({
                 page,
                 naming,
                 paths,
@@ -152,8 +154,8 @@ export function generatePageActionsFromManifest(args: {
                 actionBefore === null
                     ? "created"
                     : actionChanged || manifestChanged
-                      ? "updated"
-                      : "unchanged";
+                        ? "updated"
+                        : "unchanged";
 
             if (operation === "created") {
                 created++;

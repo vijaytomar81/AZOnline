@@ -2,23 +2,25 @@
 
 import path from "node:path";
 import type { ValidationCheckResult, ValidationNode } from "../../pipeline/types";
-import { buildExpectedActionState } from "../../../shared/expectedActionState";
-import { loadPageObjectManifestIndex } from "../../../shared/loadPageObjectManifestIndex";
-import { loadPageObjectManifestPage } from "../../../shared/loadPageObjectManifestPage";
-import { readTextIfExists } from "../../../shared/readTextIfExists";
+import {
+    buildExpectedActionState,
+    loadPageObjectManifestIndex,
+    loadPageObjectManifestPage,
+    readTextIfExists,
+} from "@toolingLayer/pageActions/common";
 
 export function checkActionExports(): ValidationCheckResult {
     try {
         const index = loadPageObjectManifestIndex();
         const issues: ValidationNode[] = [];
 
-        Object.entries(index.pages).forEach(([pageKey, relativePath]) => {
+        for (const [pageKey, relativePath] of Object.entries(index.pages)) {
             const page = loadPageObjectManifestPage(relativePath);
             const expected = buildExpectedActionState(page);
             const text = readTextIfExists(expected.actionFilePath);
 
             if (!text) {
-                return;
+                continue;
             }
 
             const firstLine = text.split("\n")[0] ?? "";
@@ -63,7 +65,7 @@ export function checkActionExports(): ValidationCheckResult {
                     children,
                 });
             }
-        });
+        };
 
         return {
             id: "checkActionExports",

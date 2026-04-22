@@ -4,9 +4,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { PAGE_ACTIONS_ACTIONS_DIR, toRepoRelative } from "@utils/paths";
 import type { ValidationCheckResult, ValidationNode } from "../../pipeline/types";
-import { buildExpectedActionState } from "../../../shared/expectedActionState";
-import { loadPageObjectManifestIndex } from "../../../shared/loadPageObjectManifestIndex";
-import { loadPageObjectManifestPage } from "../../../shared/loadPageObjectManifestPage";
+import {
+    buildExpectedActionState,
+    loadPageObjectManifestIndex,
+    loadPageObjectManifestPage,
+} from "@toolingLayer/pageActions/common";
 
 function collectActionFiles(dir: string): string[] {
     if (!fs.existsSync(dir)) {

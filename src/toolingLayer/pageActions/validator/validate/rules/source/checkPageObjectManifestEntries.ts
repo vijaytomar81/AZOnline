@@ -4,15 +4,17 @@ import fs from "node:fs";
 import path from "node:path";
 import { PAGE_MANIFEST_DIR } from "@utils/paths";
 import type { ValidationCheckResult, ValidationNode } from "../../pipeline/types";
-import { loadPageObjectManifestIndex } from "../../../shared/loadPageObjectManifestIndex";
-import { loadPageObjectManifestPage } from "../../../shared/loadPageObjectManifestPage";
+import {
+    loadPageObjectManifestIndex,
+    loadPageObjectManifestPage,
+} from "@toolingLayer/pageActions/common";
 
 export function checkPageObjectManifestEntries(): ValidationCheckResult {
     try {
         const index = loadPageObjectManifestIndex();
         const issues: ValidationNode[] = [];
 
-        Object.entries(index.pages).forEach(([pageKey, relativePath]) => {
+        for (const [pageKey, relativePath] of Object.entries(index.pages)) {
             const entryPath = path.join(PAGE_MANIFEST_DIR, relativePath);
 
             if (!fs.existsSync(entryPath)) {
@@ -27,7 +29,7 @@ export function checkPageObjectManifestEntries(): ValidationCheckResult {
                         },
                     ],
                 });
-                return;
+                continue;
             }
 
             try {
@@ -66,7 +68,7 @@ export function checkPageObjectManifestEntries(): ValidationCheckResult {
                     ],
                 });
             }
-        });
+        };
 
         return {
             id: "checkPageObjectManifestEntries",

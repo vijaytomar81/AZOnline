@@ -8,7 +8,9 @@ import {
     toRepoRelative,
 } from "@utils/paths";
 import type { ValidationCheckResult, ValidationNode } from "../../pipeline/types";
-import { loadPageActionManifestIndex } from "../../../shared/loadPageActionManifestIndex";
+import {
+    loadPageActionManifestIndex,
+} from "@toolingLayer/pageActions/common";
 
 function collectManifestFiles(dir: string): string[] {
     if (!fs.existsSync(dir)) {

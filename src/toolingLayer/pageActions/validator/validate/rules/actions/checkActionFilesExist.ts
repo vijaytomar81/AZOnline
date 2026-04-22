@@ -3,16 +3,18 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { ValidationCheckResult, ValidationNode } from "../../pipeline/types";
-import { buildExpectedActionState } from "../../../shared/expectedActionState";
-import { loadPageObjectManifestIndex } from "../../../shared/loadPageObjectManifestIndex";
-import { loadPageObjectManifestPage } from "../../../shared/loadPageObjectManifestPage";
+import {
+    buildExpectedActionState,
+    loadPageObjectManifestIndex,
+    loadPageObjectManifestPage,
+} from "@toolingLayer/pageActions/common";
 
 export function checkActionFilesExist(): ValidationCheckResult {
     try {
         const index = loadPageObjectManifestIndex();
         const issues: ValidationNode[] = [];
 
-        Object.entries(index.pages).forEach(([pageKey, relativePath]) => {
+        for (const [pageKey, relativePath] of Object.entries(index.pages)) {
             const page = loadPageObjectManifestPage(relativePath);
             const expected = buildExpectedActionState(page);
 
@@ -29,7 +31,7 @@ export function checkActionFilesExist(): ValidationCheckResult {
                     ],
                 });
             }
-        });
+        };
 
         return {
             id: "checkActionFilesExist",

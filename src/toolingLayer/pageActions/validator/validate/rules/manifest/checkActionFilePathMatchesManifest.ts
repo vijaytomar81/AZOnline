@@ -1,17 +1,19 @@
 // src/toolingLayer/pageActions/validator/validate/rules/manifest/checkActionFilePathMatchesManifest.ts
 
 import type { ValidationCheckResult, ValidationNode } from "../../pipeline/types";
-import { buildExpectedActionState } from "../../../shared/expectedActionState";
-import { loadPageActionManifestIndex } from "../../../shared/loadPageActionManifestIndex";
-import { loadPageActionManifestEntry } from "../../../shared/loadPageActionManifestEntry";
-import { loadPageObjectManifestPage } from "../../../shared/loadPageObjectManifestPage";
+import {
+    buildExpectedActionState,
+    loadPageActionManifestEntry,
+    loadPageActionManifestIndex,
+    loadPageObjectManifestPage,
+} from "@toolingLayer/pageActions/common";
 
 export function checkActionFilePathMatchesManifest(): ValidationCheckResult {
     try {
         const index = loadPageActionManifestIndex();
         const issues: ValidationNode[] = [];
 
-        Object.entries(index.actions).forEach(([pageKey, relativePath]) => {
+        for (const [pageKey, relativePath] of Object.entries(index.actions)) {
             try {
                 const actionEntry = loadPageActionManifestEntry(relativePath);
                 const page = loadPageObjectManifestPage(
@@ -90,7 +92,7 @@ export function checkActionFilePathMatchesManifest(): ValidationCheckResult {
                     ],
                 });
             }
-        });
+        };
 
         return {
             id: "checkActionFilePathMatchesManifest",

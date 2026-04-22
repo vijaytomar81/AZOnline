@@ -4,14 +4,16 @@ import fs from "node:fs";
 import path from "node:path";
 import { PAGE_ACTIONS_MANIFEST_DIR } from "@utils/paths";
 import type { ValidationCheckResult, ValidationNode } from "../../pipeline/types";
-import { loadPageActionManifestIndex } from "../../../shared/loadPageActionManifestIndex";
+import {
+    loadPageActionManifestIndex,
+} from "@toolingLayer/pageActions/common";
 
 export function checkActionManifestFileExists(): ValidationCheckResult {
     try {
         const index = loadPageActionManifestIndex();
         const issues: ValidationNode[] = [];
 
-        Object.entries(index.actions).forEach(([pageKey, relativePath]) => {
+        for (const [pageKey, relativePath] of Object.entries(index.actions)) {
             const filePath = path.join(PAGE_ACTIONS_MANIFEST_DIR, relativePath);
 
             if (!fs.existsSync(filePath)) {
@@ -27,7 +29,7 @@ export function checkActionManifestFileExists(): ValidationCheckResult {
                     ],
                 });
             }
-        });
+        };
 
         return {
             id: "checkActionManifestFileExists",

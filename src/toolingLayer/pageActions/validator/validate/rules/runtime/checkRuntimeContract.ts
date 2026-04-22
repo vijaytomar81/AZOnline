@@ -2,21 +2,23 @@
 
 import fs from "node:fs";
 import type { ValidationCheckResult, ValidationNode } from "../../pipeline/types";
-import { buildExpectedActionState } from "../../../shared/expectedActionState";
-import { loadPageObjectManifestIndex } from "../../../shared/loadPageObjectManifestIndex";
-import { loadPageObjectManifestPage } from "../../../shared/loadPageObjectManifestPage";
+import {
+    buildExpectedActionState,
+    loadPageObjectManifestIndex,
+    loadPageObjectManifestPage,
+} from "@toolingLayer/pageActions/common";
 
 export function checkRuntimeContract(): ValidationCheckResult {
     try {
         const index = loadPageObjectManifestIndex();
         const issues: ValidationNode[] = [];
 
-        Object.entries(index.pages).forEach(([pageKey, relativePath]) => {
+        for (const [pageKey, relativePath] of Object.entries(index.pages)) {
             const page = loadPageObjectManifestPage(relativePath);
             const expected = buildExpectedActionState(page);
 
             if (!fs.existsSync(expected.actionFilePath)) {
-                return;
+                continue;
             }
 
             const text = fs.readFileSync(expected.actionFilePath, "utf8");
@@ -53,7 +55,7 @@ export function checkRuntimeContract(): ValidationCheckResult {
                     children,
                 });
             }
-        });
+        };
 
         return {
             id: "checkRuntimeContract",

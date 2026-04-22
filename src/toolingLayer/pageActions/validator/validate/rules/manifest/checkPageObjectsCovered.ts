@@ -1,8 +1,10 @@
 // src/toolingLayer/pageActions/validator/validate/rules/manifest/checkPageObjectsCovered.ts
 
 import type { ValidationCheckResult, ValidationNode } from "../../pipeline/types";
-import { loadPageActionManifestIndex } from "../../../shared/loadPageActionManifestIndex";
-import { loadPageObjectManifestIndex } from "../../../shared/loadPageObjectManifestIndex";
+import {
+    loadPageActionManifestIndex,
+    loadPageObjectManifestIndex,
+} from "@toolingLayer/pageActions/common";
 
 export function checkPageObjectsCovered(): ValidationCheckResult {
     try {

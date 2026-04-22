@@ -1,17 +1,19 @@
 // src/toolingLayer/pageActions/validator/validate/rules/manifest/checkPageActionManifestEntries.ts
 
 import type { ValidationCheckResult, ValidationNode } from "../../pipeline/types";
-import { buildExpectedActionState } from "../../../shared/expectedActionState";
-import { loadPageActionManifestEntry } from "../../../shared/loadPageActionManifestEntry";
-import { loadPageActionManifestIndex } from "../../../shared/loadPageActionManifestIndex";
-import { loadPageObjectManifestPage } from "../../../shared/loadPageObjectManifestPage";
+import {
+    buildExpectedActionState,
+    loadPageActionManifestEntry,
+    loadPageActionManifestIndex,
+    loadPageObjectManifestPage,
+} from "@toolingLayer/pageActions/common";
 
 export function checkPageActionManifestEntries(): ValidationCheckResult {
     try {
         const index = loadPageActionManifestIndex();
         const issues: ValidationNode[] = [];
 
-        Object.entries(index.actions).forEach(([pageKey, relativePath]) => {
+        for (const [pageKey, relativePath] of Object.entries(index.actions)) {
             try {
                 const actual = loadPageActionManifestEntry(relativePath);
                 const page = loadPageObjectManifestPage(
@@ -85,7 +87,7 @@ export function checkPageActionManifestEntries(): ValidationCheckResult {
                     ],
                 });
             }
-        });
+        };
 
         return {
             id: "checkPageActionManifestEntries",

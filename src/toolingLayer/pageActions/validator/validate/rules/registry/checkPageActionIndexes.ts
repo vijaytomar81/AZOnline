@@ -2,9 +2,11 @@
 
 import fs from "node:fs";
 import type { ValidationCheckResult, ValidationNode } from "../../pipeline/types";
-import { loadPageObjectManifestIndex } from "../../../shared/loadPageObjectManifestIndex";
-import { loadPageObjectManifestPage } from "../../../shared/loadPageObjectManifestPage";
-import { buildExpectedActionState } from "../../../shared/expectedActionState";
+import {
+    buildExpectedActionState,
+    loadPageObjectManifestIndex,
+    loadPageObjectManifestPage,
+} from "@toolingLayer/pageActions/common";
 
 export function checkPageActionIndexes(): ValidationCheckResult {
     try {
