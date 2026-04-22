@@ -9,7 +9,7 @@ tree -d -L 3 -I "node_modules|.git"
 
 npx ts-prune | grep -v "used in module" | grep page-scanner
 
-line of code: find src/data -type f -name "*.ts" -exec wc -l {} + | sed '$d' | awk '{print $1 " - " $2}'
+line of code: find src/toolingLayer/pageActions -type f -name "*.ts" -exec wc -l {} + | sed '$d' | awk '{print $1 " - " $2}'
 
 
 empty files in given folder:
