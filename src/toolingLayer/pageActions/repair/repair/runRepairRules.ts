@@ -7,7 +7,6 @@ import type {
 
 import { repairEnvironment } from "./rules/environment/repairEnvironment";
 import { repairMissingActionFiles } from "./rules/actions/repairMissingActionFiles";
-import { repairManifestCoverage } from "./rules/manifest/repairManifestCoverage";
 import { repairManifestIndex } from "./rules/manifest/repairManifestIndex";
 import { repairManifestEntries } from "./rules/manifest/repairManifestEntries";
 import { removeOrphanManifestEntryFiles } from "./rules/manifest/removeOrphanManifestEntryFiles";
@@ -20,7 +19,6 @@ export function runRepairRules(
     return [
         repairEnvironment(context),
         repairMissingActionFiles(context),
-        repairManifestCoverage(context),
         repairManifestIndex(context),
         repairManifestEntries(context),
         removeOrphanManifestEntryFiles(context),

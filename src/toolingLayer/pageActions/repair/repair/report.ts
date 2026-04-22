@@ -43,7 +43,7 @@ function summaryFor(result: RepairRuleResult): string {
         );
     }
 
-    return success("no changes");
+    return info("no changes");
 }
 
 function printRule(result: RepairRuleResult): void {
@@ -104,7 +104,7 @@ export function printRepairReport(args: {
             ? failure("INCOMPLETE")
             : repairedRules > 0
               ? success("REPAIR APPLIED")
-              : success("NO CHANGES");
+              : info("NO CHANGES");
 
     printSummary(
         "REPAIR SUMMARY",
