@@ -11,7 +11,6 @@ import { repairManifestIndex } from "./rules/manifest/repairManifestIndex";
 import { repairManifestEntries } from "./rules/manifest/repairManifestEntries";
 import { removeOrphanManifestEntryFiles } from "./rules/manifest/removeOrphanManifestEntryFiles";
 import { repairRegistryIndexes } from "./rules/registry/repairRegistryIndexes";
-import { repairRuntimeContract } from "./rules/runtime/repairRuntimeContract";
 
 export function runRepairRules(
     context: RepairContext
@@ -23,6 +22,5 @@ export function runRepairRules(
         repairManifestEntries(context),
         removeOrphanManifestEntryFiles(context),
         repairRegistryIndexes(context),
-        repairRuntimeContract(context),
     ];
 }
