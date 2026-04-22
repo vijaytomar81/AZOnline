@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-04-21T16:59:24.019Z",
+  "generatedAt": "2026-04-22T15:39:08.652Z",
   "actions": {
     "athena.azonline.common.insurance-type-selection": "athena/azonline/common/insurance-type-selection.action.json",
     "athena.azonline.common.login-or-registration": "athena/azonline/common/login-or-registration.action.json",

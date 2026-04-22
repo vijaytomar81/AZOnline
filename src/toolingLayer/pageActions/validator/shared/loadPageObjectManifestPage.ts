@@ -1,16 +1,3 @@
 // src/toolingLayer/pageActions/validator/shared/loadPageObjectManifestPage.ts
 
-import fs from "node:fs";
-import path from "node:path";
-import { PAGE_MANIFEST_DIR } from "@utils/paths";
-import type { PageObjectManifestPage } from "../../generator/manifest/types";
-
-export function loadPageObjectManifestPage(
-    relativeFilePath: string
-): PageObjectManifestPage {
-    const filePath = path.join(PAGE_MANIFEST_DIR, relativeFilePath);
-
-    return JSON.parse(
-        fs.readFileSync(filePath, "utf8")
-    ) as PageObjectManifestPage;
-}
+export { loadPageObjectManifestPage } from "@toolingLayer/pageActions/common";
