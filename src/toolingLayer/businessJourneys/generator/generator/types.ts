@@ -1,21 +1,44 @@
 // src/toolingLayer/businessJourneys/generator/generator/types.ts
 
-import type { JourneyEntryPoint } from "@configLayer/domain/journeyEntryPoints";
-import type { JourneyStepFolder } from "@configLayer/domain/journeyStepFolders";
+import type {
+    Platform,
+} from "@configLayer/models/platform.config";
+
+import type {
+    Application,
+} from "@configLayer/models/application.config";
+
+import type {
+    Product,
+} from "@configLayer/models/product.config";
+
+import type {
+    JourneyType,
+} from "@configLayer/models/journeyContext.config";
 
 export type JourneyTarget = {
-    application: string;
-    product: string;
-    journey: string;
-    entryPoint: JourneyEntryPoint;
+    entryPlatform: Platform;
+    entryApplication: Application;
+    destinationPlatform: Platform;
+    destinationApplication: Application;
+    product: Product;
+    journeyType: JourneyType;
 };
 
 export type PageActionEntry = {
-    actionKey: string;
     pageKey: string;
-    group: string;
+    actionKey: string;
     actionName: string;
-    actionFile: string;
+    scope: {
+        platform: string;
+        application: string;
+        product: string;
+        name: string;
+        namespace: string;
+    };
+    paths: {
+        actionFile: string;
+    };
 };
 
 export type JourneyGenerationInputs = {
@@ -31,11 +54,15 @@ export type GenerateSummary = {
     filesCreated: number;
 };
 
+/*
+Temporary compatibility only.
+Can be removed later if no file imports it.
+*/
 export type StepMapping = {
     stepName: string;
     stepFileName: string;
     stepExportName: string;
-    stepFolder: JourneyStepFolder;
+    stepFolder: string;
     actionImportName: string;
     actionImportSource: string;
     payloadExpression: string;

@@ -10,7 +10,11 @@ import {
     success,
 } from "@utils/cliFormat";
 import { ICONS } from "@utils/icons";
-import { BUSINESS_JOURNEYS_DIR, PAGE_ACTIONS_MANIFEST_DIR } from "@utils/paths";
+import {
+    BUSINESS_JOURNEYS_DIR,
+    PAGE_ACTIONS_MANIFEST_DIR,
+    toRepoRelative,
+} from "@utils/paths";
 import { buildJourneyTargets } from "./buildJourneyTargets";
 import { loadJourneyGenerationInputs } from "./loadJourneyGenerationInputs";
 import type { GenerateOptions, GenerateSummary, JourneyTarget } from "./types";
@@ -18,14 +22,20 @@ import { ensureFrameworkFiles } from "./write/ensureFrameworkFiles";
 import { writeTargetFiles } from "./write/writeTargetFiles";
 
 function buildTargetKey(target: JourneyTarget): string {
-    return `${target.application}.${target.product}.${target.journey}.${target.entryPoint}`;
+    const route =
+        String(target.entryApplication) ===
+        String(target.destinationApplication)
+            ? `${target.entryPlatform}.${target.entryApplication}`
+            : `${target.entryPlatform}.${target.entryApplication}.${target.destinationApplication}`;
+
+    return `${route}.${target.product}.${target.journeyType}`;
 }
 
 function printTargetDetails(args: {
     target: JourneyTarget;
     createdFiles: number;
     verbose: boolean;
-}) {
+}): void {
     const key = buildTargetKey(args.target);
 
     if (args.createdFiles > 0) {
@@ -38,11 +48,17 @@ function printTargetDetails(args: {
         return;
     }
 
-    console.log(`   → application   : ${args.target.application}`);
-    console.log(`   → product       : ${args.target.product}`);
-    console.log(`   → journey       : ${args.target.journey}`);
-    console.log(`   → entry point   : ${args.target.entryPoint}`);
-    console.log(`   → files created : ${args.createdFiles}`);
+    console.log(`   → entry platform        : ${args.target.entryPlatform}`);
+    console.log(`   → entry application     : ${args.target.entryApplication}`);
+    console.log(
+        `   → destination platform  : ${args.target.destinationPlatform}`
+    );
+    console.log(
+        `   → destination app       : ${args.target.destinationApplication}`
+    );
+    console.log(`   → product               : ${args.target.product}`);
+    console.log(`   → journey               : ${args.target.journeyType}`);
+    console.log(`   → files created         : ${args.createdFiles}`);
     console.log("");
 }
 
@@ -57,12 +73,12 @@ function buildSummary(args: {
     };
 }
 
-export function generateBusinessJourneys(options: GenerateOptions) {
+export function generateBusinessJourneys(options: GenerateOptions): void {
     printCommandTitle("BUSINESS JOURNEY GENERATOR", "toolsBuildIcon");
 
     printEnvironment([
-        ["pageActionsManifest", PAGE_ACTIONS_MANIFEST_DIR],
-        ["businessJourneysDir", BUSINESS_JOURNEYS_DIR],
+        ["pageActionsManifest", toRepoRelative(PAGE_ACTIONS_MANIFEST_DIR)],
+        ["businessJourneysDir", toRepoRelative(BUSINESS_JOURNEYS_DIR)],
         ["verbose", options.verbose],
     ]);
 

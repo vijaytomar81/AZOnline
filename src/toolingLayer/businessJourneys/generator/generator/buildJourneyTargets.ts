@@ -1,39 +1,65 @@
 // src/toolingLayer/businessJourneys/generator/generator/buildJourneyTargets.ts
 
-import { JOURNEY_ENTRY_POINTS } from "@configLayer/domain/journeyEntryPoints";
-import { SUPPORTED_PRODUCTS, type SupportedProduct } from "@configLayer/domain/supportedProducts";
-import { PARTNER_APPLICATIONS } from "@configLayer/domain/partnerApplications";
-import { uniq } from "@utils/collections";
+import { APPLICATIONS } from "@configLayer/models/application.config";
+import { JOURNEY_TYPES } from "@configLayer/models/journeyContext.config";
+import {
+    PCW_APPLICATIONS,
+    PCW_TOOL_APPLICATIONS,
+} from "@configLayer/models/platformApplication.config";
+import { PLATFORMS } from "@configLayer/models/platform.config";
+import type { Product } from "@configLayer/models/product.config";
 import type { JourneyGenerationInputs, JourneyTarget } from "./types";
 
-function isSupportedProduct(value: string): value is SupportedProduct {
-    return value === SUPPORTED_PRODUCTS.MOTOR || value === SUPPORTED_PRODUCTS.HOME;
+function normalize(value: string): string {
+    return value.replace(/[^a-z0-9]/gi, "").toLowerCase();
 }
 
-function buildAthenaTargets(products: SupportedProduct[]): JourneyTarget[] {
-    return products.flatMap((product) => [
-        {
-            application: "athena",
-            product,
-            journey: "newBusiness",
-            entryPoint: JOURNEY_ENTRY_POINTS.DIRECT,
-        },
-        {
-            application: "athena",
-            product,
-            journey: "newBusiness",
-            entryPoint: JOURNEY_ENTRY_POINTS.PCW_TOOL,
-        },
-    ]);
+function getAvailableProducts(inputs: JourneyGenerationInputs): Product[] {
+    const values = inputs.pageActions
+        .filter(
+            (entry) =>
+                normalize(entry.scope.platform) === "athena" &&
+                normalize(entry.scope.application) === "azonline" &&
+                normalize(entry.scope.product) !== "common"
+        )
+        .map((entry) => entry.scope.product);
+
+    return [...new Set(values)] as Product[];
 }
 
-function buildPartnerTargets(products: SupportedProduct[]): JourneyTarget[] {
-    return products.flatMap((product) =>
-        PARTNER_APPLICATIONS.map((application) => ({
-            application,
+function buildAthenaTargets(products: Product[]): JourneyTarget[] {
+    return products.map((product) => ({
+        entryPlatform: PLATFORMS.ATHENA,
+        entryApplication: APPLICATIONS.AZ_ONLINE,
+        destinationPlatform: PLATFORMS.ATHENA,
+        destinationApplication: APPLICATIONS.AZ_ONLINE,
+        product,
+        journeyType: JOURNEY_TYPES.NEW_BUSINESS,
+    }));
+}
+
+function buildPcwTargets(products: Product[]): JourneyTarget[] {
+    return PCW_APPLICATIONS.flatMap((entryApplication) =>
+        products.map((product) => ({
+            entryPlatform: PLATFORMS.PCW,
+            entryApplication,
+            destinationPlatform: PLATFORMS.ATHENA,
+            destinationApplication: APPLICATIONS.AZ_ONLINE,
             product,
-            journey: "newBusiness",
-            entryPoint: JOURNEY_ENTRY_POINTS.PCW,
+            journeyType: JOURNEY_TYPES.NEW_BUSINESS,
+        }))
+    );
+}
+
+function buildPcwToolTargets(products: Product[]): JourneyTarget[] {
+    return PCW_TOOL_APPLICATIONS.flatMap((entryApplication) =>
+        products.map((product) => ({
+            entryPlatform: PLATFORMS.PCW_TOOL,
+            entryApplication,
+            destinationPlatform: PLATFORMS.ATHENA,
+            destinationApplication: APPLICATIONS.AZ_ONLINE,
+            product,
+            journeyType: JOURNEY_TYPES.NEW_BUSINESS,
         }))
     );
 }
@@ -41,15 +67,11 @@ function buildPartnerTargets(products: SupportedProduct[]): JourneyTarget[] {
 export function buildJourneyTargets(
     inputs: JourneyGenerationInputs
 ): JourneyTarget[] {
-    const products = uniq(
-        inputs.pageActions
-            .filter((entry) => entry.pageKey.startsWith("athena."))
-            .filter((entry) => entry.group !== "common")
-            .map((entry) => entry.group)
-    ).filter(isSupportedProduct);
+    const products = getAvailableProducts(inputs);
 
     return [
         ...buildAthenaTargets(products),
-        ...buildPartnerTargets(products),
+        ...buildPcwTargets(products),
+        ...buildPcwToolTargets(products),
     ];
 }

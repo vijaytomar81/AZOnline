@@ -2,32 +2,56 @@
 
 import type {
     JourneyGenerationInputs,
-    PageActionEntry,
     JourneyTarget,
+    PageActionEntry,
 } from "./types";
 
-function matchesProduct(actionKey: string, product: string): boolean {
+function normalize(value: string): string {
+    return value.replace(/[^a-z0-9]/gi, "").toLowerCase();
+}
+
+function matchesDestinationScope(
+    entry: PageActionEntry,
+    target: JourneyTarget
+): boolean {
     return (
-        actionKey.includes(`.${product}.`) ||
-        actionKey.includes(".common.")
+        normalize(entry.scope.platform) ===
+            normalize(target.destinationPlatform) &&
+        normalize(entry.scope.application) ===
+            normalize(target.destinationApplication)
     );
 }
 
-function matchesNamespace(actionKey: string, application: string): boolean {
+function isCandidateProduct(
+    entry: PageActionEntry,
+    target: JourneyTarget
+): boolean {
+    const product = normalize(entry.scope.product);
+
     return (
-        actionKey.startsWith(`${application}.`) ||
-        actionKey.startsWith("athena.")
+        product === "common" ||
+        product === normalize(target.product)
     );
+}
+
+function rank(entry: PageActionEntry): number {
+    return normalize(entry.scope.product) === "common" ? 0 : 1;
 }
 
 export function selectCandidates(
     target: JourneyTarget,
     inputs: JourneyGenerationInputs
 ): PageActionEntry[] {
-    return inputs.pageActions.filter((entry) => {
-        return (
-            matchesProduct(entry.actionKey, target.product) &&
-            matchesNamespace(entry.actionKey, target.application)
-        );
-    });
+    return inputs.pageActions
+        .filter((entry) => matchesDestinationScope(entry, target))
+        .filter((entry) => isCandidateProduct(entry, target))
+        .sort((left, right) => {
+            const rankDiff = rank(left) - rank(right);
+
+            if (rankDiff !== 0) {
+                return rankDiff;
+            }
+
+            return left.scope.name.localeCompare(right.scope.name);
+        });
 }

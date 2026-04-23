@@ -3,72 +3,48 @@
 import path from "node:path";
 import { BUSINESS_JOURNEYS_DIR } from "@utils/paths";
 import { renderFrameworkFile } from "../render/renderFrameworkFile";
-import { writeFileIfMissing } from "./writeFileIfMissing";
+import { writeFileAlways } from "./writeFileAlways";
 
 export function ensureFrameworkFiles(): number {
+    const frameworkDir = path.join(BUSINESS_JOURNEYS_DIR, "framework");
+
     const files: Array<{
         filePath: string;
-        kind:
-            | "shared-types"
-            | "shared-logging"
-            | "shared-index"
-            | "runner-runJourneySteps"
-            | "runner-runBusinessJourney"
-            | "runner-index"
-            | "registry-journeyRegistry"
-            | "registry-index"
-            | "root-index";
+        kind: "types" | "runJourney" | "index" | "rootIndex";
     }> = [
         {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "shared", "types.ts"),
-            kind: "shared-types",
+            filePath: path.join(frameworkDir, "types.ts"),
+            kind: "types",
         },
         {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "shared", "logging.ts"),
-            kind: "shared-logging",
+            filePath: path.join(frameworkDir, "runJourney.ts"),
+            kind: "runJourney",
         },
         {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "shared", "index.ts"),
-            kind: "shared-index",
-        },
-        {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "runner", "runJourneySteps.ts"),
-            kind: "runner-runJourneySteps",
-        },
-        {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "runner", "runBusinessJourney.ts"),
-            kind: "runner-runBusinessJourney",
-        },
-        {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "runner", "index.ts"),
-            kind: "runner-index",
-        },
-        {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "registry", "journeyRegistry.ts"),
-            kind: "registry-journeyRegistry",
-        },
-        {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "registry", "index.ts"),
-            kind: "registry-index",
+            filePath: path.join(frameworkDir, "index.ts"),
+            kind: "index",
         },
         {
             filePath: path.join(BUSINESS_JOURNEYS_DIR, "index.ts"),
-            kind: "root-index",
+            kind: "rootIndex",
         },
     ];
 
-    let created = 0;
+    let changed = 0;
 
-    for (const item of files) {
-        const content = renderFrameworkFile({
-            filePath: item.filePath,
-            kind: item.kind,
-        });
-
-        if (writeFileIfMissing(item.filePath, content)) {
-            created++;
+    for (const file of files) {
+        if (
+            writeFileAlways(
+                file.filePath,
+                renderFrameworkFile({
+                    filePath: file.filePath,
+                    kind: file.kind,
+                })
+            )
+        ) {
+            changed++;
         }
     }
 
-    return created;
+    return changed;
 }
