@@ -1,5 +1,13 @@
 // src/toolingLayer/pageActions/generator/manifest/types.ts
 
+export type PageScope = {
+    platform: string;
+    application: string;
+    product: string;
+    name: string;
+    namespace: string;
+};
+
 export type PageObjectManifestIndex = {
     version: number;
     generatedAt: string;
@@ -8,9 +16,7 @@ export type PageObjectManifestIndex = {
 
 export type PageObjectManifestPage = {
     pageKey: string;
-    product: string;
-    group: string;
-    name: string;
+    scope: PageScope;
     className: string;
     paths: {
         pageObjectImport: string;
@@ -20,11 +26,17 @@ export type PageObjectManifestPage = {
         aliasesFile: string;
         pageMapFile: string;
     };
-    urlPath?: string;
-    title?: string;
-    elementCount: number;
-    scannedAt: string;
-    mapHash: string;
+    pageMeta: {
+        urlPath?: string;
+        urlPathRe?: string;
+        title?: string;
+        elementCount: number;
+    };
+    source: {
+        scannedUrl?: string;
+        scannedAt?: string;
+        mapHash: string;
+    };
 };
 
 export type PageActionManifestIndex = {
@@ -36,12 +48,15 @@ export type PageActionManifestIndex = {
 export type PageActionManifestEntry = {
     pageKey: string;
     actionKey: string;
-    group: string;
     actionName: string;
+    scope: PageScope;
     paths: {
         actionFile: string;
-        indexFile: string;
+        productIndexFile: string;
+        applicationIndexFile: string;
+        platformIndexFile: string;
+        actionsIndexFile: string;
+        rootIndexFile: string;
         sourcePageObjectFile: string;
     };
-    generatedAt: string;
 };

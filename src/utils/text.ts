@@ -59,3 +59,10 @@ export function toKebabFromSnake(value: unknown): string {
         .trim()
         .replace(/_/g, "-");
 }
+
+export function splitDotPath(value: string): string[] {
+    return String(value ?? "")
+        .split(".")
+        .map((part) => part.trim())
+        .filter(Boolean);
+}

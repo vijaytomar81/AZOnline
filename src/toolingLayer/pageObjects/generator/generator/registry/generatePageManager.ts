@@ -32,18 +32,21 @@ function buildImportLine(entry: PageManifestEntry): string {
 
 function buildEntryLine(entry: PageManifestEntry): string {
     const member = toCamelFromText(lastSegment(entry.pageKey));
-    const key = `${entry.product}.${member}`;
+    const key = `${entry.scope.product}.${member}`;
 
     return `            ${member}: this.get("${key}", () => new ${entry.className}(this.page)),`;
 }
 
-function groupEntriesByProduct(entries: PageManifestEntry[]): Map<string, PageManifestEntry[]> {
+function groupEntriesByProduct(
+    entries: PageManifestEntry[]
+): Map<string, PageManifestEntry[]> {
     const byProduct = new Map<string, PageManifestEntry[]>();
 
     for (const entry of entries) {
-        const current = byProduct.get(entry.product) ?? [];
+        const product = entry.scope.product;
+        const current = byProduct.get(product) ?? [];
         current.push(entry);
-        byProduct.set(entry.product, current);
+        byProduct.set(product, current);
     }
 
     for (const [, group] of byProduct) {
@@ -51,6 +54,22 @@ function groupEntriesByProduct(entries: PageManifestEntry[]): Map<string, PageMa
     }
 
     return byProduct;
+}
+
+function extractImportLines(text: string | null): string[] {
+    if (!text) return [];
+    return text
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.startsWith("import { "));
+}
+
+function extractEntryLines(text: string | null): string[] {
+    if (!text) return [];
+    return text
+        .split("\n")
+        .map((line) => line.trimEnd())
+        .filter((line) => line.includes(': this.get("'));
 }
 
 export function generatePageManagerFromEntries(
@@ -65,7 +84,6 @@ export function generatePageManagerFromEntries(
     const lines: string[] = [];
     lines.push(headerFilePath(getPageManagerFileParts()));
     lines.push(headerGeneratedFromManifest());
-    
     lines.push(``);
     lines.push(`import type { Page } from "@playwright/test";`);
     lines.push(...importLines);
@@ -81,23 +99,25 @@ export function generatePageManagerFromEntries(
     lines.push(``);
     lines.push(`    private get<T>(key: string, factory: PageFactory<T>): T {`);
     lines.push(`        const existing = this.cache.get(key) as T | undefined;`);
-    lines.push(``);
-    lines.push(`        if (existing) {`);
-    lines.push(`            return existing;`);
-    lines.push(`        }`);
-    lines.push(``);
+    lines.push(`        if (existing) return existing;`);
     lines.push(`        const created = factory();`);
     lines.push(`        this.cache.set(key, created);`);
     lines.push(`        return created;`);
     lines.push(`    }`);
     lines.push(``);
 
-    for (const [product, productEntries] of [...byProduct.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+    const entryLines: string[] = [];
+
+    for (const [product, productEntries] of [...byProduct.entries()].sort(([a], [b]) =>
+        a.localeCompare(b)
+    )) {
         lines.push(`    get ${product}() {`);
         lines.push(`        return {`);
 
         for (const entry of productEntries) {
-            lines.push(buildEntryLine(entry));
+            const entryLine = buildEntryLine(entry);
+            entryLines.push(entryLine.trimEnd());
+            lines.push(entryLine);
         }
 
         lines.push(`        };`);
@@ -114,11 +134,17 @@ export function generatePageManagerFromEntries(
         return { changed: false, addedImports: [], addedEntries: [] };
     }
 
+    const previousImports = new Set(extractImportLines(prevText));
+    const previousEntries = new Set(extractEntryLines(prevText));
+
+    const addedImports = importLines.filter((line) => !previousImports.has(line));
+    const addedEntries = entryLines.filter((line) => !previousEntries.has(line));
+
     safeWriteText(file, nextText);
 
     return {
         changed: true,
-        addedImports: importLines,
-        addedEntries: sortedEntries.map(buildEntryLine),
+        addedImports,
+        addedEntries,
     };
 }

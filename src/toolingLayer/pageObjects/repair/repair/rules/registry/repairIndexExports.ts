@@ -9,6 +9,7 @@ import {
     buildExpectedIndexExports,
     buildIndexFileContent,
     readActualIndexExports,
+    readActualIndexFile,
 } from "../../shared/registry";
 
 function list(values: string[]): string {
@@ -50,25 +51,23 @@ function buildDiffChildren(oldValues: string[], newValues: string[]): TreeNode[]
 
 export const repairIndexExports: RepairRule = {
     id: "repair.indexExports",
-    description: "Repair src/pages/index.ts exports from actual page objects",
+    description: "Repair pageObjects index.ts exports from actual page objects",
     run(ctx) {
         const filePath = getIndexFile(ctx.pageRegistryDir);
         const oldExports = readActualIndexExports(ctx.pageRegistryDir);
         const newExports = buildExpectedIndexExports(ctx.pageObjectsDir, ctx.mapsDir);
+        const oldText = readActualIndexFile(ctx.pageRegistryDir);
+        const newText = buildIndexFileContent(
+            ctx.pageObjectsDir,
+            ctx.mapsDir,
+            ctx.pageRegistryDir
+        );
 
-        if (list(oldExports) === list(newExports)) {
+        if (oldText === newText) {
             return { changedFiles: 0, repairedPages: 0, reportNodes: [] };
         }
 
-        fs.writeFileSync(
-            filePath,
-            buildIndexFileContent(
-                ctx.pageObjectsDir,
-                ctx.mapsDir,
-                ctx.pageRegistryDir
-            ),
-            "utf8"
-        );
+        fs.writeFileSync(filePath, newText, "utf8");
 
         const reportNodes: TreeNode[] = [
             {

@@ -1,0 +1,21 @@
+{
+  "pageKey": "athena.azonline.common.manage-cookies",
+  "actionKey": "athena.azonline.common.manage-cookies.action",
+  "actionName": "manageCookiesAction",
+  "scope": {
+    "platform": "athena",
+    "application": "azonline",
+    "product": "common",
+    "name": "manage-cookies",
+    "namespace": "athena.azonline.common"
+  },
+  "paths": {
+    "actionFile": "src/businessLayer/pageActions/actions/athena/azonline/common/manageCookies.action.ts",
+    "productIndexFile": "src/businessLayer/pageActions/actions/athena/azonline/common/index.ts",
+    "applicationIndexFile": "src/businessLayer/pageActions/actions/athena/azonline/index.ts",
+    "platformIndexFile": "src/businessLayer/pageActions/actions/athena/index.ts",
+    "actionsIndexFile": "src/businessLayer/pageActions/actions/index.ts",
+    "rootIndexFile": "src/businessLayer/pageActions/index.ts",
+    "sourcePageObjectFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/manage-cookies/ManageCookiesPage.ts"
+  }
+}

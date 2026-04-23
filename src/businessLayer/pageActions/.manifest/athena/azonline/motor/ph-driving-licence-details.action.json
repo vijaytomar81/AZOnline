@@ -1,0 +1,21 @@
+{
+  "pageKey": "athena.azonline.motor.ph-driving-licence-details",
+  "actionKey": "athena.azonline.motor.ph-driving-licence-details.action",
+  "actionName": "phDrivingLicenceDetailsAction",
+  "scope": {
+    "platform": "athena",
+    "application": "azonline",
+    "product": "motor",
+    "name": "ph-driving-licence-details",
+    "namespace": "athena.azonline.motor"
+  },
+  "paths": {
+    "actionFile": "src/businessLayer/pageActions/actions/athena/azonline/motor/phDrivingLicenceDetails.action.ts",
+    "productIndexFile": "src/businessLayer/pageActions/actions/athena/azonline/motor/index.ts",
+    "applicationIndexFile": "src/businessLayer/pageActions/actions/athena/azonline/index.ts",
+    "platformIndexFile": "src/businessLayer/pageActions/actions/athena/index.ts",
+    "actionsIndexFile": "src/businessLayer/pageActions/actions/index.ts",
+    "rootIndexFile": "src/businessLayer/pageActions/index.ts",
+    "sourcePageObjectFile": "src/businessLayer/pageObjects/objects/athena/azonline/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage.ts"
+  }
+}

@@ -29,8 +29,6 @@ export type GenOptions = {
     mapsDir: string;
     pageObjectsDir: string;
     pageRegistryDir: string;
-    merge?: boolean;
-    changedOnly?: boolean;
     verbose?: boolean;
     log: Logger;
 };

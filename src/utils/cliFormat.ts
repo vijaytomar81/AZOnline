@@ -153,3 +153,20 @@ export function printSummary(
         console.log(muted(line));
     }
 }
+
+export function printSectionBlock(
+    title: string,
+    rows: Array<[string, string | number | boolean]>
+) {
+    console.log("");
+    console.log(strong(title));
+    console.log(muted("-".repeat(title.length)));
+
+    const longestKey = Math.max(...rows.map(([k]) => String(k).length));
+    const pad = longestKey + 1;
+
+    for (const [key, value] of rows) {
+        const label = String(key).padEnd(pad, " ");
+        console.log(`${muted(label)}: ${value}`);
+    }
+}

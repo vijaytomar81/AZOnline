@@ -2,9 +2,10 @@
 
 import fs from "node:fs";
 
-import type { ValidationRule } from "../../pipeline/types";
 import { getPageManagerFile } from "@toolingLayer/pageObjects/common/pagePaths";
 import { loadAllPageMaps } from "@toolingLayer/pageObjects/common/readPageMap";
+import type { ValidationRule } from "../../pipeline/types";
+import { buildMissingPageManagerResult } from "./pageManager/missingPageManagerResult";
 import { buildPageManagerExpectedState } from "./pageManager/buildPageManagerExpectedState";
 import { buildPageManagerReportNodes } from "./pageManager/buildPageManagerReportNodes";
 import { collectPageManagerIssues } from "./pageManager/collectPageManagerIssues";
@@ -12,7 +13,6 @@ import {
     extractPageManagerImports,
     extractPageManagerKeys,
 } from "./pageManager/extractPageManagerState";
-import { buildMissingPageManagerResult } from "./pageManager/missingPageManagerResult";
 
 export const checkPageManager: ValidationRule = {
     id: "registry.checkPageManager",
@@ -28,7 +28,8 @@ export const checkPageManager: ValidationRule = {
         const actualImports = extractPageManagerImports(pageManagerTs);
         const actualKeyIds = extractPageManagerKeys(pageManagerTs);
         const expectedState = buildPageManagerExpectedState(
-            loadAllPageMaps(ctx.mapsDir)
+            loadAllPageMaps(ctx.mapsDir),
+            ctx.pageObjectsDir
         );
 
         const grouped = collectPageManagerIssues({

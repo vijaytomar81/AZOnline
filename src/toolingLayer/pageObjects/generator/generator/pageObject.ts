@@ -42,21 +42,18 @@ function methodLinesFor(aliasKey: string, elementType: string): string[] {
                 `    await this.fillAliasKey(${keyRef}, value);`,
                 `  }`,
             ];
-
         case "select":
             return [
                 `  async ${aliasKey}(value: string) {`,
                 `    await this.selectAliasKey(${keyRef}, value);`,
                 `  }`,
             ];
-
         case "checkbox":
             return [
                 `  async ${aliasKey}(checked: boolean = true) {`,
                 `    await this.setCheckedAliasKey(${keyRef}, checked);`,
                 `  }`,
             ];
-
         default:
             return [
                 `  async ${aliasKey}() {`,
@@ -97,7 +94,7 @@ export function syncAliasesIntoPageObject(args: {
     pageTsPath: string;
     elementsTsPath: string;
     aliasesTsPath: string;
-}) {
+}): boolean {
     const { pageTsPath, elementsTsPath, aliasesTsPath } = args;
 
     if (
@@ -105,7 +102,7 @@ export function syncAliasesIntoPageObject(args: {
         !fs.existsSync(aliasesTsPath) ||
         !fs.existsSync(elementsTsPath)
     ) {
-        return;
+        return false;
     }
 
     const pageTs = fs.readFileSync(pageTsPath, "utf8");
@@ -120,7 +117,7 @@ export function syncAliasesIntoPageObject(args: {
     const end = pageTs.indexOf(endToken);
 
     if (start < 0 || end < 0 || end < start) {
-        return;
+        return false;
     }
 
     const lineStart = pageTs.lastIndexOf("\n", start);
@@ -138,5 +135,10 @@ export function syncAliasesIntoPageObject(args: {
         region +
         pageTs.slice(end + endToken.length);
 
+    if (updated === pageTs) {
+        return false;
+    }
+
     fs.writeFileSync(pageTsPath, updated, "utf8");
+    return true;
 }

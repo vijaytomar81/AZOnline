@@ -1,0 +1,222 @@
+{
+  "pageKey": "athena.azonline.common.insurance-type-selection",
+  "url": "https://customer-portal-lv-test.athenapaas.com/products",
+  "urlPath": "/products",
+  "scannedAt": "2026-03-13T10:57:20.737Z",
+  "title": "Get a new quote or view saved quotes",
+  "readiness": {
+    "recommendedAliases": [
+      "linkCarQuote",
+      "linkHomeQuote"
+    ]
+  },
+  "elements": {
+    "linkToAllianzHomePage": {
+      "type": "link",
+      "preferred": "css=#goToAllianzHomePage",
+      "fallbacks": [
+        "css=a[aria-label=\"Link to Allianz home page\"]",
+        "role=link[name=/Link to Allianz home page/i]"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "goToAllianzHomePage",
+        "name": "Link to Allianz home page",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": "Link to Allianz home page",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://www.allianz.co.uk",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "a49b80f2b5e9"
+    },
+    "buttonInputBack": {
+      "type": "button",
+      "preferred": "role=button[name=/Back/i]",
+      "fallbacks": [
+        "text=/Back/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": null,
+        "name": "Back",
+        "text": "Back",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "8ebb2ee7d230"
+    },
+    "linkCarQuote": {
+      "type": "link",
+      "preferred": "css=#viewSavedSubscriptionCarQuotes",
+      "fallbacks": [
+        "role=link[name=/Car quote/i]",
+        "text=/Car quote/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "viewSavedSubscriptionCarQuotes",
+        "name": "Car quote",
+        "text": "Car quote",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/journey/show/product/AnnualMotorInsurance/process/nb",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "273843c5aa23"
+    },
+    "linkHomeQuote": {
+      "type": "link",
+      "preferred": "css=#viewSavedSubscriptionHomeQuotes",
+      "fallbacks": [
+        "role=link[name=/Home quote/i]",
+        "text=/Home quote/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "viewSavedSubscriptionHomeQuotes",
+        "name": "Home quote",
+        "text": "Home quote",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/journey/show/product/AnnualHomeInsurance/process/nb/dashboardEntryPage",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "6d720003f394"
+    },
+    "linkTermsAndConditionsApply": {
+      "type": "link",
+      "preferred": "role=link[name=/T&Cs apply/i]",
+      "fallbacks": [
+        "text=/T&Cs apply/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": null,
+        "name": "T&Cs apply",
+        "text": "T&Cs apply",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://cloud.comms.allianz.co.uk/accountrdctcs",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "b2536f31be95"
+    },
+    "linkLetUsKnow": {
+      "type": "link",
+      "preferred": "css=#renewal-date-capture-link",
+      "fallbacks": [
+        "role=link[name=/Let us know/i]",
+        "text=/Let us know/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "renewal-date-capture-link",
+        "name": "Let us know",
+        "text": "Let us know",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://cloud.comms.allianz.co.uk/RenewalDateCapture",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "b4db5fa6a06b"
+    },
+    "linkInputBack": {
+      "type": "link",
+      "preferred": "role=link[name=/Back/i]",
+      "fallbacks": [
+        "text=/Back/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": null,
+        "name": "Back",
+        "text": "Back",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/dashboard",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "db022e0e13e1"
+    }
+  }
+}

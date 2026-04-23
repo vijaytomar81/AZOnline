@@ -12,7 +12,8 @@ export function buildValueLines(args: {
     methods: ExtractedMethod[];
     indent?: string;
 }): string[] {
-    const pageAccessor = toCamelCase(args.page.name);
+    const pageAccessor = toCamelCase(args.page.scope.name);
+    const productAccessor = toCamelCase(args.page.scope.product);
     const indent = args.indent ?? "    ";
 
     return args.methods.flatMap((method) => {
@@ -24,7 +25,7 @@ export function buildValueLines(args: {
             `${indent}    fieldName: "${fieldName}",`,
             `${indent}    source: "${args.page.className}",`,
             `${indent}});`,
-            `${indent}await context.pages.athena.${pageAccessor}.${method.name}(${fieldName});`,
+            `${indent}await context.pages.${productAccessor}.${pageAccessor}.${method.name}(${fieldName});`,
             "",
         ];
     });

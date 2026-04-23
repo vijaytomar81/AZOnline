@@ -6,26 +6,61 @@ import {
     type PageObjectFileStatus,
     type PageObjectGenerationStatus,
 } from "@configLayer/tooling/pageObjects";
+import { printTree } from "@utils/cliTree";
+import { printSection, printSummary } from "@utils/cliFormat";
+import { buildGenerationReportTree } from "./reporting/buildGenerationReportTree";
+import {
+    buildGenerationResultText,
+    formatGenerationResultText,
+} from "./reporting/buildGenerationResultText";
+import { buildGenerationSummaryRows } from "./reporting/buildGenerationSummaryRows";
+import { countGenerationIssues } from "./reporting/countGenerationIssues";
 import type { SyncPageRegistryResult } from "./registry";
+import type { GenerationOperation, GenerationResult } from "./reporting/types";
+
+export type InvalidPageReport = {
+    pageKey: string;
+    reason: string;
+};
+
+export type GenerationErrorReport = {
+    pageKey: string;
+    reason: string;
+};
 
 export type RepairPageReport = {
     pageKey: string;
-    changed: boolean;
+    operation: Exclude<GenerationOperation, "failed">;
     elementsStatus: PageObjectGenerationStatus;
     aliasesGeneratedStatus: PageObjectGenerationStatus;
+    aliasesHumanStatus: PageObjectGenerationStatus;
     pageObjectStatus: PageObjectFileStatus;
     registryStatus:
-    | "already-registered"
-    | "added-to-index"
-    | "added-to-page-manager"
-    | "added-to-both";
+        | "already-registered"
+        | "added-to-index"
+        | "added-to-page-manager"
+        | "added-to-both";
+    scope?: {
+        platform: string;
+        application: string;
+        product: string;
+        name: string;
+    };
 };
 
 export type RepairRunReport = {
-    pagesScanned: number;
-    pagesChanged: number;
+    availablePageMaps: number;
+    createdCount: number;
+    updatedCount: number;
+    unchangedCount: number;
+    failedCount: number;
     filesGenerated: number;
-    registryUpdates: number;
+    registryPagesUpdated: number;
+    invalidPages: InvalidPageReport[];
+    errorPages: GenerationErrorReport[];
+    result: GenerationResult;
+    exitCode: number;
+    summaryRows: Array<[string, string | number]>;
     pageReports: RepairPageReport[];
 };
 
@@ -36,8 +71,8 @@ function toMemberCamel(pageKey: string): string {
         .replace(/[-_.]/g, " ")
         .split(" ")
         .filter(Boolean)
-        .map((part, i) =>
-            i === 0
+        .map((part, index) =>
+            index === 0
                 ? part.charAt(0).toLowerCase() + part.slice(1)
                 : part.charAt(0).toUpperCase() + part.slice(1)
         )
@@ -50,15 +85,15 @@ export function applyRegistryStatusToReports(
 ): void {
     const addedIndexPaths = new Set(
         syncRes.index.added.map((line) => {
-            const m = line.match(/@pageObjectsObjects\/(.+)\/[^/]+"?;?$/);
-            return m?.[1] ?? "";
+            const match = line.match(/@businessLayer\/pageObjects\/objects\/(.+)\/[^/]+"?;?$/);
+            return match?.[1] ?? "";
         })
     );
 
     const addedManagerImports = new Set(
         syncRes.pageManager.addedImports.map((line) => {
-            const m = line.match(/@pageObjectsObjects\/(.+)\/[^/]+"?;?$/);
-            return m?.[1] ?? "";
+            const match = line.match(/@businessLayer\/pageObjects\/objects\/(.+)\/[^/]+"?;?$/);
+            return match?.[1] ?? "";
         })
     );
 
@@ -67,7 +102,7 @@ export function applyRegistryStatusToReports(
     for (const report of pageReports) {
         const pagePath = report.pageKey.split(".").join("/");
         const memberCamel = toMemberCamel(report.pageKey);
-        const product = report.pageKey.split(".")[0] || "common";
+        const product = report.scope?.product ?? "common";
         const entrySnippet = `${memberCamel}: this.get("${product}.${memberCamel}"`;
 
         const addedToIndex = addedIndexPaths.has(pagePath);
@@ -75,49 +110,105 @@ export function applyRegistryStatusToReports(
             addedManagerImports.has(pagePath) ||
             [...addedManagerEntries].some((line) => line.includes(entrySnippet));
 
-        if (addedToIndex && addedToManager) {
-            report.registryStatus = "added-to-both";
-        } else if (addedToIndex) {
-            report.registryStatus = "added-to-index";
-        } else if (addedToManager) {
-            report.registryStatus = "added-to-page-manager";
-        } else {
-            report.registryStatus = "already-registered";
-        }
-
-        if (report.registryStatus !== "already-registered") {
-            report.changed = true;
-        }
+        report.registryStatus = addedToIndex && addedToManager
+            ? "added-to-both"
+            : addedToIndex
+              ? "added-to-index"
+              : addedToManager
+                ? "added-to-page-manager"
+                : "already-registered";
     }
 }
 
+function countOperations(pageReports: RepairPageReport[]) {
+    return pageReports.reduce(
+        (acc, item) => {
+            if (item.operation === "created") acc.createdCount++;
+            if (item.operation === "updated") acc.updatedCount++;
+            if (item.operation === "unchanged") acc.unchangedCount++;
+            return acc;
+        },
+        {
+            createdCount: 0,
+            updatedCount: 0,
+            unchangedCount: 0,
+        }
+    );
+}
+
 export function buildRunSummary(params: {
-    pagesScanned: number;
+    availablePageMaps: number;
     pageReports: RepairPageReport[];
     syncRes: SyncPageRegistryResult;
+    invalidPages?: InvalidPageReport[];
+    errorPages?: GenerationErrorReport[];
 }): RepairRunReport {
-    const { pagesScanned, pageReports, syncRes } = params;
+    const invalidPages = params.invalidPages ?? [];
+    const errorPages = params.errorPages ?? [];
+    const { createdCount, updatedCount, unchangedCount } = countOperations(
+        params.pageReports
+    );
 
-    const pagesChanged = pageReports.filter((r) => r.changed).length;
-
-    const filesGenerated = pageReports.reduce((sum, r) => {
+    const filesGenerated = params.pageReports.reduce((sum, item) => {
         let count = 0;
-        if (r.elementsStatus === PAGE_OBJECT_GENERATION_STATUSES.GENERATED) count++;
-        if (r.aliasesGeneratedStatus === PAGE_OBJECT_GENERATION_STATUSES.GENERATED) count++;
-        if (r.pageObjectStatus === PAGE_OBJECT_FILE_STATUSES.GENERATED) count++;
+        if (item.elementsStatus === PAGE_OBJECT_GENERATION_STATUSES.GENERATED) count++;
+        if (item.aliasesGeneratedStatus === PAGE_OBJECT_GENERATION_STATUSES.GENERATED) count++;
+        if (item.aliasesHumanStatus === PAGE_OBJECT_GENERATION_STATUSES.GENERATED) count++;
+        if (item.pageObjectStatus === PAGE_OBJECT_FILE_STATUSES.GENERATED) count++;
         return sum + count;
     }, 0);
 
-    const registryUpdates =
-        syncRes.index.added.length +
-        syncRes.pageManager.addedImports.length +
-        syncRes.pageManager.addedEntries.length;
+    const registryPagesUpdated = params.pageReports.filter(
+        (item) => item.registryStatus !== "already-registered"
+    ).length;
+
+    const issueCounts = countGenerationIssues({ invalidPages, errorPages });
+    const result = buildGenerationResultText(issueCounts);
+    const exitCode = issueCounts.errors > 0 ? 1 : 0;
+    const failedCount = errorPages.length;
 
     return {
-        pagesScanned,
-        pagesChanged,
+        availablePageMaps: params.availablePageMaps,
+        createdCount,
+        updatedCount,
+        unchangedCount,
+        failedCount,
         filesGenerated,
-        registryUpdates,
-        pageReports,
+        registryPagesUpdated,
+        invalidPages,
+        errorPages,
+        result,
+        exitCode,
+        summaryRows: buildGenerationSummaryRows({
+            availablePageMaps: params.availablePageMaps,
+            createdCount,
+            updatedCount,
+            unchangedCount,
+            failedCount,
+            filesGenerated,
+            registryPagesUpdated,
+            invalidPages: invalidPages.length,
+            exitCode,
+        }),
+        pageReports: params.pageReports,
     };
+}
+
+export function printGenerationExecution(result: RepairRunReport): void {
+    printSection("Generation");
+    printTree(
+        buildGenerationReportTree({
+            pageReports: result.pageReports,
+            invalidPages: result.invalidPages,
+            errorPages: result.errorPages,
+        })
+    );
+}
+
+export function printGenerationSummary(result: RepairRunReport): void {
+    printSummary(
+        "GENERATOR SUMMARY",
+        result.summaryRows,
+        formatGenerationResultText(result.result)
+    );
 }

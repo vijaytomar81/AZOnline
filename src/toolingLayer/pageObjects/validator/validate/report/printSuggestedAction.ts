@@ -14,9 +14,9 @@ export function printSuggestedAction(summary: ValidationSummary): void {
         `${info(ICONS.hintIcon)} Run automatic repair to synchronize generated artifacts.`
     );
     console.log("");
-    console.log(`    ${strong("npm run repair:run")}`);
+    console.log(`    ${strong("npm run pageobjects:repair")}`);
     console.log("");
     console.log(`${info(ICONS.hintIcon)} For detailed output use:`);
     console.log("");
-    console.log(`    ${strong("npm run repair:run:verbose")}`);
+    console.log(`    ${strong("npm run pageobjects:repair:verbose")}`);
 }

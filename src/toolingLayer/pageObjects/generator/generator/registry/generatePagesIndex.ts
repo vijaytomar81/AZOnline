@@ -20,6 +20,14 @@ function ensureTrailingNewline(text: string): string {
     return text.endsWith("\n") ? text : `${text}\n`;
 }
 
+function extractExportLines(text: string | null): string[] {
+    if (!text) return [];
+    return text
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.startsWith('export * from "') || line.startsWith('export { PageManager }'));
+}
+
 export function generatePagesIndexFromEntries(
     entries: PageManifestEntry[],
     pagesDir = PAGE_OBJECTS_ROOT_DIR
@@ -36,7 +44,6 @@ export function generatePagesIndexFromEntries(
     const lines: string[] = [];
     lines.push(headerFilePath(getIndexFileParts()));
     lines.push(headerGeneratedFromManifest());
-
     lines.push(``);
     lines.push(...exportLines);
     lines.push(``);
@@ -48,10 +55,13 @@ export function generatePagesIndexFromEntries(
         return { changed: false, added: [] };
     }
 
+    const previousExports = new Set(extractExportLines(prevText));
+    const added = exportLines.filter((line) => !previousExports.has(line));
+
     safeWriteText(indexFile, nextText);
 
     return {
         changed: true,
-        added: exportLines,
+        added,
     };
 }

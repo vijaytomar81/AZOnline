@@ -6,19 +6,31 @@ import path from "node:path";
 import type { Logger } from "@utils/logger";
 import { ensureDir, safeWriteText } from "@utils/fs";
 import type { PageMap } from "./types";
-import { buildPageArtifact } from "./pageArtifact";
+import { buildPageArtifact } from "@toolingLayer/pageObjects/common/artifacts/buildPageArtifact";
 import { buildAliasesGeneratedTs } from "../builders/buildAliasesGeneratedTs";
 import { buildAliasesHumanTs } from "../builders/buildAliasesHumanTs";
 import { buildPageTsStub } from "../builders/buildPageTsStub";
 import { syncAliasesIntoPageObject } from "./pageObject";
 
+export type ScaffoldResult = {
+    aliasesHumanCreated: boolean;
+    aliasesGeneratedCreated: boolean;
+    pageObjectCreated: boolean;
+};
+
 function writeIfMissing(filePath: string, content: string): boolean {
-    if (fs.existsSync(filePath)) return false;
+    if (fs.existsSync(filePath)) {
+        return false;
+    }
+
     safeWriteText(filePath, content);
     return true;
 }
 
-export function hasMissingGeneratedOutputs(params: { pagesDir: string; pageKey: string }): boolean {
+export function hasMissingGeneratedOutputs(params: {
+    pagesDir: string;
+    pageKey: string;
+}): boolean {
     const artifact = buildPageArtifact(params.pagesDir, params.pageKey);
     const required = [
         artifact.folderPath,
@@ -28,7 +40,7 @@ export function hasMissingGeneratedOutputs(params: { pagesDir: string; pageKey: 
         artifact.pageObjectPath,
     ];
 
-    return required.some((p) => !fs.existsSync(p));
+    return required.some((targetPath) => !fs.existsSync(targetPath));
 }
 
 export function ensureScaffoldFiles(params: {
@@ -36,21 +48,36 @@ export function ensureScaffoldFiles(params: {
     pageMap: PageMap;
     verbose?: boolean;
     log: Logger;
-}) {
+}): ScaffoldResult {
     const { pagesDir, pageMap, verbose, log } = params;
     const artifact = buildPageArtifact(pagesDir, pageMap.pageKey);
 
     ensureDir(artifact.folderPath);
 
-    if (writeIfMissing(artifact.aliasesHumanPath, buildAliasesHumanTs(pageMap))) {
+    const aliasesHumanCreated = writeIfMissing(
+        artifact.aliasesHumanPath,
+        buildAliasesHumanTs(pageMap)
+    );
+
+    if (aliasesHumanCreated) {
         log.info(`Scaffolded: ${artifact.aliasesHumanPath}`);
     }
 
-    if (writeIfMissing(artifact.aliasesGeneratedPath, buildAliasesGeneratedTs(pageMap))) {
+    const aliasesGeneratedCreated = writeIfMissing(
+        artifact.aliasesGeneratedPath,
+        buildAliasesGeneratedTs(pageMap)
+    );
+
+    if (aliasesGeneratedCreated) {
         log.info(`Scaffolded: ${artifact.aliasesGeneratedPath}`);
     }
 
-    if (writeIfMissing(artifact.pageObjectPath, buildPageTsStub(pageMap))) {
+    const pageObjectCreated = writeIfMissing(
+        artifact.pageObjectPath,
+        buildPageTsStub(pageMap)
+    );
+
+    if (pageObjectCreated) {
         log.info(`Scaffolded: ${artifact.pageObjectPath}`);
     }
 
@@ -61,6 +88,17 @@ export function ensureScaffoldFiles(params: {
     });
 
     if (verbose) {
-        log.debug(`Synced page object aliases region: ${path.relative(process.cwd(), artifact.pageObjectPath)}`);
+        log.debug(
+            `Synced page object aliases region: ${path.relative(
+                process.cwd(),
+                artifact.pageObjectPath
+            )}`
+        );
     }
+
+    return {
+        aliasesHumanCreated,
+        aliasesGeneratedCreated,
+        pageObjectCreated,
+    };
 }

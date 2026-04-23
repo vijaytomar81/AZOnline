@@ -43,7 +43,7 @@ export function buildConditionalIndexedBlocks(args: {
         };
 
         const index = hasNumericToken(fieldName)
-            ? Number(fieldName.match(/\d+/)?.[0] ?? 1)
+            ? Number(fieldName.match(/\\d+/)?.[0] ?? 1)
             : 1;
 
         const current = entry.byIndex.get(index) ?? [];
@@ -66,6 +66,8 @@ export function buildConditionalIndexedBlocks(args: {
     });
 
     const lines: string[] = [];
+    const pageAccessor = toCamelCase(args.page.scope.name);
+    const productAccessor = toCamelCase(args.page.scope.product);
 
     for (const family of Array.from(familyMap.keys()).sort()) {
         const entry = familyMap.get(family)!;
@@ -87,9 +89,8 @@ export function buildConditionalIndexedBlocks(args: {
             lines.push(`    if (${countField} >= ${index}) {`);
 
             if (index > 1 && entry.addAnotherControl) {
-                const pageAccessor = toCamelCase(args.page.name);
                 lines.push(
-                    `        await context.pages.athena.${pageAccessor}.${entry.addAnotherControl.name}();`,
+                    `        await context.pages.${productAccessor}.${pageAccessor}.${entry.addAnotherControl.name}();`,
                     ""
                 );
             }

@@ -1,89 +1,163 @@
 // src/toolingLayer/pageScanner/scanner/runner.ts
 
-import fs from "node:fs";
-import path from "node:path";
-
 import { ensureDir, safeReadJson } from "@utils/fs";
-import { PAGE_MAPS_DIR } from "@utils/paths";
-import type { PageMap, ScanPageOptions } from "./types";
+import {
+    PAGE_SCAN_OPERATIONS,
+    type PageScanOperation,
+} from "@configLayer/tooling/pageScanner";
+import {
+    PAGE_SCANNER_DIR,
+    PAGE_SCANNER_MANIFEST_DIR,
+} from "@utils/paths";
 import { connectAndGetPage } from "./browser";
 import { extractDomElements } from "./domExtract";
+import { parsePageKey } from "./pageKey/parsePageKey";
 import { buildPageMap } from "./pageMap/buildPageMap";
+import { diffPageMaps, type PageMapDiff } from "./pageMap/diffPageMaps";
 import { mergePageMaps } from "./pageMap/mergePageMaps";
-import { diffPageMaps } from "./pageMap/diffPageMaps";
+import {
+    buildManifestFilePath,
+    buildScannerFilePath,
+    saveManifestEntry,
+    writePageMapFile,
+} from "./persistence";
+import type { PageMap, ScanPageOptions } from "./types";
+import type { ScanPageResult } from "./reporting/types";
 
-export async function scanPage(opts: ScanPageOptions): Promise<void> {
-    const log = opts.log;
+function emptyDiff(): PageMapDiff {
+    return { added: [], updated: [], removed: [], unchanged: [] };
+}
 
-    const outDir = opts.outDir ?? PAGE_MAPS_DIR;
-    ensureDir(outDir);
+function buildFailedResult(params: {
+    pageKey: string;
+    outFile: string;
+    message: string;
+    scope: ReturnType<typeof parsePageKey>;
+}): ScanPageResult {
+    return {
+        pageKey: params.pageKey,
+        operation: PAGE_SCAN_OPERATIONS.FAILED,
+        outFile: params.outFile,
+        elementsFound: 0,
+        diff: emptyDiff(),
+        errorMessage: params.message,
+        scope: params.scope,
+    };
+}
 
-    const outFile = path.join(outDir, `${opts.pageKey}.json`);
+function hasMapMetaChanges(existing: PageMap, incoming: PageMap): boolean {
+    return JSON.stringify({
+        pageKey: existing.pageKey,
+        url: existing.url,
+        urlPath: existing.urlPath,
+        title: existing.title,
+        readiness: existing.readiness,
+    }) !== JSON.stringify({
+        pageKey: incoming.pageKey,
+        url: incoming.url,
+        urlPath: incoming.urlPath,
+        title: incoming.title,
+        readiness: incoming.readiness,
+    });
+}
 
-    log.info(`Connecting to browser: ${opts.connectCdp}`);
+function resolveOperation(
+    existing: PageMap | null,
+    merged: PageMap,
+    diff: PageMapDiff
+): PageScanOperation {
+    if (!existing) {
+        return PAGE_SCAN_OPERATIONS.CREATED;
+    }
+
+    const changed =
+        diff.added.length > 0 ||
+        diff.updated.length > 0 ||
+        diff.removed.length > 0 ||
+        hasMapMetaChanges(existing, merged);
+
+    return changed
+        ? PAGE_SCAN_OPERATIONS.MERGED
+        : PAGE_SCAN_OPERATIONS.UNCHANGED;
+}
+
+function buildInitialDiff(pageMap: PageMap): PageMapDiff {
+    return {
+        added: Object.keys(pageMap.elements).sort(),
+        updated: [],
+        removed: [],
+        unchanged: [],
+    };
+}
+
+export async function scanPage(
+    opts: ScanPageOptions
+): Promise<ScanPageResult> {
+    const rootDir = opts.outDir ?? PAGE_SCANNER_DIR;
+    const manifestFile = buildManifestFilePath(rootDir);
+    const outFile = buildScannerFilePath(rootDir, opts.pageKey);
+    const scope = parsePageKey(opts.pageKey);
+
+    ensureDir(rootDir);
+    ensureDir(PAGE_SCANNER_MANIFEST_DIR);
 
     const { page, detach, url } = await connectAndGetPage(opts);
 
     try {
-        let title: string | undefined;
-        try {
-            const t = await page.title();
-            title = t?.trim() ? t.trim() : undefined;
-        } catch {
-            title = undefined;
-        }
-
-        log.info(`Scanning tab[${opts.tabIndex ?? 0}]: ${url}${title ? ` (title: ${title})` : ""}`);
-
+        const rawTitle = await page.title().catch(() => "");
         const scanned = await extractDomElements(page);
 
         const pageMap = buildPageMap({
             pageKey: opts.pageKey,
             url,
-            title,
+            title: rawTitle?.trim() || undefined,
             scanned,
             verbose: opts.verbose,
-            onDebug: opts.verbose ? (message) => log.debug(message) : undefined,
+            onDebug: opts.verbose ? (message) => opts.log.debug(message) : undefined,
         });
 
-        log.info(`Scanned entries found: ${Object.keys(pageMap.elements).length}`);
+        const elementsFound = Object.keys(pageMap.elements).length;
+        if (elementsFound === 0) {
+            const message = `No interactive elements found on page: ${opts.pageKey}`;
+            opts.log.error(message);
 
-        if (opts.merge) {
-            log.info(`Merging into existing mapper (if any): ${outFile}`);
-
-            const existing = safeReadJson<PageMap>(outFile);
-
-            if (!existing) {
-                fs.writeFileSync(outFile, JSON.stringify(pageMap, null, 2), "utf8");
-                log.info(`Mapper written (new file): ${outFile}`);
-                return;
-            }
-
-            const merged = mergePageMaps(existing, pageMap);
-            const diff = diffPageMaps(existing, merged);
-
-            fs.writeFileSync(outFile, JSON.stringify(merged, null, 2), "utf8");
-            log.info(`Mapper written (merged): ${outFile}`);
-
-            log.info(
-                `Page diff summary: added=${diff.added.length}, updated=${diff.updated.length}, removed=${diff.removed.length}, unchanged=${diff.unchanged.length}`
-            );
-
-            if (opts.verbose) {
-                if (diff.added.length) {
-                    log.debug(`Added: ${diff.added.join(", ")}`);
-                }
-                if (diff.updated.length) {
-                    log.debug(`Updated: ${diff.updated.join(", ")}`);
-                }
-                if (diff.removed.length) {
-                    log.debug(`Removed: ${diff.removed.join(", ")}`);
-                }
-            }
-        } else {
-            fs.writeFileSync(outFile, JSON.stringify(pageMap, null, 2), "utf8");
-            log.info(`Mapper written: ${outFile}`);
+            return buildFailedResult({
+                pageKey: opts.pageKey,
+                outFile,
+                message,
+                scope,
+            });
         }
+
+        const existing = safeReadJson<PageMap>(outFile);
+        const merged = existing ? mergePageMaps(existing, pageMap) : pageMap;
+        const diff = existing ? diffPageMaps(existing, merged) : buildInitialDiff(pageMap);
+        const operation = resolveOperation(existing, merged, diff);
+
+        if (operation !== PAGE_SCAN_OPERATIONS.UNCHANGED) {
+            writePageMapFile(outFile, merged);
+            opts.log.info(
+                `Page map ${existing ? "written (merged)" : "written"}: ${outFile}`
+            );
+        } else {
+            opts.log.info(`No changes detected for page map: ${outFile}`);
+        }
+
+        saveManifestEntry({
+            manifestFile,
+            pageKey: opts.pageKey,
+            pageMapFile: outFile,
+            pageMap: merged,
+        });
+
+        return {
+            pageKey: opts.pageKey,
+            scope,
+            operation,
+            outFile,
+            elementsFound,
+            diff,
+        };
     } finally {
         await detach();
     }

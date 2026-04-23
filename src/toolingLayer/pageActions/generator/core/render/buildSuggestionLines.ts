@@ -8,10 +8,10 @@ export function buildSuggestionLines(args: {
     page: PageObjectManifestPage;
     methods: ExtractedMethod[];
 }): string[] {
-    const pageAccessor = toCamelCase(args.page.name);
+    const pageAccessor = toCamelCase(args.page.scope.name);
+    const productAccessor = toCamelCase(args.page.scope.product);
 
     return args.methods.flatMap((method) => [
-        `    await context.pages.athena.${pageAccessor}.${method.name}();`,
-        "",
+        `await context.pages.${productAccessor}.${pageAccessor}.${method.name}();`,
     ]);
 }

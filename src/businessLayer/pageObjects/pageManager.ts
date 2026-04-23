@@ -1,11 +1,12 @@
 // src/businessLayer/pageObjects/pageManager.ts
-// AUTO-GENERATED from src/pageObjects/.manifest/
+// AUTO-GENERATED from src/businessLayer/pageObjects/.manifest/
 
 import type { Page } from "@playwright/test";
-import { InsuranceTypeSelectionPage } from "@businessLayer/pageObjects/objects/athena/common/insurance-type-selection/InsuranceTypeSelectionPage";
-import { LoginOrRegistrationPage } from "@businessLayer/pageObjects/objects/athena/common/login-or-registration/LoginOrRegistrationPage";
-import { ManageCookiesPage } from "@businessLayer/pageObjects/objects/athena/common/manage-cookies/ManageCookiesPage";
-import { PhDrivingLicenceDetailsPage } from "@businessLayer/pageObjects/objects/athena/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage";
+import { InsuranceTypeSelectionPage } from "@businessLayer/pageObjects/objects/athena/azonline/common/insurance-type-selection/InsuranceTypeSelectionPage";
+import { LoginOrRegistrationPage } from "@businessLayer/pageObjects/objects/athena/azonline/common/login-or-registration/LoginOrRegistrationPage";
+import { ManageCookiesPage } from "@businessLayer/pageObjects/objects/athena/azonline/common/manage-cookies/ManageCookiesPage";
+import { CarDetailsPage } from "@businessLayer/pageObjects/objects/athena/azonline/motor/car-details/CarDetailsPage";
+import { PhDrivingLicenceDetailsPage } from "@businessLayer/pageObjects/objects/athena/azonline/motor/ph-driving-licence-details/PhDrivingLicenceDetailsPage";
 
 type PageFactory<T> = () => T;
 
@@ -16,22 +17,24 @@ export class PageManager {
 
     private get<T>(key: string, factory: PageFactory<T>): T {
         const existing = this.cache.get(key) as T | undefined;
-
-        if (existing) {
-            return existing;
-        }
-
+        if (existing) return existing;
         const created = factory();
         this.cache.set(key, created);
         return created;
     }
 
-    get athena() {
+    get common() {
         return {
-            insuranceTypeSelection: this.get("athena.insuranceTypeSelection", () => new InsuranceTypeSelectionPage(this.page)),
-            loginOrRegistration: this.get("athena.loginOrRegistration", () => new LoginOrRegistrationPage(this.page)),
-            manageCookies: this.get("athena.manageCookies", () => new ManageCookiesPage(this.page)),
-            phDrivingLicenceDetails: this.get("athena.phDrivingLicenceDetails", () => new PhDrivingLicenceDetailsPage(this.page)),
+            insuranceTypeSelection: this.get("common.insuranceTypeSelection", () => new InsuranceTypeSelectionPage(this.page)),
+            loginOrRegistration: this.get("common.loginOrRegistration", () => new LoginOrRegistrationPage(this.page)),
+            manageCookies: this.get("common.manageCookies", () => new ManageCookiesPage(this.page)),
+        };
+    }
+
+    get motor() {
+        return {
+            carDetails: this.get("motor.carDetails", () => new CarDetailsPage(this.page)),
+            phDrivingLicenceDetails: this.get("motor.phDrivingLicenceDetails", () => new PhDrivingLicenceDetailsPage(this.page)),
         };
     }
 

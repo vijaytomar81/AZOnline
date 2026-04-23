@@ -1,46 +1,57 @@
 // src/toolingLayer/pageObjects/validator/validate/rules/manifest/manifestAgainstPageMap/buildManifestComparisonReportNode.ts
 
 import type { TreeNode } from "@utils/cliTree";
-import {
-    formatKeyList,
-    formatMismatchList,
-    manifestFileName,
-} from "./manifestAgainstPageMapFormatters";
+import { manifestFileName } from "./manifestAgainstPageMapFormatters";
 
-export function buildManifestComparisonReportNode(args: {
+type BuildManifestComparisonReportNodeArgs = {
     pageKey: string;
     manifestFile: string;
     missingItems: string[];
     mismatchItems: string[];
-}): TreeNode | undefined {
-    if (args.missingItems.length === 0 && args.mismatchItems.length === 0) {
-        return undefined;
+};
+
+function buildMissingNode(missingItems: string[]): TreeNode | null {
+    if (missingItems.length === 0) {
+        return null;
     }
 
-    const children: TreeNode[] = [];
+    return {
+        severity: "error",
+        title: "Missing",
+        summary: `[${missingItems.join(", ")}]`,
+    };
+}
 
-    if (args.missingItems.length > 0) {
-        children.push({
-            severity: "warning",
-            title: "Missing",
-            summary: formatKeyList(args.missingItems),
-        });
+function buildMismatchNode(mismatchItems: string[]): TreeNode | null {
+    if (mismatchItems.length === 0) {
+        return null;
     }
 
-    if (args.mismatchItems.length > 0) {
-        children.push({
-            severity: "warning",
-            title: "Mismatch",
-            summary: formatMismatchList(args.mismatchItems),
-        });
-    }
+    return {
+        severity: "error",
+        title: "Mismatch",
+        summary: `[${mismatchItems.join(", ")}]`,
+    };
+}
 
+function buildChildren(args: BuildManifestComparisonReportNodeArgs): TreeNode[] {
+    const children = [
+        buildMissingNode(args.missingItems),
+        buildMismatchNode(args.mismatchItems),
+    ].filter((node): node is TreeNode => Boolean(node));
+
+    return children;
+}
+
+export function buildManifestComparisonReportNode(
+    args: BuildManifestComparisonReportNodeArgs
+): TreeNode {
     return {
         title: args.pageKey,
         children: [
             {
                 title: manifestFileName(args.manifestFile),
-                children,
+                children: buildChildren(args),
             },
         ],
     };

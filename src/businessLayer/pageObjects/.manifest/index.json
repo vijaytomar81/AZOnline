@@ -1,10 +1,11 @@
 {
   "version": 1,
-  "generatedAt": "2026-04-09T07:41:48.562Z",
+  "generatedAt": "2026-04-21T10:20:26.653Z",
   "pages": {
-    "athena.common.insurance-type-selection": "athena.common.insurance-type-selection.json",
-    "athena.common.login-or-registration": "athena.common.login-or-registration.json",
-    "athena.common.manage-cookies": "athena.common.manage-cookies.json",
-    "athena.motor.ph-driving-licence-details": "athena.motor.ph-driving-licence-details.json"
+    "athena.azonline.common.insurance-type-selection": "athena/azonline/common/insurance-type-selection.json",
+    "athena.azonline.common.login-or-registration": "athena/azonline/common/login-or-registration.json",
+    "athena.azonline.common.manage-cookies": "athena/azonline/common/manage-cookies.json",
+    "athena.azonline.motor.car-details": "athena/azonline/motor/car-details.json",
+    "athena.azonline.motor.ph-driving-licence-details": "athena/azonline/motor/ph-driving-licence-details.json"
   }
 }

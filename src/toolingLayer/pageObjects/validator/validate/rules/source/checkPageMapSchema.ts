@@ -2,12 +2,11 @@
 
 import path from "node:path";
 
+import { parsePageScope } from "@toolingLayer/pageObjects/common/manifest/parsePageScope";
+import { loadAllPageMaps } from "@toolingLayer/pageObjects/common/readPageMap";
 import type { TreeNode } from "@utils/cliTree";
-import { safeReadJson } from "@utils/fs";
-import type { PageMap } from "@toolingLayer/pageObjects/generator/generator/types";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
-import { listPageMapFiles } from "@toolingLayer/pageObjects/common/readPageMap";
 
 export const checkPageMapSchema: ValidationRule = {
     id: "source.checkPageMapSchema",
@@ -16,79 +15,50 @@ export const checkPageMapSchema: ValidationRule = {
         const issues: ValidationIssue[] = [];
         const reportNodes: TreeNode[] = [];
 
-        for (const fileName of listPageMapFiles(ctx.mapsDir)) {
-            const absPath = path.join(ctx.mapsDir, fileName);
-            const pageMap = safeReadJson<PageMap>(absPath);
-
+        for (const item of loadAllPageMaps(ctx.mapsDir)) {
+            const pageMap = item.pageMap;
             const missingItems: string[] = [];
-
-            if (!pageMap) {
-                issues.push({
-                    ruleId: this.id,
-                    severity: "ERROR",
-                    issueLabel: "Invalid",
-                    message: "[json]",
-                    filePath: absPath,
-                });
-
-                reportNodes.push({
-                    title: fileName,
-                    children: [
-                        {
-                            title: fileName,
-                            children: [
-                                {
-                                    severity: "error",
-                                    title: "Invalid",
-                                    summary: "[json]",
-                                },
-                            ],
-                        },
-                    ],
-                });
-                continue;
-            }
 
             if (typeof pageMap.pageKey !== "string" || !pageMap.pageKey.trim()) {
                 missingItems.push("pageKey");
-                issues.push({
-                    ruleId: this.id,
-                    severity: "ERROR",
-                    issueLabel: "Missing",
-                    message: "[pageKey]",
-                    filePath: absPath,
-                });
+            } else if (!parsePageScope(pageMap.pageKey).ok) {
+                missingItems.push("pageKey-format");
             }
 
             if (!pageMap.elements || typeof pageMap.elements !== "object") {
                 missingItems.push("elements");
+            }
+
+            if (missingItems.length === 0) {
+                continue;
+            }
+
+            for (const missingItem of missingItems) {
                 issues.push({
                     ruleId: this.id,
                     severity: "ERROR",
                     issueLabel: "Missing",
-                    message: "[elements]",
+                    message: `[${missingItem}]`,
                     pageKey: pageMap.pageKey,
-                    filePath: absPath,
+                    filePath: item.absPath,
                 });
             }
 
-            if (missingItems.length > 0) {
-                reportNodes.push({
-                    title: pageMap.pageKey || fileName,
-                    children: [
-                        {
-                            title: fileName,
-                            children: [
-                                {
-                                    severity: "error",
-                                    title: "Missing",
-                                    summary: `[${missingItems.join(", ")}]`,
-                                },
-                            ],
-                        },
-                    ],
-                });
-            }
+            reportNodes.push({
+                title: pageMap.pageKey || item.fileName,
+                children: [
+                    {
+                        title: path.basename(item.absPath),
+                        children: [
+                            {
+                                severity: "error",
+                                title: "Missing",
+                                summary: `[${missingItems.join(", ")}]`,
+                            },
+                        ],
+                    },
+                ],
+            });
         }
 
         return { issues, reportNodes };

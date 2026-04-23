@@ -1,0 +1,30 @@
+{
+  "pageKey": "athena.azonline.common.login-or-registration",
+  "scope": {
+    "platform": "athena",
+    "application": "azonline",
+    "product": "common",
+    "name": "login-or-registration",
+    "namespace": "athena.azonline.common"
+  },
+  "className": "LoginOrRegistrationPage",
+  "paths": {
+    "pageObjectImport": "@businessLayer/pageObjects/objects/athena/azonline/common/login-or-registration/LoginOrRegistrationPage",
+    "pageObjectFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/login-or-registration/LoginOrRegistrationPage.ts",
+    "elementsFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/login-or-registration/elements.ts",
+    "aliasesGeneratedFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/login-or-registration/aliases.generated.ts",
+    "aliasesFile": "src/businessLayer/pageObjects/objects/athena/azonline/common/login-or-registration/aliases.ts",
+    "pageMapFile": "src/businessLayer/pageScanner/athena/azonline/common/login-or-registration.json"
+  },
+  "pageMeta": {
+    "urlPath": "/",
+    "urlPathRe": "/^\\/$/i",
+    "title": "Allianz login page",
+    "elementCount": 4
+  },
+  "source": {
+    "scannedUrl": "https://myinsurance-allianz-nft.athenapaas.com/",
+    "scannedAt": "2026-03-09T12:48:41.552Z",
+    "mapHash": "878303bca51187a68a1b4c198c5dc6aece76845d"
+  }
+}

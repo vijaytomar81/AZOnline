@@ -25,10 +25,9 @@ export type SyncPageRegistryResult = {
 
 function loadManifestEntries(manifestDir: string): PageManifestEntry[] {
     const index = loadManifestIndex(path.join(manifestDir, "index.json"));
-    const pagesDir = path.join(manifestDir, "pages");
 
-    return Object.entries(index.pages)
-        .map(([, fileName]) => loadPageManifestEntry(path.join(pagesDir, fileName)))
+    return Object.values(index.pages)
+        .map((fileName) => loadPageManifestEntry(path.join(manifestDir, fileName)))
         .filter((entry): entry is PageManifestEntry => Boolean(entry))
         .sort((a, b) => a.pageKey.localeCompare(b.pageKey));
 }

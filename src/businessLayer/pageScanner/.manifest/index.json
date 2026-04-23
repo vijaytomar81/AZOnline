@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "generatedAt": "2026-04-16T19:49:15.538Z",
+  "pages": {
+    "athena.azonline.common.insurance-type-selection": {
+      "file": "src/businessLayer/pageScanner/athena/azonline/common/insurance-type-selection.json",
+      "elementCount": 7,
+      "scannedAt": "2026-03-13T10:57:20.737Z"
+    },
+    "athena.azonline.common.login-or-registration": {
+      "file": "src/businessLayer/pageScanner/athena/azonline/common/login-or-registration.json",
+      "elementCount": 4,
+      "scannedAt": "2026-03-09T12:48:41.552Z"
+    },
+    "athena.azonline.common.manage-cookies": {
+      "file": "src/businessLayer/pageScanner/athena/azonline/common/manage-cookies.json",
+      "elementCount": 4,
+      "scannedAt": "2026-04-01T10:40:09.711Z"
+    },
+    "athena.azonline.motor.ph-driving-licence-details": {
+      "file": "src/businessLayer/pageScanner/athena/azonline/motor/ph-driving-licence-details.json",
+      "elementCount": 49,
+      "scannedAt": "2026-03-13T17:03:49.922Z"
+    },
+    "athena.azonline.motor.car-details": {
+      "file": "src/businessLayer/pageScanner/athena/azonline/motor/car-details.json",
+      "elementCount": 7,
+      "scannedAt": "2026-04-16T19:49:15.528Z"
+    }
+  }
+}

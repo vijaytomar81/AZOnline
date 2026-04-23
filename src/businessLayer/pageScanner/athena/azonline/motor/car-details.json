@@ -1,0 +1,209 @@
+{
+  "pageKey": "athena.azonline.motor.car-details",
+  "url": "https://myinsurance.allianz.co.uk/journey/show/product/AnnualMotorInsurance/process/nb/numberPlateScan/69e13d24db62f63f1acab464",
+  "urlPath": "/journey/show/product/AnnualMotorInsurance/process/nb/numberPlateScan/69e13d24db62f63f1acab464",
+  "scannedAt": "2026-04-16T19:49:15.528Z",
+  "title": "Car details",
+  "elements": {
+    "linkToAllianzHomePage": {
+      "type": "link",
+      "preferred": "css=#goToAllianzHomePage",
+      "fallbacks": [
+        "css=a[aria-label=\"Link to Allianz home page\"]",
+        "role=link[name=/Link to Allianz home page/i]"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "goToAllianzHomePage",
+        "name": "Link to Allianz home page",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": "Link to Allianz home page",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://www.allianz.co.uk",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "a49b80f2b5e9"
+    },
+    "linkPersonalInfoUse": {
+      "type": "link",
+      "preferred": "css=#personal-info-use",
+      "fallbacks": [
+        "role=link[name=/view how we’ll use your info/i]",
+        "text=/view how we’ll use your info/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "personal-info-use",
+        "name": "view how we’ll use your info",
+        "text": "view how we’ll use your info",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://www.allianz.co.uk/privacy-notice.html",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": null,
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "4e4c1caed32c"
+    },
+    "radioRegistrationNumberPolarQuestionYes": {
+      "type": "radio",
+      "preferred": "css=#registrationNumberPolarQuestionfalse",
+      "fallbacks": [
+        "css=input[name=\"registrationNumberPolarQuestion\"]",
+        "role=textbox[name=/Yes/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "registrationNumberPolarQuestionfalse",
+        "name": "Yes",
+        "text": null,
+        "labelText": "Yes",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "registrationNumberPolarQuestion",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": "Do you know the registration number of the car?",
+        "ownerAriaLabel": "Do you know the registration number of the car?",
+        "ownerGroupLabelFor": "registrationNumberPolarQuestion",
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "e08447a314e2"
+    },
+    "radioRegistrationNumberPolarQuestionNo": {
+      "type": "radio",
+      "preferred": "css=#registrationNumberPolarQuestiontrue",
+      "fallbacks": [
+        "css=input[name=\"registrationNumberPolarQuestion\"]",
+        "role=textbox[name=/No/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "registrationNumberPolarQuestiontrue",
+        "name": "No",
+        "text": null,
+        "labelText": "No",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": "registrationNumberPolarQuestion",
+        "typeAttr": "radio",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": "Do you know the registration number of the car?",
+        "ownerAriaLabel": "Do you know the registration number of the car?",
+        "ownerGroupLabelFor": "registrationNumberPolarQuestion",
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "24a54bc12692"
+    },
+    "inputRegistrationNumber": {
+      "type": "input",
+      "preferred": "css=#registrationNumber",
+      "fallbacks": [
+        "role=textbox[name=/What’s your car registration number\\?/i]"
+      ],
+      "meta": {
+        "tag": "input",
+        "role": null,
+        "id": "registrationNumber",
+        "name": "What’s your car registration number?",
+        "text": null,
+        "labelText": "What’s your car registration number?",
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": "text",
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": "registrationNumberQuestionInput",
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "79fedb18806c"
+    },
+    "buttonFindMyCar": {
+      "type": "button",
+      "preferred": "role=button[name=/Find my car/i]",
+      "fallbacks": [
+        "text=/Find my car/i"
+      ],
+      "meta": {
+        "tag": "button",
+        "role": null,
+        "id": null,
+        "name": "Find my car",
+        "text": "Find my car",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": null,
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null,
+        "ownerId": null,
+        "ownerLabelText": null,
+        "ownerAriaLabel": null,
+        "ownerGroupLabelFor": "registrationNumberQuestionInput",
+        "isFrameworkSearchInput": false
+      },
+      "stableKey": "9138f85cc924"
+    },
+    "groupRadioRegistrationNumberPolarQuestion": {
+      "type": "radio-group",
+      "preferred": "",
+      "fallbacks": [],
+      "options": {
+        "Yes": "radioRegistrationNumberPolarQuestionYes",
+        "No": "radioRegistrationNumberPolarQuestionNo"
+      },
+      "meta": {
+        "inputName": "registrationNumberPolarQuestion",
+        "ownerLabelText": "Do you know the registration number of the car?",
+        "ownerAriaLabel": "Do you know the registration number of the car?",
+        "ownerId": null
+      }
+    }
+  },
+  "readiness": {
+    "recommendedAliases": [
+      "inputRegistrationNumber",
+      "groupRadioRegistrationNumberPolarQuestion",
+      "radioRegistrationNumberPolarQuestionNo"
+    ]
+  }
+}

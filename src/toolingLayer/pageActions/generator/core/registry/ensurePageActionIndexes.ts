@@ -1,53 +1,131 @@
 // src/toolingLayer/pageActions/generator/core/registry/ensurePageActionIndexes.ts
 
-import fs from "node:fs";
-import path from "node:path";
-import type { ActionNaming, ActionPathInfo } from "../../shared/types";
+import {
+    buildActionsIndexContent,
+    buildApplicationIndexContent,
+    buildPlatformIndexContent,
+    buildProductIndexContent,
+    buildRootIndexContent,
+    writeIfChanged,
+} from "@toolingLayer/pageActions/common";
+import type { ActionRegistryEntry } from "../../shared/types";
 
-function upsertLine(filePath: string, line: string): void {
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+type RegistryWriteResult = {
+    createdFiles: number;
+    updatedFiles: number;
+};
 
-    const existing = fs.existsSync(filePath)
-        ? fs.readFileSync(filePath, "utf8")
-        : "";
-
-    const lines = existing
-        .split("\n")
-        .map((item) => item.trimEnd())
-        .filter(Boolean);
-
-    if (!lines.includes(line)) {
-        lines.push(line);
+function trackWrite(
+    current: RegistryWriteResult,
+    write: { changed: boolean; created: boolean; updated: boolean }
+): void {
+    if (!write.changed) {
+        return;
     }
 
-    fs.writeFileSync(filePath, `${lines.join("\n")}\n`);
+    if (write.created) {
+        current.createdFiles++;
+        return;
+    }
+
+    if (write.updated) {
+        current.updatedFiles++;
+    }
 }
 
 export function ensurePageActionIndexes(args: {
-    naming: ActionNaming;
-    paths: ActionPathInfo;
-}): void {
-    const actionImportPath =
-        `./${args.paths.group}/` +
-        args.naming.actionFileName.replace(".ts", "");
+    entries: ActionRegistryEntry[];
+}): RegistryWriteResult {
+    const { entries } = args;
+    const result: RegistryWriteResult = {
+        createdFiles: 0,
+        updatedFiles: 0,
+    };
 
-    upsertLine(
-        args.paths.rootIndexFile,
-        `export * from "./shared";`
+    if (entries.length === 0) {
+        return result;
+    }
+
+    const rootIndexFile = entries[0].paths.rootIndexFile;
+    const actionsIndexFile = entries[0].paths.actionsIndexFile;
+
+    trackWrite(
+        result,
+        writeIfChanged(
+            rootIndexFile,
+            buildRootIndexContent(rootIndexFile)
+        )
     );
 
-    upsertLine(
-        args.paths.rootIndexFile,
-        `export * from "./actions";`
+    const platforms = [...new Set(entries.map((entry) => entry.scope.platform))]
+        .sort((a, b) => a.localeCompare(b));
+
+    trackWrite(
+        result,
+        writeIfChanged(
+            actionsIndexFile,
+            buildActionsIndexContent(actionsIndexFile, platforms)
+        )
     );
 
-    upsertLine(
-        path.join(path.dirname(args.paths.platformIndexFile), "..", "index.ts"),
-        `export * from "./${args.paths.platform}";`
-    );
+    for (const platform of platforms) {
+        const platformEntries = entries.filter(
+            (entry) => entry.scope.platform === platform
+        );
+        const platformIndexFile = platformEntries[0].paths.platformIndexFile;
+        const applications = [
+            ...new Set(platformEntries.map((entry) => entry.scope.application)),
+        ].sort((a, b) => a.localeCompare(b));
 
-    upsertLine(
-        args.paths.platformIndexFile,
-        `export { ${args.naming.actionName} } from "${actionImportPath}";`
-    );
+        trackWrite(
+            result,
+            writeIfChanged(
+                platformIndexFile,
+                buildPlatformIndexContent(platformIndexFile, applications)
+            )
+        );
+
+        for (const application of applications) {
+            const applicationEntries = platformEntries.filter(
+                (entry) => entry.scope.application === application
+            );
+            const applicationIndexFile =
+                applicationEntries[0].paths.applicationIndexFile;
+            const products = [
+                ...new Set(applicationEntries.map((entry) => entry.scope.product)),
+            ].sort((a, b) => a.localeCompare(b));
+
+            trackWrite(
+                result,
+                writeIfChanged(
+                    applicationIndexFile,
+                    buildApplicationIndexContent(
+                        applicationIndexFile,
+                        products
+                    )
+                )
+            );
+
+            for (const product of products) {
+                const productEntries = applicationEntries.filter(
+                    (entry) => entry.scope.product === product
+                );
+                const productIndexFile =
+                    productEntries[0].paths.productIndexFile;
+
+                trackWrite(
+                    result,
+                    writeIfChanged(
+                        productIndexFile,
+                        buildProductIndexContent(
+                            productIndexFile,
+                            productEntries
+                        )
+                    )
+                );
+            }
+        }
+    }
+
+    return result;
 }

@@ -2,10 +2,11 @@
 
 import path from "node:path";
 
+import { parsePageScope } from "@toolingLayer/pageObjects/common/manifest/parsePageScope";
+import { loadAllPageMaps } from "@toolingLayer/pageObjects/common/readPageMap";
 import type { TreeNode } from "@utils/cliTree";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
-import { loadAllPageMaps } from "@toolingLayer/pageObjects/common/readPageMap";
 
 function formatKeyList(keys: string[]): string {
     return `[${keys.sort((a, b) => a.localeCompare(b)).join(", ")}]`;
@@ -20,14 +21,15 @@ export const checkPageMapKeys: ValidationRule = {
 
         for (const item of loadAllPageMaps(ctx.mapsDir)) {
             const invalidItems: string[] = [];
+            const scopeResult = parsePageScope(item.pageMap.pageKey);
 
-            if (!/^[a-z0-9]+(?:\.[a-z0-9-]+){2,}$/.test(item.pageMap.pageKey)) {
+            if (!scopeResult.ok) {
                 invalidItems.push("pageKey");
                 issues.push({
                     ruleId: this.id,
                     severity: "WARN",
                     issueLabel: "Invalid",
-                    message: "[pageKey]",
+                    message: `[pageKey] ${scopeResult.reason}`,
                     pageKey: item.pageMap.pageKey,
                     filePath: item.absPath,
                 });
@@ -61,35 +63,34 @@ export const checkPageMapKeys: ValidationRule = {
                 });
             }
 
-            if (invalidItems.length > 0 || invalidElementKeys.length > 0) {
-                const children: TreeNode[] = [];
+            if (invalidItems.length === 0 && invalidElementKeys.length === 0) continue;
 
-                if (invalidItems.length > 0) {
-                    children.push({
-                        severity: invalidItems.includes("elements") ? "error" : "warning",
-                        title: invalidItems.includes("elements") ? "Missing" : "Invalid",
-                        summary: `[${invalidItems.join(", ")}]`,
-                    });
-                }
-
-                if (invalidElementKeys.length > 0) {
-                    children.push({
-                        severity: "warning",
-                        title: "Invalid",
-                        summary: formatKeyList(invalidElementKeys),
-                    });
-                }
-
-                reportNodes.push({
-                    title: item.pageMap.pageKey,
-                    children: [
-                        {
-                            title: path.basename(item.absPath),
-                            children,
-                        },
-                    ],
+            const children: TreeNode[] = [];
+            if (invalidItems.length > 0) {
+                children.push({
+                    severity: invalidItems.includes("elements") ? "error" : "warning",
+                    title: invalidItems.includes("elements") ? "Missing" : "Invalid",
+                    summary: `[${invalidItems.join(", ")}]`,
                 });
             }
+
+            if (invalidElementKeys.length > 0) {
+                children.push({
+                    severity: "warning",
+                    title: "Invalid",
+                    summary: formatKeyList(invalidElementKeys),
+                });
+            }
+
+            reportNodes.push({
+                title: item.pageMap.pageKey,
+                children: [
+                    {
+                        title: path.basename(item.absPath),
+                        children,
+                    },
+                ],
+            });
         }
 
         return { issues, reportNodes };

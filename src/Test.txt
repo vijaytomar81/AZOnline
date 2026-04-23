@@ -9,20 +9,49 @@ tree -d -L 3 -I "node_modules|.git"
 
 npx ts-prune | grep -v "used in module" | grep page-scanner
 
-line of code: find src/data -type f -name "*.ts" -exec wc -l {} + | sed '$d' | awk '{print $1 " - " $2}'
+line of code: find src/toolingLayer/pageActions -type f -name "*.ts" -exec wc -l {} + | sed '$d' | awk '{print $1 " - " $2}'
+
+
+empty files in given folder:
+
+find src/toolingLayer/pageActions/validator -type f -empty
 
 
 =========
-
+For Windows:
 
 $profile = Join-Path $env:TEMP ("edge-cdp-" + (Get-Date -Format "yyyyMMdd-HHmmss")); `
 Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "--remote-debugging-port=9222 --user-data-dir=$profile"; `
 Start-Sleep -Seconds 2; `
 $CDP = (Invoke-RestMethod http://localhost:9222/json/version).webSocketDebuggerUrl;
 
+For Mac:
 
+PROFILE_DIR="/tmp/edge-cdp-$(date +%Y%m%d-%H%M%S)"
 
-npm run scan:page:verbose `-- --connectCdp="$CDP" --pageKey="athena.motor.car-details"
+open -na "Microsoft Edge" --args \
+  --remote-debugging-port=9222 \
+  --user-data-dir="$PROFILE_DIR"
+
+sleep 2
+
+CDP=$(curl -s http://localhost:9222/json/version | jq -r .webSocketDebuggerUrl)
+
+echo "CDP URL: $CDP"
+
+------------------
+To kill browser: 
+
+lsof -ti :9222 | xargs kill -9
+
+------------------
+Windows:
+
+npm run scan:page:verbose `-- --connectCdp="$CDP" --pageKey="athena.azonline.motor.car-details"
+
+Mac:
+
+npm run scan:page:verbose -- --connectCdp="$CDP" --pageKey="athena.azonline.motor.car-details"
 
 ==============
 

@@ -1,0 +1,112 @@
+{
+  "pageKey": "athena.azonline.common.login-or-registration",
+  "url": "https://myinsurance-allianz-nft.athenapaas.com/",
+  "urlPath": "/",
+  "scannedAt": "2026-03-09T12:48:41.552Z",
+  "title": "Allianz login page",
+  "readiness": {
+    "recommendedAliases": [
+      "logIn",
+      "register",
+      "skipThisStepILlRegisterLater"
+    ]
+  },
+  "elements": {
+    "linkToAllianzHomePage": {
+      "type": "link",
+      "preferred": "css=#goToAllianzHomePage",
+      "fallbacks": [
+        "css=a[aria-label=\"Link to Allianz home page\"]",
+        "role=link[name=/Link to Allianz home page/i]"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "goToAllianzHomePage",
+        "name": "Link to Allianz home page",
+        "text": null,
+        "labelText": null,
+        "ariaLabel": "Link to Allianz home page",
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://www.allianz.co.uk",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "logIn": {
+      "type": "link",
+      "preferred": "css=#login",
+      "fallbacks": [
+        "role=link[name=/Log in/i]",
+        "text=/Log in/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "login",
+        "name": "Log in",
+        "text": "Log in",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/dashboard",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "register": {
+      "type": "link",
+      "preferred": "css=#register",
+      "fallbacks": [
+        "role=link[name=/Register/i]",
+        "text=/Register/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "register",
+        "name": "Register",
+        "text": "Register",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "https://login-myinsurance-allianz-nft.athenapaas.com/auth/realms/customer-portal/protocol/openid-connect/registrations?client_id=customer-portal-web&redirect_uri=https%3A%2F%2Fmyinsurance-allianz-nft.athenapaas.com%2Fdashboard&state=d099af8a-d3f4-4c41-ad80-77c99f9074b9&response_mode=fragment&response_type=code&scope=openid&nonce=df305a71-d7f7-472e-bc56-980ba92e878e&code_challenge=Q4iAFP9Y-mrLpX5uvBQwmWkW0C84EGNLt2DrB_Xbca0&code_challenge_method=S256",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    },
+    "skipThisStepILlRegisterLater": {
+      "type": "link",
+      "preferred": "css=#skipRegistration",
+      "fallbacks": [
+        "role=link[name=/Skip this step, I’ll register later/i]",
+        "text=/Skip this step, I’ll register later/i"
+      ],
+      "meta": {
+        "tag": "a",
+        "role": null,
+        "id": "skipRegistration",
+        "name": "Skip this step, I’ll register later",
+        "text": "Skip this step, I’ll register later",
+        "labelText": null,
+        "ariaLabel": null,
+        "placeholder": null,
+        "inputName": null,
+        "typeAttr": null,
+        "href": "/products",
+        "dataTestId": null,
+        "dataTest": null,
+        "dataQa": null
+      }
+    }
+  }
+}

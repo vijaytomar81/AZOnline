@@ -2,12 +2,11 @@
 
 import path from "node:path";
 
+import { loadAllPageMaps } from "@toolingLayer/pageObjects/common/readPageMap";
 import type { TreeNode } from "@utils/cliTree";
-import { safeReadJson } from "@utils/fs";
 import type { PageMap } from "@toolingLayer/pageObjects/generator/generator/types";
 import type { ValidationRule } from "../../pipeline/types";
 import type { ValidationIssue } from "../../types";
-import { listPageMapFiles } from "@toolingLayer/pageObjects/common/readPageMap";
 
 type PageMapReadiness = {
     recommendedAliases?: unknown;
@@ -93,14 +92,8 @@ export const checkPageMapReadiness: ValidationRule = {
         const issues: ValidationIssue[] = [];
         const reportNodes: TreeNode[] = [];
 
-        for (const fileName of listPageMapFiles(ctx.mapsDir)) {
-            const absPath = path.join(ctx.mapsDir, fileName);
-            const pageMap = safeReadJson<PageMapWithReadiness>(absPath);
-
-            if (!pageMap) {
-                continue;
-            }
-
+        for (const item of loadAllPageMaps(ctx.mapsDir)) {
+            const pageMap = item.pageMap as PageMapWithReadiness;
             const invalidItems = collectReadinessIssues(pageMap);
 
             if (invalidItems.length === 0) {
@@ -113,11 +106,11 @@ export const checkPageMapReadiness: ValidationRule = {
                 issueLabel: "Invalid",
                 message: formatKeyList(invalidItems),
                 pageKey: pageMap.pageKey,
-                filePath: absPath,
+                filePath: item.absPath,
             });
 
             reportNodes.push(
-                buildReportNode(pageMap.pageKey, fileName, invalidItems)
+                buildReportNode(pageMap.pageKey, path.basename(item.absPath), invalidItems)
             );
         }
 

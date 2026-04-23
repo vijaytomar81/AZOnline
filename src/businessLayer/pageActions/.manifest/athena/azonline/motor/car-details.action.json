@@ -1,0 +1,21 @@
+{
+  "pageKey": "athena.azonline.motor.car-details",
+  "actionKey": "athena.azonline.motor.car-details.action",
+  "actionName": "carDetailsAction",
+  "scope": {
+    "platform": "athena",
+    "application": "azonline",
+    "product": "motor",
+    "name": "car-details",
+    "namespace": "athena.azonline.motor"
+  },
+  "paths": {
+    "actionFile": "src/businessLayer/pageActions/actions/athena/azonline/motor/carDetails.action.ts",
+    "productIndexFile": "src/businessLayer/pageActions/actions/athena/azonline/motor/index.ts",
+    "applicationIndexFile": "src/businessLayer/pageActions/actions/athena/azonline/index.ts",
+    "platformIndexFile": "src/businessLayer/pageActions/actions/athena/index.ts",
+    "actionsIndexFile": "src/businessLayer/pageActions/actions/index.ts",
+    "rootIndexFile": "src/businessLayer/pageActions/index.ts",
+    "sourcePageObjectFile": "src/businessLayer/pageObjects/objects/athena/azonline/motor/car-details/CarDetailsPage.ts"
+  }
+}

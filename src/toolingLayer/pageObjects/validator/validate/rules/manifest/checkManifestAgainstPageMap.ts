@@ -1,8 +1,8 @@
 // src/toolingLayer/pageObjects/validator/validate/rules/manifest/checkManifestAgainstPageMap.ts
 
+import { loadAllPageMaps } from "@toolingLayer/pageObjects/common/readPageMap";
 import { loadPageManifest } from "@toolingLayer/pageObjects/generator/generator/pageManifest";
 import type { ValidationRule } from "../../pipeline/types";
-import { loadAllPageMaps } from "@toolingLayer/pageObjects/common/readPageMap";
 import { buildExtraManifestIssueEntries } from "./manifestAgainstPageMap/buildExtraManifestIssueEntries";
 import { buildManifestComparisonInputs } from "./manifestAgainstPageMap/buildManifestComparisonInputs";
 import { buildManifestComparisonResult } from "./manifestAgainstPageMap/buildManifestComparisonResult";
