@@ -7,10 +7,8 @@ import type { Product } from "@configLayer/models/product.config";
 import type { JourneyGenerationStatus } from "@toolingLayer/businessJourneys/common";
 
 export type JourneyTarget = {
-    entryPlatform: Platform;
-    entryApplication: Application;
-    destinationPlatform: Platform;
-    destinationApplication: Application;
+    platform: Platform;
+    application: Application;
     product: Product;
     journeyType: JourneyType;
 };
@@ -40,15 +38,26 @@ export type GenerateOptions = {
 };
 
 export type GenerateSummary = {
-    targets: number;
+    availablePageActions: number;
     created: number;
     updated: number;
     unchanged: number;
     failed: number;
     filesCreated: number;
+    filesUpdated: number;
+    filesSkipped: number;
+    exitCode: number;
 };
 
 export type WriteTargetFilesResult = {
     status: JourneyGenerationStatus;
     filesCreated: number;
+    filesUpdated: number;
+    filesSkipped: number;
+};
+
+export type EnsureFrameworkFilesResult = {
+    filesCreated: number;
+    filesUpdated: number;
+    filesSkipped: number;
 };

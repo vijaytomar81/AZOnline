@@ -1,6 +1,7 @@
 // src/toolingLayer/businessJourneys/generator/generator/write/writeTargetFiles.ts
 
 import path from "node:path";
+import { fileExists } from "@utils/fs";
 import { BUSINESS_JOURNEYS_DIR } from "@utils/paths";
 import type {
     JourneyGenerationInputs,
@@ -14,22 +15,12 @@ import { writeFileAlways } from "./writeFileAlways";
 import { writeFileIfMissing } from "./writeFileIfMissing";
 
 function buildTargetSegments(target: JourneyTarget): string[] {
-    const segments = [
-        String(target.entryPlatform),
-        String(target.entryApplication),
+    return [
+        String(target.platform),
+        String(target.application),
+        String(target.product),
+        String(target.journeyType),
     ];
-
-    if (
-        String(target.entryApplication) !==
-        String(target.destinationApplication)
-    ) {
-        segments.push(String(target.destinationApplication));
-    }
-
-    segments.push(String(target.product));
-    segments.push(String(target.journeyType));
-
-    return segments;
 }
 
 export function writeTargetFiles(
@@ -46,8 +37,11 @@ export function writeTargetFiles(
         const runFile = path.join(baseDir, `run${journeyName}Journey.ts`);
         const indexFile = path.join(baseDir, "index.ts");
 
+        const runExistedBefore = fileExists(runFile);
+        const indexExistedBefore = fileExists(indexFile);
+
         let filesCreated = 0;
-        let indexChanged = false;
+        let filesUpdated = 0;
 
         if (
             writeFileIfMissing(
@@ -76,32 +70,47 @@ export function writeTargetFiles(
                 })
             )
         ) {
-            filesCreated++;
-            indexChanged = true;
+            if (indexExistedBefore) {
+                filesUpdated++;
+            } else {
+                filesCreated++;
+            }
         }
 
-        if (filesCreated > 0 && !indexChanged) {
+        const filesSkipped =
+            (runExistedBefore ? 1 : 0) +
+            (indexExistedBefore && filesUpdated === 0 ? 1 : 0);
+
+        if (!runExistedBefore && filesCreated > 0) {
             return {
                 status: "created",
                 filesCreated,
+                filesUpdated,
+                filesSkipped,
             };
         }
 
-        if (filesCreated > 0) {
+        if (filesUpdated > 0) {
             return {
                 status: "updated",
                 filesCreated,
+                filesUpdated,
+                filesSkipped,
             };
         }
 
         return {
             status: "unchanged",
-            filesCreated: 0,
+            filesCreated,
+            filesUpdated,
+            filesSkipped,
         };
     } catch {
         return {
             status: "failed",
             filesCreated: 0,
+            filesUpdated: 0,
+            filesSkipped: 0,
         };
     }
 }

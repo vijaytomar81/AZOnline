@@ -12,8 +12,8 @@ function buildActionAccess(
     target: JourneyTarget,
     entry: PageActionEntry
 ): string {
-    const platform = toRegistryKey(String(target.destinationPlatform));
-    const application = toRegistryKey(String(target.destinationApplication));
+    const platform = toRegistryKey(String(target.platform));
+    const application = toRegistryKey(String(target.application));
     const product = toRegistryKey(entry.scope.product);
     const member = toCamelCase(entry.scope.name);
 

@@ -10,19 +10,17 @@ function normalize(value: string): string {
     return value.replace(/[^a-z0-9]/gi, "").toLowerCase();
 }
 
-function matchesDestinationScope(
+function matchesScope(
     entry: PageActionEntry,
     target: JourneyTarget
 ): boolean {
     return (
-        normalize(entry.scope.platform) ===
-            normalize(target.destinationPlatform) &&
-        normalize(entry.scope.application) ===
-            normalize(target.destinationApplication)
+        normalize(entry.scope.platform) === normalize(target.platform) &&
+        normalize(entry.scope.application) === normalize(target.application)
     );
 }
 
-function isCandidateProduct(
+function matchesProduct(
     entry: PageActionEntry,
     target: JourneyTarget
 ): boolean {
@@ -43,8 +41,8 @@ export function selectCandidates(
     inputs: JourneyGenerationInputs
 ): PageActionEntry[] {
     return inputs.pageActions
-        .filter((entry) => matchesDestinationScope(entry, target))
-        .filter((entry) => isCandidateProduct(entry, target))
+        .filter((entry) => matchesScope(entry, target))
+        .filter((entry) => matchesProduct(entry, target))
         .sort((left, right) => {
             const rankDiff = rank(left) - rank(right);
 

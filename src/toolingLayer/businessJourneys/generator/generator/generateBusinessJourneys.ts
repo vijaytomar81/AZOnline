@@ -8,11 +8,11 @@ import {
     printSummary,
     success,
     failure,
-    warning,
 } from "@utils/cliFormat";
 import {
     BUSINESS_JOURNEYS_DIR,
     PAGE_ACTIONS_MANIFEST_DIR,
+    PAGE_ACTIONS_REGISTRY_DIR,
     toRepoRelative,
 } from "@utils/paths";
 import {
@@ -30,59 +30,38 @@ import { ensureFrameworkFiles } from "./write/ensureFrameworkFiles";
 import { writeTargetFiles } from "./write/writeTargetFiles";
 
 function buildTargetSegments(target: JourneyTarget): string[] {
-    const segments = [
-        String(target.entryPlatform),
-        String(target.entryApplication),
+    return [
+        String(target.platform),
+        String(target.application),
+        String(target.product),
+        String(target.journeyType),
     ];
-
-    if (
-        String(target.entryApplication) !==
-        String(target.destinationApplication)
-    ) {
-        segments.push(String(target.destinationApplication));
-    }
-
-    segments.push(String(target.product));
-    segments.push(String(target.journeyType));
-
-    return segments;
 }
 
-function buildLeafSummary(args: {
-    status: "created" | "updated" | "unchanged" | "failed";
-    filesCreated: number;
-}): string {
-    if (args.status === "failed") {
-        return "failed";
-    }
-
-    if (args.status === "unchanged") {
-        return "unchanged";
-    }
-
-    if (args.status === "created") {
-        return `${args.filesCreated} file(s) created`;
-    }
-
-    return `${args.filesCreated} file(s) updated`;
+function buildLeafSummary(filesCreated: number): string {
+    return `${filesCreated} file(s) created`;
 }
 
 function buildSummary(args: {
-    targets: JourneyTarget[];
-    frameworkFiles: number;
+    availablePageActions: number;
     created: number;
     updated: number;
     unchanged: number;
     failed: number;
-    createdByTarget: number;
+    filesCreated: number;
+    filesUpdated: number;
+    filesSkipped: number;
 }): GenerateSummary {
     return {
-        targets: args.targets.length,
+        availablePageActions: args.availablePageActions,
         created: args.created,
-        updated: args.updated + (args.frameworkFiles > 0 ? 1 : 0),
+        updated: args.updated,
         unchanged: args.unchanged,
         failed: args.failed,
-        filesCreated: args.frameworkFiles + args.createdByTarget,
+        filesCreated: args.filesCreated,
+        filesUpdated: args.filesUpdated,
+        filesSkipped: args.filesSkipped,
+        exitCode: args.failed > 0 ? 1 : 0,
     };
 }
 
@@ -93,6 +72,7 @@ export function generateBusinessJourneys(
 
     printEnvironment([
         ["pageActionsManifest", toRepoRelative(PAGE_ACTIONS_MANIFEST_DIR)],
+        ["pageActionsRegistry", toRepoRelative(PAGE_ACTIONS_REGISTRY_DIR)],
         ["businessJourneysDir", toRepoRelative(BUSINESS_JOURNEYS_DIR)],
         ["verbose", options.verbose],
     ]);
@@ -102,67 +82,87 @@ export function generateBusinessJourneys(
 
     printSection("Generation details");
 
-    const frameworkFiles = ensureFrameworkFiles();
-    let createdByTarget = 0;
+    const frameworkResult = ensureFrameworkFiles();
+
     let created = 0;
     let updated = 0;
     let unchanged = 0;
     let failed = 0;
+    let filesCreated = frameworkResult.filesCreated;
+    let filesUpdated = frameworkResult.filesUpdated;
+    let filesSkipped = frameworkResult.filesSkipped;
 
     const leaves: JourneyTreeLeaf[] = [];
 
     for (const target of targets) {
         const result = writeTargetFiles(target, inputs);
-        createdByTarget += result.filesCreated;
+
+        filesCreated += result.filesCreated;
+        filesUpdated += result.filesUpdated;
+        filesSkipped += result.filesSkipped;
 
         if (result.status === "created") {
             created++;
-        } else if (result.status === "updated") {
-            updated++;
-        } else if (result.status === "unchanged") {
-            unchanged++;
-        } else {
-            failed++;
+            leaves.push({
+                segments: buildTargetSegments(target),
+                status: "created",
+                summary: buildLeafSummary(result.filesCreated),
+            });
+            continue;
         }
 
-        leaves.push({
-            segments: buildTargetSegments(target),
-            status: result.status,
-            summary: buildLeafSummary({
-                status: result.status,
-                filesCreated: result.filesCreated,
-            }),
-        });
+        if (result.status === "failed") {
+            failed++;
+            leaves.push({
+                segments: buildTargetSegments(target),
+                status: "failed",
+                summary: "failed",
+            });
+            continue;
+        }
+
+        if (result.status === "updated") {
+            updated++;
+            continue;
+        }
+
+        unchanged++;
     }
 
-    renderJourneyTree(leaves);
+    if (leaves.length > 0) {
+        renderJourneyTree(leaves);
+    } else {
+        console.log(info("ℹ no new business journeys were created"));
+    }
 
     const summary = buildSummary({
-        targets,
-        frameworkFiles,
+        availablePageActions: inputs.pageActions.length,
         created,
         updated,
         unchanged,
         failed,
-        createdByTarget,
+        filesCreated,
+        filesUpdated,
+        filesSkipped,
     });
 
     const resultText =
         summary.failed > 0
-            ? failure("COMPLETED WITH ERRORS")
-            : summary.created > 0 || summary.updated > 0
-              ? success("UPDATED")
-              : info("UP TO DATE");
+            ? failure("INCOMPLETE")
+            : success("ALL GOOD");
 
     printSummary(
         "GENERATOR SUMMARY",
         [
-            ["Targets", summary.targets],
+            ["Available Page Actions", summary.availablePageActions],
             ["Created", summary.created],
             ["Updated", summary.updated],
             ["Unchanged", summary.unchanged],
             ["Failed", summary.failed],
             ["Files created", summary.filesCreated],
+            ["Files updated", summary.filesUpdated],
+            ["Files skipped", summary.filesSkipped],
+            ["Exit code", summary.exitCode],
         ],
         resultText
     );
