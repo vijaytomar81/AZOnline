@@ -9,6 +9,7 @@ export function buildRootIndexContent(filePath: string): string {
         ``,
         `export * from "./shared";`,
         `export * from "./actions";`,
+        `export * from "./registry";`,
         ``,
     ].join("\n");
 }

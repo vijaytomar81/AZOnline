@@ -1,64 +1,70 @@
 // src/toolingLayer/pageActions/generator/cli/runPageActionGenerator.ts
 
-import path from "node:path";
-import { generatePageActionsFromManifest } from "../core/generatePageActionsFromManifest";
 import {
+    failure,
+    info,
     printCommandTitle,
     printEnvironment,
     printSummary,
     success,
-    warning,
-    failure,
 } from "@utils/cliFormat";
 import {
     PAGE_ACTIONS_ACTIONS_DIR,
     PAGE_ACTIONS_MANIFEST_DIR,
+    PAGE_ACTIONS_REGISTRY_DIR,
     PAGE_MANIFEST_DIR,
+    toRepoRelative,
 } from "@utils/paths";
+import { generatePageActionsFromManifest } from "../core/generatePageActionsFromManifest";
 
-type CliOptions = {
-    verbose: boolean;
-};
+export function runPageActionGenerator(args: {
+    verbose?: boolean;
+} = {}): number {
+    const verbose = !!args.verbose;
 
-function parseArgs(): CliOptions {
-    const args = process.argv.slice(2);
-
-    return {
-        verbose: args.includes("--verbose"),
-    };
-}
-
-function main(): void {
-    const options = parseArgs();
-
-    printCommandTitle("PAGE ACTION GENERATOR", "elementsGeneratorIcon");
+    printCommandTitle("PAGE ACTION GENERATOR", "toolsBuildIcon");
 
     printEnvironment([
-        ["pageObjectsManifest", path.resolve(PAGE_MANIFEST_DIR)],
-        ["pageActionsDir", path.resolve(PAGE_ACTIONS_ACTIONS_DIR)],
-        ["manifestDir", path.resolve(PAGE_ACTIONS_MANIFEST_DIR)],
-        ["verbose", options.verbose],
+        ["pageObjectsManifest", toRepoRelative(PAGE_MANIFEST_DIR)],
+        ["pageActionsDir", toRepoRelative(PAGE_ACTIONS_ACTIONS_DIR)],
+        ["manifestDir", toRepoRelative(PAGE_ACTIONS_MANIFEST_DIR)],
+        ["registryDir", toRepoRelative(PAGE_ACTIONS_REGISTRY_DIR)],
+        ["verbose", verbose],
     ]);
 
     const summary = generatePageActionsFromManifest({
-        verbose: options.verbose,
+        verbose,
     });
 
     const resultText =
-        summary.exitCode > 0
-            ? failure("ERROR FOUND")
-            : summary.created > 0 || summary.updated > 0
+        summary.failed > 0
+            ? failure("COMPLETED WITH ERRORS")
+            : summary.created > 0 ||
+                summary.updated > 0 ||
+                summary.metadataExportFilesCreated > 0 ||
+                summary.metadataExportFilesUpdated > 0 ||
+                summary.registryFilesCreated > 0 ||
+                summary.registryFilesUpdated > 0
               ? success("UPDATED")
-              : warning("UP TO DATE");
+              : info("UP TO DATE");
 
     printSummary(
-        "GENERATION SUMMARY",
+        "GENERATOR SUMMARY",
         [
-            ["Available page objects", summary.availablePages],
+            ["Available pages", summary.availablePages],
+            ["Existing actions", summary.existingActions],
             ["Created", summary.created],
             ["Updated", summary.updated],
             ["Unchanged", summary.unchanged],
             ["Failed", summary.failed],
+            [
+                "Metadata export files created",
+                summary.metadataExportFilesCreated,
+            ],
+            [
+                "Metadata export files updated",
+                summary.metadataExportFilesUpdated,
+            ],
             ["Registry files created", summary.registryFilesCreated],
             ["Registry files updated", summary.registryFilesUpdated],
             ["Invalid pages", summary.invalidPages],
@@ -67,9 +73,5 @@ function main(): void {
         resultText
     );
 
-    if (summary.exitCode > 0) {
-        process.exit(summary.exitCode);
-    }
+    return summary.exitCode;
 }
-
-main();
