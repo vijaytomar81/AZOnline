@@ -9,11 +9,19 @@ import { writeFileAlways } from "./writeFileAlways";
 
 export function ensureFrameworkFiles(): EnsureFrameworkFilesResult {
     const frameworkDir = path.join(BUSINESS_JOURNEYS_DIR, "framework");
+    const runtimeDir = path.join(BUSINESS_JOURNEYS_DIR, "runtime");
 
     const files: Array<{
         filePath: string;
         fileName: string;
-        kind: "types" | "runJourney" | "index" | "rootIndex";
+        kind:
+            | "types"
+            | "runJourney"
+            | "frameworkIndex"
+            | "runtimeResolveNewBusiness"
+            | "runtimeRunNewBusiness"
+            | "runtimeIndex"
+            | "rootIndex";
     }> = [
         {
             filePath: path.join(frameworkDir, "types.ts"),
@@ -28,7 +36,22 @@ export function ensureFrameworkFiles(): EnsureFrameworkFilesResult {
         {
             filePath: path.join(frameworkDir, "index.ts"),
             fileName: "framework/index.ts",
-            kind: "index",
+            kind: "frameworkIndex",
+        },
+        {
+            filePath: path.join(runtimeDir, "resolveNewBusinessJourney.ts"),
+            fileName: "runtime/resolveNewBusinessJourney.ts",
+            kind: "runtimeResolveNewBusiness",
+        },
+        {
+            filePath: path.join(runtimeDir, "runNewBusiness.ts"),
+            fileName: "runtime/runNewBusiness.ts",
+            kind: "runtimeRunNewBusiness",
+        },
+        {
+            filePath: path.join(runtimeDir, "index.ts"),
+            fileName: "runtime/index.ts",
+            kind: "runtimeIndex",
         },
         {
             filePath: path.join(BUSINESS_JOURNEYS_DIR, "index.ts"),

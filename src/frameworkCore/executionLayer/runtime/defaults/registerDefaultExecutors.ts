@@ -4,7 +4,7 @@ import { LOG_CATEGORIES } from "@frameworkCore/logging/core/logCategories";
 import { LOG_LEVELS } from "@frameworkCore/logging/core/logLevels";
 import { emitLog } from "@frameworkCore/logging/emitLog";
 import type { ExecutionBootstrap } from "@frameworkCore/executionLayer/core/bootstrap";
-import { runNewBusiness } from "@businessLayer/businessJourneys/newBusiness";
+import { runNewBusiness } from "@businessLayer/businessJourneys";
 import { registerOneDefaultExecutor } from "./registerOneDefaultExecutor";
 import type { ExecutorRegistration } from "./types";
 
