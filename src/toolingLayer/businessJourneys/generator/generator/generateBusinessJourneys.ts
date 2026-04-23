@@ -5,75 +5,90 @@ import {
     printCommandTitle,
     printEnvironment,
     printSection,
-    printStatus,
     printSummary,
     success,
+    failure,
+    warning,
 } from "@utils/cliFormat";
-import { ICONS } from "@utils/icons";
 import {
     BUSINESS_JOURNEYS_DIR,
     PAGE_ACTIONS_MANIFEST_DIR,
     toRepoRelative,
 } from "@utils/paths";
+import {
+    renderJourneyTree,
+    type JourneyTreeLeaf,
+} from "@toolingLayer/businessJourneys/common";
 import { buildJourneyTargets } from "./buildJourneyTargets";
 import { loadJourneyGenerationInputs } from "./loadJourneyGenerationInputs";
-import type { GenerateOptions, GenerateSummary, JourneyTarget } from "./types";
+import type {
+    GenerateOptions,
+    GenerateSummary,
+    JourneyTarget,
+} from "./types";
 import { ensureFrameworkFiles } from "./write/ensureFrameworkFiles";
 import { writeTargetFiles } from "./write/writeTargetFiles";
 
-function buildTargetKey(target: JourneyTarget): string {
-    const route =
-        String(target.entryApplication) ===
-        String(target.destinationApplication)
-            ? `${target.entryPlatform}.${target.entryApplication}`
-            : `${target.entryPlatform}.${target.entryApplication}.${target.destinationApplication}`;
+function buildTargetSegments(target: JourneyTarget): string[] {
+    const segments = [
+        String(target.entryPlatform),
+        String(target.entryApplication),
+    ];
 
-    return `${route}.${target.product}.${target.journeyType}`;
+    if (
+        String(target.entryApplication) !==
+        String(target.destinationApplication)
+    ) {
+        segments.push(String(target.destinationApplication));
+    }
+
+    segments.push(String(target.product));
+    segments.push(String(target.journeyType));
+
+    return segments;
 }
 
-function printTargetDetails(args: {
-    target: JourneyTarget;
-    createdFiles: number;
-    verbose: boolean;
-}): void {
-    const key = buildTargetKey(args.target);
-
-    if (args.createdFiles > 0) {
-        printStatus(ICONS.successIcon, key);
-    } else {
-        printStatus(ICONS.hintIcon, `${key} -> skipped (already exists)`);
+function buildLeafSummary(args: {
+    status: "created" | "updated" | "unchanged" | "failed";
+    filesCreated: number;
+}): string {
+    if (args.status === "failed") {
+        return "failed";
     }
 
-    if (!args.verbose) {
-        return;
+    if (args.status === "unchanged") {
+        return "unchanged";
     }
 
-    console.log(`   → entry platform        : ${args.target.entryPlatform}`);
-    console.log(`   → entry application     : ${args.target.entryApplication}`);
-    console.log(
-        `   → destination platform  : ${args.target.destinationPlatform}`
-    );
-    console.log(
-        `   → destination app       : ${args.target.destinationApplication}`
-    );
-    console.log(`   → product               : ${args.target.product}`);
-    console.log(`   → journey               : ${args.target.journeyType}`);
-    console.log(`   → files created         : ${args.createdFiles}`);
-    console.log("");
+    if (args.status === "created") {
+        return `${args.filesCreated} file(s) created`;
+    }
+
+    return `${args.filesCreated} file(s) updated`;
 }
 
 function buildSummary(args: {
     targets: JourneyTarget[];
     frameworkFiles: number;
+    created: number;
+    updated: number;
+    unchanged: number;
+    failed: number;
     createdByTarget: number;
 }): GenerateSummary {
     return {
         targets: args.targets.length,
+        created: args.created,
+        updated: args.updated + (args.frameworkFiles > 0 ? 1 : 0),
+        unchanged: args.unchanged,
+        failed: args.failed,
         filesCreated: args.frameworkFiles + args.createdByTarget,
     };
 }
 
-export function generateBusinessJourneys(options: GenerateOptions): void {
+export function generateBusinessJourneys(
+    options: GenerateOptions
+): void {
     printCommandTitle("BUSINESS JOURNEY GENERATOR", "toolsBuildIcon");
 
     printEnvironment([
@@ -89,30 +104,66 @@ export function generateBusinessJourneys(options: GenerateOptions): void {
 
     const frameworkFiles = ensureFrameworkFiles();
     let createdByTarget = 0;
+    let created = 0;
+    let updated = 0;
+    let unchanged = 0;
+    let failed = 0;
+
+    const leaves: JourneyTreeLeaf[] = [];
 
     for (const target of targets) {
         const result = writeTargetFiles(target, inputs);
         createdByTarget += result.filesCreated;
 
-        printTargetDetails({
-            target,
-            createdFiles: result.filesCreated,
-            verbose: options.verbose,
+        if (result.status === "created") {
+            created++;
+        } else if (result.status === "updated") {
+            updated++;
+        } else if (result.status === "unchanged") {
+            unchanged++;
+        } else {
+            failed++;
+        }
+
+        leaves.push({
+            segments: buildTargetSegments(target),
+            status: result.status,
+            summary: buildLeafSummary({
+                status: result.status,
+                filesCreated: result.filesCreated,
+            }),
         });
     }
+
+    renderJourneyTree(leaves);
 
     const summary = buildSummary({
         targets,
         frameworkFiles,
+        created,
+        updated,
+        unchanged,
+        failed,
         createdByTarget,
     });
+
+    const resultText =
+        summary.failed > 0
+            ? failure("COMPLETED WITH ERRORS")
+            : summary.created > 0 || summary.updated > 0
+              ? success("UPDATED")
+              : info("UP TO DATE");
 
     printSummary(
         "GENERATOR SUMMARY",
         [
             ["Targets", summary.targets],
+            ["Created", summary.created],
+            ["Updated", summary.updated],
+            ["Unchanged", summary.unchanged],
+            ["Failed", summary.failed],
             ["Files created", summary.filesCreated],
         ],
-        summary.filesCreated > 0 ? success("UPDATED") : info("UP TO DATE")
+        resultText
     );
 }
