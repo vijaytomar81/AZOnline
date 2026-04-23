@@ -59,7 +59,7 @@
     "pageobjects:repair": "npm run pageobjects:repair:cli -- repair",
     "pageobjects:repair:verbose": "npm run pageobjects:repair:cli -- repair --verbose",
     "pageobjects:repair:help": "npm run pageobjects:repair:cli -- help",
-    "pageactions:generate:cli": "node -r ts-node/register -r tsconfig-paths/register src/toolingLayer/pageActions/generator/cli/runPageActionGenerator.ts",
+    "pageactions:generate:cli": "node -r ts-node/register -r tsconfig-paths/register src/toolingLayer/pageActions/generator/cli.ts",
     "pageactions:generate": "npm run pageactions:generate:cli",
     "pageactions:generate:verbose": "npm run pageactions:generate:cli -- --verbose",
     "pageactions:validate:cli": "node -r ts-node/register -r tsconfig-paths/register src/toolingLayer/pageActions/validator/cli.ts",
