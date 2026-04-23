@@ -56,8 +56,14 @@ export type WriteTargetFilesResult = {
     filesSkipped: number;
 };
 
+export type FrameworkFileChange = {
+    fileName: string;
+    status: "created" | "updated" | "unchanged";
+};
+
 export type EnsureFrameworkFilesResult = {
     filesCreated: number;
     filesUpdated: number;
     filesSkipped: number;
+    changes: FrameworkFileChange[];
 };

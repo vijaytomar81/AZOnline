@@ -36,11 +36,14 @@ function buildDraftSteps(
     });
 }
 
-function buildAvailableActions(
+function buildExtraAvailableActions(
     target: JourneyTarget,
     entries: PageActionEntry[]
 ): string[] {
-    return entries.map((entry) => `     ${buildActionAccess(target, entry)}`);
+    const used = new Set(entries.map((entry) => buildActionAccess(target, entry)));
+    const all = entries.map((entry) => buildActionAccess(target, entry));
+
+    return all.filter((item, index) => !used.has(item) && all.indexOf(item) === index);
 }
 
 export function renderRunJourneyFile(args: {
@@ -49,8 +52,23 @@ export function renderRunJourneyFile(args: {
     entries: PageActionEntry[];
 }): string {
     const draftSteps = buildDraftSteps(args.target, args.entries);
-    const availableActions = buildAvailableActions(args.target, args.entries);
+    const extraAvailableActions = buildExtraAvailableActions(
+        args.target,
+        args.entries
+    );
     const journeyName = String(args.target.journeyType);
+
+    const extraBlock =
+        extraAvailableActions.length > 0
+            ? `
+
+    /*
+     ---------------------------------------------------------------------------
+     ADDITIONAL AVAILABLE PAGE ACTIONS FOR THIS JOURNEY
+     ---------------------------------------------------------------------------
+${extraAvailableActions.map((item) => `     ${item}`).join("\n")}
+    */`
+            : "";
 
     return `// ${toRepoRelative(args.filePath)}
 
@@ -70,14 +88,7 @@ ${draftSteps.length > 0 ? draftSteps.join("\n") : `            async () => {
                 // TODO: no pageActions were matched for this journey yet
             },`}
         ],
-    });
-
-    /*
-     ---------------------------------------------------------------------------
-     AVAILABLE PAGE ACTIONS FOR THIS JOURNEY
-     ---------------------------------------------------------------------------
-${availableActions.length > 0 ? availableActions.join("\n") : "     // none detected"}
-    */
+    });${extraBlock}
 };
 `;
 }

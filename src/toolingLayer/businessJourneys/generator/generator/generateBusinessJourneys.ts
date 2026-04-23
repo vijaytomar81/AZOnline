@@ -94,6 +94,16 @@ export function generateBusinessJourneys(
 
     const leaves: JourneyTreeLeaf[] = [];
 
+    for (const change of frameworkResult.changes) {
+        if (change.status === "created") {
+            leaves.push({
+                segments: ["framework", change.fileName],
+                status: "created",
+                summary: "created",
+            });
+        }
+    }
+
     for (const target of targets) {
         const result = writeTargetFiles(target, inputs);
 
