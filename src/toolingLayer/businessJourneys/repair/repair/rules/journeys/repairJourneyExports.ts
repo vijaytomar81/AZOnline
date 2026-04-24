@@ -4,7 +4,7 @@ import fs from "node:fs";
 import { writeFileAlways } from "@toolingLayer/businessJourneys/generator/generator/write/writeFileAlways";
 import { renderIndexFile } from "@toolingLayer/businessJourneys/generator/generator/render/renderIndexFile";
 import {
-    buildJourneyExportName,
+    buildJourneyExportNameForTarget,
     buildJourneyIndexFile,
     loadExpectedJourneyTargets,
 } from "@toolingLayer/businessJourneys/validator/validate/rules/journeys/shared";
@@ -22,7 +22,7 @@ export function repairJourneyExports(
     for (const target of loadExpectedJourneyTargets()) {
         const indexFile = buildJourneyIndexFile(target);
         const existedBefore = fs.existsSync(indexFile);
-        const exportName = buildJourneyExportName(target);
+        const exportName = buildJourneyExportNameForTarget(target);
 
         const changed = writeFileAlways(
             indexFile,

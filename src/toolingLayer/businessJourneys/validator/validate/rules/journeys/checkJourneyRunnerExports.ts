@@ -7,7 +7,7 @@ import type {
     ValidationNode,
 } from "../../pipeline/types";
 import {
-    buildJourneyExportName,
+    buildJourneyExportNameForTarget,
     buildJourneyIndexFile,
     loadExpectedJourneyTargets,
 } from "./shared";
@@ -17,7 +17,7 @@ export function checkJourneyRunnerExports(): ValidationCheckResult {
 
     for (const target of loadExpectedJourneyTargets()) {
         const indexFile = buildJourneyIndexFile(target);
-        const exportName = buildJourneyExportName(target);
+        const exportName = buildJourneyExportNameForTarget(target);
         const expectedLine = `export { ${exportName} } from "./${exportName}";`;
 
         if (!fs.existsSync(indexFile)) {

@@ -11,6 +11,11 @@ import type {
 import { selectCandidates } from "../selectCandidates";
 import { renderIndexFile } from "../render/renderIndexFile";
 import { renderRunJourneyFile } from "../render/renderRunJourneyFile";
+import {
+    buildJourneyExportName,
+    buildJourneyFolderSegments,
+    buildJourneyRunnerFileName,
+} from "../journey/journeyNaming";
 import { writeFileAlways } from "./writeFileAlways";
 import { writeFileIfMissing } from "./writeFileIfMissing";
 
@@ -19,7 +24,9 @@ function buildTargetSegments(target: JourneyTarget): string[] {
         String(target.platform),
         String(target.application),
         String(target.product),
-        String(target.journeyType),
+        ...buildJourneyFolderSegments(
+            target.journeyContext
+        ),
     ];
 }
 
@@ -29,13 +36,23 @@ export function writeTargetFiles(
 ): WriteTargetFilesResult {
     try {
         const candidates = selectCandidates(target, inputs);
+
         const baseDir = path.join(
             BUSINESS_JOURNEYS_DIR,
             ...buildTargetSegments(target)
         );
-        const journeyName = String(target.journeyType);
-        const runFile = path.join(baseDir, `run${journeyName}Journey.ts`);
-        const indexFile = path.join(baseDir, "index.ts");
+
+        const runFile = path.join(
+            baseDir,
+            buildJourneyRunnerFileName(
+                target.journeyContext
+            )
+        );
+
+        const indexFile = path.join(
+            baseDir,
+            "index.ts"
+        );
 
         const runExistedBefore = fileExists(runFile);
         const indexExistedBefore = fileExists(indexFile);
@@ -63,8 +80,13 @@ export function writeTargetFiles(
                     filePath: indexFile,
                     exports: [
                         {
-                            exportName: `run${journeyName}Journey`,
-                            from: `run${journeyName}Journey`,
+                            exportName:
+                                buildJourneyExportName(
+                                    target.journeyContext
+                                ),
+                            from: buildJourneyRunnerFileName(
+                                target.journeyContext
+                            ).replace(".ts", ""),
                         },
                     ],
                 })
@@ -79,7 +101,10 @@ export function writeTargetFiles(
 
         const filesSkipped =
             (runExistedBefore ? 1 : 0) +
-            (indexExistedBefore && filesUpdated === 0 ? 1 : 0);
+            (indexExistedBefore &&
+            filesUpdated === 0
+                ? 1
+                : 0);
 
         if (!runExistedBefore && filesCreated > 0) {
             return {

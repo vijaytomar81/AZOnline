@@ -1,7 +1,7 @@
 // src/toolingLayer/businessJourneys/generator/generator/types.ts
 
 import type { Application } from "@configLayer/models/application.config";
-import type { JourneyType } from "@configLayer/models/journeyContext.config";
+import type { JourneyContext } from "@configLayer/models/journeyContext.config";
 import type { Platform } from "@configLayer/models/platform.config";
 import type { Product } from "@configLayer/models/product.config";
 import type { JourneyGenerationStatus } from "@toolingLayer/businessJourneys/common";
@@ -10,7 +10,7 @@ export type JourneyTarget = {
     platform: Platform;
     application: Application;
     product: Product;
-    journeyType: JourneyType;
+    journeyContext: JourneyContext;
 };
 
 export type PageActionEntry = {

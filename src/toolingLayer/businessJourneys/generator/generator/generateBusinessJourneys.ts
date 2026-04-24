@@ -26,20 +26,23 @@ import type {
     GenerateSummary,
     JourneyTarget,
 } from "./types";
+import {
+    buildJourneyFolderSegments,
+} from "./journey/journeyNaming";
 import { ensureFrameworkFiles } from "./write/ensureFrameworkFiles";
 import { writeTargetFiles } from "./write/writeTargetFiles";
 
-function buildTargetSegments(target: JourneyTarget): string[] {
+function buildTargetSegments(
+    target: JourneyTarget
+): string[] {
     return [
         String(target.platform),
         String(target.application),
         String(target.product),
-        String(target.journeyType),
+        ...buildJourneyFolderSegments(
+            target.journeyContext
+        ),
     ];
-}
-
-function buildLeafSummary(filesCreated: number): string {
-    return `${filesCreated} file(s) created`;
 }
 
 function buildSummary(args: {
@@ -53,7 +56,8 @@ function buildSummary(args: {
     filesSkipped: number;
 }): GenerateSummary {
     return {
-        availablePageActions: args.availablePageActions,
+        availablePageActions:
+            args.availablePageActions,
         created: args.created,
         updated: args.updated,
         unchanged: args.unchanged,
@@ -61,43 +65,75 @@ function buildSummary(args: {
         filesCreated: args.filesCreated,
         filesUpdated: args.filesUpdated,
         filesSkipped: args.filesSkipped,
-        exitCode: args.failed > 0 ? 1 : 0,
+        exitCode:
+            args.failed > 0 ? 1 : 0,
     };
 }
 
 export function generateBusinessJourneys(
     options: GenerateOptions
 ): void {
-    printCommandTitle("BUSINESS JOURNEY GENERATOR", "toolsBuildIcon");
+    printCommandTitle(
+        "BUSINESS JOURNEY GENERATOR",
+        "toolsBuildIcon"
+    );
 
     printEnvironment([
-        ["pageActionsManifest", toRepoRelative(PAGE_ACTIONS_MANIFEST_DIR)],
-        ["pageActionsRegistry", toRepoRelative(PAGE_ACTIONS_REGISTRY_DIR)],
-        ["businessJourneysDir", toRepoRelative(BUSINESS_JOURNEYS_DIR)],
+        [
+            "pageActionsManifest",
+            toRepoRelative(
+                PAGE_ACTIONS_MANIFEST_DIR
+            ),
+        ],
+        [
+            "pageActionsRegistry",
+            toRepoRelative(
+                PAGE_ACTIONS_REGISTRY_DIR
+            ),
+        ],
+        [
+            "businessJourneysDir",
+            toRepoRelative(
+                BUSINESS_JOURNEYS_DIR
+            ),
+        ],
         ["verbose", options.verbose],
     ]);
 
-    const inputs = loadJourneyGenerationInputs();
-    const targets = buildJourneyTargets(inputs);
+    const inputs =
+        loadJourneyGenerationInputs();
+
+    const targets =
+        buildJourneyTargets(inputs);
 
     printSection("Generation details");
 
-    const frameworkResult = ensureFrameworkFiles();
+    const frameworkResult =
+        ensureFrameworkFiles();
 
     let created = 0;
     let updated = 0;
     let unchanged = 0;
     let failed = 0;
-    let filesCreated = frameworkResult.filesCreated;
-    let filesUpdated = frameworkResult.filesUpdated;
-    let filesSkipped = frameworkResult.filesSkipped;
+
+    let filesCreated =
+        frameworkResult.filesCreated;
+
+    let filesUpdated =
+        frameworkResult.filesUpdated;
+
+    let filesSkipped =
+        frameworkResult.filesSkipped;
 
     const leaves: JourneyTreeLeaf[] = [];
 
     for (const change of frameworkResult.changes) {
         if (change.status === "created") {
             leaves.push({
-                segments: ["framework", change.fileName],
+                segments: [
+                    "framework",
+                    change.fileName,
+                ],
                 status: "created",
                 summary: "created",
             });
@@ -105,34 +141,49 @@ export function generateBusinessJourneys(
     }
 
     for (const target of targets) {
-        const result = writeTargetFiles(target, inputs);
+        const result =
+            writeTargetFiles(
+                target,
+                inputs
+            );
 
-        filesCreated += result.filesCreated;
-        filesUpdated += result.filesUpdated;
-        filesSkipped += result.filesSkipped;
+        filesCreated +=
+            result.filesCreated;
 
-        if (result.status === "created") {
+        filesUpdated +=
+            result.filesUpdated;
+
+        filesSkipped +=
+            result.filesSkipped;
+
+        if (
+            result.status === "created"
+        ) {
             created++;
+
             leaves.push({
-                segments: buildTargetSegments(target),
+                segments:
+                    buildTargetSegments(
+                        target
+                    ),
                 status: "created",
-                summary: buildLeafSummary(result.filesCreated),
+                summary: `${result.filesCreated} file(s) created`,
             });
+
             continue;
         }
 
-        if (result.status === "failed") {
-            failed++;
-            leaves.push({
-                segments: buildTargetSegments(target),
-                status: "failed",
-                summary: "failed",
-            });
-            continue;
-        }
-
-        if (result.status === "updated") {
+        if (
+            result.status === "updated"
+        ) {
             updated++;
+            continue;
+        }
+
+        if (
+            result.status === "failed"
+        ) {
+            failed++;
             continue;
         }
 
@@ -142,37 +193,65 @@ export function generateBusinessJourneys(
     if (leaves.length > 0) {
         renderJourneyTree(leaves);
     } else {
-        console.log(info("ℹ no new business journeys were created"));
+        console.log(
+            info(
+                "ℹ no new business journeys were created"
+            )
+        );
     }
 
-    const summary = buildSummary({
-        availablePageActions: inputs.pageActions.length,
-        created,
-        updated,
-        unchanged,
-        failed,
-        filesCreated,
-        filesUpdated,
-        filesSkipped,
-    });
+    const summary =
+        buildSummary({
+            availablePageActions:
+                inputs.pageActions.length,
+            created,
+            updated,
+            unchanged,
+            failed,
+            filesCreated,
+            filesUpdated,
+            filesSkipped,
+        });
 
     const resultText =
         summary.failed > 0
-            ? failure("INCOMPLETE")
-            : success("ALL GOOD");
+            ? failure(
+                  "INCOMPLETE"
+              )
+            : success(
+                  "ALL GOOD"
+              );
 
     printSummary(
         "GENERATOR SUMMARY",
         [
-            ["Available Page Actions", summary.availablePageActions],
+            [
+                "Available Page Actions",
+                summary.availablePageActions,
+            ],
             ["Created", summary.created],
             ["Updated", summary.updated],
-            ["Unchanged", summary.unchanged],
+            [
+                "Unchanged",
+                summary.unchanged,
+            ],
             ["Failed", summary.failed],
-            ["Files created", summary.filesCreated],
-            ["Files updated", summary.filesUpdated],
-            ["Files skipped", summary.filesSkipped],
-            ["Exit code", summary.exitCode],
+            [
+                "Files created",
+                summary.filesCreated,
+            ],
+            [
+                "Files updated",
+                summary.filesUpdated,
+            ],
+            [
+                "Files skipped",
+                summary.filesSkipped,
+            ],
+            [
+                "Exit code",
+                summary.exitCode,
+            ],
         ],
         resultText
     );
