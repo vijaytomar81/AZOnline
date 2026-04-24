@@ -3,30 +3,20 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-    BUSINESS_JOURNEYS_DIR,
     PAGE_ACTIONS_REGISTRY_DIR,
     toRepoRelative,
 } from "@utils/paths";
-import type { ValidationCheckResult, ValidationNode } from "../../pipeline/types";
+import type {
+    ValidationCheckResult,
+    ValidationNode,
+} from "../../pipeline/types";
+import {
+    buildJourneyRunnerFile,
+    loadExpectedJourneyTargets,
+} from "../journeys/shared";
 
 const PAGE_ACTION_REF_PATTERN =
     /pageActionsRegistry\.([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)/g;
-
-function walkJourneyFiles(dir: string): string[] {
-    if (!fs.existsSync(dir)) return [];
-
-    return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-        const fullPath = path.join(dir, entry.name);
-
-        if (entry.isDirectory()) {
-            return walkJourneyFiles(fullPath);
-        }
-
-        return entry.isFile() && entry.name === "runNewBusinessJourney.ts"
-            ? [fullPath]
-            : [];
-    });
-}
 
 function registryLeafExists(args: {
     platform: string;
@@ -52,7 +42,13 @@ function registryLeafExists(args: {
 export function checkJourneyPageActionReferences(): ValidationCheckResult {
     const issues: ValidationNode[] = [];
 
-    for (const file of walkJourneyFiles(BUSINESS_JOURNEYS_DIR)) {
+    for (const target of loadExpectedJourneyTargets()) {
+        const file = buildJourneyRunnerFile(target);
+
+        if (!fs.existsSync(file)) {
+            continue;
+        }
+
         const content = fs.readFileSync(file, "utf8");
         const matches = [...content.matchAll(PAGE_ACTION_REF_PATTERN)];
 
@@ -79,7 +75,10 @@ export function checkJourneyPageActionReferences(): ValidationCheckResult {
     return {
         id: "checkJourneyPageActionReferences",
         severity: issues.length === 0 ? "success" : "error",
-        summary: issues.length === 0 ? "no issues" : `${issues.length} invalid reference(s)`,
+        summary:
+            issues.length === 0
+                ? "no issues"
+                : `${issues.length} invalid reference(s)`,
         nodes: issues,
     };
 }
