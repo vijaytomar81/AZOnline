@@ -30,6 +30,27 @@ function colorSummary(summary: string | undefined, severity?: string): string {
     return info(summary);
 }
 
+function colorCount(value: number, label: string, severity: "warning" | "error"): string {
+    const text = `${value} ${label}`;
+
+    if (value === 0) {
+        return info(text);
+    }
+
+    return severity === "error" ? failure(text) : warning(text);
+}
+
+function renderGroupSummary(group: ValidationRuleGroupResult): string {
+    if (group.warnings === 0 && group.errors === 0) {
+        return success("no issues");
+    }
+
+    return [
+        colorCount(group.warnings, "warning(s)", "warning"),
+        colorCount(group.errors, "error(s)", "error"),
+    ].join(", ");
+}
+
 function renderNode(node: ValidationNode, prefix: string, isLast: boolean): void {
     const branch = isLast ? "└─" : "├─";
     const summary = node.summary
@@ -54,13 +75,8 @@ function renderGroup(group: ValidationRuleGroupResult): void {
               ? "warning"
               : "success";
 
-    const summary =
-        group.errors === 0 && group.warnings === 0
-            ? "no issues"
-            : `${group.warnings} warning(s), ${group.errors} error(s)`;
-
     console.log(
-        `${iconFor(severity)} ${group.id}  (${group.checks} check${group.checks === 1 ? "" : "s"}, ${colorSummary(summary, severity)})`
+        `${iconFor(severity)} ${group.id}  (${group.checks} check${group.checks === 1 ? "" : "s"}, ${renderGroupSummary(group)})`
     );
 
     group.nodes.forEach((node, index) => {
