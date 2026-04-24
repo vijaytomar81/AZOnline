@@ -10,6 +10,9 @@ import { checkJourneyFilesExist } from "./rules/journeys/checkJourneyFilesExist"
 import { checkJourneyRunnerExports } from "./rules/journeys/checkJourneyRunnerExports";
 import { checkJourneyTargetsCovered } from "./rules/journeys/checkJourneyTargetsCovered";
 import { checkNoOrphanJourneyFiles } from "./rules/journeys/checkNoOrphanJourneyFiles";
+import { checkFrameworkIndexExports } from "./rules/framework/checkFrameworkIndexExports";
+import { checkRuntimeIndexExports } from "./rules/framework/checkRuntimeIndexExports";
+import { checkRootIndexExports } from "./rules/framework/checkRootIndexExports";
 
 export function buildRuleGroups(): ValidationRuleGroup[] {
     return [
@@ -35,6 +38,14 @@ export function buildRuleGroups(): ValidationRuleGroup[] {
                 checkJourneyRunnerExports,
                 checkJourneyTargetsCovered,
                 checkNoOrphanJourneyFiles,
+            ],
+        },
+        {
+            id: "framework",
+            checks: [
+                checkFrameworkIndexExports,
+                checkRuntimeIndexExports,
+                checkRootIndexExports,
             ],
         },
     ];
