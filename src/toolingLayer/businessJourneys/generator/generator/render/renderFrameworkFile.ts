@@ -5,129 +5,167 @@ import { toRepoRelative } from "@utils/paths";
 export function renderFrameworkFile(args: {
     filePath: string;
     kind:
-        | "shared-types"
-        | "shared-logging"
-        | "shared-index"
-        | "runner-runJourneySteps"
-        | "runner-runBusinessJourney"
-        | "runner-index"
-        | "registry-journeyRegistry"
-        | "registry-index"
-        | "root-index";
+        | "types"
+        | "runJourney"
+        | "frameworkIndex"
+        | "runtimeResolveNewBusiness"
+        | "runtimeRunNewBusiness"
+        | "runtimeIndex"
+        | "rootIndex";
 }): string {
     const header = `// ${toRepoRelative(args.filePath)}\n\n`;
 
-    if (args.kind === "shared-types") {
-        return `${header}export type BusinessJourneyRoute = {
-    application: string;
-    product: string;
-    journey: string;
-    entryPoint: string;
-    startUrl: string;
-};
+    if (args.kind === "types") {
+        return `${header}import type { PageActionContext } from "@businessLayer/pageActions";
 
 export type BusinessJourneyContext = {
-    page: any;
-    pageActionContext: any;
-    pageActions: typeof import("@pageActions");
+    pageActionContext: PageActionContext;
     logScope: string;
 };
 
-export type JourneyStepArgs<TData = unknown> = {
+export type BusinessJourneyArgs<TPayload = Record<string, unknown>> = {
     context: BusinessJourneyContext;
-    route: BusinessJourneyRoute;
-    data: TData;
+    payload?: TPayload;
 };
 
-export type JourneyStep<TData = unknown> = {
-    stepKey: string;
-    shouldRun?: (args: JourneyStepArgs<TData>) => boolean | Promise<boolean>;
-    run: (args: JourneyStepArgs<TData>) => Promise<void>;
-};
-
-export type BusinessJourney<TData = unknown> = {
-    journeyKey: string;
-    matches: (args: {
-        application: string;
-        product: string;
-        journey: string;
-    }) => boolean;
-    run: (args: {
-        context: BusinessJourneyContext;
-        route: BusinessJourneyRoute;
-        data: TData;
-    }) => Promise<void>;
-};
+export type BusinessJourney<TPayload = Record<string, unknown>> = (
+    args: BusinessJourneyArgs<TPayload>
+) => Promise<void>;
 `;
     }
 
-    if (args.kind === "shared-logging") {
-        return `${header}export function logBusinessJourneyInfo(args: {
-    scope: string;
-    message: string;
-}) {
-    console.log(\`[business-journey] [\${args.scope}] \${args.message}\`);
-}
-`;
-    }
-
-    if (args.kind === "shared-index") {
-        return `${header}export * from "./types";
-export * from "./logging";
-`;
-    }
-
-    if (args.kind === "runner-runJourneySteps") {
-        return `${header}import type { JourneyStep, JourneyStepArgs } from "../shared/types";
-
-export async function runJourneySteps<TData>(args: {
-    context: JourneyStepArgs<TData>["context"];
-    route: JourneyStepArgs<TData>["route"];
-    data: TData;
-    steps: JourneyStep<TData>[];
-}) {
+    if (args.kind === "runJourney") {
+        return `${header}export async function runJourney(args: {
+    steps: Array<() => Promise<void>>;
+}): Promise<void> {
     for (const step of args.steps) {
-        const stepArgs: JourneyStepArgs<TData> = {
-            context: args.context,
-            route: args.route,
-            data: args.data,
-        };
+        await step();
+    }
+}
+`;
+    }
 
-        const shouldRun = step.shouldRun ? await step.shouldRun(stepArgs) : true;
+    if (args.kind === "frameworkIndex") {
+        return `${header}export * from "./types";
+export * from "./runJourney";
+`;
+    }
 
-        if (shouldRun) {
-            await step.run(stepArgs);
+    if (args.kind === "runtimeResolveNewBusiness") {
+        return `${header}import { AppError } from "@utils/errors";
+import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
+import type { BusinessJourney } from "@businessLayer/businessJourneys/framework";
+
+type NewBusinessJourneyModule = {
+    runNewBusinessJourney?: BusinessJourney;
+};
+
+function buildModulePath(scenario: ExecutionScenario): string {
+    return [
+        "@businessLayer/businessJourneys",
+        scenario.platform,
+        scenario.application,
+        scenario.product,
+        "NewBusiness",
+    ].join("/");
+}
+
+export function resolveNewBusinessJourney(
+    scenario: ExecutionScenario
+): BusinessJourney {
+    const modulePath = buildModulePath(scenario);
+
+    try {
+        const resolved = require(modulePath) as NewBusinessJourneyModule;
+        const journey = resolved.runNewBusinessJourney;
+
+        if (journey) {
+            return journey;
         }
+
+        throw new AppError({
+            code: "BUSINESS_JOURNEY_EXPORT_MISSING",
+            stage: "business-journey",
+            source: "resolveNewBusinessJourney",
+            message:
+                'Generated module does not export "runNewBusinessJourney".',
+            context: {
+                modulePath,
+            },
+        });
+    } catch (error) {
+        const isMissingModule =
+            error instanceof Error &&
+            "code" in error &&
+            (error as { code?: string }).code === "MODULE_NOT_FOUND" &&
+            error.message.includes(modulePath);
+
+        if (isMissingModule) {
+            throw new AppError({
+                code: "BUSINESS_JOURNEY_NOT_FOUND",
+                stage: "business-journey",
+                source: "resolveNewBusinessJourney",
+                message:
+                    "No generated NewBusiness journey exists for the current route.",
+                context: {
+                    modulePath,
+                    platform: scenario.platform,
+                    application: scenario.application,
+                    product: scenario.product,
+                },
+            });
+        }
+
+        throw error;
     }
 }
 `;
     }
 
-    if (args.kind === "runner-runBusinessJourney") {
-        return `${header}export async function runBusinessJourney() {
-    // TODO: wire journey registry lookup here
-}
+    if (args.kind === "runtimeRunNewBusiness") {
+        return `${header}import { createPageActionContext } from "@businessLayer/pageActions";
+import type { ExecutionItemExecutor } from "@frameworkCore/executionLayer/core/registry";
+import { resolveNewBusinessJourney } from "./resolveNewBusinessJourney";
+
+export const runNewBusiness: ExecutionItemExecutor = async ({
+    context,
+    item,
+    itemData,
+}) => {
+    const journey = resolveNewBusinessJourney(context.scenario);
+
+    const logScope = [
+        "businessJourney",
+        context.scenario.platform,
+        context.scenario.application,
+        context.scenario.product,
+        item.action,
+    ].join(":");
+
+    const pageActionContext = createPageActionContext({
+        executionContext: context,
+        source: "runNewBusiness",
+        logScope,
+    });
+
+    await journey({
+        context: {
+            pageActionContext,
+            logScope,
+        },
+        payload: itemData,
+    });
+};
 `;
     }
 
-    if (args.kind === "runner-index") {
-        return `${header}export * from "./runJourneySteps";
-export * from "./runBusinessJourney";
+    if (args.kind === "runtimeIndex") {
+        return `${header}export * from "./resolveNewBusinessJourney";
+export * from "./runNewBusiness";
 `;
     }
 
-    if (args.kind === "registry-journeyRegistry") {
-        return `${header}export const journeyRegistry = [];
-`;
-    }
-
-    if (args.kind === "registry-index") {
-        return `${header}export * from "./journeyRegistry";
-`;
-    }
-
-    return `${header}export * from "./shared";
-export * from "./runner";
-export * from "./registry";
+    return `${header}export * from "./framework";
+export * from "./runtime";
 `;
 }

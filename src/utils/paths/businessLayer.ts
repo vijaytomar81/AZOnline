@@ -42,6 +42,18 @@ export const PAGE_ACTIONS_MANIFEST_ACTIONS_DIR = path.join(
     PAGE_ACTIONS_MANIFEST_DIR,
     "actions"
 );
+export const PAGE_ACTIONS_REGISTRY_DIR = path.join(
+    PAGE_ACTIONS_DIR,
+    "registry"
+);
+export const PAGE_ACTIONS_REGISTRY_INDEX_FILE = path.join(
+    PAGE_ACTIONS_REGISTRY_DIR,
+    "index.ts"
+);
+export const PAGE_ACTIONS_RUNTIME_REGISTRY_FILE = path.join(
+    PAGE_ACTIONS_REGISTRY_DIR,
+    "pageActionsRegistry.ts"
+);
 export const PAGE_ACTIONS_JOURNEY_PAGES_CONFIG_FILE = path.join(
     PAGE_ACTIONS_DIR,
     "businessJourneyPages.config.ts"

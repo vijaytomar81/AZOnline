@@ -16,6 +16,7 @@ import { checkPageObjectsCovered } from "./rules/manifest/checkPageObjectsCovere
 import { checkActionFilePathMatchesManifest } from "./rules/manifest/checkActionFilePathMatchesManifest";
 import { checkNoOrphanManifestEntryFiles } from "./rules/manifest/checkNoOrphanManifestEntryFiles";
 import { checkPageActionIndexes } from "./rules/registry/checkPageActionIndexes";
+import { checkPageActionRegistry } from "./rules/registry/checkPageActionRegistry";
 import { checkRuntimeContract } from "./rules/runtime/checkRuntimeContract";
 
 export function buildRuleGroups(): ValidationRuleGroup[] {
@@ -53,8 +54,12 @@ export function buildRuleGroups(): ValidationRuleGroup[] {
             ],
         },
         {
-            id: "registry",
+            id: "metadataExports",
             checks: [checkPageActionIndexes],
+        },
+        {
+            id: "registry",
+            checks: [checkPageActionRegistry],
         },
         {
             id: "runtime",

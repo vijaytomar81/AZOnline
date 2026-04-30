@@ -1,74 +1,108 @@
 // src/toolingLayer/businessJourneys/generator/generator/write/ensureFrameworkFiles.ts
 
 import path from "node:path";
+import { fileExists } from "@utils/fs";
 import { BUSINESS_JOURNEYS_DIR } from "@utils/paths";
+import type { EnsureFrameworkFilesResult } from "../types";
 import { renderFrameworkFile } from "../render/renderFrameworkFile";
-import { writeFileIfMissing } from "./writeFileIfMissing";
+import { writeFileAlways } from "./writeFileAlways";
 
-export function ensureFrameworkFiles(): number {
+export function ensureFrameworkFiles(): EnsureFrameworkFilesResult {
+    const frameworkDir = path.join(BUSINESS_JOURNEYS_DIR, "framework");
+    const runtimeDir = path.join(BUSINESS_JOURNEYS_DIR, "runtime");
+
     const files: Array<{
         filePath: string;
+        fileName: string;
         kind:
-            | "shared-types"
-            | "shared-logging"
-            | "shared-index"
-            | "runner-runJourneySteps"
-            | "runner-runBusinessJourney"
-            | "runner-index"
-            | "registry-journeyRegistry"
-            | "registry-index"
-            | "root-index";
+            | "types"
+            | "runJourney"
+            | "frameworkIndex"
+            | "runtimeResolveNewBusiness"
+            | "runtimeRunNewBusiness"
+            | "runtimeIndex"
+            | "rootIndex";
     }> = [
         {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "shared", "types.ts"),
-            kind: "shared-types",
+            filePath: path.join(frameworkDir, "types.ts"),
+            fileName: "framework/types.ts",
+            kind: "types",
         },
         {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "shared", "logging.ts"),
-            kind: "shared-logging",
+            filePath: path.join(frameworkDir, "runJourney.ts"),
+            fileName: "framework/runJourney.ts",
+            kind: "runJourney",
         },
         {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "shared", "index.ts"),
-            kind: "shared-index",
+            filePath: path.join(frameworkDir, "index.ts"),
+            fileName: "framework/index.ts",
+            kind: "frameworkIndex",
         },
         {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "runner", "runJourneySteps.ts"),
-            kind: "runner-runJourneySteps",
+            filePath: path.join(runtimeDir, "resolveNewBusinessJourney.ts"),
+            fileName: "runtime/resolveNewBusinessJourney.ts",
+            kind: "runtimeResolveNewBusiness",
         },
         {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "runner", "runBusinessJourney.ts"),
-            kind: "runner-runBusinessJourney",
+            filePath: path.join(runtimeDir, "runNewBusiness.ts"),
+            fileName: "runtime/runNewBusiness.ts",
+            kind: "runtimeRunNewBusiness",
         },
         {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "runner", "index.ts"),
-            kind: "runner-index",
-        },
-        {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "registry", "journeyRegistry.ts"),
-            kind: "registry-journeyRegistry",
-        },
-        {
-            filePath: path.join(BUSINESS_JOURNEYS_DIR, "registry", "index.ts"),
-            kind: "registry-index",
+            filePath: path.join(runtimeDir, "index.ts"),
+            fileName: "runtime/index.ts",
+            kind: "runtimeIndex",
         },
         {
             filePath: path.join(BUSINESS_JOURNEYS_DIR, "index.ts"),
-            kind: "root-index",
+            fileName: "index.ts",
+            kind: "rootIndex",
         },
     ];
 
-    let created = 0;
+    let filesCreated = 0;
+    let filesUpdated = 0;
+    let filesSkipped = 0;
+    const changes: EnsureFrameworkFilesResult["changes"] = [];
 
-    for (const item of files) {
-        const content = renderFrameworkFile({
-            filePath: item.filePath,
-            kind: item.kind,
-        });
+    for (const file of files) {
+        const existedBefore = fileExists(file.filePath);
+        const changed = writeFileAlways(
+            file.filePath,
+            renderFrameworkFile({
+                filePath: file.filePath,
+                kind: file.kind,
+            })
+        );
 
-        if (writeFileIfMissing(item.filePath, content)) {
-            created++;
+        if (!changed) {
+            filesSkipped++;
+            changes.push({
+                fileName: file.fileName,
+                status: "unchanged",
+            });
+            continue;
+        }
+
+        if (existedBefore) {
+            filesUpdated++;
+            changes.push({
+                fileName: file.fileName,
+                status: "updated",
+            });
+        } else {
+            filesCreated++;
+            changes.push({
+                fileName: file.fileName,
+                status: "created",
+            });
         }
     }
 
-    return created;
+    return {
+        filesCreated,
+        filesUpdated,
+        filesSkipped,
+        changes,
+    };
 }

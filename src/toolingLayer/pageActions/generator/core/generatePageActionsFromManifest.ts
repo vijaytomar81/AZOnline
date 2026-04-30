@@ -18,6 +18,7 @@ import {
 import type { PageActionManifestIndex } from "../manifest/types";
 import type {
     ActionRegistryEntry,
+    ActionRuntimeRegistryEntry,
     GenerateSummary,
     PageActionOperation,
 } from "../shared/types";
@@ -35,7 +36,8 @@ import {
 } from "@toolingLayer/pageActions/common";
 import { writePageActionManifestEntry } from "./manifestSync/writePageActionManifestEntry";
 import { writePageActionManifestIndex } from "./manifestSync/writePageActionManifestIndex";
-import { ensurePageActionIndexes } from "./registry/ensurePageActionIndexes";
+import { ensurePageActionMetadataExports } from "./registry/ensurePageActionIndexes";
+import { ensurePageActionRegistry } from "./runtimeRegistry/ensurePageActionRegistry";
 
 function readTextIfExists(filePath: string): string | null {
     return fs.existsSync(filePath) ? fs.readFileSync(filePath, "utf8") : null;
@@ -51,22 +53,22 @@ function printPageResult(
         operation === "failed"
             ? ICONS.failIcon
             : operation === "unchanged"
-                ? ICONS.hintIcon
-                : ICONS.successIcon;
+              ? ICONS.hintIcon
+              : ICONS.successIcon;
 
     const text =
         operation === "failed"
             ? failure(pageKey)
             : operation === "unchanged"
-                ? info(pageKey)
-                : success(pageKey);
+              ? info(pageKey)
+              : success(pageKey);
 
     const summary =
         operation === "failed"
             ? failure("(failed)")
             : operation === "unchanged"
-                ? info("(unchanged)")
-                : success(`(${operation})`);
+              ? info("(unchanged)")
+              : success(`(${operation})`);
 
     printStatus(icon, `${text} ${summary}`);
 
@@ -91,7 +93,8 @@ export function generatePageActionsFromManifest(args: {
         actions: {},
     };
 
-    const registryEntries: ActionRegistryEntry[] = [];
+    const metadataExportEntries: ActionRegistryEntry[] = [];
+    const runtimeRegistryEntries: ActionRuntimeRegistryEntry[] = [];
     const pageKeys = Object.keys(pageObjectIndex.pages).sort();
     let created = 0;
     let updated = 0;
@@ -103,7 +106,9 @@ export function generatePageActionsFromManifest(args: {
 
     for (const pageKey of pageKeys) {
         try {
-            const page = loadPageObjectManifestPage(pageObjectIndex.pages[pageKey]);
+            const page = loadPageObjectManifestPage(
+                pageObjectIndex.pages[pageKey]
+            );
             const naming = buildActionName(page);
             const paths = buildActionPath({ page, naming });
             const source = readPageObjectFile(page.paths.pageObjectFile);
@@ -154,8 +159,8 @@ export function generatePageActionsFromManifest(args: {
                 actionBefore === null
                     ? "created"
                     : actionChanged || manifestChanged
-                        ? "updated"
-                        : "unchanged";
+                      ? "updated"
+                      : "unchanged";
 
             if (operation === "created") {
                 created++;
@@ -165,7 +170,7 @@ export function generatePageActionsFromManifest(args: {
                 unchanged++;
             }
 
-            registryEntries.push({
+            metadataExportEntries.push({
                 pageKey,
                 scope: page.scope,
                 actionName: naming.actionName,
@@ -179,6 +184,12 @@ export function generatePageActionsFromManifest(args: {
                 },
             });
 
+            runtimeRegistryEntries.push({
+                pageKey,
+                scope: page.scope,
+                actionName: naming.actionName,
+            });
+
             const details = [
                 `action : ${success(naming.actionName)}`,
                 `file   : ${toRepoRelative(paths.actionFile)}`,
@@ -188,8 +199,12 @@ export function generatePageActionsFromManifest(args: {
             printPageResult(pageKey, operation, verbose, details);
         } catch (error) {
             failed++;
+            invalidPages++;
+
             const message =
-                error instanceof Error ? error.message : "Unknown generation error";
+                error instanceof Error
+                    ? error.message
+                    : "Unknown generation error";
 
             printPageResult(pageKey, "failed", true, [failure(message)]);
         }
@@ -204,8 +219,12 @@ export function generatePageActionsFromManifest(args: {
         // Manifest index changed, but this is not shown as a separate summary row.
     }
 
-    const registryResult = ensurePageActionIndexes({
-        entries: registryEntries,
+    const metadataExportsResult = ensurePageActionMetadataExports({
+        entries: metadataExportEntries,
+    });
+
+    const registryResult = ensurePageActionRegistry({
+        entries: runtimeRegistryEntries,
     });
 
     return {
@@ -215,6 +234,8 @@ export function generatePageActionsFromManifest(args: {
         updated,
         unchanged,
         failed,
+        metadataExportFilesCreated: metadataExportsResult.createdFiles,
+        metadataExportFilesUpdated: metadataExportsResult.updatedFiles,
         registryFilesCreated: registryResult.createdFiles,
         registryFilesUpdated: registryResult.updatedFiles,
         invalidPages,

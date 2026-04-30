@@ -10,13 +10,13 @@ import {
 } from "@toolingLayer/pageActions/common";
 import type { ActionRegistryEntry } from "../../shared/types";
 
-type RegistryWriteResult = {
+type MetadataExportsWriteResult = {
     createdFiles: number;
     updatedFiles: number;
 };
 
 function trackWrite(
-    current: RegistryWriteResult,
+    current: MetadataExportsWriteResult,
     write: { changed: boolean; created: boolean; updated: boolean }
 ): void {
     if (!write.changed) {
@@ -33,11 +33,11 @@ function trackWrite(
     }
 }
 
-export function ensurePageActionIndexes(args: {
+export function ensurePageActionMetadataExports(args: {
     entries: ActionRegistryEntry[];
-}): RegistryWriteResult {
+}): MetadataExportsWriteResult {
     const { entries } = args;
-    const result: RegistryWriteResult = {
+    const result: MetadataExportsWriteResult = {
         createdFiles: 0,
         updatedFiles: 0,
     };

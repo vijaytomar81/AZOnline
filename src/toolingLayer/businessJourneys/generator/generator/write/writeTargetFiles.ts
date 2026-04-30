@@ -1,135 +1,141 @@
 // src/toolingLayer/businessJourneys/generator/generator/write/writeTargetFiles.ts
 
 import path from "node:path";
-import { JOURNEY_ENTRY_POINTS, type JourneyEntryPoint } from "@configLayer/domain/journeyEntryPoints";
+import { fileExists } from "@utils/fs";
 import { BUSINESS_JOURNEYS_DIR } from "@utils/paths";
 import type {
     JourneyGenerationInputs,
     JourneyTarget,
+    WriteTargetFilesResult,
 } from "../types";
-import { buildJourneyNames } from "../naming/buildJourneyNames";
 import { selectCandidates } from "../selectCandidates";
-import { mapActionToStep } from "../mapActionToStep";
-import { renderBuildStepsFile } from "../render/renderBuildStepsFile";
-import { renderEntryPointBuilderFile } from "../render/renderEntryPointBuilderFile";
 import { renderIndexFile } from "../render/renderIndexFile";
-import { renderOpenStartUrlStepFile } from "../render/renderOpenStartUrlStepFile";
 import { renderRunJourneyFile } from "../render/renderRunJourneyFile";
-import { renderStepFile } from "../render/renderStepFile";
+import {
+    buildJourneyExportName,
+    buildJourneyFolderSegments,
+    buildJourneyRunnerFileName,
+} from "../journey/journeyNaming";
+import { writeFileAlways } from "./writeFileAlways";
 import { writeFileIfMissing } from "./writeFileIfMissing";
 
-function resolveEntryPointFileName(entryPoint: JourneyEntryPoint): string {
-    if (entryPoint === JOURNEY_ENTRY_POINTS.DIRECT) {
-        return "buildDirectEntrySteps.ts";
-    }
-
-    if (entryPoint === JOURNEY_ENTRY_POINTS.PCW_TOOL) {
-        return "buildPcwToolEntrySteps.ts";
-    }
-
-    return "buildPcwEntrySteps.ts";
-}
-
-function resolveEntryPointKind(
-    entryPoint: JourneyEntryPoint
-): JourneyEntryPoint {
-    if (entryPoint === JOURNEY_ENTRY_POINTS.DIRECT) {
-        return JOURNEY_ENTRY_POINTS.DIRECT;
-    }
-
-    if (entryPoint === JOURNEY_ENTRY_POINTS.PCW_TOOL) {
-        return JOURNEY_ENTRY_POINTS.PCW_TOOL;
-    }
-
-    return JOURNEY_ENTRY_POINTS.PCW;
+function buildTargetSegments(target: JourneyTarget): string[] {
+    return [
+        String(target.platform),
+        String(target.application),
+        String(target.product),
+        ...buildJourneyFolderSegments(
+            target.journeyContext
+        ),
+    ];
 }
 
 export function writeTargetFiles(
     target: JourneyTarget,
     inputs: JourneyGenerationInputs
-): { filesCreated: number } {
-    const names = buildJourneyNames(target);
-    const candidates = selectCandidates(target, inputs);
-    const mappings = candidates.map(mapActionToStep);
+): WriteTargetFilesResult {
+    try {
+        const candidates = selectCandidates(target, inputs);
 
-    const baseDir = path.join(
-        BUSINESS_JOURNEYS_DIR,
-        "journeys",
-        names.applicationFolderName,
-        names.productFolderName,
-        names.journeyFolderName
-    );
+        const baseDir = path.join(
+            BUSINESS_JOURNEYS_DIR,
+            ...buildTargetSegments(target)
+        );
 
-    let filesCreated = 0;
+        const runFile = path.join(
+            baseDir,
+            buildJourneyRunnerFileName(
+                target.journeyContext
+            )
+        );
 
-    const runFile = path.join(baseDir, names.runFileName);
-    const buildStepsFile = path.join(baseDir, names.buildStepsFileName);
-    const journeyIndexFile = path.join(baseDir, "index.ts");
-    const entryPointFileName = resolveEntryPointFileName(target.entryPoint);
-    const entryPointFile = path.join(baseDir, "entryPoints", entryPointFileName);
-    const entryPointIndexFile = path.join(baseDir, "entryPoints", "index.ts");
-    const commonStepFile = path.join(baseDir, "steps", "common", "stepOpenStartUrl.ts");
-    const commonIndexFile = path.join(baseDir, "steps", "common", "index.ts");
-    const stepsIndexFile = path.join(baseDir, "steps", "index.ts");
+        const indexFile = path.join(
+            baseDir,
+            "index.ts"
+        );
 
-    if (writeFileIfMissing(runFile, renderRunJourneyFile({ filePath: runFile, target, names }))) filesCreated++;
-    if (writeFileIfMissing(buildStepsFile, renderBuildStepsFile({ filePath: buildStepsFile, target, names }))) filesCreated++;
+        const runExistedBefore = fileExists(runFile);
+        const indexExistedBefore = fileExists(indexFile);
 
-    if (
-        writeFileIfMissing(
-            entryPointFile,
-            renderEntryPointBuilderFile({
-                filePath: entryPointFile,
-                kind: resolveEntryPointKind(target.entryPoint),
-            })
-        )
-    ) filesCreated++;
+        let filesCreated = 0;
+        let filesUpdated = 0;
 
-    if (writeFileIfMissing(commonStepFile, renderOpenStartUrlStepFile(commonStepFile))) filesCreated++;
-
-    for (const mapping of mappings) {
-        const stepFile = path.join(baseDir, "steps", mapping.stepFolder, mapping.stepFileName);
-        if (writeFileIfMissing(stepFile, renderStepFile({ filePath: stepFile, mapping }))) {
+        if (
+            writeFileIfMissing(
+                runFile,
+                renderRunJourneyFile({
+                    filePath: runFile,
+                    target,
+                    entries: candidates,
+                })
+            )
+        ) {
             filesCreated++;
         }
+
+        if (
+            writeFileAlways(
+                indexFile,
+                renderIndexFile({
+                    filePath: indexFile,
+                    exports: [
+                        {
+                            exportName:
+                                buildJourneyExportName(
+                                    target.journeyContext
+                                ),
+                            from: buildJourneyRunnerFileName(
+                                target.journeyContext
+                            ).replace(".ts", ""),
+                        },
+                    ],
+                })
+            )
+        ) {
+            if (indexExistedBefore) {
+                filesUpdated++;
+            } else {
+                filesCreated++;
+            }
+        }
+
+        const filesSkipped =
+            (runExistedBefore ? 1 : 0) +
+            (indexExistedBefore &&
+            filesUpdated === 0
+                ? 1
+                : 0);
+
+        if (!runExistedBefore && filesCreated > 0) {
+            return {
+                status: "created",
+                filesCreated,
+                filesUpdated,
+                filesSkipped,
+            };
+        }
+
+        if (filesUpdated > 0) {
+            return {
+                status: "updated",
+                filesCreated,
+                filesUpdated,
+                filesSkipped,
+            };
+        }
+
+        return {
+            status: "unchanged",
+            filesCreated,
+            filesUpdated,
+            filesSkipped,
+        };
+    } catch {
+        return {
+            status: "failed",
+            filesCreated: 0,
+            filesUpdated: 0,
+            filesSkipped: 0,
+        };
     }
-
-    const stepExports = mappings.map((mapping) => ({
-        exportName: mapping.stepExportName,
-        from: `${mapping.stepFolder}/${mapping.stepFileName.replace(".ts", "")}`,
-    }));
-
-    if (writeFileIfMissing(stepsIndexFile, renderIndexFile({ filePath: stepsIndexFile, exports: stepExports }))) filesCreated++;
-
-    if (
-        writeFileIfMissing(
-            commonIndexFile,
-            renderIndexFile({
-                filePath: commonIndexFile,
-                exports: [{ exportName: "stepOpenStartUrl", from: "stepOpenStartUrl" }],
-            })
-        )
-    ) filesCreated++;
-
-    if (
-        writeFileIfMissing(
-            entryPointIndexFile,
-            renderIndexFile({
-                filePath: entryPointIndexFile,
-                exports: [{ from: entryPointFileName.replace(".ts", "") }],
-            })
-        )
-    ) filesCreated++;
-
-    if (
-        writeFileIfMissing(
-            journeyIndexFile,
-            renderIndexFile({
-                filePath: journeyIndexFile,
-                exports: [{ exportName: names.runExportName, from: names.runFileName.replace(".ts", "") }],
-            })
-        )
-    ) filesCreated++;
-
-    return { filesCreated };
 }

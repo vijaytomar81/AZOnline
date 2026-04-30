@@ -1,21 +1,32 @@
 // src/toolingLayer/businessJourneys/generator/generator/types.ts
 
-import type { JourneyEntryPoint } from "@configLayer/domain/journeyEntryPoints";
-import type { JourneyStepFolder } from "@configLayer/domain/journeyStepFolders";
+import type { Application } from "@configLayer/models/application.config";
+import type { JourneyContext } from "@configLayer/models/journeyContext.config";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Product } from "@configLayer/models/product.config";
+import type { JourneyGenerationStatus } from "@toolingLayer/businessJourneys/common";
 
 export type JourneyTarget = {
-    application: string;
-    product: string;
-    journey: string;
-    entryPoint: JourneyEntryPoint;
+    platform: Platform;
+    application: Application;
+    product: Product;
+    journeyContext: JourneyContext;
 };
 
 export type PageActionEntry = {
     actionKey: string;
     pageKey: string;
-    group: string;
     actionName: string;
-    actionFile: string;
+    scope: {
+        platform: string;
+        application: string;
+        product: string;
+        name: string;
+        namespace: string;
+    };
+    paths: {
+        actionFile: string;
+    };
 };
 
 export type JourneyGenerationInputs = {
@@ -27,16 +38,32 @@ export type GenerateOptions = {
 };
 
 export type GenerateSummary = {
-    targets: number;
+    availablePageActions: number;
+    created: number;
+    updated: number;
+    unchanged: number;
+    failed: number;
     filesCreated: number;
+    filesUpdated: number;
+    filesSkipped: number;
+    exitCode: number;
 };
 
-export type StepMapping = {
-    stepName: string;
-    stepFileName: string;
-    stepExportName: string;
-    stepFolder: JourneyStepFolder;
-    actionImportName: string;
-    actionImportSource: string;
-    payloadExpression: string;
+export type WriteTargetFilesResult = {
+    status: JourneyGenerationStatus;
+    filesCreated: number;
+    filesUpdated: number;
+    filesSkipped: number;
+};
+
+export type FrameworkFileChange = {
+    fileName: string;
+    status: "created" | "updated" | "unchanged";
+};
+
+export type EnsureFrameworkFilesResult = {
+    filesCreated: number;
+    filesUpdated: number;
+    filesSkipped: number;
+    changes: FrameworkFileChange[];
 };

@@ -53,6 +53,12 @@ export type ActionRegistryEntry = {
     >;
 };
 
+export type ActionRuntimeRegistryEntry = {
+    pageKey: string;
+    scope: PageScope;
+    actionName: string;
+};
+
 export type PageActionOperation =
     | "created"
     | "updated"
@@ -66,6 +72,8 @@ export type GenerateSummary = {
     updated: number;
     unchanged: number;
     failed: number;
+    metadataExportFilesCreated: number;
+    metadataExportFilesUpdated: number;
     registryFilesCreated: number;
     registryFilesUpdated: number;
     invalidPages: number;

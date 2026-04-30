@@ -14,6 +14,7 @@ import {
     PAGE_ACTIONS_DIR,
     PAGE_ACTIONS_MANIFEST_DIR,
     PAGE_MANIFEST_DIR,
+    PAGE_ACTIONS_REGISTRY_DIR,
     toRepoRelative,
 } from "@utils/paths";
 import type {
@@ -65,9 +66,10 @@ export function printRepairReport(args: {
 
     printEnvironment([
         ["pageObjectsManifest", toRepoRelative(PAGE_MANIFEST_DIR)],
+        ["pageActionsRoot", toRepoRelative(PAGE_ACTIONS_DIR)],
         ["pageActionsDir", toRepoRelative(PAGE_ACTIONS_ACTIONS_DIR)],
-        ["pageRegistryDir", toRepoRelative(PAGE_ACTIONS_DIR)],
-        ["manifestFile", toRepoRelative(PAGE_ACTIONS_MANIFEST_DIR)],
+        ["manifestDir", toRepoRelative(PAGE_ACTIONS_MANIFEST_DIR)],
+        ["registryDir", toRepoRelative(PAGE_ACTIONS_REGISTRY_DIR)],
         ["strict", args.context.strict],
         ["verbose", args.context.verbose],
     ]);
@@ -103,8 +105,8 @@ export function printRepairReport(args: {
         failedRules > 0
             ? failure("INCOMPLETE")
             : repairedRules > 0
-              ? success("REPAIR APPLIED")
-              : info("NO CHANGES");
+                ? success("REPAIR APPLIED")
+                : info("NO CHANGES");
 
     printSummary(
         "REPAIR SUMMARY",

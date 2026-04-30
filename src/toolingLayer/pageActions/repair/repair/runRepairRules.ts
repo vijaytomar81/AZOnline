@@ -10,7 +10,8 @@ import { repairMissingActionFiles } from "./rules/actions/repairMissingActionFil
 import { repairManifestIndex } from "./rules/manifest/repairManifestIndex";
 import { repairManifestEntries } from "./rules/manifest/repairManifestEntries";
 import { removeOrphanManifestEntryFiles } from "./rules/manifest/removeOrphanManifestEntryFiles";
-import { repairRegistryIndexes } from "./rules/registry/repairRegistryIndexes";
+import { repairPageActionMetadataExports } from "./rules/registry/repairRegistryIndexes";
+import { repairPageActionRegistry } from "./rules/registry/repairPageActionRegistry";
 
 export function runRepairRules(
     context: RepairContext
@@ -21,6 +22,7 @@ export function runRepairRules(
         repairManifestIndex(context),
         repairManifestEntries(context),
         removeOrphanManifestEntryFiles(context),
-        repairRegistryIndexes(context),
+        repairPageActionMetadataExports(context),
+        repairPageActionRegistry(context),
     ];
 }

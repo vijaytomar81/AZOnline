@@ -16,3 +16,8 @@ export * from "./registry/buildActionsIndexContent";
 export * from "./registry/buildPlatformIndexContent";
 export * from "./registry/buildApplicationIndexContent";
 export * from "./registry/buildProductIndexContent";
+
+export * from "./runtimeRegistry/buildRegistryLeafContent";
+export * from "./runtimeRegistry/buildRegistryBranchContent";
+export * from "./runtimeRegistry/buildRuntimeRegistryContent";
+export * from "./runtimeRegistry/buildRuntimeRegistryIndexContent";

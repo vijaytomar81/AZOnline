@@ -1,9 +1,10 @@
 // src/toolingLayer/pageActions/validator/validate/runPageActionValidator.ts
 
 import {
-    PAGE_ACTIONS_ACTIONS_DIR,
     PAGE_ACTIONS_DIR,
+    PAGE_ACTIONS_ACTIONS_DIR,
     PAGE_ACTIONS_MANIFEST_DIR,
+    PAGE_ACTIONS_REGISTRY_DIR,
     PAGE_MANIFEST_DIR,
     toRepoRelative,
 } from "@utils/paths";
@@ -24,9 +25,10 @@ export function runPageActionValidator(
 
     printValidatorEnvironment([
         ["pageObjectsManifest", toRepoRelative(PAGE_MANIFEST_DIR)],
+        ["pageActionsRoot", toRepoRelative(PAGE_ACTIONS_DIR)],
         ["pageActionsDir", toRepoRelative(PAGE_ACTIONS_ACTIONS_DIR)],
-        ["pageRegistryDir", toRepoRelative(PAGE_ACTIONS_DIR)],
-        ["manifestFile", toRepoRelative(PAGE_ACTIONS_MANIFEST_DIR)],
+        ["manifestDir", toRepoRelative(PAGE_ACTIONS_MANIFEST_DIR)],
+        ["registryDir", toRepoRelative(PAGE_ACTIONS_REGISTRY_DIR)],
         ["strict", options.strict],
         ["verbose", options.verbose],
     ]);
