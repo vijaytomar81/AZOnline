@@ -2,7 +2,10 @@
 
 import { AppError } from "@utils/errors";
 import { getCasesFile } from "@dataLayer/runtime/cases/getCasesFile";
-import { JOURNEY_TYPES, MTA_TYPES } from "@configLayer/models/journeyContext.config";
+import {
+    JOURNEY_TYPES,
+    MTA_TYPES,
+} from "@configLayer/models/journeyContext.config";
 import type { CasesFile } from "@dataLayer/builder/types";
 import type {
     ExecutionItem,
@@ -15,6 +18,14 @@ import type {
 } from "../types";
 import { buildExecutionItemDataCacheKey } from "./buildExecutionItemDataCacheKey";
 import { emitResolverDebug } from "./emitResolverDebug";
+
+function buildActionLabel(item: ExecutionItem): string {
+    if (item.action === JOURNEY_TYPES.MTA && item.subType) {
+        return `action="${item.action}", subType="${item.subType}"`;
+    }
+
+    return `action="${item.action}"`;
+}
 
 function resolveMtaSubType(raw?: string) {
     const allowed = Object.values(MTA_TYPES);
@@ -48,19 +59,55 @@ function resolveJourneyContext(args: {
     | { type: typeof JOURNEY_TYPES.MTC }
     | { type: typeof JOURNEY_TYPES.MTA; subType: typeof MTA_TYPES[keyof typeof MTA_TYPES] } {
     switch (args.source.action) {
-        case "NewBusiness":
+        case JOURNEY_TYPES.NEW_BUSINESS:
             return { type: JOURNEY_TYPES.NEW_BUSINESS };
-        case "Renewal":
+        case JOURNEY_TYPES.RENEWAL:
             return { type: JOURNEY_TYPES.RENEWAL };
-        case "MTC":
+        case JOURNEY_TYPES.MTC:
             return { type: JOURNEY_TYPES.MTC };
-        case "MTA":
+        case JOURNEY_TYPES.MTA:
             return {
                 type: JOURNEY_TYPES.MTA,
                 subType: resolveMtaSubType(args.item.subType),
             };
         default:
             return { type: JOURNEY_TYPES.NEW_BUSINESS };
+    }
+}
+
+function loadCasesFile(args: {
+    scenario: ExecutionScenario;
+    item: ExecutionItem;
+    journeyContext:
+        | { type: typeof JOURNEY_TYPES.NEW_BUSINESS }
+        | { type: typeof JOURNEY_TYPES.RENEWAL }
+        | { type: typeof JOURNEY_TYPES.MTC }
+        | { type: typeof JOURNEY_TYPES.MTA; subType: typeof MTA_TYPES[keyof typeof MTA_TYPES] };
+}): CasesFile {
+    try {
+        return getCasesFile({
+            platform: args.scenario.platform,
+            application: args.scenario.application,
+            product: args.scenario.product,
+            journeyContext: args.journeyContext,
+        });
+    } catch (error) {
+        throw new AppError({
+            code: "EXECUTION_ITEM_TEST_DATA_JSON_LOAD_FAILED",
+            stage: "resolve-execution-item-data",
+            source: "getOrLoadExecutionItemCasesFile",
+            message: `Test Data JSON file could not be loaded for ${buildActionLabel(args.item)}.`,
+            context: {
+                scenarioId: args.scenario.scenarioId,
+                platform: args.scenario.platform,
+                application: args.scenario.application,
+                product: args.scenario.product,
+                action: args.item.action,
+                subType: args.item.subType ?? "",
+                testCaseRef: args.item.testCaseRef,
+                cause: error instanceof Error ? error.message : String(error),
+            },
+        });
     }
 }
 
@@ -101,10 +148,9 @@ export function getOrLoadExecutionItemCasesFile(args: {
         debugCollector: args.debugCollector,
     });
 
-    const loaded = getCasesFile({
-        platform: args.scenario.platform,
-        application: args.scenario.application,
-        product: args.scenario.product,
+    const loaded = loadCasesFile({
+        scenario: args.scenario,
+        item: args.item,
         journeyContext,
     });
 
