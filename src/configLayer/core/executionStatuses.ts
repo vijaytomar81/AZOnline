@@ -3,6 +3,7 @@
 export const EXECUTION_ITEM_STATUSES = {
     PASSED: "passed",
     FAILED: "failed",
+    ERROR: "error",
     SKIPPED: "skipped",
     NOT_EXECUTED: "not_executed",
 } as const;

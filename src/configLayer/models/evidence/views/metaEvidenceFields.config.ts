@@ -25,21 +25,23 @@ export const META_EVIDENCE_FIELDS = [
     { ...EVIDENCE_RUNTIME_FIELDS.EXECUTION_TIME, section: "Timing", toStructuredOutput: true, toReportOutput: true },
 
     // =========================
-    // Results section
+    // Results - Scenarios
     // =========================
-    { ...EVIDENCE_STATIC_FIELDS.TOTAL_ITEMS, section: "Results", toStructuredOutput: true, toReportOutput: true },
-    { ...EVIDENCE_STATIC_FIELDS.PASSED_ITEMS, section: "Results", toStructuredOutput: true, toReportOutput: true },
-    { ...EVIDENCE_STATIC_FIELDS.FAILED_ITEMS, section: "Results", toStructuredOutput: true, toReportOutput: true },
-    { ...EVIDENCE_STATIC_FIELDS.ERROR_ITEMS, section: "Results", toStructuredOutput: true, toReportOutput: true },
-    { ...EVIDENCE_STATIC_FIELDS.NOT_EXECUTED_ITEMS, section: "Results", toStructuredOutput: true, toReportOutput: true },
+    { ...EVIDENCE_STATIC_FIELDS.TOTAL_COUNT, section: "Results - Scenarios", toStructuredOutput: true, toReportOutput: true },
+    { ...EVIDENCE_STATIC_FIELDS.PASSED_COUNT, section: "Results - Scenarios", toStructuredOutput: true, toReportOutput: true },
+    { ...EVIDENCE_STATIC_FIELDS.FAILED_COUNT, section: "Results - Scenarios", toStructuredOutput: true, toReportOutput: true },
+    { ...EVIDENCE_RUNTIME_FIELDS.PASS_RATE, section: "Results - Scenarios", toStructuredOutput: true, toReportOutput: true },
 
-    // Optional extended counts
-    { ...EVIDENCE_STATIC_FIELDS.TOTAL_COUNT, section: "Results", toStructuredOutput: true, toReportOutput: true },
-    { ...EVIDENCE_STATIC_FIELDS.PASSED_COUNT, section: "Results", toStructuredOutput: true, toReportOutput: true },
-    { ...EVIDENCE_STATIC_FIELDS.FAILED_COUNT, section: "Results", toStructuredOutput: true, toReportOutput: true },
-    { ...EVIDENCE_STATIC_FIELDS.ERROR_COUNT, section: "Results", toStructuredOutput: true, toReportOutput: true },
-    { ...EVIDENCE_STATIC_FIELDS.NOT_EXECUTED_COUNT, section: "Results", toStructuredOutput: true, toReportOutput: true },
-    { ...EVIDENCE_RUNTIME_FIELDS.PASS_RATE, section: "Results", toStructuredOutput: true, toReportOutput: true },
+    // =========================
+    // Results - Items
+    // =========================
+    { ...EVIDENCE_STATIC_FIELDS.TOTAL_ITEMS, section: "Results - Items", toStructuredOutput: true, toReportOutput: true },
+    { ...EVIDENCE_STATIC_FIELDS.PASSED_ITEMS, section: "Results - Items", toStructuredOutput: true, toReportOutput: true },
+    { ...EVIDENCE_STATIC_FIELDS.FAILED_ITEMS, section: "Results - Items", toStructuredOutput: true, toReportOutput: true },
+    { ...EVIDENCE_STATIC_FIELDS.ERROR_ITEMS, section: "Results - Items", toStructuredOutput: true, toReportOutput: true },
+    { ...EVIDENCE_STATIC_FIELDS.NOT_EXECUTED_ITEMS, section: "Results - Items", toStructuredOutput: true, toReportOutput: true },
+    { ...EVIDENCE_STATIC_FIELDS.ERROR_COUNT, section: "Results - Items", toStructuredOutput: true, toReportOutput: true },
+    { ...EVIDENCE_STATIC_FIELDS.NOT_EXECUTED_COUNT, section: "Results - Items", toStructuredOutput: true, toReportOutput: true },
 
     // =========================
     // Runtime section

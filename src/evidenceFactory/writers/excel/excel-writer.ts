@@ -57,6 +57,7 @@ export class ExcelWriter {
       const statusItems = items.filter(
         (item) => String(item.status).toLowerCase() === status,
       );
+
       if (statusItems.length > 0) {
         this.addStatusSheet(workbook, title, status, statusItems);
       }
@@ -101,6 +102,7 @@ export class ExcelWriter {
         fields,
         EVIDENCE_OUTPUT_FORMAT.EXCEL,
       );
+
       sheet.addRow(headers.map((header) => mapped[header] ?? ''));
     }
 
@@ -120,6 +122,7 @@ export class ExcelWriter {
       if (!this.hasDisplayableSummaryValue(value)) continue;
 
       const section = field.section ?? 'Other Info';
+
       if (!sectionMap.has(section)) {
         sectionMap.set(section, []);
       }
@@ -131,15 +134,7 @@ export class ExcelWriter {
       });
     }
 
-    const orderedSections: EvidenceReportSection[] = [
-      'Run',
-      'Runtime',
-      'Browser',
-      'Results',
-      'Timing',
-      'System Metadata',
-      'Other Info',
-    ];
+    const orderedSections = this.buildOrderedSections(metaFields);
 
     return orderedSections
       .filter((section) => (sectionMap.get(section)?.length ?? 0) > 0)
@@ -147,6 +142,24 @@ export class ExcelWriter {
         title: section,
         rows: sectionMap.get(section)!,
       }));
+  }
+
+  private buildOrderedSections(
+    metaFields: readonly MetaEvidenceViewField[],
+  ): EvidenceReportSection[] {
+    const sections: EvidenceReportSection[] = [];
+
+    for (const field of metaFields) {
+      if (field.toReportOutput === false) continue;
+
+      const section = field.section ?? 'Other Info';
+
+      if (!sections.includes(section)) {
+        sections.push(section);
+      }
+    }
+
+    return sections;
   }
 
   private hasDisplayableSummaryValue(value: unknown): boolean {

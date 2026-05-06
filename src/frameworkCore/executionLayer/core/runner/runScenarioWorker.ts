@@ -21,7 +21,6 @@ export async function runScenarioWorker(args: {
         logScope: getScenarioScope(args.scenario),
         overrideItemData: args.runArgs.resolveOverrideItemData?.(args.scenario),
 
-        // ✅ pass EvidenceFactory context
         evidenceFactory: args.runArgs.evidenceFactory,
         runId: args.runArgs.runId,
         suiteName: args.runArgs.suiteName,
@@ -37,6 +36,7 @@ export async function runScenarioWorker(args: {
             duration: formatDuration(startedAtMs),
             verbose: args.runArgs.verbose,
         }),
-        browser: (result as any).browser,
+        itemResults: result.itemResults,
+        browser: (result as { browser?: unknown }).browser,
     };
 }
