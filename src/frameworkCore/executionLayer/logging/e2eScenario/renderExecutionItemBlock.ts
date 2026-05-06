@@ -1,9 +1,22 @@
 // src/frameworkCore/executionLayer/logging/e2eScenario/renderExecutionItemBlock.ts
 
 import type { ExecutionItemResult } from "@frameworkCore/executionLayer/contracts";
-import { renderFields, safeText } from "@frameworkCore/executionLayer/logging/shared";
+import {
+    renderFields,
+    safeText,
+} from "@frameworkCore/executionLayer/logging/shared";
 import { buildExecutionItemFields } from "./buildExecutionItemFields";
 import { getTreeTokens } from "./getTreeTokens";
+
+function buildItemTitle(item: ExecutionItemResult): string {
+    const subType = safeText(item.details?.subType ?? "");
+
+    if (item.action === "MTA" && subType) {
+        return `${item.action} - ${subType}`;
+    }
+
+    return item.action;
+}
 
 export function renderExecutionItemBlock(args: {
     item: ExecutionItemResult;
@@ -14,10 +27,11 @@ export function renderExecutionItemBlock(args: {
 }): string[] {
     const { branch, indent } = getTreeTokens(args.index, args.total);
     const testCaseRef = safeText(args.item.details?.testCaseRef ?? "");
+    const itemTitle = buildItemTitle(args.item);
     const lines: string[] = [];
 
     lines.push(
-        `${branch} [ITEM ${args.item.itemNo}] ${args.item.action} | TestCaseRef=${testCaseRef}`
+        `${branch} [ITEM ${args.item.itemNo}] ${itemTitle} | TestCaseRef=${testCaseRef}`
     );
 
     renderFields(

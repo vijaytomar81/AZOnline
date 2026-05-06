@@ -13,8 +13,15 @@ import type {
 } from "../types";
 import { findExecutionItemCase } from "./findExecutionItemCase";
 import { findExecutionItemDataSource } from "./findExecutionItemDataSource";
-import { emitResolverDebug } from "../utils/emitResolverDebug";
 import { getOrLoadExecutionItemCasesFile } from "../utils/getOrLoadExecutionItemCasesFile";
+
+function buildActionLabel(item: ExecutionItem): string {
+    if (item.action === "MTA" && item.subType) {
+        return `action="${item.action}", subType="${item.subType}"`;
+    }
+
+    return `action="${item.action}"`;
+}
 
 export function resolveExecutionItemData(args: {
     registry: ExecutionItemDataRegistry;
@@ -24,6 +31,7 @@ export function resolveExecutionItemData(args: {
     debugCollector?: ExecutionItemDataDebugCollector;
 }): ResolvedExecutionItemData {
     const testCaseRef = normalizeSpaces(args.item.testCaseRef);
+    const actionLabel = buildActionLabel(args.item);
 
     const source = findExecutionItemDataSource({
         registry: args.registry,
@@ -35,7 +43,7 @@ export function resolveExecutionItemData(args: {
             code: "EXECUTION_ITEM_DATA_SOURCE_NOT_FOUND",
             stage: "resolve-execution-item-data",
             source: "resolveExecutionItemData",
-            message: `No data source found for action="${args.item.action}" subType="${args.item.subType ?? ""}".`,
+            message: `Test Data JSON not found for ${actionLabel}.`,
             context: {
                 action: args.item.action,
                 subType: args.item.subType ?? "",
@@ -63,7 +71,7 @@ export function resolveExecutionItemData(args: {
             code: "EXECUTION_ITEM_TEST_CASE_NOT_FOUND",
             stage: "resolve-execution-item-data",
             source: "resolveExecutionItemData",
-            message: `TestCaseRef "${testCaseRef}" not found for action="${args.item.action}".`,
+            message: `TestCaseRef="${testCaseRef}" not found in Test Data JSON for ${actionLabel}.`,
             context: {
                 testCaseRef,
                 action: args.item.action,
