@@ -31,6 +31,15 @@ export type ParseScenariosOptions = {
     product?: Product;
 };
 
+function countValidationErrors(
+    validation: ScenarioValidationResult[]
+): number {
+    return validation.reduce(
+        (sum, item) => sum + item.errors.length,
+        0
+    );
+}
+
 export function parseScenarios(
     rows: RawExecutionScenarioRow[],
     opts: ParseScenariosOptions = {}
@@ -47,7 +56,7 @@ export function parseScenarios(
                 templateValidation
             ),
             context: {
-                errorCount: templateValidation.length,
+                errorCount: countValidationErrors(templateValidation),
             },
         });
     }
@@ -62,6 +71,7 @@ export function parseScenarios(
         normalized,
         !!opts.includeDisabled
     );
+
     const validation = validateScenarioList(scenarios);
 
     if (opts.failOnValidationErrors && hasValidationErrors(validation)) {
@@ -74,7 +84,7 @@ export function parseScenarios(
                 validation
             ),
             context: {
-                errorCount: validation.length,
+                errorCount: countValidationErrors(validation),
             },
         });
     }

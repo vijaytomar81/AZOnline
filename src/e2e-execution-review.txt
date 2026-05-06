@@ -1,0 +1,321 @@
+==================== src/frameworkCore/executionLayer/mode/e2e/scenario/normalize/createExecutionItemFromRow.ts ====================
+// src/frameworkCore/executionLayer/mode/e2e/scenario/normalize/createExecutionItemFromRow.ts
+
+import type { ExecutionItem } from "@frameworkCore/executionLayer/contracts";
+import type { RawExecutionScenarioRow } from "../types";
+import { getString } from "./shared";
+
+function getItemField(
+    row: RawExecutionScenarioRow,
+    itemNo: number,
+    suffix: string
+): string {
+    return getString(row[`Item${itemNo}${suffix}`]);
+}
+
+export function createExecutionItemFromRow(
+    row: RawExecutionScenarioRow,
+    itemNo: number
+): ExecutionItem {
+    return {
+        itemNo,
+        action: getItemField(row, itemNo, "Action"),
+        subType: getItemField(row, itemNo, "SubType") || undefined,
+        portal: getItemField(row, itemNo, "Portal") || undefined,
+        testCaseRef: getItemField(row, itemNo, "TestCaseRef"),
+    };
+}
+
+==================== src/frameworkCore/executionLayer/mode/e2e/scenario/normalize/normalizeScenarioRow.ts ====================
+// src/frameworkCore/executionLayer/mode/e2e/scenario/normalize/normalizeScenarioRow.ts
+
+import { AppError } from "@utils/errors";
+import { normalizePlatform } from "@configLayer/normalizers/normalizePlatform";
+import { normalizeApplication } from "@configLayer/normalizers/normalizeApplication";
+import { normalizeProduct } from "@configLayer/normalizers/normalizeProduct";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Application } from "@configLayer/models/application.config";
+import type { Product } from "@configLayer/models/product.config";
+import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
+import type { RawExecutionScenarioRow } from "../types";
+import { createExecutionItemsFromRow } from "./createExecutionItemsFromRow";
+import { getTotalItems } from "./getTotalItems";
+import { normalizeExecute } from "./normalizeExecute";
+import { normalizeJourneyStartWith } from "./normalizeJourneyStartWith";
+import { getString } from "./shared";
+
+function resolvePlatform(
+    raw: unknown,
+    fallback?: Platform
+): Platform {
+    const resolved = normalizePlatform(String(raw ?? "")) ?? fallback;
+
+    if (resolved) {
+        return resolved;
+    }
+
+    throw new AppError({
+        code: "E2E_PLATFORM_MISSING",
+        stage: "scenario-normalize",
+        source: "normalizeScenarioRow",
+        message: 'Provide "Platform" column or --platform.',
+    });
+}
+
+function resolveApplication(
+    raw: unknown,
+    fallback?: Application
+): Application {
+    const resolved = normalizeApplication(String(raw ?? "")) ?? fallback;
+
+    if (resolved) {
+        return resolved;
+    }
+
+    throw new AppError({
+        code: "E2E_APPLICATION_MISSING",
+        stage: "scenario-normalize",
+        source: "normalizeScenarioRow",
+        message: 'Provide "Application" column or --application.',
+    });
+}
+
+function resolveProduct(
+    raw: unknown,
+    fallback?: Product
+): Product {
+    const resolved = normalizeProduct(String(raw ?? "")) ?? fallback;
+
+    if (resolved) {
+        return resolved;
+    }
+
+    throw new AppError({
+        code: "E2E_PRODUCT_MISSING",
+        stage: "scenario-normalize",
+        source: "normalizeScenarioRow",
+        message: 'Provide "Product" column or --product.',
+    });
+}
+
+export function normalizeScenarioRow(
+    row: RawExecutionScenarioRow,
+    opts: {
+        platform?: Platform;
+        application?: Application;
+        product?: Product;
+    } = {}
+): ExecutionScenario {
+    const totalItems = getTotalItems(row.TotalItems);
+    const policyNumber = getString(row.PolicyNumber) || undefined;
+
+    return {
+        scenarioId: getString(row.ScenarioId),
+        scenarioName: getString(row.ScenarioName),
+        platform: resolvePlatform(row.Platform, opts.platform),
+        application: resolveApplication(row.Application, opts.application),
+        product: resolveProduct(row.Product, opts.product),
+        journeyStartWith: normalizeJourneyStartWith({
+            value: row.JourneyStartWith,
+            policyNumber,
+        }),
+        policyNumber,
+        loginId: getString(row.LoginId) || undefined,
+        password: getString(row.Password) || undefined,
+        description: getString(row.Description),
+        execute: normalizeExecute(row.Execute),
+        totalItems,
+        items: createExecutionItemsFromRow(row, totalItems),
+    };
+}
+
+==================== src/frameworkCore/executionLayer/mode/e2e/scenario/parse/parseScenarios.ts ====================
+// src/frameworkCore/executionLayer/mode/e2e/scenario/parse/parseScenarios.ts
+
+import { AppError } from "@utils/errors";
+import type { Platform } from "@configLayer/models/platform.config";
+import type { Application } from "@configLayer/models/application.config";
+import type { Product } from "@configLayer/models/product.config";
+import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
+import type {
+    RawExecutionScenarioRow,
+    ScenarioValidationResult,
+} from "../types";
+import { normalizeScenarioList } from "../normalize";
+import { validateScenarioList } from "../validate";
+import { validateScenarioTemplates } from "../template";
+import { filterDisabledScenarios } from "./filterDisabledScenarios";
+import { formatValidationErrors } from "./formatValidationErrors";
+import { hasValidationErrors } from "./hasValidationErrors";
+
+export type ParseScenariosResult = {
+    scenarios: ExecutionScenario[];
+    templateValidation: ScenarioValidationResult[];
+    validation: ScenarioValidationResult[];
+};
+
+export type ParseScenariosOptions = {
+    includeDisabled?: boolean;
+    failOnTemplateErrors?: boolean;
+    failOnValidationErrors?: boolean;
+    platform?: Platform;
+    application?: Application;
+    product?: Product;
+};
+
+export function parseScenarios(
+    rows: RawExecutionScenarioRow[],
+    opts: ParseScenariosOptions = {}
+): ParseScenariosResult {
+    const templateValidation = validateScenarioTemplates(rows);
+
+    if (opts.failOnTemplateErrors && hasValidationErrors(templateValidation)) {
+        throw new AppError({
+            code: "SCENARIO_TEMPLATE_VALIDATION_FAILED",
+            stage: "scenario-parsing",
+            source: "parseScenarios",
+            message: formatValidationErrors(
+                "E2E scenario template validation failed",
+                templateValidation
+            ),
+            context: {
+                errorCount: templateValidation.length,
+            },
+        });
+    }
+
+    const normalized = normalizeScenarioList(rows, {
+        platform: opts.platform,
+        application: opts.application,
+        product: opts.product,
+    });
+
+    const scenarios = filterDisabledScenarios(
+        normalized,
+        !!opts.includeDisabled
+    );
+    const validation = validateScenarioList(scenarios);
+
+    if (opts.failOnValidationErrors && hasValidationErrors(validation)) {
+        throw new AppError({
+            code: "SCENARIO_VALIDATION_FAILED",
+            stage: "scenario-parsing",
+            source: "parseScenarios",
+            message: formatValidationErrors(
+                "Scenario validation failed",
+                validation
+            ),
+            context: {
+                errorCount: validation.length,
+            },
+        });
+    }
+
+    return {
+        scenarios,
+        templateValidation,
+        validation,
+    };
+}
+
+==================== src/frameworkCore/executionLayer/mode/e2e/scenario/validate/validateExecutionItem.ts ====================
+// src/frameworkCore/executionLayer/mode/e2e/scenario/validate/validateExecutionItem.ts
+
+import type { ExecutionItem } from "@frameworkCore/executionLayer/contracts";
+import { normalizeValidationKey } from "./shared";
+import { validateExecutionItemPortal } from "./validateExecutionItemPortal";
+
+export function validateExecutionItem(
+    item: ExecutionItem
+): string[] {
+    const errors: string[] = [];
+
+    if (!item.action) {
+        errors.push(`Item${item.itemNo}: Missing Action`);
+    }
+
+    if (!item.testCaseRef) {
+        errors.push(`Item${item.itemNo}: Missing TestCaseRef`);
+    }
+
+    errors.push(...validateExecutionItemPortal(item));
+
+    if (normalizeValidationKey(item.action) !== "newbusiness" && !item.subType) {
+        errors.push(`Item${item.itemNo}: Missing SubType`);
+    }
+
+    return errors;
+}
+
+==================== src/frameworkCore/executionLayer/mode/e2e/scenario/validate/validateScenarioList.ts ====================
+// src/frameworkCore/executionLayer/mode/e2e/scenario/validate/validateScenarioList.ts
+
+import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
+import type { ScenarioValidationResult } from "../types";
+import { validateSingleScenario } from "./validateSingleScenario";
+
+export function validateScenarioList(
+    scenarios: ExecutionScenario[]
+): ScenarioValidationResult[] {
+    return scenarios.map((scenario) => ({
+        scenarioId: scenario.scenarioId || "(missing)",
+        errors: validateSingleScenario(scenario),
+    }));
+}
+
+==================== src/frameworkCore/executionLayer/mode/e2e/scenario/validate/validateSingleScenario.ts ====================
+// src/frameworkCore/executionLayer/mode/e2e/scenario/validate/validateSingleScenario.ts
+
+import type { ExecutionScenario } from "@frameworkCore/executionLayer/contracts";
+import { validateExecutionItem } from "./validateExecutionItem";
+import { validateExecutionItemOrder } from "./validateExecutionItemOrder";
+import { validateScenarioIdentity } from "./validateScenarioIdentity";
+
+export function validateSingleScenario(
+    scenario: ExecutionScenario
+): string[] {
+    const errors: string[] = [];
+
+    errors.push(...validateScenarioIdentity(scenario));
+
+    if (!scenario.items.length) {
+        errors.push("At least one execution item is required");
+        return errors;
+    }
+
+    errors.push(...validateExecutionItemOrder(scenario.items));
+    scenario.items.forEach((item) => {
+        errors.push(...validateExecutionItem(item));
+    });
+
+    return errors;
+}
+
+==================== src/frameworkCore/executionLayer/mode/e2e/schema/e2eHeaders.ts ====================
+// src/frameworkCore/executionLayer/mode/e2e/schema/e2eHeaders.ts
+
+export const E2E_HEADERS = {
+    SCENARIO_ID: "ScenarioId",
+    SCENARIO_NAME: "ScenarioName",
+
+    PLATFORM: "Platform",
+    APPLICATION: "Application",
+    PRODUCT: "Product",
+    JOURNEY_START_WITH: "JourneyStartWith",
+
+    POLICY_NUMBER: "PolicyNumber",
+    LOGIN_ID: "LoginId",
+    PASSWORD: "Password",
+    DESCRIPTION: "Description",
+    EXECUTE: "Execute",
+    TOTAL_ITEMS: "TotalItems",
+
+    item(itemNo: number) {
+        return {
+            ACTION: `Item${itemNo}Action`,
+            SUB_TYPE: `Item${itemNo}SubType`,
+            PORTAL: `Item${itemNo}Portal`,
+            TEST_CASE_REF: `Item${itemNo}TestCaseRef`,
+        };
+    },
+} as const;

@@ -19,8 +19,9 @@ export function checkRuntimeIndexExports(): ValidationCheckResult {
     );
 
     const expectedLines = [
-        'export * from "./resolveNewBusinessJourney";',
-        'export * from "./runNewBusiness";',
+        'export { buildJourneyContextFromExecutionItem } from "./buildJourneyContextFromExecutionItem";',
+        'export { resolveBusinessJourney } from "./resolveBusinessJourney";',
+        'export { runBusinessJourney } from "./runBusinessJourney";',
     ];
 
     const issues: ValidationNode[] = [];

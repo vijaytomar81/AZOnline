@@ -6,14 +6,17 @@ import {
     BUSINESS_JOURNEYS_DIR,
     toRepoRelative,
 } from "@utils/paths";
-import type { ValidationCheckResult, ValidationNode } from "../../pipeline/types";
+import type {
+    ValidationCheckResult,
+    ValidationNode,
+} from "../../pipeline/types";
 
 export function checkRuntimeFilesExist(): ValidationCheckResult {
     const files = [
-        path.join(BUSINESS_JOURNEYS_DIR, "runtime", "resolveNewBusinessJourney.ts"),
-        path.join(BUSINESS_JOURNEYS_DIR, "runtime", "runNewBusiness.ts"),
+        path.join(BUSINESS_JOURNEYS_DIR, "runtime", "buildJourneyContextFromExecutionItem.ts"),
+        path.join(BUSINESS_JOURNEYS_DIR, "runtime", "resolveBusinessJourney.ts"),
+        path.join(BUSINESS_JOURNEYS_DIR, "runtime", "runBusinessJourney.ts"),
         path.join(BUSINESS_JOURNEYS_DIR, "runtime", "index.ts"),
-        path.join(BUSINESS_JOURNEYS_DIR, "index.ts"),
     ];
 
     const issues: ValidationNode[] = files
@@ -27,7 +30,10 @@ export function checkRuntimeFilesExist(): ValidationCheckResult {
     return {
         id: "checkRuntimeFilesExist",
         severity: issues.length === 0 ? "success" : "error",
-        summary: issues.length === 0 ? "no issues" : `${issues.length} missing file(s)`,
+        summary:
+            issues.length === 0
+                ? "no issues"
+                : `${issues.length} missing file(s)`,
         nodes: issues,
     };
 }

@@ -1,16 +1,23 @@
 // src/frameworkCore/executionLayer/mode/e2e/scenario/parse/formatValidationErrors.ts
 
 import type { ScenarioValidationResult } from "../types";
+import { getExecutionItemValidationHelp } from "../validate/validateExecutionItem";
 
 export function formatValidationErrors(
     title: string,
-    items: ScenarioValidationResult[]
+    results: ScenarioValidationResult[]
 ): string {
-    const lines = items
-        .filter((item) => item.errors.length > 0)
-        .flatMap((item) =>
-            item.errors.map((error) => `[${item.scenarioId}] ${error}`)
-        );
+    const lines = results.flatMap((result) =>
+        result.errors.map((error) => `[${result.scenarioId}] ${error}`)
+    );
 
-    return `${title}\n${lines.join("\n")}`;
+    const help = getExecutionItemValidationHelp();
+
+    return [
+        title,
+        ...lines,
+        "",
+        "Allowed values:",
+        ...help.map((line) => `- ${line}`),
+    ].join("\n");
 }

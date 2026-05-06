@@ -12,9 +12,10 @@ export type JourneyType =
 
 export const MTA_TYPES = {
     CHANGE_ADDRESS: "ChangeAddress",
-    CHANGE_VEHICLE: "ChangeVehicle",
+    CHANGE_VEHICLE: "ReplaceCar",
     ADD_DRIVER: "AddDriver",
     REMOVE_DRIVER: "RemoveDriver",
+    EDIT_DRIVER: "EditDriver",
 } as const;
 
 export type MtaType =
