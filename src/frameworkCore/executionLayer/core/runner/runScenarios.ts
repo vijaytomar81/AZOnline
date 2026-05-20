@@ -21,7 +21,7 @@ import { countExecutionStatuses } from "./countExecutionStatuses";
 import { expandScenarios } from "./expandScenarios";
 import { runScenarioBatch } from "./runScenarioBatch";
 import { runScenarioWorker } from "./runScenarioWorker";
-import type { RunScenariosArgs } from "./types";
+import type { RunOutput, RunScenariosArgs } from "./types";
 import { EvidenceFactory } from "@evidenceFactory";
 
 function buildSuiteName(args: RunScenariosArgs): string {
@@ -32,6 +32,22 @@ function buildSuiteName(args: RunScenariosArgs): string {
     return [args.platform, args.application, args.product]
         .filter(Boolean)
         .join("-");
+}
+
+function getItemResults(outputs: RunOutput[]) {
+    return outputs.flatMap((output) => output.itemResults);
+}
+
+function countItemsByStatus(outputs: RunOutput[]) {
+    const itemResults = getItemResults(outputs);
+
+    return {
+        totalItems: itemResults.length,
+        passedItems: itemResults.filter((item) => item.status === "passed").length,
+        failedItems: itemResults.filter((item) => item.status === "failed").length,
+        errorItems: itemResults.filter((item) => item.status === "error").length,
+        notExecutedItems: itemResults.filter((item) => item.status === "not_executed").length,
+    };
 }
 
 export async function runScenarios(
@@ -98,14 +114,17 @@ export async function runScenarios(
     });
 
     const { passed, failed } = countExecutionStatuses(outputs);
+    const itemCounts = countItemsByStatus(outputs);
 
     const totalTime = formatDuration(startedAtMs);
     const finishedAt = new Date().toISOString();
-    const notExecutedCount = runs.length - (passed + failed);
-    const errorCount = 0;
+
     const totalCount = runs.length;
     const passedCount = passed;
     const failedCount = failed;
+    const errorCount = 0;
+    const notExecutedCount = runs.length - (passed + failed);
+
     const passRate =
         totalCount > 0
             ? `${((passedCount / totalCount) * 100).toFixed(2)}%`
@@ -146,10 +165,11 @@ export async function runScenarios(
             finishedAt,
             totalTime,
 
-            totalItems: runs.length,
-            passedItems: passedCount,
-            failedItems: failedCount,
-            notExecutedItems: notExecutedCount,
+            totalItems: itemCounts.totalItems,
+            passedItems: itemCounts.passedItems,
+            failedItems: itemCounts.failedItems,
+            errorItems: itemCounts.errorItems,
+            notExecutedItems: itemCounts.notExecutedItems,
 
             totalCount,
             passedCount,

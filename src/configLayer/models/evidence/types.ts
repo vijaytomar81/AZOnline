@@ -10,6 +10,8 @@ export type EvidenceReportSection =
     | "Run"
     | "Timing"
     | "Results"
+    | "Results - Scenarios"
+    | "Results - Items"
     | "Runtime"
     | "Browser"
     | "System Metadata"
